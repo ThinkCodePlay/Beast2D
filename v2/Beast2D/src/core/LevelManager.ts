@@ -28,7 +28,7 @@ export class LevelManager {
 
     // Stop the current level if one is active
     if (this.currentLevel) {
-      this.currentLevel.stop();
+      this.currentLevel.destroy();
     }
 
     // Start the new level

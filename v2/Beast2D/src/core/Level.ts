@@ -23,7 +23,7 @@ export abstract class Level {
   }
 
   // Clean up the level when switching
-  public stop() {
+  public destroy() {
     // Destroy all objects (this will clean up all components and graphics)
     this.objects.forEach((obj) => {
       obj.destroy();

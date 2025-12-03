@@ -1,6 +1,6 @@
 # TODO:
 
-[ ] make global variable such as canvas height and width and root node (stage)
+[x] make global variable such as canvas height and width and root node (stage)
 [x] make GameObject Generic
 [x] make box object implement gameobject
 [x] discuss using component based architecture

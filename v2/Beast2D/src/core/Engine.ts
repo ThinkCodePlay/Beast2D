@@ -2,6 +2,7 @@ import { Application } from "pixi.js";
 import { LevelManager } from "./LevelManager";
 import { Level1 } from "../game/Level1";
 import { Level2 } from "../game/Level2";
+import { Globals } from "./Globals";
 
 export class Engine {
   app: Application;
@@ -20,6 +21,14 @@ export class Engine {
 
   async mount(domElement: HTMLElement) {
     await this.ready;
+    
+    // Initialize global variables
+    Globals.init(
+      this.app.renderer.width,
+      this.app.renderer.height,
+      this.app.stage
+    );
+    
     domElement.appendChild(this.app.canvas);
   }
 
@@ -32,7 +41,6 @@ export class Engine {
   }
 
   bootstrap(container: HTMLElement) {
-    // Initialize and mount the engine to the container
     (async () => {
       await this.mount(container);
 
@@ -49,18 +57,6 @@ export class Engine {
         console.log("Switching to Level 2...");
         levelManager.loadLevel("level2");
       }, 5000);
-
-      // Pause the engine after 5 seconds
-      setTimeout(() => {
-        console.log("Pausing engine after 5 seconds...");
-        this.pause();
-      }, 10000);
-
-      // Resume the engine after 10 seconds (5 seconds after pause)
-      setTimeout(() => {
-        console.log("Resuming engine after additional 5 seconds...");
-        this.resume();
-      }, 15000);
     })();
   }
 }
