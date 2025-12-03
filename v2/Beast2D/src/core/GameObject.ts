@@ -10,10 +10,10 @@ export class GameObject {
 
   constructor(
     container: Container,
-    x: number,
-    y: number,
-    width: number,
-    height: number
+    x: number = 0,
+    y: number = 0,
+    width: number = 0,
+    height: number = 0
   ) {
     this.container = container;
     this.x = x;

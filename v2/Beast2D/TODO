@@ -1,0 +1,7 @@
+# TODO:
+
+[ ] make global variable such as canvas height and width and root node (stage)
+[ ] make GameObject Generic
+[ ] make box object implement gameobject
+[ ] discuss using component based architecture
+[ ] create level manager
