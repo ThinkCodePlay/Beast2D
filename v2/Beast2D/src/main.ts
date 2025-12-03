@@ -32,5 +32,16 @@ appRoot.appendChild(container);
     color: 0x00ff00,
     strokeWidth: 2,
   });
+
   
+  // Add a ticker to rotate the box
+  engine.app.ticker.add((ticker) => {
+
+      box.transform?.setRotation(box.transform.rotation + 0.01);
+      
+      // Update the box to apply the rotation
+      box.update(ticker.deltaTime);
+    
+  });
+
 })();

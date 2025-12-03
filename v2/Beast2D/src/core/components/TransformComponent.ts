@@ -18,6 +18,10 @@ export class TransformComponent extends Component {
     this.y = y;
   }
 
+  setRotation(angle: number): void {
+    this.rotation = angle;
+  }
+
   setScale(x: number, y?: number): void {
     this.scaleX = x;
     this.scaleY = y ?? x;
@@ -26,9 +30,5 @@ export class TransformComponent extends Component {
   translate(dx: number, dy: number): void {
     this.x += dx;
     this.y += dy;
-  }
-
-  rotate(angle: number): void {
-    this.rotation += angle;
   }
 }

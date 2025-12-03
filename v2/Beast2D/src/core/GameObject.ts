@@ -1,5 +1,6 @@
 import { Container } from "pixi.js";
 import { Component } from "./components/Component";
+import { TransformComponent } from "./components/TransformComponent";
 
 export class GameObject {
   uuid: string = crypto.randomUUID();
@@ -92,5 +93,14 @@ export class GameObject {
       component.destroy();
     }
     this.components.clear();
+  }
+
+  // Direct access to TransformComponent (if exists)
+  get transform(): TransformComponent | null {
+    if (!this.hasComponent(TransformComponent)) {
+      console.warn("TransformComponent not found on GameObject " + this.uuid);
+      return null;
+    }
+    return this.getComponent(TransformComponent);
   }
 }
