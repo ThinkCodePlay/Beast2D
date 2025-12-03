@@ -3,11 +3,6 @@ import { Component } from "./components/Component";
 
 export class GameObject {
   uuid: string = crypto.randomUUID();
-  x: number = 0;
-  y: number = 0;
-  rotation: number = 0;
-  scaleX: number = 1;
-  scaleY: number = 1;
   
   parent: GameObject | null = null;
   children: GameObject[] = [];
@@ -15,10 +10,8 @@ export class GameObject {
   container: Container;
   private components: Map<string, Component> = new Map();
 
-  constructor(container: Container, x: number = 0, y: number = 0) {
+  constructor(container: Container) {
     this.container = container;
-    this.x = x;
-    this.y = y;
   }
 
   // Scene Graph Methods
@@ -39,14 +32,8 @@ export class GameObject {
   }
 
   getWorldPosition(): { x: number; y: number } {
-    if (!this.parent) {
-      return { x: this.x, y: this.y };
-    }
-    const parentPos = this.parent.getWorldPosition();
-    return {
-      x: parentPos.x + this.x,
-      y: parentPos.y + this.y,
-    };
+    // This will be handled by TransformComponent
+    return { x: 0, y: 0 };
   }
 
   // Component Methods
