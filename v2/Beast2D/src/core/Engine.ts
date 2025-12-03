@@ -19,4 +19,12 @@ export class Engine {
     await this.ready;
     domElement.appendChild(this.app.canvas);
   }
+
+  pause() {
+    this.app.ticker.stop();
+  }
+
+  resume() {
+    this.app.ticker.start();
+  }
 }

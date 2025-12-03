@@ -1,7 +1,7 @@
 import { Engine } from './core/Engine';
-import { Box } from './core/prefabs/Box';
-import { Circle } from './core/prefabs/Circle';
-import { TransformComponent } from './core/components/TransformComponent';
+import { LevelManager } from './core/LevelManager';
+import { Level1 } from './game/Level1';
+import { Level2 } from './game/Level2';
 import './style.css';
 
 const appRoot = document.getElementById('app')!;
@@ -14,34 +14,19 @@ appRoot.appendChild(container);
 (async () => {
   const engine = new Engine();
   await engine.mount(container);
-  const stage = engine.app.stage; // stage is the root container for all display objects
   
-  const SIZE = 100;
-  const X = (engine.app.renderer.width - SIZE) / 2;
-  const Y = (engine.app.renderer.height - SIZE) / 2;
+  // Create level manager and register levels
+  const levelManager = new LevelManager(engine);
+  levelManager.registerLevel('level1', new Level1(engine));
+  levelManager.registerLevel('level2', new Level2(engine));
   
-  // Create a box - components are added automatically
-  const box = new Box(stage, X, Y, SIZE, SIZE, {
-    color: 0xff6600,
-    strokeColor: 0x333333,
-    strokeWidth: 3,
-  });
+  // Start with level 1
+  levelManager.loadLevel('level1');
   
-  // Create a circle - components are added automatically
-  const circle = new Circle(stage, 50, 50, 40, {
-    color: 0x00ff00,
-    strokeWidth: 2,
-  });
-
-  
-  // Add a ticker to rotate the box
-  engine.app.ticker.add((ticker) => {
-
-      box.transform?.setRotation(box.transform.rotation + 0.01);
-      
-      // Update the box to apply the rotation
-      box.update(ticker.deltaTime);
-    
-  });
+  // Switch to level 2 after 5 seconds (for demo)
+  setTimeout(() => {
+    console.log('Switching to Level 2...');
+    levelManager.loadLevel('level2');
+  }, 5000);
 
 })();
