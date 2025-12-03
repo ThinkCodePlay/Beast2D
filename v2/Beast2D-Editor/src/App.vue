@@ -15,35 +15,57 @@ onMounted(async () => {
   }
 })
 
-function pause() {
+const pause = () => {
   if (!engine) return
   engine.pause()
   isPaused.value = true
 }
 
-function resume() {
+const resume = () => {
   if (!engine) return
   engine.resume()
   isPaused.value = false
 }
+
+const togglePlay = () => {
+  if (isPaused.value) {
+    resume()
+  } else {
+    pause()
+  }
+}
 </script>
 
 <template>
-  <header>
-    <h1>Beast2D Editor</h1>
-    <div class="controls">
-      <button @click="pause" :disabled="isPaused">Pause</button>
-      <button @click="resume" :disabled="!isPaused">Resume</button>
+  <div class="app-container">
+    <div class="left-panel">
+      <h2>Hierarchy</h2>
+      <!-- ...existing code... -->  
     </div>
-  </header>
-  <main>
-    <div class="runner-container">
-      <div ref="containerRef" class="viewport" />
+    <div class="center-panel">
+      <h2>Game Runner</h2>
+      <button @click="togglePlay">{{ isPaused ? 'Play' : 'Pause' }}</button>
+      <div class="runner-container">
+        <div ref="containerRef" class="viewport" />
+      </div>
     </div>
-  </main>
+    <div class="right-panel">
+      <h2>Inspector</h2>
+      <!-- ...existing code... -->
+    </div>
+  </div>
 </template>
 
+
 <style scoped>
+.app-container {
+  display: flex;
+}
+.left-panel, .center-panel, .right-panel {
+  flex: 1;
+  padding: 10px;
+}
+
 header {
   display: flex;
   align-items: center;

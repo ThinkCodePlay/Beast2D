@@ -7,6 +7,7 @@ import { Globals } from "./Globals";
 export class Engine {
   app: Application;
   private ready: Promise<void>;
+  levelManager?: LevelManager;
 
   constructor() {
     this.app = new Application();
@@ -45,17 +46,17 @@ export class Engine {
       await this.mount(container);
 
       // Create level manager and register levels
-      const levelManager = new LevelManager(this);
-      levelManager.registerLevel("level1", new Level1(this));
-      levelManager.registerLevel("level2", new Level2(this));
+      this.levelManager = new LevelManager(this);
+      this.levelManager.registerLevel("level1", new Level1(this));
+      this.levelManager.registerLevel("level2", new Level2(this));
 
       // Start with level 1
-      levelManager.loadLevel("level1");
+      this.levelManager.loadLevel("level1");
 
       // Switch to level 2 after 5 seconds (for demo)
       setTimeout(() => {
         console.log("Switching to Level 2...");
-        levelManager.loadLevel("level2");
+        this.levelManager?.loadLevel("level2");
       }, 5000);
     })();
   }
