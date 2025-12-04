@@ -27,6 +27,9 @@ export abstract class Level {
     // Register the update callback with the engine ticker
     this.tickerCallback = this.update.bind(this);
     this.engine.app.ticker.add(this.tickerCallback);
+
+    // every tick updadte engine with scene graph
+
   }
 
   // Clean up the level when switching
@@ -47,6 +50,7 @@ export abstract class Level {
   // Update method called by the engine ticker (can be overridden)
   protected update(ticker: Ticker): void {
     this.levelRoot.update(ticker.deltaTime);
+    this.engine.updateLevelGraph(this.getHierarchy());
   }
 
   // Get the complete scene hierarchy

@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 // Import the engine directly from the Beast2D project
 import { Engine } from 'beast2d/core/Engine'
-import LeftPanel from './components/LeftPanel/LeftPanel.vue'
-import { useEngineStore } from './stores/engine'
 
 const containerRef = ref<HTMLElement | null>(null)
 const isPaused = ref(false)
-const engineStore = useEngineStore()
+let engine: Engine | null = null
+const levelGraph = ref<{ uuid: string; name: string; children: any[] } | null>(null)
 
 onMounted(async () => {
-  const engine = new Engine()
-  engineStore.setEngine(engine)
+  engine = new Engine()
   if (containerRef.value) {
-    // Use the demo bootstrap that registers and loads a level
     engine.bootstrap(containerRef.value)
-    
-    // Refresh hierarchy after level loads
-    setTimeout(() => {
-      engineStore.refreshHierarchy()
-    }, 1000)
   }
+
+  setInterval(() => {
+    if (!engine) return
+    const currentLevel = engine.levelManager?.getCurrentLevel()
+    if (currentLevel) {
+      levelGraph.value = currentLevel.getHierarchy()
+    }
+  }, 100)
 })
 
 const pause = () => {
-  if (!engineStore.engine) return
-  engineStore.engine.pause()
+  if (!engine) return
+  engine.pause()
   isPaused.value = true
 }
 
 const resume = () => {
-  if (!engineStore.engine) return
-  engineStore.engine.resume()
+  if (!engine) return
+  engine.resume()
   isPaused.value = false
 }
 
@@ -47,7 +47,16 @@ const togglePlay = () => {
 <template>
   <div class="app-container">
     <div class="left-panel">
-      <LeftPanel />
+      <h2>Hierarchy</h2>
+      <!-- ...existing code... -->
+      <div v-for="child in levelGraph?.children" :key="child.uuid" style="margin-left: 20px">
+        <pre>{{ child.name }} ({{ child.uuid }})</pre>
+        <div v-if="child.children && child.children.length > 0" style="margin-left: 20px">
+          <div v-for="grandChild in child.children" :key="grandChild.uuid">
+            <pre>{{ grandChild.name }} ({{ grandChild.uuid }})</pre>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="center-panel">
       <h2>Game Runner</h2>
@@ -63,12 +72,13 @@ const togglePlay = () => {
   </div>
 </template>
 
-
 <style scoped>
 .app-container {
   display: flex;
 }
-.left-panel, .center-panel, .right-panel {
+.left-panel,
+.center-panel,
+.right-panel {
   flex: 1;
   padding: 10px;
 }

@@ -14,6 +14,7 @@ export class Engine {
   app: Application;
   private ready: Promise<void>;
   levelManager?: LevelManager;
+  private levelGraph: any = null;
 
   constructor() {
     this.app = new Application();
@@ -47,6 +48,14 @@ export class Engine {
     this.app.ticker.start();
   }
 
+  updateLevelGraph(hierarchy: any) {
+    this.levelGraph = hierarchy;
+  }
+
+  getLevelGraph() {
+    return this.levelGraph;
+  }
+
   bootstrap(container: HTMLElement) {
     (async () => {
       await this.mount(container);
@@ -60,12 +69,12 @@ export class Engine {
       this.levelManager.loadLevel("level1");
 
       // Log hierarchy every 100ms
-      setInterval(() => {
-        const currentLevel = this.levelManager?.getCurrentLevel();
-        if (currentLevel) {
-          console.log("Current Level Hierarchy:", JSON.stringify(currentLevel.getHierarchy(), null, 2));
-        }
-      }, 100);
+      // setInterval(() => {
+      //   const currentLevel = this.levelManager?.getCurrentLevel();
+      //   if (currentLevel) {
+      //     console.log("Current Level Hierarchy:", currentLevel.getHierarchy());
+      //   }
+      // }, 100);
 
       // Switch to level 2 after 5 seconds (for demo)
       setTimeout(() => {
