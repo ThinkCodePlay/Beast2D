@@ -1,3 +1,9 @@
+/* Engine.ts
+  Engine is the core of the Beast2D game engine, responsible for initializing
+  the PixiJS application, managing the game loop, and handling level transitions.
+  It sets up the rendering context and provides methods to pause and resume the game.
+  */
+
 import { Application } from "pixi.js";
 import { LevelManager } from "./LevelManager";
 import { Level1 } from "../game/Level1";
@@ -22,14 +28,14 @@ export class Engine {
 
   async mount(domElement: HTMLElement) {
     await this.ready;
-    
+
     // Initialize global variables
     Globals.init(
       this.app.renderer.width,
       this.app.renderer.height,
       this.app.stage
     );
-    
+
     domElement.appendChild(this.app.canvas);
   }
 

@@ -1,13 +1,23 @@
+/* GameObject.ts
+ GameObject is a base node that is used for every entity in the game scene.
+ Every GameObject has the following features:
+ - Unique Identifier (UUID)
+ - Scene Graph Structure (parent-child relationships)
+ - Component System (add, remove, get components)
+ - Update Loop Integration
+ - Transform Handling (position, rotation, scale via TransformComponent)
+*/
+
 import { Container } from "pixi.js";
 import { Component } from "./components/Component";
 import { TransformComponent } from "./components/TransformComponent";
 
 export class GameObject {
   uuid: string = crypto.randomUUID();
-  
+
   parent: GameObject | null = null;
   children: GameObject[] = [];
-  
+
   container: Container;
   private components: Map<string, Component> = new Map();
 
@@ -40,23 +50,27 @@ export class GameObject {
   // Component Methods
   addComponent<T extends Component>(component: T): T {
     const componentName = component.constructor.name;
-    
+
     if (this.components.has(componentName)) {
-      console.warn(`Component ${componentName} already exists on this GameObject`);
+      console.warn(
+        `Component ${componentName} already exists on this GameObject`
+      );
       return this.components.get(componentName) as T;
     }
 
     component.gameObject = this;
     this.components.set(componentName, component);
     component.init();
-    
+
     return component;
   }
 
-  removeComponent<T extends Component>(componentClass: new (...args: any[]) => T): void {
+  removeComponent<T extends Component>(
+    componentClass: new (...args: any[]) => T
+  ): void {
     const componentName = componentClass.name;
     const component = this.components.get(componentName);
-    
+
     if (component) {
       component.destroy();
       component.gameObject = null;
@@ -64,11 +78,15 @@ export class GameObject {
     }
   }
 
-  getComponent<T extends Component>(componentClass: new (...args: any[]) => T): T | null {
+  getComponent<T extends Component>(
+    componentClass: new (...args: any[]) => T
+  ): T | null {
     return (this.components.get(componentClass.name) as T) || null;
   }
 
-  hasComponent<T extends Component>(componentClass: new (...args: any[]) => T): boolean {
+  hasComponent<T extends Component>(
+    componentClass: new (...args: any[]) => T
+  ): boolean {
     return this.components.has(componentClass.name);
   }
 
@@ -80,7 +98,7 @@ export class GameObject {
         component.update(deltaTime);
       }
     }
-    
+
     // Update children
     for (const child of this.children) {
       child.update(deltaTime);

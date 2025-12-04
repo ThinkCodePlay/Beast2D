@@ -1,5 +1,8 @@
-// Globals.ts
-// Global variables accessible throughout the engine
+/* Globals.ts
+  Globals is a singleton class that holds global variables and settings
+  for the Beast2D game engine. It provides access to the canvas dimensions
+  and the root stage node, ensuring consistent references throughout the engine.
+  */
 
 import { Container } from "pixi.js";
 

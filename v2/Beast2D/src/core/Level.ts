@@ -1,5 +1,9 @@
-// Level.ts
-// Base class for game levels
+/* Level.ts
+  Level is an abstract base class representing a game level or scene.
+  It provides lifecycle methods for initializing, updating, and destroying
+  the level, as well as managing game objects within the level.
+  All specific levels should extend this class and implement the init method.
+  */
 
 import { Engine } from "./Engine";
 import { GameObject } from "./GameObject";

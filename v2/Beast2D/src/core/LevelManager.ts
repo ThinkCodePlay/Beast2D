@@ -1,5 +1,8 @@
-// LevelManager.ts
-// Manages switching between different game levels
+/* LevelManager.ts
+  LevelManager is responsible for managing different game levels (scenes).
+  It allows registering levels, switching between them, and ensures proper
+  initialization and cleanup of levels during transitions.
+  */
 
 import { Engine } from "./Engine";
 import { Level } from "./Level";

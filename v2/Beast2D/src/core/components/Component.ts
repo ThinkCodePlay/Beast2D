@@ -1,3 +1,9 @@
+/* Component.ts
+  Component is the base class for all components that can be attached to GameObjects.
+  It provides lifecycle methods for initialization, updating, and destruction.
+  Specific components should extend this class and implement their own logic.
+  */
+
 import type { GameObject } from "../GameObject";
 
 export abstract class Component {
