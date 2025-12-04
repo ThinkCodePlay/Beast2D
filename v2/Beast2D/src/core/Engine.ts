@@ -59,6 +59,14 @@ export class Engine {
       // Start with level 1
       this.levelManager.loadLevel("level1");
 
+      // Log hierarchy every 100ms
+      setInterval(() => {
+        const currentLevel = this.levelManager?.getCurrentLevel();
+        if (currentLevel) {
+          console.log("Current Level Hierarchy:", JSON.stringify(currentLevel.getHierarchy(), null, 2));
+        }
+      }, 100);
+
       // Switch to level 2 after 5 seconds (for demo)
       setTimeout(() => {
         console.log("Switching to Level 2...");

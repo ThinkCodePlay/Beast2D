@@ -22,14 +22,14 @@ export class Level1 extends Level {
       strokeColor: 0x333333,
       strokeWidth: 3,
     });
-    this.objects.push(this.box);
+    this.levelRoot.addChild(this.box);
 
     // Create a circle
     this.circle = new Circle(Globals.stage, 50, 50, 40, {
       color: 0x00ff00,
       strokeWidth: 2,
     });
-    this.objects.push(this.circle);
+    this.levelRoot.addChild(this.circle);
   }
 
   protected update(ticker: Ticker) {

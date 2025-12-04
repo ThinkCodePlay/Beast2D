@@ -5,17 +5,20 @@
   All specific levels should extend this class and implement the init method.
   */
 
+import { ObjectNames } from "./consts";
 import { Engine } from "./Engine";
 import { GameObject } from "./GameObject";
-import { Ticker } from "pixi.js";
+import { Ticker, Container } from "pixi.js";
 
 export abstract class Level {
   protected engine: Engine;
-  protected objects: GameObject[] = [];
+  protected levelRoot: GameObject;
   private tickerCallback: ((ticker: Ticker) => void) | null = null;
 
   constructor(engine: Engine) {
     this.engine = engine;
+    this.levelRoot = new GameObject(new Container());
+    this.levelRoot.name = ObjectNames.LevelRoot;
   }
 
   // Initialize the level (add objects, set up logic)
@@ -29,10 +32,7 @@ export abstract class Level {
   // Clean up the level when switching
   public destroy() {
     // Destroy all objects (this will clean up all components and graphics)
-    this.objects.forEach((obj) => {
-      obj.destroy();
-    });
-    this.objects = [];
+    this.levelRoot.destroy();
 
     // Remove ticker callback
     if (this.tickerCallback) {
@@ -46,6 +46,11 @@ export abstract class Level {
 
   // Update method called by the engine ticker (can be overridden)
   protected update(ticker: Ticker): void {
-    this.objects.forEach((obj) => obj.update(ticker.deltaTime));
+    this.levelRoot.update(ticker.deltaTime);
+  }
+
+  // Get the complete scene hierarchy
+  public getHierarchy() {
+    return this.levelRoot.getHierarchy();
   }
 }

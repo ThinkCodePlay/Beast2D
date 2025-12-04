@@ -2,28 +2,36 @@
 import { ref, onMounted } from 'vue'
 // Import the engine directly from the Beast2D project
 import { Engine } from 'beast2d/core/Engine'
+import LeftPanel from './components/LeftPanel/LeftPanel.vue'
+import { useEngineStore } from './stores/engine'
 
 const containerRef = ref<HTMLElement | null>(null)
 const isPaused = ref(false)
-let engine: Engine | null = null
+const engineStore = useEngineStore()
 
 onMounted(async () => {
-  engine = new Engine()
+  const engine = new Engine()
+  engineStore.setEngine(engine)
   if (containerRef.value) {
     // Use the demo bootstrap that registers and loads a level
     engine.bootstrap(containerRef.value)
+    
+    // Refresh hierarchy after level loads
+    setTimeout(() => {
+      engineStore.refreshHierarchy()
+    }, 1000)
   }
 })
 
 const pause = () => {
-  if (!engine) return
-  engine.pause()
+  if (!engineStore.engine) return
+  engineStore.engine.pause()
   isPaused.value = true
 }
 
 const resume = () => {
-  if (!engine) return
-  engine.resume()
+  if (!engineStore.engine) return
+  engineStore.engine.resume()
   isPaused.value = false
 }
 
@@ -39,8 +47,7 @@ const togglePlay = () => {
 <template>
   <div class="app-container">
     <div class="left-panel">
-      <h2>Hierarchy</h2>
-      <!-- ...existing code... -->  
+      <LeftPanel />
     </div>
     <div class="center-panel">
       <h2>Game Runner</h2>

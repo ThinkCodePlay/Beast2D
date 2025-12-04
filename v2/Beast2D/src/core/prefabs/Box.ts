@@ -3,6 +3,7 @@ import { GameObject } from "../GameObject";
 import { TransformComponent } from "../components/TransformComponent";
 import { BoxRenderComponent } from "../components/BoxRenderComponent";
 import type { RenderOptions } from "../components/RenderComponent";
+import { ObjectNames } from "../consts";
 
 export class Box extends GameObject {
   constructor(
@@ -14,6 +15,7 @@ export class Box extends GameObject {
     renderOptions: RenderOptions = {}
   ) {
     super(container);
+    this.name = ObjectNames.BoxObject;
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(new BoxRenderComponent(width, height, renderOptions));
   }

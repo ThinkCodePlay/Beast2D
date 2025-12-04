@@ -24,7 +24,7 @@ export class Level2 extends Level {
       strokeColor: 0xffffff,
       strokeWidth: 2,
     });
-    this.objects.push(box);
+    this.levelRoot.addChild(box);
 
     // Create multiple bouncing circles
     const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
@@ -37,7 +37,7 @@ export class Level2 extends Level {
         { color: colors[i % colors.length], strokeWidth: 2 }
       );
       this.circles.push(circle);
-      this.objects.push(circle);
+      this.levelRoot.addChild(circle);
 
       // Random velocity for each circle
       this.velocities.push({

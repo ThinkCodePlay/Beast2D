@@ -5,3 +5,4 @@
 [x] make box object implement gameobject
 [x] discuss using component based architecture
 [x] create level manager
+[ ] display object hierarchy

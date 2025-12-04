@@ -11,9 +11,11 @@
 import { Container } from "pixi.js";
 import { Component } from "./components/Component";
 import { TransformComponent } from "./components/TransformComponent";
+import { ObjectNames } from "./consts";
 
 export class GameObject {
   uuid: string = crypto.randomUUID();
+  name: string = ObjectNames.BoxObject;
 
   parent: GameObject | null = null;
   children: GameObject[] = [];
@@ -106,6 +108,12 @@ export class GameObject {
   }
 
   destroy(): void {
+    // Destroy all children first
+    for (const child of this.children) {
+      child.destroy();
+    }
+    this.children = [];
+
     // Destroy all components
     for (const component of this.components.values()) {
       component.destroy();
@@ -120,5 +128,14 @@ export class GameObject {
       return null;
     }
     return this.getComponent(TransformComponent);
+  }
+
+  // Get hierarchy structure for scene graph display
+  getHierarchy(): { uuid: string; name: string; children: any[] } {
+    return {
+      uuid: this.uuid,
+      name: this.name,
+      children: this.children.map(child => child.getHierarchy())
+    };
   }
 }
