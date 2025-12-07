@@ -85,25 +85,21 @@ export class UserInputComponent extends Component {
         let dy = 0;
 
         if (this.keyUp) {
-            dy -= 1;
+            dy -= this.speed;
         }
         if (this.keyDown) {
-            dy += 1;
+            dy += this.speed;
         }
         if (this.keyLeft) {
-            dx -= 1;
+            dx -= this.speed;
         }
         if (this.keyRight) {
-            dx += 1;
+            dx += this.speed;
         }
 
         // Apply movement to the transform
         if (dx !== 0 || dy !== 0) {
-            // Normalize direction vector to prevent faster diagonal movement
-            const magnitude = Math.sqrt(dx * dx + dy * dy);
-            const normalizedDx = (dx / magnitude) * this.speed;
-            const normalizedDy = (dy / magnitude) * this.speed;
-            transform.translate(normalizedDx, normalizedDy);
+            transform.translate(dx, dy);
         }
     }
 

@@ -66,7 +66,7 @@ export class Engine {
       this.levelManager.registerLevel("level2", new Level2(this));
 
       // Start with level 1
-      this.levelManager.loadLevel("level1");
+      this.levelManager.loadLevel("level2");
 
       // Log hierarchy every 100ms
       // setInterval(() => {
