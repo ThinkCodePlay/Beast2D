@@ -19,8 +19,8 @@ export class Engine {
   constructor() {
     this.app = new Application();
     this.ready = this.app.init({
-      width: 400,
-      height: 300,
+      width: 800,
+      height: 600,
       backgroundAlpha: 1,
       resolution: devicePixelRatio || 1,
       antialias: true,
@@ -77,10 +77,10 @@ export class Engine {
       // }, 100);
 
       // Switch to level 2 after 5 seconds (for demo)
-      setTimeout(() => {
-        console.log("Switching to Level 2...");
-        this.levelManager?.loadLevel("level2");
-      }, 5000);
+      // setTimeout(() => {
+      //   console.log("Switching to Level 2...");
+      //   this.levelManager?.loadLevel("level2");
+      // }, 5000);
     })();
   }
 }

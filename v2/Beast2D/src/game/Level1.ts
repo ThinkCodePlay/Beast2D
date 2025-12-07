@@ -4,6 +4,7 @@
 import { Level } from "../core/Level";
 import { Box } from "../core/prefabs/Box";
 import { Circle } from "../core/prefabs/Circle";
+import { Player } from "../core/prefabs/Player";
 import { Globals } from "../core/Globals";
 import { Ticker } from "pixi.js";
 
@@ -30,6 +31,9 @@ export class Level1 extends Level {
       strokeWidth: 2,
     });
     this.levelRoot.addChild(this.circle);
+
+    // create player object
+    this.levelRoot.addChild(new Player(Globals.stage, X, Y, SIZE, SIZE));
   }
 
   protected update(ticker: Ticker) {

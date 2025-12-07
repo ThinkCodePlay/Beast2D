@@ -5,4 +5,13 @@
 [x] make box object implement gameobject
 [x] discuss using component based architecture
 [x] create level manager
-[ ] display object hierarchy
+[x] display object hierarchy
+[ ] discuss who and how to expose the engine api
+[ ] handle hover and click events on game objects
+[ ] create win object
+[ ] create lose object
+[ ] create score object
+[ ] create spawner
+[ ] create object interaction (collision) system
+[ ] check initil trajectory of game objects
+[ ] background object 

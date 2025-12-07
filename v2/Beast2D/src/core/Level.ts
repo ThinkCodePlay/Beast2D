@@ -28,8 +28,6 @@ export abstract class Level {
     this.tickerCallback = this.update.bind(this);
     this.engine.app.ticker.add(this.tickerCallback);
 
-    // every tick updadte engine with scene graph
-
   }
 
   // Clean up the level when switching
