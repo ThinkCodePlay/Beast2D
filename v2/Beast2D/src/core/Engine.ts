@@ -10,6 +10,10 @@ import { Level1 } from "../game/Level1";
 import { Level2 } from "../game/Level2";
 import { Globals } from "./Globals";
 
+declare global {
+  var __PIXI_APP__: Application;
+}
+
 export class Engine {
   app: Application;
   private ready: Promise<void>;
