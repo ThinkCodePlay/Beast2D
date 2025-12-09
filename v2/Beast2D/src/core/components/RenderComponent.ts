@@ -1,4 +1,4 @@
-import { Graphics, Container } from "pixi.js";
+import { Graphics, Sprite, Container } from "pixi.js";
 import { Component } from "./Component";
 import { TransformComponent } from "./TransformComponent";
 
@@ -11,7 +11,7 @@ export interface RenderOptions {
 }
 
 export abstract class RenderComponent extends Component {
-  protected graphics: Graphics | null = null;
+  protected graphics: Graphics | Sprite | null = null;
   protected container: Container | null = null;
   protected transform: TransformComponent | null = null;
   renderOptions: RenderOptions;
@@ -28,7 +28,7 @@ export abstract class RenderComponent extends Component {
     };
   }
 
-  abstract createGraphics(): Graphics;
+  abstract createGraphics(): Graphics | Sprite;
 
   override init(): void {
     if (!this.gameObject) return;

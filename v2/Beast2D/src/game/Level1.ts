@@ -33,7 +33,7 @@ export class Level1 extends Level {
     this.levelRoot.addChild(this.circle);
 
     // create player object
-    this.levelRoot.addChild(new Player(Globals.stage, X, Y, SIZE, SIZE));
+    this.levelRoot.addChild(new Player(Globals.stage, X, Y));
   }
 
   protected update(ticker: Ticker) {

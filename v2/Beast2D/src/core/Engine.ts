@@ -14,10 +14,10 @@ export class Engine {
   app: Application;
   private ready: Promise<void>;
   levelManager?: LevelManager;
-  private levelGraph: any = null;
 
   constructor() {
     this.app = new Application();
+    globalThis.__PIXI_APP__ = this.app; // Expose app globally for debugging
     this.ready = this.app.init({
       width: 800,
       height: 600,
@@ -48,14 +48,6 @@ export class Engine {
     this.app.ticker.start();
   }
 
-  updateLevelGraph(hierarchy: any) {
-    this.levelGraph = hierarchy;
-  }
-
-  getLevelGraph() {
-    return this.levelGraph;
-  }
-
   bootstrap(container: HTMLElement) {
     (async () => {
       await this.mount(container);
@@ -66,7 +58,7 @@ export class Engine {
       this.levelManager.registerLevel("level2", new Level2(this));
 
       // Start with level 1
-      this.levelManager.loadLevel("level2");
+      this.levelManager.loadLevel("level1");
 
       // Log hierarchy every 100ms
       // setInterval(() => {
