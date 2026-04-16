@@ -5,9 +5,7 @@
   */
 
 import { Application } from "pixi.js";
-import { LevelManager } from "./LevelManager";
-import { Level1 } from "../game/Level1";
-import { Level2 } from "../game/Level2";
+import { GameManager } from "./GameManager";
 import { Globals } from "./Globals";
 
 declare global {
@@ -17,7 +15,7 @@ declare global {
 export class Engine {
   app: Application;
   private ready: Promise<void>;
-  levelManager?: LevelManager;
+  gameManager?: GameManager;
 
   constructor() {
     this.app = new Application();
@@ -34,49 +32,18 @@ export class Engine {
   async mount(domElement: HTMLElement) {
     await this.ready;
 
-    // Initialize global variables
-    Globals.init(
-      this.app.renderer.width,
-      this.app.renderer.height,
-      this.app.stage
-    );
+    Globals.init(this.app);
 
     domElement.appendChild(this.app.canvas);
-  }
-
-  pause() {
-    this.app.ticker.stop();
-  }
-
-  resume() {
-    this.app.ticker.start();
   }
 
   bootstrap(container: HTMLElement) {
     (async () => {
       await this.mount(container);
 
-      // Create level manager and register levels
-      this.levelManager = new LevelManager(this);
-      this.levelManager.registerLevel("level1", new Level1(this));
-      this.levelManager.registerLevel("level2", new Level2(this));
-
-      // Start with level 1
-      this.levelManager.loadLevel("level1");
-
-      // Log hierarchy every 100ms
-      // setInterval(() => {
-      //   const currentLevel = this.levelManager?.getCurrentLevel();
-      //   if (currentLevel) {
-      //     console.log("Current Level Hierarchy:", currentLevel.getHierarchy());
-      //   }
-      // }, 100);
-
-      // Switch to level 2 after 5 seconds (for demo)
-      // setTimeout(() => {
-      //   console.log("Switching to Level 2...");
-      //   this.levelManager?.loadLevel("level2");
-      // }, 5000);
+      // Create and initialize game manager
+      this.gameManager = new GameManager(this);
+      this.gameManager.initialize();
     })();
   }
 }

@@ -29,10 +29,10 @@ export class Globals {
   }
 
   // Initialize globals (called by Engine)
-  static init(width: number, height: number, stage: Container): void {
-    this._canvasWidth = width;
-    this._canvasHeight = height;
-    this._stage = stage;
+  static init(app: any): void {
+    this._canvasWidth = app.renderer.width;
+    this._canvasHeight = app.renderer.height;
+    this._stage = app.stage;
   }
 
   // Update dimensions if canvas is resized
