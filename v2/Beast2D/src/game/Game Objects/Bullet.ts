@@ -1,0 +1,44 @@
+import { Container } from "pixi.js";
+import { Circle } from "../../core/prefabs/Circle";
+import { VerticalMoveComponent } from "../../core/components/Movement/VerticalMoveComponent";
+import { DestroyOutOfBoundsComponent } from "../../core/components/Behavior/DestroyOutOfBoundsComponent";
+import { Globals } from "../../core/Globals";
+import { CircleColliderComponent } from "../../core/components/Collision/CircleColliderComponent";
+import { CollisionLayers, ColliderModes } from "../../core/consts";
+
+export class Bullet extends Circle {
+  constructor(container: Container, x: number = 0, y: number = 0) {
+    super(container, x, y, 5, {
+      color: 0xffff55,
+      strokeColor: 0xffffff,
+      strokeWidth: 1,
+    });
+    this.addComponent(new VerticalMoveComponent(-8));
+    this.addComponent(
+      new CircleColliderComponent(5, {
+        layer: CollisionLayers.Bullet,
+        mode: ColliderModes.Active,
+        mask: [CollisionLayers.Enemy],
+        onCollisionEnter: (_self, other) => {
+          const enemy = other.gameObject;
+          if (enemy) {
+            enemy.parent?.removeChild(enemy);
+            enemy.destroy();
+          }
+
+          const bullet = this;
+          bullet.parent?.removeChild(bullet);
+          bullet.destroy();
+        },
+      }),
+    );
+    this.addComponent(
+      new DestroyOutOfBoundsComponent({
+        minX: -20,
+        maxX: Globals.canvasWidth + 20,
+        minY: -20,
+        maxY: Globals.canvasHeight + 20,
+      }),
+    );
+  }
+}

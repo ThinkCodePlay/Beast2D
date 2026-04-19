@@ -10,6 +10,7 @@ export class Globals {
   private static _canvasWidth: number = 0;
   private static _canvasHeight: number = 0;
   private static _stage: Container | null = null;
+  private static _debug: boolean = true;
 
   // Canvas dimensions
   static get canvasWidth(): number {
@@ -26,6 +27,14 @@ export class Globals {
       throw new Error("Globals.stage accessed before initialization");
     }
     return this._stage;
+  }
+
+  static get debug(): boolean {
+    return this._debug;
+  }
+
+  static set debug(value: boolean) {
+    this._debug = value;
   }
 
   // Initialize globals (called by Engine)
@@ -46,5 +55,6 @@ export class Globals {
     this._canvasWidth = 0;
     this._canvasHeight = 0;
     this._stage = null;
+    this._debug = false;
   }
 }

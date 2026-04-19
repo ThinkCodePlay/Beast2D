@@ -10,7 +10,7 @@
 
 import { Container } from "pixi.js";
 import { Component } from "./components/Component";
-import { TransformComponent } from "./components/TransformComponent";
+import { TransformComponent } from "./components/Movement/TransformComponent";
 import { ObjectNames } from "./consts";
 
 export class GameObject {
@@ -55,7 +55,7 @@ export class GameObject {
 
     if (this.components.has(componentName)) {
       console.warn(
-        `Component ${componentName} already exists on this GameObject`
+        `Component ${componentName} already exists on this GameObject`,
       );
       return this.components.get(componentName) as T;
     }
@@ -68,7 +68,7 @@ export class GameObject {
   }
 
   removeComponent<T extends Component>(
-    componentClass: new (...args: any[]) => T
+    componentClass: new (...args: any[]) => T,
   ): void {
     const componentName = componentClass.name;
     const component = this.components.get(componentName);
@@ -81,13 +81,13 @@ export class GameObject {
   }
 
   getComponent<T extends Component>(
-    componentClass: new (...args: any[]) => T
+    componentClass: new (...args: any[]) => T,
   ): T | null {
     return (this.components.get(componentClass.name) as T) || null;
   }
 
   hasComponent<T extends Component>(
-    componentClass: new (...args: any[]) => T
+    componentClass: new (...args: any[]) => T,
   ): boolean {
     return this.components.has(componentClass.name);
   }
@@ -135,7 +135,7 @@ export class GameObject {
     return {
       uuid: this.uuid,
       name: this.name,
-      children: this.children.map(child => child.getHierarchy())
+      children: this.children.map((child) => child.getHierarchy()),
     };
   }
 }

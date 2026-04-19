@@ -1,22 +1,32 @@
 import { Container } from "pixi.js";
 import { GameObject } from "../GameObject";
-import { TransformComponent } from "../components/TransformComponent";
-import { SpriteRenderComponent } from "../components/SpriteRenederComponent";
-import { UserInputComponent } from "../components/UserInputComponent";
-import type { RenderOptions } from "../components/RenderComponent";
-import { ObjectNames } from "../consts";
+import { TransformComponent } from "../components/Movement/TransformComponent";
+import { SpriteRenderComponent } from "../components/Render/SpriteRenederComponent";
+import { UserInputComponent } from "../components/Movement/UserInputComponent";
+import type { RenderOptions } from "../components/Render/RenderComponent";
+import { ObjectNames, CollisionLayers, ColliderModes } from "../consts";
+import { SquareColliderComponent } from "../components/Collision/SquareColliderComponent";
 
 export class Player extends GameObject {
   constructor(
     container: Container,
     x: number = 0,
     y: number = 0,
-    renderOptions: RenderOptions = {}
+    renderOptions: RenderOptions = {},
   ) {
     super(container);
+    const playerSize = 64;
     this.name = ObjectNames.BoxObject;
     this.addComponent(new TransformComponent(x, y));
-    this.addComponent(new SpriteRenderComponent("BeastShip.png", renderOptions));
+    this.addComponent(
+      new SpriteRenderComponent("BeastShip.png", renderOptions),
+    );
+    this.addComponent(
+      new SquareColliderComponent(playerSize, playerSize, {
+        layer: CollisionLayers.Player,
+        mode: ColliderModes.Passive,
+      }),
+    );
     this.addComponent(new UserInputComponent());
   }
 }

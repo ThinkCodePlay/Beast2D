@@ -3,6 +3,7 @@ import { LevelManager } from "./LevelManager";
 import type { Level } from "./Level";
 import { Level1 } from "../game/Level1";
 import { Level2 } from "../game/Level2";
+import { SpaceShooter } from "../game/Space Shooter/SpaceShooter.ts";
 
 export class GameManager {
   private engine: Engine;
@@ -16,7 +17,8 @@ export class GameManager {
   public initialize() {
     this.registerLevel("level1", new Level1(this.engine));
     this.registerLevel("level2", new Level2(this.engine));
-    this.loadLevel("level1");
+    this.registerLevel("spaceShooter", new SpaceShooter(this.engine));
+    this.loadLevel("spaceShooter");
   }
 
   pause() {

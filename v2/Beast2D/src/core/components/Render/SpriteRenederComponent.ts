@@ -14,18 +14,20 @@ export class SpriteRenderComponent extends RenderComponent {
   createGraphics(): Graphics {
     // Create empty graphics container first
     const graphics = new Graphics();
-    
+
     // Load texture asynchronously
-    Assets.load(this.texturePath).then((texture) => {
-      this.sprite = new Sprite(texture);
-    //   this.sprite.anchor.set(0.5);
-      this.sprite.alpha = this.renderOptions.alpha ?? 1;
-      this.sprite.visible = this.renderOptions.visible ?? true;
-      graphics.addChild(this.sprite);
-    }).catch((error) => {
-      console.error(`Failed to load sprite: ${this.texturePath}`, error);
-    });
-    
+    Assets.load(this.texturePath)
+      .then((texture) => {
+        this.sprite = new Sprite(texture);
+        //   this.sprite.anchor.set(0.5);
+        this.sprite.alpha = this.renderOptions.alpha ?? 1;
+        this.sprite.visible = this.renderOptions.visible ?? true;
+        graphics.addChild(this.sprite);
+      })
+      .catch((error) => {
+        console.error(`Failed to load sprite: ${this.texturePath}`, error);
+      });
+
     return graphics;
   }
 

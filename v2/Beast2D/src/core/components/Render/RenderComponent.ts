@@ -1,6 +1,6 @@
 import { Graphics, Sprite, Container } from "pixi.js";
-import { Component } from "./Component";
-import { TransformComponent } from "./TransformComponent";
+import { Component } from "../Component";
+import { TransformComponent } from "../Movement/TransformComponent";
 
 export interface RenderOptions {
   color?: number;
@@ -32,15 +32,15 @@ export abstract class RenderComponent extends Component {
 
   override init(): void {
     if (!this.gameObject) return;
-    
+
     this.container = this.gameObject.container;
     this.transform = this.gameObject.getComponent(TransformComponent);
     this.graphics = this.createGraphics();
-    
+
     this.updateTransform();
     this.graphics.alpha = this.renderOptions.alpha ?? 1;
     this.graphics.visible = this.renderOptions.visible ?? true;
-    
+
     this.container.addChild(this.graphics);
   }
 
@@ -50,7 +50,7 @@ export abstract class RenderComponent extends Component {
 
   protected updateTransform(): void {
     if (!this.graphics || !this.transform) return;
-    
+
     this.graphics.x = this.transform.x;
     this.graphics.y = this.transform.y;
     this.graphics.rotation = this.transform.rotation;

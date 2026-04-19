@@ -6,7 +6,11 @@ export class BoxRenderComponent extends RenderComponent {
   width: number;
   height: number;
 
-  constructor(width: number = 100, height: number = 100, renderOptions: RenderOptions = {}) {
+  constructor(
+    width: number = 100,
+    height: number = 100,
+    renderOptions: RenderOptions = {},
+  ) {
     super(renderOptions);
     this.width = width;
     this.height = height;
