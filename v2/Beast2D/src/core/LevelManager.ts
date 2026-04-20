@@ -8,13 +8,10 @@ import { Engine } from "./Engine";
 import { Level } from "./Level";
 
 export class LevelManager {
-  private engine: Engine;
   private currentLevel: Level | null = null;
   private levels: Map<string, Level> = new Map();
 
-  constructor(engine: Engine) {
-    this.engine = engine;
-  }
+  constructor(_engine: Engine) {}
 
   // Register a level with a name
   public registerLevel(name: string, level: Level) {

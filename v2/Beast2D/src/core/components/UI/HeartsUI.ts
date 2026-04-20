@@ -13,7 +13,7 @@ export class HeartsUI extends GameObject {
     x: number = 16,
     y: number = 16,
     hearts: number = 3,
-    heartSize: number = 12,
+    heartSize: number = 32,
     spacing: number = 8,
     renderOptions: RenderOptions = {},
   ) {

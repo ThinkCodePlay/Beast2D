@@ -13,7 +13,7 @@ export class ScoreUIRenderComponent extends RenderComponent {
     renderOptions: RenderOptions = {},
   ) {
     super({
-      color: 0xffffff,
+      color: 0xfd62a7,
       ...renderOptions,
     });
     this.score = score;

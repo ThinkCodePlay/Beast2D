@@ -1,6 +1,8 @@
-import { Graphics } from "pixi.js";
+import { Graphics, Sprite, Assets } from "pixi.js";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
+
+const HEART_TEXTURE_PATH = "/HeartBeast.png";
 
 export class HeartsUIRenderComponent extends RenderComponent {
   private hearts: number;
@@ -9,34 +11,28 @@ export class HeartsUIRenderComponent extends RenderComponent {
 
   constructor(
     hearts: number = 3,
-    heartSize: number = 12,
+    heartSize: number = 64,
     spacing: number = 8,
     renderOptions: RenderOptions = {},
   ) {
-    super({
-      color: 0xff4d6d,
-      strokeColor: 0xffffff,
-      strokeWidth: 1,
-      ...renderOptions,
-    });
+    super(renderOptions);
     this.hearts = hearts;
     this.heartSize = heartSize;
     this.spacing = spacing;
   }
 
   createGraphics(): Graphics {
-    const graphics = new Graphics();
-    this.drawHearts(graphics);
-
-    return graphics;
+    const container = new Graphics();
+    this.loadAndDrawHearts(container);
+    return container;
   }
 
   setHearts(hearts: number): void {
     this.hearts = Math.max(0, hearts);
 
     if (this.graphics && this.graphics instanceof Graphics) {
-      this.graphics.clear();
-      this.drawHearts(this.graphics);
+      this.graphics.removeChildren();
+      this.loadAndDrawHearts(this.graphics);
     }
   }
 
@@ -44,28 +40,23 @@ export class HeartsUIRenderComponent extends RenderComponent {
     return this.hearts;
   }
 
-  private drawHearts(graphics: Graphics): void {
-    for (let i = 0; i < this.hearts; i += 1) {
-      const x = this.heartSize + i * (this.heartSize * 1.8 + this.spacing);
-      const y = this.heartSize;
-      this.drawHeart(graphics, x, y);
-    }
-  }
-
-  private drawHeart(graphics: Graphics, x: number, y: number): void {
-    const lobeRadius = this.heartSize * 0.35;
-    const lobeYOffset = this.heartSize * 0.25;
-    const halfWidth = this.heartSize * 0.75;
-    const bottomY = y + this.heartSize;
-
-    graphics
-      .circle(x - lobeRadius, y - lobeYOffset, lobeRadius)
-      .circle(x + lobeRadius, y - lobeYOffset, lobeRadius)
-      .poly([x - halfWidth, y, x + halfWidth, y, x, bottomY])
-      .fill({ color: this.renderOptions.color })
-      .stroke({
-        width: this.renderOptions.strokeWidth,
-        color: this.renderOptions.strokeColor,
+  private loadAndDrawHearts(container: Graphics): void {
+    Assets.load(HEART_TEXTURE_PATH)
+      .then((texture) => {
+        for (let i = 0; i < this.hearts; i += 1) {
+          const sprite = new Sprite(texture);
+          sprite.width = this.heartSize;
+          sprite.height = this.heartSize;
+          sprite.x = i * (this.heartSize + this.spacing);
+          sprite.y = 0;
+          container.addChild(sprite);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          `Failed to load heart texture: ${HEART_TEXTURE_PATH}`,
+          error,
+        );
       });
   }
 }

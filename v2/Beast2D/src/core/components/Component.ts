@@ -16,7 +16,7 @@ export abstract class Component {
   }
 
   // Called every frame
-  update(deltaTime: number): void {
+  update(_deltaTime: number): void {
     // Override in subclasses
   }
 

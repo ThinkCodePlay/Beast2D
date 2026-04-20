@@ -3,6 +3,7 @@ import { Level } from "../../core/Level";
 import { Globals } from "../../core/Globals";
 import { Spaceship } from "./Game Objects/Spaceship";
 import { EnemyCircleSpawner } from "./Game Objects/EnemyCircleSpawner";
+import { ParallaxBackground } from "./Game Objects/ParallaxBackground";
 import { HeartsUI } from "../../core/components/UI/HeartsUI";
 import { DialogUI } from "../../core/components/UI/DialogUI";
 import { ScoreUI } from "../../core/components/UI/ScoreUI";
@@ -12,6 +13,9 @@ export class SpaceShooter extends Level {
     const startX = Globals.canvasWidth / 2;
     const startY = Globals.canvasHeight - 90;
 
+    // background
+    this.levelRoot.addChild(new ParallaxBackground(Globals.stage));
+
     // player
     this.levelRoot.addChild(new Spaceship(Globals.stage, startX, startY));
 
@@ -19,7 +23,7 @@ export class SpaceShooter extends Level {
     this.levelRoot.addChild(new EnemyCircleSpawner(Globals.stage));
 
     // UI
-    this.levelRoot.addChild(new HeartsUI(Globals.stage, 16, 16, 3));
+    this.levelRoot.addChild(new HeartsUI(Globals.stage, 16, 16, 3, 32));
     this.levelRoot.addChild(
       new ScoreUI(Globals.stage, Globals.canvasWidth - 16, 16),
     );

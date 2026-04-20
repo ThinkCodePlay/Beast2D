@@ -70,7 +70,7 @@ export class UserInputComponent extends Component {
     });
   }
 
-  update(deltaTime: number): void {
+  update(_deltaTime: number): void {
     if (!this.gameObject) {
       return;
     }
