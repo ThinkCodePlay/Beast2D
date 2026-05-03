@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { Circle } from "../../core/prefabs/Circle";
 import { VerticalMoveComponent } from "../../core/components/Movement/VerticalMoveComponent";
 import { DestroyOutOfBoundsComponent } from "../../core/components/Behavior/DestroyOutOfBoundsComponent";
@@ -7,8 +6,8 @@ import { CircleColliderComponent } from "../../core/components/Collision/CircleC
 import { CollisionLayers, ColliderModes } from "../../core/consts";
 
 export class EnemyCircle extends Circle {
-  constructor(container: Container, x: number = 0, y: number = 0) {
-    super(container, x, y, 12, {
+  constructor(x: number = 0, y: number = 0) {
+    super(x, y, 12, {
       color: 0xff4444,
       strokeColor: 0xffffff,
       strokeWidth: 2,

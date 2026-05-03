@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Graphics } from "pixi.js";
 import { GameObject } from "../../../core/GameObject";
 import { SpawnerComponent } from "../../../core/components/Behavior/SpawnerComponent";
 import { SpaceShootInputComponent } from "../../../core/components/Input/SpaceShootInputComponent";
@@ -13,12 +13,8 @@ export class BulletSpawner extends GameObject {
   private getShipY: () => number;
   private debugSpawnMarker: Graphics | null = null;
 
-  constructor(
-    container: Container,
-    getShipX: () => number,
-    getShipY: () => number,
-  ) {
-    super(container);
+  constructor(getShipX: () => number, getShipY: () => number) {
+    super();
     this.name = "BulletSpawner";
     this.getShipX = getShipX;
     this.getShipY = getShipY;
@@ -32,7 +28,6 @@ export class BulletSpawner extends GameObject {
         const parent = this.parent ?? this;
         parent.addChild(
           new Bullet(
-            Globals.stage,
             this.getShipX() + this.bulletSpawnOffsetX,
             this.getShipY() + this.bulletSpawnOffsetY,
           ),

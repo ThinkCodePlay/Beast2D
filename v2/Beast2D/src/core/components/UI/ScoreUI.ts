@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { ScoreUIRenderComponent } from "./ScoreUIRenderComponent";
@@ -9,14 +8,13 @@ export class ScoreUI extends GameObject {
   private renderComponent: ScoreUIRenderComponent;
 
   constructor(
-    container: Container,
     x: number,
     y: number,
     score: number = 0,
     label: string = "Score",
     renderOptions: RenderOptions = {},
   ) {
-    super(container);
+    super();
     this.name = "ScoreUI";
     ScoreUI.current = this;
 

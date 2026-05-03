@@ -14,27 +14,26 @@ export class Level2 extends Level {
   protected init() {
     // Create a centered box
     const box = new Box(
-      Globals.stage,
       Globals.canvasWidth / 2 - 75,
       Globals.canvasHeight / 2 - 75,
       150,
       150,
       {
-      color: 0x3366ff,
-      strokeColor: 0xffffff,
-      strokeWidth: 2,
-    });
+        color: 0x3366ff,
+        strokeColor: 0xffffff,
+        strokeWidth: 2,
+      },
+    );
     this.levelRoot.addChild(box);
 
     // Create multiple bouncing circles
     const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
     for (let i = 0; i < 5; i++) {
       const circle = new Circle(
-        Globals.stage,
         Math.random() * Globals.canvasWidth,
         Math.random() * Globals.canvasHeight,
         20 + Math.random() * 20,
-        { color: colors[i % colors.length], strokeWidth: 2 }
+        { color: colors[i % colors.length], strokeWidth: 2 },
       );
       this.circles.push(circle);
       this.levelRoot.addChild(circle);

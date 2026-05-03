@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { GameObject } from "../GameObject";
 import { TransformComponent } from "../components/Movement/TransformComponent";
 import { BoxRenderComponent } from "../components/Render/BoxRenderComponent";
@@ -7,14 +6,13 @@ import { ObjectNames } from "../consts";
 
 export class Box extends GameObject {
   constructor(
-    container: Container,
     x: number = 0,
     y: number = 0,
     width: number = 100,
     height: number = 100,
     renderOptions: RenderOptions = {},
   ) {
-    super(container);
+    super();
     this.name = ObjectNames.BoxObject;
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(new BoxRenderComponent(width, height, renderOptions));

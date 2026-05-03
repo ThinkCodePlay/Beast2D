@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { GameObject } from "../../../core/GameObject";
 import {
   ParallaxBackgroundRenderComponent,
@@ -21,11 +20,8 @@ const defaultLayers: ParallaxLayerConfig[] = [
 ];
 
 export class ParallaxBackground extends GameObject {
-  constructor(
-    container: Container,
-    layersConfig: ParallaxLayerConfig[] = defaultLayers,
-  ) {
-    super(container);
+  constructor(layersConfig: ParallaxLayerConfig[] = defaultLayers) {
+    super();
     this.name = "ParallaxBackground";
 
     this.addComponent(new ParallaxBackgroundRenderComponent(layersConfig));

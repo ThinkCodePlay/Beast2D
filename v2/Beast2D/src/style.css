@@ -1,5 +1,6 @@
 html,body,#app {
   height: 100%;
+  width: 100%;
   margin: 0;
   background: #FFCBDD;
   color: #eee;
@@ -13,8 +14,8 @@ html,body,#app {
 }
 
 .game-container {
-  width: 800px;
-  height: 600px;
+  width: 400px;
+  height: 300px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 6px 24px rgba(0,0,0,0.6);

@@ -17,29 +17,37 @@ export abstract class Level {
 
   constructor(engine: Engine) {
     this.engine = engine;
-    this.levelRoot = new GameObject(new Container());
-    this.levelRoot.name = ObjectNames.LevelRoot;
+    this.levelRoot = this.createLevelRoot();
+  }
+
+  private createLevelRoot(): GameObject {
+    const levelRoot = new GameObject(new Container());
+    levelRoot.name = ObjectNames.LevelRoot;
+    return levelRoot;
   }
 
   // Initialize the level (add objects, set up logic)
   public start() {
+    this.levelRoot = this.createLevelRoot();
+    this.engine.app.stage.addChild(this.levelRoot.container);
+
     this.init();
+
     // Register the update callback with the engine ticker
     this.tickerCallback = this.update.bind(this);
     this.engine.app.ticker.add(this.tickerCallback);
-
   }
 
   // Clean up the level when switching
   public destroy() {
-    // Destroy all objects (this will clean up all components and graphics)
-    this.levelRoot.destroy();
-
-    // Remove ticker callback
+    // Remove ticker callback first to prevent updates during teardown.
     if (this.tickerCallback) {
       this.engine.app.ticker.remove(this.tickerCallback);
       this.tickerCallback = null;
     }
+
+    // Destroy all objects (this will clean up all components and graphics)
+    this.levelRoot.destroy();
   }
 
   // Abstract method for setting up the level (must be implemented by subclasses)

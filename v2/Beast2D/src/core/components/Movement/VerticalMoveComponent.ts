@@ -12,7 +12,10 @@ export class VerticalMoveComponent extends Component {
 
   override init(): void {
     if (!this.gameObject) return;
-    this.transform = this.gameObject.getComponent(TransformComponent);
+    this.transform = this.gameObject.getRequiredComponent(
+      TransformComponent,
+      this.constructor.name,
+    );
   }
 
   override update(deltaTime: number): void {

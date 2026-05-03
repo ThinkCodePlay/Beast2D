@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { DialogUIRenderComponent } from "./DialogUIRenderComponent";
@@ -9,7 +8,6 @@ export class DialogUI extends GameObject {
   private renderComponent: DialogUIRenderComponent;
 
   constructor(
-    container: Container,
     x: number,
     y: number,
     width: number = 320,
@@ -19,7 +17,7 @@ export class DialogUI extends GameObject {
     isOpen: boolean = false,
     renderOptions: RenderOptions = {},
   ) {
-    super(container);
+    super();
     this.name = "DialogUI";
     DialogUI.current = this;
 

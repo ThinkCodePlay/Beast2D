@@ -23,8 +23,8 @@ export class GameObject {
   container: Container;
   private components: Map<string, Component> = new Map();
 
-  constructor(container: Container) {
-    this.container = container;
+  constructor(container?: Container) {
+    this.container = container ?? new Container();
   }
 
   // Scene Graph Methods
@@ -32,6 +32,12 @@ export class GameObject {
     if (child.parent) {
       child.parent.removeChild(child);
     }
+
+    if (child.container.parent) {
+      child.container.parent.removeChild(child.container);
+    }
+
+    this.container.addChild(child.container);
     child.parent = this;
     this.children.push(child);
   }
@@ -40,6 +46,11 @@ export class GameObject {
     const index = this.children.indexOf(child);
     if (index !== -1) {
       this.children.splice(index, 1);
+
+      if (child.container.parent === this.container) {
+        this.container.removeChild(child.container);
+      }
+
       child.parent = null;
     }
   }
@@ -86,6 +97,21 @@ export class GameObject {
     return (this.components.get(componentClass.name) as T) || null;
   }
 
+  getRequiredComponent<T extends Component>(
+    componentClass: new (...args: any[]) => T,
+    requester?: string,
+  ): T {
+    const component = this.getComponent(componentClass);
+    if (!component) {
+      const requestedBy = requester ? ` for ${requester}` : "";
+      throw new Error(
+        `${componentClass.name} is required${requestedBy} on GameObject ${this.uuid}`,
+      );
+    }
+
+    return component;
+  }
+
   hasComponent<T extends Component>(
     componentClass: new (...args: any[]) => T,
   ): boolean {
@@ -119,6 +145,11 @@ export class GameObject {
       component.destroy();
     }
     this.components.clear();
+
+    if (this.container.parent) {
+      this.container.parent.removeChild(this.container);
+    }
+    this.container.destroy({ children: true });
   }
 
   // Direct access to TransformComponent (if exists)

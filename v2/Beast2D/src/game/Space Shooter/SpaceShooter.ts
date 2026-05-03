@@ -14,24 +14,21 @@ export class SpaceShooter extends Level {
     const startY = Globals.canvasHeight - 90;
 
     // background
-    this.levelRoot.addChild(new ParallaxBackground(Globals.stage));
+    this.levelRoot.addChild(new ParallaxBackground());
 
     // player
-    this.levelRoot.addChild(new Spaceship(Globals.stage, startX, startY));
+    this.levelRoot.addChild(new Spaceship(startX, startY));
 
     // enemies
-    this.levelRoot.addChild(new EnemyCircleSpawner(Globals.stage));
+    this.levelRoot.addChild(new EnemyCircleSpawner());
 
     // UI
-    this.levelRoot.addChild(new HeartsUI(Globals.stage, 16, 16, 3, 32));
-    this.levelRoot.addChild(
-      new ScoreUI(Globals.stage, Globals.canvasWidth - 16, 16),
-    );
+    this.levelRoot.addChild(new HeartsUI(16, 16, 3, 32));
+    this.levelRoot.addChild(new ScoreUI(Globals.canvasWidth - 16, 16));
 
     // dialog (hidden by default)
     this.levelRoot.addChild(
       new DialogUI(
-        Globals.stage,
         Globals.canvasWidth / 2 - 160,
         Globals.canvasHeight / 2 - 70,
         320,

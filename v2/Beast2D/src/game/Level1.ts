@@ -18,7 +18,7 @@ export class Level1 extends Level {
     const Y = (Globals.canvasHeight - SIZE) / 2;
 
     // Create a box
-    this.box = new Box(Globals.stage, X, Y, SIZE, SIZE, {
+    this.box = new Box(X, Y, SIZE, SIZE, {
       color: 0xff6600,
       strokeColor: 0x333333,
       strokeWidth: 3,
@@ -26,22 +26,22 @@ export class Level1 extends Level {
     this.levelRoot.addChild(this.box);
 
     // Create a circle
-    this.circle = new Circle(Globals.stage, 50, 50, 40, {
+    this.circle = new Circle(50, 50, 40, {
       color: 0x00ff00,
       strokeWidth: 2,
     });
     this.levelRoot.addChild(this.circle);
 
     // create player object
-    this.levelRoot.addChild(new Player(Globals.stage, X, Y));
+    this.levelRoot.addChild(new Player(X, Y));
   }
 
   protected update(ticker: Ticker) {
     super.update(ticker);
-    
+
     // Custom animations for Level 1
     this.box?.transform?.setRotation(
-      this.box.transform.rotation + 0.01 * ticker.deltaTime
+      this.box.transform.rotation + 0.01 * ticker.deltaTime,
     );
     this.circle?.transform?.setScale(1 + 0.3 * Math.sin(ticker.lastTime / 200));
   }

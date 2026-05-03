@@ -34,7 +34,10 @@ export abstract class RenderComponent extends Component {
     if (!this.gameObject) return;
 
     this.container = this.gameObject.container;
-    this.transform = this.gameObject.getComponent(TransformComponent);
+    this.transform = this.gameObject.getRequiredComponent(
+      TransformComponent,
+      this.constructor.name,
+    );
     this.graphics = this.createGraphics();
 
     this.updateTransform();

@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenederComponent";
@@ -14,13 +13,8 @@ import { DialogUI } from "../../../core/components/UI/DialogUI";
 import { ScoreUI } from "../../../core/components/UI/ScoreUI";
 
 export class Spaceship extends GameObject {
-  constructor(
-    container: Container,
-    x: number = 0,
-    y: number = 0,
-    renderOptions: RenderOptions = {},
-  ) {
-    super(container);
+  constructor(x: number = 0, y: number = 0, renderOptions: RenderOptions = {}) {
+    super();
     const shipWidth = 64;
     this.name = "Spaceship";
 
@@ -56,7 +50,6 @@ export class Spaceship extends GameObject {
     // weapon system
     this.addChild(
       new BulletSpawner(
-        Globals.stage,
         () => this.transform?.x ?? 0,
         () => this.transform?.y ?? 0,
       ),

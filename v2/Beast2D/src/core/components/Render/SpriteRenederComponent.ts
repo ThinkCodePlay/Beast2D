@@ -5,6 +5,7 @@ import type { RenderOptions } from "./RenderComponent";
 export class SpriteRenderComponent extends RenderComponent {
   private sprite: Sprite | null = null;
   private texturePath: string;
+  private isDestroyed: boolean = false;
 
   constructor(texturePath: string, renderOptions: RenderOptions = {}) {
     super(renderOptions);
@@ -18,6 +19,10 @@ export class SpriteRenderComponent extends RenderComponent {
     // Load texture asynchronously
     Assets.load(this.texturePath)
       .then((texture) => {
+        if (this.isDestroyed || graphics.destroyed) {
+          return;
+        }
+
         this.sprite = new Sprite(texture);
         //   this.sprite.anchor.set(0.5);
         this.sprite.alpha = this.renderOptions.alpha ?? 1;
@@ -32,6 +37,8 @@ export class SpriteRenderComponent extends RenderComponent {
   }
 
   override destroy(): void {
+    this.isDestroyed = true;
+
     if (this.sprite) {
       this.sprite.destroy();
       this.sprite = null;

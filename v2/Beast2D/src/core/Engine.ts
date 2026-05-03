@@ -21,8 +21,8 @@ export class Engine {
     this.app = new Application();
     globalThis.__PIXI_APP__ = this.app; // Expose app globally for debugging
     this.ready = this.app.init({
-      width: 800,
-      height: 600,
+      width: 400,
+      height: 300,
       backgroundAlpha: 1,
       resolution: devicePixelRatio || 1,
       antialias: true,

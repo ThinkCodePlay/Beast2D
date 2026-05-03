@@ -5,55 +5,57 @@ export class HorizontalInputComponent extends Component {
   keyLeft: boolean = false;
   keyRight: boolean = false;
   speed: number;
+  private transform: TransformComponent | null = null;
+  private onKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "ArrowLeft":
+      case "a":
+      case "A":
+        this.keyLeft = true;
+        event.preventDefault();
+        break;
+      case "ArrowRight":
+      case "d":
+      case "D":
+        this.keyRight = true;
+        event.preventDefault();
+        break;
+    }
+  };
+  private onKeyUp = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "ArrowLeft":
+      case "a":
+      case "A":
+        this.keyLeft = false;
+        break;
+      case "ArrowRight":
+      case "d":
+      case "D":
+        this.keyRight = false;
+        break;
+    }
+  };
 
   constructor(speed: number = 6) {
     super();
     this.speed = speed;
-    this.setupListeners();
   }
 
-  private setupListeners(): void {
-    window.addEventListener("keydown", (event) => {
-      switch (event.key) {
-        case "ArrowLeft":
-        case "a":
-        case "A":
-          this.keyLeft = true;
-          event.preventDefault();
-          break;
-        case "ArrowRight":
-        case "d":
-        case "D":
-          this.keyRight = true;
-          event.preventDefault();
-          break;
-      }
-    });
+  override init(): void {
+    if (!this.gameObject) return;
 
-    window.addEventListener("keyup", (event) => {
-      switch (event.key) {
-        case "ArrowLeft":
-        case "a":
-        case "A":
-          this.keyLeft = false;
-          break;
-        case "ArrowRight":
-        case "d":
-        case "D":
-          this.keyRight = false;
-          break;
-      }
-    });
+    this.transform = this.gameObject.getRequiredComponent(
+      TransformComponent,
+      this.constructor.name,
+    );
+
+    window.addEventListener("keydown", this.onKeyDown);
+    window.addEventListener("keyup", this.onKeyUp);
   }
 
-  update(deltaTime: number): void {
-    if (!this.gameObject) {
-      return;
-    }
-
-    const transform = this.gameObject.getComponent(TransformComponent);
-    if (!transform) {
-      console.warn("HorizontalInputComponent requires a TransformComponent");
+  override update(deltaTime: number): void {
+    if (!this.transform) {
       return;
     }
 
@@ -66,10 +68,17 @@ export class HorizontalInputComponent extends Component {
     }
 
     if (direction !== 0) {
-      transform.setPosition(
-        transform.x + direction * this.speed * deltaTime,
-        transform.y,
+      this.transform.setPosition(
+        this.transform.x + direction * this.speed * deltaTime,
+        this.transform.y,
       );
     }
+  }
+
+  override destroy(): void {
+    window.removeEventListener("keydown", this.onKeyDown);
+    window.removeEventListener("keyup", this.onKeyUp);
+    this.transform = null;
+    super.destroy();
   }
 }

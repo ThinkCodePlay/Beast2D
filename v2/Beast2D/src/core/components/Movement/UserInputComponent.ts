@@ -7,79 +7,79 @@ export class UserInputComponent extends Component {
   keyLeft: boolean = false;
   keyRight: boolean = false;
   speed: number = 5;
+  private transform: TransformComponent | null = null;
+  private onKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "ArrowUp":
+      case "w":
+      case "W":
+        this.keyUp = true;
+        event.preventDefault();
+        break;
+      case "ArrowDown":
+      case "s":
+      case "S":
+        this.keyDown = true;
+        event.preventDefault();
+        break;
+      case "ArrowLeft":
+      case "a":
+      case "A":
+        this.keyLeft = true;
+        event.preventDefault();
+        break;
+      case "ArrowRight":
+      case "d":
+      case "D":
+        this.keyRight = true;
+        event.preventDefault();
+        break;
+    }
+  };
+  private onKeyUp = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "ArrowUp":
+      case "w":
+      case "W":
+        this.keyUp = false;
+        break;
+      case "ArrowDown":
+      case "s":
+      case "S":
+        this.keyDown = false;
+        break;
+      case "ArrowLeft":
+      case "a":
+      case "A":
+        this.keyLeft = false;
+        break;
+      case "ArrowRight":
+      case "d":
+      case "D":
+        this.keyRight = false;
+        break;
+    }
+  };
 
   constructor(speed: number = 5) {
     super();
     this.speed = speed;
-    this.setupListeners();
   }
 
-  private setupListeners(): void {
-    window.addEventListener("keydown", (event) => {
-      switch (event.key) {
-        case "ArrowUp":
-        case "w":
-        case "W":
-          this.keyUp = true;
-          event.preventDefault();
-          break;
-        case "ArrowDown":
-        case "s":
-        case "S":
-          this.keyDown = true;
-          event.preventDefault();
-          break;
-        case "ArrowLeft":
-        case "a":
-        case "A":
-          this.keyLeft = true;
-          event.preventDefault();
-          break;
-        case "ArrowRight":
-        case "d":
-        case "D":
-          this.keyRight = true;
-          event.preventDefault();
-          break;
-      }
-    });
+  override init(): void {
+    if (!this.gameObject) return;
 
-    window.addEventListener("keyup", (event) => {
-      switch (event.key) {
-        case "ArrowUp":
-        case "w":
-        case "W":
-          this.keyUp = false;
-          break;
-        case "ArrowDown":
-        case "s":
-        case "S":
-          this.keyDown = false;
-          break;
-        case "ArrowLeft":
-        case "a":
-        case "A":
-          this.keyLeft = false;
-          break;
-        case "ArrowRight":
-        case "d":
-        case "D":
-          this.keyRight = false;
-          break;
-      }
-    });
+    this.transform = this.gameObject.getRequiredComponent(
+      TransformComponent,
+      this.constructor.name,
+    );
+
+    window.addEventListener("keydown", this.onKeyDown);
+    window.addEventListener("keyup", this.onKeyUp);
   }
 
-  update(_deltaTime: number): void {
-    if (!this.gameObject) {
-      return;
-    }
-
-    const transform = this.gameObject.getComponent(TransformComponent);
-    if (!transform) {
-      console.warn(
-        "UserInputComponent requires a TransformComponent on the GameObject",
-      );
+  override update(_deltaTime: number): void {
+    if (!this.transform) {
       return;
     }
 
@@ -101,13 +101,14 @@ export class UserInputComponent extends Component {
 
     // Apply movement to the transform
     if (dx !== 0 || dy !== 0) {
-      transform.translate(dx, dy);
+      this.transform.translate(dx, dy);
     }
   }
 
-  destroy(): void {
-    // Note: In a production system, you'd want to remove the event listeners
-    // to prevent memory leaks. This would require storing bound functions.
+  override destroy(): void {
+    window.removeEventListener("keydown", this.onKeyDown);
+    window.removeEventListener("keyup", this.onKeyUp);
+    this.transform = null;
     super.destroy();
   }
 }

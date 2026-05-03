@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { GameObject } from "../GameObject";
 import { TransformComponent } from "../components/Movement/TransformComponent";
 import { SpriteRenderComponent } from "../components/Render/SpriteRenederComponent";
@@ -8,13 +7,8 @@ import { ObjectNames, CollisionLayers, ColliderModes } from "../consts";
 import { SquareColliderComponent } from "../components/Collision/SquareColliderComponent";
 
 export class Player extends GameObject {
-  constructor(
-    container: Container,
-    x: number = 0,
-    y: number = 0,
-    renderOptions: RenderOptions = {},
-  ) {
-    super(container);
+  constructor(x: number = 0, y: number = 0, renderOptions: RenderOptions = {}) {
+    super();
     const playerSize = 64;
     this.name = ObjectNames.BoxObject;
     this.addComponent(new TransformComponent(x, y));

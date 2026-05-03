@@ -1,4 +1,3 @@
-import { Container } from "pixi.js";
 import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { HeartsUIRenderComponent } from "./HeartsUIRenderComponent";
@@ -9,7 +8,6 @@ export class HeartsUI extends GameObject {
   private renderComponent: HeartsUIRenderComponent;
 
   constructor(
-    container: Container,
     x: number = 16,
     y: number = 16,
     hearts: number = 3,
@@ -17,7 +15,7 @@ export class HeartsUI extends GameObject {
     spacing: number = 8,
     renderOptions: RenderOptions = {},
   ) {
-    super(container);
+    super();
     this.name = "HeartsUI";
     HeartsUI.current = this;
 

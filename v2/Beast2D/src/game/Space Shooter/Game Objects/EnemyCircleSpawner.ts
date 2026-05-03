@@ -1,12 +1,11 @@
-import { Container } from "pixi.js";
 import { GameObject } from "../../../core/GameObject";
 import { SpawnerComponent } from "../../../core/components/Behavior/SpawnerComponent";
 import { Globals } from "../../../core/Globals";
 import { EnemyCircle } from "./EnemyCircle";
 
 export class EnemyCircleSpawner extends GameObject {
-  constructor(container: Container) {
-    super(container);
+  constructor() {
+    super();
     this.name = "EnemyCircleSpawner";
     this.setupSpawner();
   }
@@ -19,7 +18,7 @@ export class EnemyCircleSpawner extends GameObject {
         0,
         (x, y) => {
           const parent = this.parent ?? this;
-          parent.addChild(new EnemyCircle(Globals.stage, x, y));
+          parent.addChild(new EnemyCircle(x, y));
         },
       ),
     );
