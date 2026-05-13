@@ -1,6 +1,6 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
-import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenederComponent";
+import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenderComponent";
 import type { RenderOptions } from "../../../core/components/Render/RenderComponent";
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
 import { HorizontalInputComponent } from "../../../core/components/Movement/HorizontalInputComponent";

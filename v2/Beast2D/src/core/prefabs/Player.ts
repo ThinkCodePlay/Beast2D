@@ -1,6 +1,6 @@
 import { GameObject } from "../GameObject";
 import { TransformComponent } from "../components/Movement/TransformComponent";
-import { SpriteRenderComponent } from "../components/Render/SpriteRenederComponent";
+import { SpriteRenderComponent } from "../components/Render/SpriteRenderComponent";
 import { UserInputComponent } from "../components/Movement/UserInputComponent";
 import type { RenderOptions } from "../components/Render/RenderComponent";
 import { ObjectNames, CollisionLayers, ColliderModes } from "../consts";
