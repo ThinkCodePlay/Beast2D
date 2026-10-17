@@ -1,23 +1,24 @@
 import { Graphics } from "pixi.js";
 import { GameObject } from "../../../core/GameObject";
+import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import { SpawnerComponent } from "../../../core/components/Behavior/SpawnerComponent";
 import { SpaceShootInputComponent } from "../../../core/components/Input/SpaceShootInputComponent";
 import { Globals } from "../../../core/Globals";
 import { Bullet } from "./Bullet";
 
+/**
+ * Child of the ship. Its transform is the muzzle position relative to the
+ * ship, so bullets are spawned at its world position into the level root
+ * (not as ship children, which would make them follow the ship).
+ */
 export class BulletSpawner extends GameObject {
-  private readonly bulletSpawnOffsetX: number = 30;
-  private readonly bulletSpawnOffsetY: number = -8;
   private readonly bulletRadius: number = 5;
-  private getShipX: () => number;
-  private getShipY: () => number;
   private debugSpawnMarker: Graphics | null = null;
 
-  constructor(getShipX: () => number, getShipY: () => number) {
+  constructor(offsetX: number = 30, offsetY: number = -8) {
     super();
     this.name = "BulletSpawner";
-    this.getShipX = getShipX;
-    this.getShipY = getShipY;
+    this.addComponent(new TransformComponent(offsetX, offsetY));
     this.setupWeaponSystem();
     this.createDebugSpawnMarker();
   }
@@ -25,13 +26,8 @@ export class BulletSpawner extends GameObject {
   private setupWeaponSystem(): void {
     const spawner = this.addComponent(
       new SpawnerComponent(0.2, 0, 0, () => {
-        const parent = this.parent ?? this;
-        parent.addChild(
-          new Bullet(
-            this.getShipX() + this.bulletSpawnOffsetX,
-            this.getShipY() + this.bulletSpawnOffsetY,
-          ),
-        );
+        const { x, y } = this.getWorldPosition();
+        this.root.addChild(new Bullet(x, y));
       }),
     );
 
@@ -43,39 +39,11 @@ export class BulletSpawner extends GameObject {
     if (!Globals.debug) return;
 
     this.debugSpawnMarker = new Graphics()
-      .circle(0, 0, 3)
+      .circle(this.bulletRadius, this.bulletRadius, 3)
       .fill({ color: 0x00ff66 })
       .stroke({ color: 0x003300, width: 1 });
-
-    this.container.sortableChildren = true;
     this.debugSpawnMarker.zIndex = 1000;
+    this.container.sortableChildren = true;
     this.container.addChild(this.debugSpawnMarker);
-    this.updateDebugSpawnMarker();
-  }
-
-  private updateDebugSpawnMarker(): void {
-    if (!this.debugSpawnMarker) return;
-
-    this.debugSpawnMarker.x =
-      this.getShipX() + this.bulletSpawnOffsetX + this.bulletRadius;
-    this.debugSpawnMarker.y =
-      this.getShipY() + this.bulletSpawnOffsetY + this.bulletRadius;
-  }
-
-  override update(deltaTime: number): void {
-    super.update(deltaTime);
-    if (this.debugSpawnMarker) {
-      this.updateDebugSpawnMarker();
-    }
-  }
-
-  override destroy(): void {
-    if (this.debugSpawnMarker) {
-      this.container.removeChild(this.debugSpawnMarker);
-      this.debugSpawnMarker.destroy();
-      this.debugSpawnMarker = null;
-    }
-
-    super.destroy();
   }
 }

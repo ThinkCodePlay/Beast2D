@@ -29,7 +29,7 @@ export class DestroyOutOfBoundsComponent extends Component {
   override update(_deltaTime: number): void {
     if (!this.gameObject || !this.transform) return;
 
-    const { x, y } = this.transform;
+    const { x, y } = this.transform.getWorldPosition();
     const { minX, maxX, minY, maxY } = this.bounds;
 
     const isOutOfBounds =

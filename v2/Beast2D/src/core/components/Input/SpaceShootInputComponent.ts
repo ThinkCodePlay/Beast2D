@@ -1,18 +1,11 @@
 import { Component } from "../Component";
+import type { Input } from "../../Input";
 import { SpawnerComponent } from "../Behavior/SpawnerComponent";
 
+/** Enables the spawner while the "shoot" action is held. */
 export class SpaceShootInputComponent extends Component {
   private readonly spawner: SpawnerComponent;
-  private isShooting: boolean = false;
-  private onKeyDown = (event: KeyboardEvent) => {
-    if (event.code !== "Space") return;
-    this.isShooting = true;
-    event.preventDefault();
-  };
-  private onKeyUp = (event: KeyboardEvent) => {
-    if (event.code !== "Space") return;
-    this.isShooting = false;
-  };
+  private input: Input | null = null;
 
   constructor(spawner: SpawnerComponent) {
     super();
@@ -20,19 +13,15 @@ export class SpaceShootInputComponent extends Component {
   }
 
   override onInit(): void {
-    window.addEventListener("keydown", this.onKeyDown);
-    window.addEventListener("keyup", this.onKeyUp);
+    this.input = this.requireContext().input;
   }
 
   override update(_deltaTime: number): void {
-    this.spawner.enabled = this.isShooting;
+    this.spawner.enabled = this.input?.isDown("shoot") ?? false;
   }
 
   override onDestroy(): void {
-    window.removeEventListener("keydown", this.onKeyDown);
-    window.removeEventListener("keyup", this.onKeyUp);
-    this.isShooting = false;
+    this.input = null;
     this.spawner.enabled = false;
-    super.onDestroy();
   }
 }

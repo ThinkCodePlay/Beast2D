@@ -1,69 +1,83 @@
 /* Level.ts
-  Level is an abstract base class representing a game level or scene.
-  It provides lifecycle methods for initializing, updating, and destroying
-  the level, as well as managing game objects within the level.
-  All specific levels should extend this class and implement the init method.
-  */
+  Abstract base class for a level (scene). Subclasses implement `init()` to
+  add objects to `levelRoot` and may override `update(dt)` for level logic
+  (call `super.update(dt)` first). The engine drives the level through
+  `tick`, which also runs collisions, applies transforms and flushes
+  destroyed objects.
+*/
 
+import { Container } from "pixi.js";
 import { ObjectNames } from "./consts";
-import { Engine } from "./Engine";
+import type { Engine } from "./Engine";
+import type { EngineContext } from "./EngineContext";
 import { GameObject } from "./GameObject";
-import { ColliderComponent } from "./components/Collision/ColliderComponent";
-import { Ticker, Container } from "pixi.js";
 
 export abstract class Level {
   protected engine: Engine;
   protected levelRoot!: GameObject;
-  private tickerCallback: ((ticker: Ticker) => void) | null = null;
+  private started = false;
+
+  /** Asset paths that LevelManager preloads before `start()`. */
+  assets: string[] = [];
 
   constructor(engine: Engine) {
     this.engine = engine;
   }
 
-  private createLevelRoot(): GameObject {
-    const levelRoot = new GameObject(new Container());
-    levelRoot.name = ObjectNames.LevelRoot;
-    return levelRoot;
+  protected get context(): EngineContext {
+    return this.engine.context;
   }
 
-  // Initialize the level (add objects, set up logic)
+  // Initialize the level (create the root, add objects, set up logic)
   public start() {
-    this.levelRoot = this.createLevelRoot();
-    this.engine.app.stage.addChild(this.levelRoot.container);
+    const context = this.context;
 
+    this.levelRoot = new GameObject(new Container());
+    this.levelRoot.name = ObjectNames.LevelRoot;
+    this.levelRoot.runWhenPaused = true;
+    this.levelRoot.context = context;
+    context.stage.addChild(this.levelRoot.container);
+
+    this.started = true;
     this.init();
-
-    // Register the update callback with the engine ticker
-    this.tickerCallback = this.update.bind(this);
-    this.engine.app.ticker.add(this.tickerCallback);
   }
 
   // Clean up the level when switching
   public destroy() {
-    // Remove ticker callback first to prevent updates during teardown.
-    if (this.tickerCallback) {
-      this.engine.app.ticker.remove(this.tickerCallback);
-      this.tickerCallback = null;
-    }
+    if (!this.started) return;
+    this.started = false;
 
-    // Destroy all objects (this will clean up all components and graphics)
     this.levelRoot.destroy();
     GameObject.flushDestroyed();
-    ColliderComponent.clearRegistry();
+    this.context.resetLevelState();
   }
 
   // Abstract method for setting up the level (must be implemented by subclasses)
   protected abstract init(): void;
 
-  // Update method called by the engine ticker (can be overridden)
-  protected update(ticker: Ticker): void {
-    this.levelRoot.update(ticker.deltaTime);
+  // Level logic, called every frame (can be overridden)
+  protected update(deltaTime: number): void {
+    this.levelRoot.update(deltaTime);
+  }
+
+  /** One frame. Called by the engine. */
+  public tick(deltaTime: number): void {
+    if (!this.started) return;
+    const context = this.context;
+
+    this.update(deltaTime);
+
+    if (!context.time.paused && context.collisionStepper.consume(deltaTime) > 0) {
+      context.collisions.update();
+    }
+
+    this.levelRoot.syncTransforms();
+    context.timers.update(context.time.deltaSeconds);
     GameObject.flushDestroyed();
   }
 
   // Get the complete scene hierarchy
   public getHierarchy() {
-    if (!this.levelRoot) return null;
-    return this.levelRoot.getHierarchy();
+    return this.started ? this.levelRoot.getHierarchy() : null;
   }
 }

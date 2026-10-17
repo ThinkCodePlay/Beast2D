@@ -1,6 +1,6 @@
 import { Assets, Container, Sprite, Texture } from "pixi.js";
 import { Component } from "../Component";
-import { Globals } from "../../Globals";
+import type { EngineContext } from "../../EngineContext";
 
 export interface ParallaxLayerConfig {
   texturePath: string;
@@ -28,8 +28,11 @@ export class ParallaxBackgroundRenderComponent extends Component {
     this.layersConfig = layersConfig;
   }
 
+  private ctx!: EngineContext;
+
   override onInit(): void {
     if (!this.gameObject) return;
+    this.ctx = this.requireContext();
 
     this.layerContainer = new Container();
     this.gameObject.container.addChild(this.layerContainer);
@@ -38,8 +41,8 @@ export class ParallaxBackgroundRenderComponent extends Component {
   }
 
   override update(deltaTime: number): void {
-    const canvasWidth = Globals.canvasWidth;
-    const canvasHeight = Globals.canvasHeight;
+    const canvasWidth = this.ctx.width;
+    const canvasHeight = this.ctx.height;
 
     for (const layer of this.layers) {
       const offsetX = layer.speedX * deltaTime;
@@ -107,8 +110,8 @@ export class ParallaxBackgroundRenderComponent extends Component {
       return;
     }
 
-    const canvasWidth = Globals.canvasWidth;
-    const canvasHeight = Globals.canvasHeight;
+    const canvasWidth = this.ctx.width;
+    const canvasHeight = this.ctx.height;
 
     for (let i = 0; i < textures.length; i += 1) {
       const texture = textures[i] as Texture;

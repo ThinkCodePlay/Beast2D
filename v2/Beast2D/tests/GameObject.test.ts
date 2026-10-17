@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GameObject } from "../src/core/GameObject";
 import { Component } from "../src/core/components/Component";
-import { ColliderComponent } from "../src/core/components/Collision/ColliderComponent";
 import { SpawnerComponent } from "../src/core/components/Behavior/SpawnerComponent";
 import { TransformComponent } from "../src/core/components/Movement/TransformComponent";
 
@@ -78,8 +77,13 @@ describe("GameObject lifecycle", () => {
 });
 
 describe("components", () => {
-  it("clears the collider registry", () => {
-    expect(() => ColliderComponent.clearRegistry()).not.toThrow();
+  it("spawner with a zero interval does not hang", () => {
+    let spawned = 0;
+    const go = new GameObject();
+    go.addComponent(new SpawnerComponent(0, 0, 0, () => spawned++));
+    go.update(1);
+    expect(spawned).toBeGreaterThan(0);
+    expect(spawned).toBeLessThanOrEqual(10);
   });
 
   it("spawner spawns on schedule", () => {

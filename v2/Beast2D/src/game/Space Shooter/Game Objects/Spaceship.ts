@@ -36,8 +36,6 @@ export class Spaceship extends GameObject {
 
           const enemy = other.gameObject;
           if (!enemy) return;
-
-          enemy.parent?.removeChild(enemy);
           enemy.destroy();
         },
       }),
@@ -47,12 +45,7 @@ export class Spaceship extends GameObject {
       new HorizontalClampComponent(0, Globals.canvasWidth - shipWidth),
     );
 
-    // weapon system
-    this.addChild(
-      new BulletSpawner(
-        () => this.transform?.x ?? 0,
-        () => this.transform?.y ?? 0,
-      ),
-    );
+    // weapon system (positioned relative to the ship)
+    this.addChild(new BulletSpawner());
   }
 }

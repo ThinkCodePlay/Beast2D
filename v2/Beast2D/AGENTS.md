@@ -50,30 +50,31 @@ Notes:
 - Use constructor-driven configuration (values passed at object construction time).
 - Compose behavior with components via `addComponent(...)`.
 - Use `getRequiredComponent(...)` when absence is a programming error; use `getComponent(...)` when optional.
-- Keep level-specific setup in `Level.init()` and per-frame logic in `Level.update()`.
+- Keep level-specific setup in `Level.init()` and per-frame logic in `Level.update(dt)`.
 
 ## Component Lifecycle
 
-Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()`.
+Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `README.md`).
 - `addComponent` only registers; `onInit` runs once on the first update of the owning `GameObject`, after all its components are added (siblings are available).
-- `GameObject.destroy()` is idempotent and safe inside `update`/callbacks: it detaches immediately and components' `onDestroy` run at the end of the frame (`GameObject.flushDestroyed()`, called by `Level`). `onDestroy` only runs if `onInit` ran.
+- `GameObject.destroy()` is idempotent and safe inside `update`/callbacks: it detaches immediately; `onDestroy` of components (and the object's own protected `onDestroy()`) run at the end of the frame via `GameObject.flushDestroyed()` (called by `Level.tick`). Component `onDestroy` only runs if `onInit` ran. Do not override `destroy()`, override `onDestroy()`.
+- `update(dt)` uses frame units (1 = 1/60 s). Seconds: `context.time.deltaSeconds`.
 
 ## Repo Gotchas
 
 - Paths with spaces exist and are valid (for example `src/game/Space Shooter/` and nested `Game Objects/`). Keep import paths exact.
-- `GameObject` deduplicates components by class name; adding a duplicate returns the existing instance.
-- Many render/collision flows assume a `TransformComponent` exists on the same `GameObject`.
-- `Globals.stage` access before engine initialization throws.
-- `GameObject.getWorldPosition()` is currently a stub.
+- Components are keyed by class reference; adding a second component of the same class returns the existing one. `getComponent(Base)` finds subclasses.
+- `TransformComponent` drives the GameObject container (applied after updates). Render/collider graphics are drawn at the object origin. Children inherit the parent transform, so spawn world-space objects (bullets) into the level root (`this.root`), not under a moving parent.
+- Components needing engine services use `this.requireContext()` (throws if the object is not in a level). `Globals` is only a facade for construction-time values like canvas size.
+- Levels override `update(dt: number)` (call `super.update(dt)`), not a ticker callback. The game registers its levels in `src/main.ts`.
+- `GameObject.getWorldPosition()` composes parent transforms.
 
 ## Safe Change Workflow
 
 1. Start from an existing nearby prefab/component/level and mirror its style.
 2. Make minimal changes in the relevant domain folder (`core/components`, `core/prefabs`, or `game/...`).
-3. Run `npm run build` before finishing.
+3. Run `npm test` and `npm run build` before finishing.
 4. If you introduce new behavior, ensure it is wired through level setup (`init`) and that teardown uses `destroy()` patterns already in use.
 
 ## Documentation Status
 
-- No `README.md`, `CONTRIBUTING.md`, or `docs/` markdown docs are currently present.
-- Treat this file as the quick-start guide for agent behavior in this repository.
+- `README.md` documents the engine concepts; this file is the quick-start guide for agents.

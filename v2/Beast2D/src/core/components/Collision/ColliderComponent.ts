@@ -1,179 +1,155 @@
+import { Graphics } from "pixi.js";
 import { Component } from "../Component";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { CollisionLayers, ColliderModes } from "../../consts";
+import type { ColliderShape } from "./shapes";
 
+export type { ColliderShape } from "./shapes";
 export type ColliderMode = (typeof ColliderModes)[keyof typeof ColliderModes];
 export type CollisionLayer =
   (typeof CollisionLayers)[keyof typeof CollisionLayers];
 
-export type ColliderShape =
-  | { type: "circle"; x: number; y: number; radius: number }
-  | { type: "rect"; x: number; y: number; width: number; height: number };
+export type CollisionHandler = (
+  self: ColliderComponent,
+  other: ColliderComponent,
+) => void;
 
 export interface ColliderOptions {
   layer?: CollisionLayer;
   mode?: ColliderMode;
   mask?: CollisionLayer[];
-  onCollisionEnter?: (
-    self: ColliderComponent,
-    other: ColliderComponent,
-  ) => void;
+  onCollisionEnter?: CollisionHandler;
+  onCollisionStay?: CollisionHandler;
+  onCollisionExit?: CollisionHandler;
 }
 
+export interface ColliderDebugOptions {
+  color?: number;
+  lineWidth?: number;
+  alpha?: number;
+  hitColor?: number;
+}
+
+/* ColliderComponent
+  Describes a collider (layer, mode, mask, callbacks). The actual checks are
+  done by the CollisionSystem of the engine context. Debug outlines are drawn
+  as a child of the GameObject container, so they follow its transform.
+*/
 export abstract class ColliderComponent extends Component {
-  private static registry: Set<ColliderComponent> = new Set();
-
-  static clearRegistry(): void {
-    ColliderComponent.registry.clear();
-  }
-
   readonly layer: CollisionLayer;
   readonly mode: ColliderMode;
   readonly mask: CollisionLayer[];
-  readonly onCollisionEnter?: (
-    self: ColliderComponent,
-    other: ColliderComponent,
-  ) => void;
+  readonly onCollisionEnter?: CollisionHandler;
+  readonly onCollisionStay?: CollisionHandler;
+  readonly onCollisionExit?: CollisionHandler;
+
+  /** True while an active collider overlaps at least one other collider. */
+  isColliding: boolean = false;
 
   protected transform: TransformComponent | null = null;
-  private activeCollisionKeys: Set<string> = new Set();
-  protected isColliding: boolean = false;
+  private readonly debugOptions: Required<ColliderDebugOptions>;
+  private debugGraphics: Graphics | null = null;
+  private highlighted: boolean = false;
 
-  constructor(options: ColliderOptions = {}) {
+  constructor(
+    options: ColliderOptions = {},
+    debugOptions: ColliderDebugOptions = {},
+  ) {
     super();
     this.layer = options.layer ?? CollisionLayers.Default;
     this.mode = options.mode ?? ColliderModes.Passive;
     this.mask = options.mask ?? [];
     this.onCollisionEnter = options.onCollisionEnter;
+    this.onCollisionStay = options.onCollisionStay;
+    this.onCollisionExit = options.onCollisionExit;
+    this.debugOptions = {
+      color: debugOptions.color ?? 0x00ff66,
+      lineWidth: debugOptions.lineWidth ?? 1,
+      alpha: debugOptions.alpha ?? 0.9,
+      hitColor: debugOptions.hitColor ?? 0xff0000,
+    };
   }
+
+  /** Shape in world space, or null if it cannot be computed. */
+  abstract getShape(): ColliderShape | null;
+
+  /** Draws the outline in the GameObject's local space. */
+  protected abstract drawDebugShape(graphics: Graphics, color: number): void;
 
   override onInit(): void {
     if (!this.gameObject) return;
 
     this.transform = this.gameObject.getComponent(TransformComponent);
-    ColliderComponent.registry.add(this);
+    this.gameObject.context?.collisions.register(this);
+
+    this.debugGraphics = new Graphics();
+    this.debugGraphics.alpha = this.debugOptions.alpha;
+    this.drawDebug(this.debugOptions.color);
+    this.gameObject.container.addChild(this.debugGraphics);
+    this.updateDebugVisibility();
   }
 
   override update(_deltaTime: number): void {
-    if (!this.isActive()) return;
+    this.updateDebugVisibility();
+    if (!this.debugGraphics || !this.debugGraphics.visible) return;
 
-    const nextActiveKeys = new Set<string>();
-
-    for (const other of [...ColliderComponent.registry]) {
-      if (this.gameObject?.destroyed) break;
-      if (!this.shouldCheckAgainst(other)) continue;
-
-      if (!this.intersects(other)) continue;
-
-      const collisionKey = this.getCollisionKey(other);
-      nextActiveKeys.add(collisionKey);
-
-      if (this.activeCollisionKeys.has(collisionKey)) continue;
-
-      this.onCollisionEnter?.(this, other);
+    if (this.isColliding !== this.highlighted) {
+      this.highlighted = this.isColliding;
+      this.drawDebug(
+        this.highlighted ? this.debugOptions.hitColor : this.debugOptions.color,
+      );
     }
-
-    this.isColliding = nextActiveKeys.size > 0;
-    this.activeCollisionKeys = nextActiveKeys;
   }
 
   override onDestroy(): void {
-    ColliderComponent.registry.delete(this);
-    this.activeCollisionKeys.clear();
+    this.gameObject?.context?.collisions.unregister(this);
+    if (this.debugGraphics) {
+      this.debugGraphics.destroy();
+      this.debugGraphics = null;
+    }
+    this.isColliding = false;
   }
 
-  protected abstract getShape(): ColliderShape | null;
-
-  private isActive(): boolean {
-    return (
-      this.mode === ColliderModes.Active || this.mode === ColliderModes.Both
-    );
+  isActiveMode(): boolean {
+    return this.mode === ColliderModes.Active || this.mode === ColliderModes.Both;
   }
 
-  private isPassive(): boolean {
+  isPassiveMode(): boolean {
     return (
       this.mode === ColliderModes.Passive || this.mode === ColliderModes.Both
     );
   }
 
-  private shouldCheckAgainst(other: ColliderComponent): boolean {
-    if (other === this) return false;
-    if (!this.enabled || !other.enabled) return false;
-    if (!this.gameObject || !other.gameObject) return false;
-    if (this.gameObject.destroyed || other.gameObject.destroyed) return false;
-    if (!other.isPassive()) return false;
-    if (this.mask.length > 0 && !this.mask.includes(other.layer)) return false;
+  /** Enabled and attached to a live GameObject. */
+  isLive(): boolean {
+    return this.enabled && !this.isDestroyedOrGone();
+  }
 
+  isDestroyedOrGone(): boolean {
+    return this.destroyed || !this.gameObject || this.gameObject.destroyed;
+  }
+
+  /** Whether this collider wants to be notified about `other`. */
+  accepts(other: ColliderComponent): boolean {
+    if (other === this) return false;
+    if (!this.isLive() || !other.isLive()) return false;
+    if (!other.isPassiveMode()) return false;
+    if (this.mask.length > 0 && !this.mask.includes(other.layer)) return false;
     return true;
   }
 
-  private intersects(other: ColliderComponent): boolean {
-    const shapeA = this.getShape();
-    const shapeB = other.getShape();
-
-    if (!shapeA || !shapeB) return false;
-
-    return ColliderComponent.intersectsShapes(shapeA, shapeB);
+  private drawDebug(color: number): void {
+    if (!this.debugGraphics) return;
+    this.debugGraphics.clear();
+    this.drawDebugShape(this.debugGraphics, color);
+    this.debugGraphics.stroke({
+      color,
+      width: this.debugOptions.lineWidth,
+    });
   }
 
-  private getCollisionKey(other: ColliderComponent): string {
-    const ownId = this.gameObject?.uuid ?? "self";
-    const otherId = other.gameObject?.uuid ?? "other";
-    return `${ownId}:${otherId}`;
-  }
-
-  private static intersectsShapes(a: ColliderShape, b: ColliderShape): boolean {
-    if (a.type === "circle" && b.type === "circle") {
-      return this.intersectsCircleCircle(a, b);
-    }
-
-    if (a.type === "rect" && b.type === "rect") {
-      return this.intersectsRectRect(a, b);
-    }
-
-    if (a.type === "circle" && b.type === "rect") {
-      return this.intersectsCircleRect(a, b);
-    }
-
-    if (a.type === "rect" && b.type === "circle") {
-      return this.intersectsCircleRect(b, a);
-    }
-
-    return false;
-  }
-
-  private static intersectsCircleCircle(
-    a: Extract<ColliderShape, { type: "circle" }>,
-    b: Extract<ColliderShape, { type: "circle" }>,
-  ): boolean {
-    const dx = a.x - b.x;
-    const dy = a.y - b.y;
-    const radiusSum = a.radius + b.radius;
-    return dx * dx + dy * dy <= radiusSum * radiusSum;
-  }
-
-  private static intersectsRectRect(
-    a: Extract<ColliderShape, { type: "rect" }>,
-    b: Extract<ColliderShape, { type: "rect" }>,
-  ): boolean {
-    return (
-      a.x < b.x + b.width &&
-      a.x + a.width > b.x &&
-      a.y < b.y + b.height &&
-      a.y + a.height > b.y
-    );
-  }
-
-  private static intersectsCircleRect(
-    circle: Extract<ColliderShape, { type: "circle" }>,
-    rect: Extract<ColliderShape, { type: "rect" }>,
-  ): boolean {
-    const closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.width));
-    const closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.height));
-
-    const dx = circle.x - closestX;
-    const dy = circle.y - closestY;
-
-    return dx * dx + dy * dy <= circle.radius * circle.radius;
+  private updateDebugVisibility(): void {
+    if (!this.debugGraphics) return;
+    this.debugGraphics.visible = this.gameObject?.context?.debug ?? true;
   }
 }

@@ -1,65 +1,12 @@
 import { Component } from "../Component";
+import type { Input } from "../../Input";
 import { TransformComponent } from "./TransformComponent";
 
+/** Moves the GameObject in 4 directions using the left/right/up/down actions. */
 export class UserInputComponent extends Component {
-  keyUp: boolean = false;
-  keyDown: boolean = false;
-  keyLeft: boolean = false;
-  keyRight: boolean = false;
-  speed: number = 5;
+  speed: number;
   private transform: TransformComponent | null = null;
-  private onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "ArrowUp":
-      case "w":
-      case "W":
-        this.keyUp = true;
-        event.preventDefault();
-        break;
-      case "ArrowDown":
-      case "s":
-      case "S":
-        this.keyDown = true;
-        event.preventDefault();
-        break;
-      case "ArrowLeft":
-      case "a":
-      case "A":
-        this.keyLeft = true;
-        event.preventDefault();
-        break;
-      case "ArrowRight":
-      case "d":
-      case "D":
-        this.keyRight = true;
-        event.preventDefault();
-        break;
-    }
-  };
-  private onKeyUp = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "ArrowUp":
-      case "w":
-      case "W":
-        this.keyUp = false;
-        break;
-      case "ArrowDown":
-      case "s":
-      case "S":
-        this.keyDown = false;
-        break;
-      case "ArrowLeft":
-      case "a":
-      case "A":
-        this.keyLeft = false;
-        break;
-      case "ArrowRight":
-      case "d":
-      case "D":
-        this.keyRight = false;
-        break;
-    }
-  };
+  private input: Input | null = null;
 
   constructor(speed: number = 5) {
     super();
@@ -73,37 +20,28 @@ export class UserInputComponent extends Component {
       TransformComponent,
       this.constructor.name,
     );
-
-    window.addEventListener("keydown", this.onKeyDown);
-    window.addEventListener("keyup", this.onKeyUp);
+    this.input = this.requireContext().input;
   }
 
   override update(deltaTime: number): void {
-    if (!this.transform) {
-      return;
-    }
+    if (!this.transform || !this.input) return;
 
     let dx = 0;
     let dy = 0;
+    if (this.input.isDown("up")) dy -= 1;
+    if (this.input.isDown("down")) dy += 1;
+    if (this.input.isDown("left")) dx -= 1;
+    if (this.input.isDown("right")) dx += 1;
 
-    if (this.keyUp) dy -= 1;
-    if (this.keyDown) dy += 1;
-    if (this.keyLeft) dx -= 1;
-    if (this.keyRight) dx += 1;
+    if (dx === 0 && dy === 0) return;
 
-    // Apply movement to the transform
-    if (dx !== 0 || dy !== 0) {
-      // Normalize so diagonal movement is not faster, then scale by speed
-      const magnitude = Math.hypot(dx, dy);
-      const scale = (this.speed * deltaTime) / magnitude;
-      this.transform.translate(dx * scale, dy * scale);
-    }
+    // Normalize so diagonal movement is not faster
+    const scale = (this.speed * deltaTime) / Math.hypot(dx, dy);
+    this.transform.translate(dx * scale, dy * scale);
   }
 
   override onDestroy(): void {
-    window.removeEventListener("keydown", this.onKeyDown);
-    window.removeEventListener("keyup", this.onKeyUp);
     this.transform = null;
-    super.onDestroy();
+    this.input = null;
   }
 }

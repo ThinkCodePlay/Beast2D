@@ -1,17 +1,11 @@
 # TODO
 
-[x] make global variable such as canvas height and width and root node (stage)
-[x] make GameObject Generic
-[x] make box object implement gameobject
-[x] discuss using component based architecture
-[x] create level manager
-[x] display object hierarchy
-[ ] discuss who and how to expose the engine api
-[ ] handle hover and click events on game objects
+[x] global canvas size and root node
+[x] generic GameObject, component based architecture
+[x] level manager, object hierarchy
+[x] spawner, collision system, background object
+[x] expose the engine api (src/core/index.ts, README.md)
+[x] handle hover and click events on game objects (InteractiveComponent)
 [ ] create win object
 [ ] create lose object
-[ ] create score object
-[ ] create spawner
-[ ] create object interaction (collision) system
-[ ] check initil trajectory of game objects
-[ ] background object 
+[ ] object pooling for bullets/enemies (ObjectPool exists, GameObject reuse does not yet)

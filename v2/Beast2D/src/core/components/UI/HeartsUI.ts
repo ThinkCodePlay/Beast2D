@@ -17,6 +17,7 @@ export class HeartsUI extends GameObject {
   ) {
     super();
     this.name = "HeartsUI";
+    this.runWhenPaused = true;
     HeartsUI.current = this;
 
     this.addComponent(new TransformComponent(x, y));
@@ -45,10 +46,10 @@ export class HeartsUI extends GameObject {
     return this.renderComponent.getHearts();
   }
 
-  override destroy(): void {
+  protected override onDestroy(): void {
     if (HeartsUI.current === this) {
       HeartsUI.current = null;
     }
-    super.destroy();
+    super.onDestroy();
   }
 }

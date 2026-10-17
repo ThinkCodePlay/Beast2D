@@ -3,6 +3,7 @@
 
 export const ObjectNames = {
   LevelRoot: "LevelRoot",
+  GameObject: "GameObject",
   BoxObject: "BoxObject",
   CircleObject: "CircleObject",
 } as const;

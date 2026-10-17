@@ -1,4 +1,5 @@
 import { Component } from "../Component";
+import { FRAMES_PER_SECOND } from "../../Time";
 
 export type NumberRange = {
   min: number;
@@ -6,6 +7,9 @@ export type NumberRange = {
 };
 
 export type NumberOrRange = number | NumberRange;
+
+const MIN_INTERVAL_SECONDS = 0.01;
+const MAX_SPAWNS_PER_UPDATE = 10;
 
 type SpawnCallback = (x: number, y: number) => void;
 
@@ -33,14 +37,21 @@ export class SpawnerComponent extends Component {
   }
 
   override update(deltaTime: number): void {
-    const deltaSeconds = deltaTime / 60;
+    const deltaSeconds = deltaTime / FRAMES_PER_SECOND;
     this.timeUntilNextSpawnSeconds -= deltaSeconds;
 
-    while (this.timeUntilNextSpawnSeconds <= 0) {
+    // Capped so a zero interval or a long frame cannot loop forever.
+    let spawned = 0;
+    while (this.timeUntilNextSpawnSeconds <= 0 && spawned < MAX_SPAWNS_PER_UPDATE) {
       this.spawn();
-      this.timeUntilNextSpawnSeconds += this.randomInRange(
-        this.intervalRangeSeconds,
+      spawned += 1;
+      this.timeUntilNextSpawnSeconds += Math.max(
+        this.randomInRange(this.intervalRangeSeconds),
+        MIN_INTERVAL_SECONDS,
       );
+    }
+    if (this.timeUntilNextSpawnSeconds <= 0) {
+      this.timeUntilNextSpawnSeconds = MIN_INTERVAL_SECONDS;
     }
   }
 

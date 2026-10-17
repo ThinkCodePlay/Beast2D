@@ -1,46 +1,45 @@
 import type { Engine } from "./Engine";
 import { LevelManager } from "./LevelManager";
 import type { Level } from "./Level";
-import { Level1 } from "../game/Level1";
-import { Level2 } from "../game/Level2";
-import { SpaceShooter } from "../game/Space Shooter/SpaceShooter.ts";
 
+/* GameManager: game-agnostic facade for levels and pause. The game registers
+  its own levels (see src/main.ts). */
 export class GameManager {
   private engine: Engine;
   private levelManager: LevelManager;
 
   constructor(engine: Engine) {
     this.engine = engine;
-    this.levelManager = new LevelManager(this.engine);
+    this.levelManager = new LevelManager();
   }
 
-  public initialize() {
-    this.registerLevel("level1", new Level1(this.engine));
-    this.registerLevel("level2", new Level2(this.engine));
-    this.registerLevel("spaceShooter", new SpaceShooter(this.engine));
-    this.loadLevel("spaceShooter");
-  }
-
+  /** Pauses game time. Objects with `runWhenPaused` (UI) keep updating and rendering continues. */
   pause() {
-    this.engine.app.ticker.stop();
+    this.engine.context.time.paused = true;
   }
 
   resume() {
-    this.engine.app.ticker.start();
+    this.engine.context.time.paused = false;
   }
 
-  // Register a level with a name
+  get paused(): boolean {
+    return this.engine.context.time.paused;
+  }
+
   public registerLevel(name: string, level: Level) {
     this.levelManager.registerLevel(name, level);
   }
 
-  // Load a specific level by name
-  public loadLevel(name: string) {
-    this.levelManager.loadLevel(name);
+  public loadLevel(name: string): Promise<void> {
+    return this.levelManager.loadLevel(name);
   }
 
-  // Get the current active level
   public getCurrentLevel() {
     return this.levelManager.getCurrentLevel();
+  }
+
+  /** Called by the engine every frame. */
+  tick(deltaTime: number) {
+    this.levelManager.tick(deltaTime);
   }
 }

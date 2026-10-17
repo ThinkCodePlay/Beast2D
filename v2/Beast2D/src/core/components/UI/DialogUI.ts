@@ -19,6 +19,7 @@ export class DialogUI extends GameObject {
   ) {
     super();
     this.name = "DialogUI";
+    this.runWhenPaused = true;
     DialogUI.current = this;
 
     this.addComponent(new TransformComponent(x, y));
@@ -58,10 +59,10 @@ export class DialogUI extends GameObject {
     return DialogUI.current?.renderComponent.getOpenState() ?? false;
   }
 
-  override destroy(): void {
+  protected override onDestroy(): void {
     if (DialogUI.current === this) {
       DialogUI.current = null;
     }
-    super.destroy();
+    super.onDestroy();
   }
 }
