@@ -39,8 +39,8 @@ export class SquareColliderComponent extends ColliderComponent {
     this.normalColor = this.options.color;
   }
 
-  override init(): void {
-    super.init();
+  override onInit(): void {
+    super.onInit();
     if (!this.gameObject) return;
 
     this.graphics = new Graphics().rect(0, 0, this.width, this.height).stroke({
@@ -102,12 +102,12 @@ export class SquareColliderComponent extends ColliderComponent {
     this.graphics.scale.set(this.transform.scaleX, this.transform.scaleY);
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     if (this.graphics && this.gameObject) {
       this.gameObject.container.removeChild(this.graphics);
       this.graphics.destroy();
       this.graphics = null;
     }
-    super.destroy();
+    super.onDestroy();
   }
 }

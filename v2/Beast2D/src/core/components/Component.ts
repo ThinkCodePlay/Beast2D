@@ -10,8 +10,12 @@ export abstract class Component {
   gameObject: GameObject | null = null;
   enabled: boolean = true;
 
-  // Called when component is added to a GameObject
-  init(): void {
+  // Lifecycle flags, managed by GameObject
+  initialized: boolean = false;
+  destroyed: boolean = false;
+
+  // Called once, before the first update, after the whole GameObject is assembled
+  onInit(): void {
     // Override in subclasses
   }
 
@@ -20,8 +24,8 @@ export abstract class Component {
     // Override in subclasses
   }
 
-  // Called when component is removed
-  destroy(): void {
+  // Called once when the component is removed or its GameObject is destroyed
+  onDestroy(): void {
     // Override in subclasses
   }
 }

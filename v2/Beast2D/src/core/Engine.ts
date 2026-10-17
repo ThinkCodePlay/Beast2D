@@ -37,13 +37,11 @@ export class Engine {
     domElement.appendChild(this.app.canvas);
   }
 
-  bootstrap(container: HTMLElement) {
-    (async () => {
-      await this.mount(container);
+  async bootstrap(container: HTMLElement): Promise<void> {
+    await this.mount(container);
 
-      // Create and initialize game manager
-      this.gameManager = new GameManager(this);
-      this.gameManager.initialize();
-    })();
+    // Create and initialize game manager
+    this.gameManager = new GameManager(this);
+    this.gameManager.initialize();
   }
 }

@@ -8,4 +8,6 @@ container.style.position = "relative";
 appRoot.appendChild(container);
 
 const engine = new Engine();
-engine.bootstrap(container);
+engine.bootstrap(container).catch((error) => {
+  console.error("Failed to start Beast2D engine", error);
+});

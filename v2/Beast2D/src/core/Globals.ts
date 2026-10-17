@@ -55,6 +55,6 @@ export class Globals {
     this._canvasWidth = 0;
     this._canvasHeight = 0;
     this._stage = null;
-    this._debug = false;
+    this._debug = true;
   }
 }

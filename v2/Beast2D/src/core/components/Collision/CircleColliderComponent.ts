@@ -36,8 +36,8 @@ export class CircleColliderComponent extends ColliderComponent {
     this.normalColor = this.options.color;
   }
 
-  override init(): void {
-    super.init();
+  override onInit(): void {
+    super.onInit();
     if (!this.gameObject) return;
 
     this.graphics = new Graphics()
@@ -102,12 +102,12 @@ export class CircleColliderComponent extends ColliderComponent {
     this.graphics.scale.set(this.transform.scaleX, this.transform.scaleY);
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     if (this.graphics && this.gameObject) {
       this.gameObject.container.removeChild(this.graphics);
       this.graphics.destroy();
       this.graphics = null;
     }
-    super.destroy();
+    super.onDestroy();
   }
 }

@@ -42,7 +42,7 @@ export class HorizontalInputComponent extends Component {
     this.speed = speed;
   }
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
 
     this.transform = this.gameObject.getRequiredComponent(
@@ -75,10 +75,10 @@ export class HorizontalInputComponent extends Component {
     }
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
     this.transform = null;
-    super.destroy();
+    super.onDestroy();
   }
 }

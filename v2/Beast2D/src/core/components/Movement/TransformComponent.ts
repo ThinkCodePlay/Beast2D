@@ -28,13 +28,7 @@ export class TransformComponent extends Component {
   }
 
   translate(dx: number, dy: number): void {
-    // Normalize direction vector to prevent faster diagonal movement
-    if (dx !== 0 || dy !== 0) {
-      const magnitude = Math.sqrt(dx * dx + dy * dy);
-      const normalizedDx = dx / magnitude;
-      const normalizedDy = dy / magnitude;
-      this.x += normalizedDx;
-      this.y += normalizedDy;
-    }
+    this.x += dx;
+    this.y += dy;
   }
 }

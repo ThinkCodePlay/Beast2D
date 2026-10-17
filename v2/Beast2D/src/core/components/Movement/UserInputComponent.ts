@@ -66,7 +66,7 @@ export class UserInputComponent extends Component {
     this.speed = speed;
   }
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
 
     this.transform = this.gameObject.getRequiredComponent(
@@ -78,7 +78,7 @@ export class UserInputComponent extends Component {
     window.addEventListener("keyup", this.onKeyUp);
   }
 
-  override update(_deltaTime: number): void {
+  override update(deltaTime: number): void {
     if (!this.transform) {
       return;
     }
@@ -86,29 +86,24 @@ export class UserInputComponent extends Component {
     let dx = 0;
     let dy = 0;
 
-    if (this.keyUp) {
-      dy -= this.speed;
-    }
-    if (this.keyDown) {
-      dy += this.speed;
-    }
-    if (this.keyLeft) {
-      dx -= this.speed;
-    }
-    if (this.keyRight) {
-      dx += this.speed;
-    }
+    if (this.keyUp) dy -= 1;
+    if (this.keyDown) dy += 1;
+    if (this.keyLeft) dx -= 1;
+    if (this.keyRight) dx += 1;
 
     // Apply movement to the transform
     if (dx !== 0 || dy !== 0) {
-      this.transform.translate(dx, dy);
+      // Normalize so diagonal movement is not faster, then scale by speed
+      const magnitude = Math.hypot(dx, dy);
+      const scale = (this.speed * deltaTime) / magnitude;
+      this.transform.translate(dx * scale, dy * scale);
     }
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
     this.transform = null;
-    super.destroy();
+    super.onDestroy();
   }
 }

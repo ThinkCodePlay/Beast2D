@@ -23,6 +23,10 @@ export interface ColliderOptions {
 export abstract class ColliderComponent extends Component {
   private static registry: Set<ColliderComponent> = new Set();
 
+  static clearRegistry(): void {
+    ColliderComponent.registry.clear();
+  }
+
   readonly layer: CollisionLayer;
   readonly mode: ColliderMode;
   readonly mask: CollisionLayer[];
@@ -43,7 +47,7 @@ export abstract class ColliderComponent extends Component {
     this.onCollisionEnter = options.onCollisionEnter;
   }
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
 
     this.transform = this.gameObject.getComponent(TransformComponent);
@@ -55,7 +59,8 @@ export abstract class ColliderComponent extends Component {
 
     const nextActiveKeys = new Set<string>();
 
-    for (const other of ColliderComponent.registry) {
+    for (const other of [...ColliderComponent.registry]) {
+      if (this.gameObject?.destroyed) break;
       if (!this.shouldCheckAgainst(other)) continue;
 
       if (!this.intersects(other)) continue;
@@ -72,7 +77,7 @@ export abstract class ColliderComponent extends Component {
     this.activeCollisionKeys = nextActiveKeys;
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     ColliderComponent.registry.delete(this);
     this.activeCollisionKeys.clear();
   }
@@ -95,6 +100,7 @@ export abstract class ColliderComponent extends Component {
     if (other === this) return false;
     if (!this.enabled || !other.enabled) return false;
     if (!this.gameObject || !other.gameObject) return false;
+    if (this.gameObject.destroyed || other.gameObject.destroyed) return false;
     if (!other.isPassive()) return false;
     if (this.mask.length > 0 && !this.mask.includes(other.layer)) return false;
 

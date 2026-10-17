@@ -18,7 +18,7 @@ export class DestroyOutOfBoundsComponent extends Component {
     this.bounds = bounds;
   }
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
     this.transform = this.gameObject.getRequiredComponent(
       TransformComponent,
@@ -44,14 +44,8 @@ export class DestroyOutOfBoundsComponent extends Component {
   }
 
   private destroyGameObject(): void {
-    if (!this.gameObject) return;
-
-    const gameObject = this.gameObject;
-    const parent = gameObject.parent;
-
     this.enabled = false;
-    parent?.removeChild(gameObject);
-    gameObject.destroy();
+    this.gameObject?.destroy();
   }
 }
 

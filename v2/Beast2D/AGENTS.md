@@ -14,10 +14,12 @@ Guidance for AI coding agents working in this repository.
 - Install: `npm install`
 - Dev server: `npm run dev`
 - Build (also type-checks): `npm run build`
+- Type-check only: `npm run typecheck`
+- Tests: `npm test` (Vitest, `tests/`)
 - Preview build: `npm run preview`
 
 Notes:
-- There are no dedicated test or lint scripts in `package.json`.
+- There is no lint script in `package.json`.
 - TypeScript is strict; expect `noUnusedLocals` and `noUnusedParameters` errors.
 
 ## Where To Start Reading
@@ -49,6 +51,12 @@ Notes:
 - Compose behavior with components via `addComponent(...)`.
 - Use `getRequiredComponent(...)` when absence is a programming error; use `getComponent(...)` when optional.
 - Keep level-specific setup in `Level.init()` and per-frame logic in `Level.update()`.
+
+## Component Lifecycle
+
+Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()`.
+- `addComponent` only registers; `onInit` runs once on the first update of the owning `GameObject`, after all its components are added (siblings are available).
+- `GameObject.destroy()` is idempotent and safe inside `update`/callbacks: it detaches immediately and components' `onDestroy` run at the end of the frame (`GameObject.flushDestroyed()`, called by `Level`). `onDestroy` only runs if `onInit` ran.
 
 ## Repo Gotchas
 

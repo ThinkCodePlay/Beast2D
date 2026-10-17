@@ -19,7 +19,7 @@ export class SpaceShootInputComponent extends Component {
     this.spawner = spawner;
   }
 
-  override init(): void {
+  override onInit(): void {
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
   }
@@ -28,11 +28,11 @@ export class SpaceShootInputComponent extends Component {
     this.spawner.enabled = this.isShooting;
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
     this.isShooting = false;
     this.spawner.enabled = false;
-    super.destroy();
+    super.onDestroy();
   }
 }

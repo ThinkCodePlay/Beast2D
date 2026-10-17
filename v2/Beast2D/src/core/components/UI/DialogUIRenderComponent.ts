@@ -198,10 +198,10 @@ export class DialogUIRenderComponent extends RenderComponent {
     }
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     if (this.graphics && this.graphics instanceof Graphics) {
       this.destroyDynamicNodes(this.graphics);
     }
-    super.destroy();
+    super.onDestroy();
   }
 }

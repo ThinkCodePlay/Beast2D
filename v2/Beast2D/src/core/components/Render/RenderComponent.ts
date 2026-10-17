@@ -30,7 +30,7 @@ export abstract class RenderComponent extends Component {
 
   abstract createGraphics(): Graphics | Sprite;
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
 
     this.container = this.gameObject.container;
@@ -65,11 +65,11 @@ export abstract class RenderComponent extends Component {
     if (this.graphics && this.container) {
       this.container.removeChild(this.graphics);
       this.graphics.destroy();
-      this.init();
+      this.onInit();
     }
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     if (this.graphics && this.container) {
       this.container.removeChild(this.graphics);
       this.graphics.destroy();

@@ -22,6 +22,9 @@ export class GameObject {
 
   container: Container;
   private components: Map<string, Component> = new Map();
+  destroyed: boolean = false;
+
+  private static pendingDestroy: GameObject[] = [];
 
   constructor(container?: Container) {
     this.container = container ?? new Container();
@@ -73,7 +76,6 @@ export class GameObject {
 
     component.gameObject = this;
     this.components.set(componentName, component);
-    component.init();
 
     return component;
   }
@@ -85,9 +87,9 @@ export class GameObject {
     const component = this.components.get(componentName);
 
     if (component) {
-      component.destroy();
-      component.gameObject = null;
       this.components.delete(componentName);
+      GameObject.destroyComponent(component);
+      component.gameObject = null;
     }
   }
 
@@ -120,36 +122,93 @@ export class GameObject {
 
   // Update Loop
   update(deltaTime: number): void {
-    // Update all components
-    for (const component of this.components.values()) {
-      if (component.enabled) {
+    if (this.destroyed) return;
+
+    // Iterate over snapshots: components and children may be added or
+    // destroyed while updating.
+    const components = [...this.components.values()];
+
+    // Initialize every component first so onInit can rely on siblings.
+    for (const component of components) {
+      if (!component.initialized && !component.destroyed) {
+        component.initialized = true;
+        component.onInit();
+      }
+    }
+
+    for (const component of components) {
+      if (this.destroyed) return;
+      if (component.enabled && !component.destroyed) {
         component.update(deltaTime);
       }
     }
 
-    // Update children
-    for (const child of this.children) {
+    for (const child of [...this.children]) {
+      if (this.destroyed) return;
       child.update(deltaTime);
     }
   }
 
+  // Marks the object (and its children) as destroyed and detaches it right
+  // away. Components are torn down by GameObject.flushDestroyed() at the end
+  // of the frame, so it is safe to call this from inside update/callbacks.
   destroy(): void {
-    // Destroy all children first
+    if (this.destroyed) return;
+    this.markDestroyed();
+
+    if (this.parent) {
+      this.parent.removeChild(this);
+    } else if (this.container.parent) {
+      this.container.parent.removeChild(this.container);
+    }
+
+    GameObject.pendingDestroy.push(this);
+  }
+
+  private markDestroyed(): void {
+    this.destroyed = true;
     for (const child of this.children) {
-      child.destroy();
+      child.markDestroyed();
+    }
+  }
+
+  // Tears down every object destroyed since the last flush.
+  static flushDestroyed(): void {
+    while (GameObject.pendingDestroy.length > 0) {
+      const pending = GameObject.pendingDestroy;
+      GameObject.pendingDestroy = [];
+      for (const gameObject of pending) {
+        gameObject.teardown();
+      }
+    }
+  }
+
+  private teardown(): void {
+    for (const child of this.children) {
+      child.teardown();
     }
     this.children = [];
 
-    // Destroy all components
-    for (const component of this.components.values()) {
-      component.destroy();
+    for (const component of [...this.components.values()]) {
+      GameObject.destroyComponent(component);
     }
     this.components.clear();
 
     if (this.container.parent) {
       this.container.parent.removeChild(this.container);
     }
-    this.container.destroy({ children: true });
+    if (!this.container.destroyed) {
+      this.container.destroy({ children: true });
+    }
+  }
+
+  private static destroyComponent(component: Component): void {
+    if (component.destroyed) return;
+    component.destroyed = true;
+    // onDestroy only pairs with an onInit that actually ran.
+    if (component.initialized) {
+      component.onDestroy();
+    }
   }
 
   // Direct access to TransformComponent (if exists)

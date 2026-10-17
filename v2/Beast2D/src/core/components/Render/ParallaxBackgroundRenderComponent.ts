@@ -28,7 +28,7 @@ export class ParallaxBackgroundRenderComponent extends Component {
     this.layersConfig = layersConfig;
   }
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
 
     this.layerContainer = new Container();
@@ -84,7 +84,7 @@ export class ParallaxBackgroundRenderComponent extends Component {
     }
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     this.isDestroyed = true;
 
     if (this.layerContainer && this.gameObject) {
