@@ -16,6 +16,7 @@ export class ScoreUI extends GameObject {
   ) {
     super();
     this.name = "ScoreUI";
+    this.runWhenPaused = true;
     ScoreUI.current = this;
 
     this.addComponent(new TransformComponent(x, y));
@@ -48,10 +49,10 @@ export class ScoreUI extends GameObject {
     return this.renderComponent.getScore();
   }
 
-  override destroy(): void {
+  protected override onDestroy(): void {
     if (ScoreUI.current === this) {
       ScoreUI.current = null;
     }
-    super.destroy();
+    super.onDestroy();
   }
 }

@@ -63,11 +63,11 @@ export class ScoreUIRenderComponent extends RenderComponent {
     graphics.addChild(this.textNode);
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     if (this.textNode) {
       this.textNode.destroy();
       this.textNode = null;
     }
-    super.destroy();
+    super.onDestroy();
   }
 }

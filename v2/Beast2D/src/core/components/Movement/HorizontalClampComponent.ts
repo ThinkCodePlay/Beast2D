@@ -12,7 +12,7 @@ export class HorizontalClampComponent extends Component {
     this.maxX = maxX;
   }
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
     this.transform = this.gameObject.getRequiredComponent(
       TransformComponent,

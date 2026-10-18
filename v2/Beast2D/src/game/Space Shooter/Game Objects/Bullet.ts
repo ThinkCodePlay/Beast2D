@@ -23,12 +23,10 @@ export class Bullet extends Circle {
           const enemy = other.gameObject;
           if (enemy) {
             ScoreUI.addScore(100);
-            enemy.parent?.removeChild(enemy);
             enemy.destroy();
           }
 
           const bullet = this;
-          bullet.parent?.removeChild(bullet);
           bullet.destroy();
         },
       }),

@@ -1,84 +1,42 @@
 import { Component } from "../Component";
+import type { Input } from "../../Input";
 import { TransformComponent } from "./TransformComponent";
 
+/** Moves the GameObject left/right using the left/right input actions. */
 export class HorizontalInputComponent extends Component {
-  keyLeft: boolean = false;
-  keyRight: boolean = false;
   speed: number;
   private transform: TransformComponent | null = null;
-  private onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "ArrowLeft":
-      case "a":
-      case "A":
-        this.keyLeft = true;
-        event.preventDefault();
-        break;
-      case "ArrowRight":
-      case "d":
-      case "D":
-        this.keyRight = true;
-        event.preventDefault();
-        break;
-    }
-  };
-  private onKeyUp = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "ArrowLeft":
-      case "a":
-      case "A":
-        this.keyLeft = false;
-        break;
-      case "ArrowRight":
-      case "d":
-      case "D":
-        this.keyRight = false;
-        break;
-    }
-  };
+  private input: Input | null = null;
 
   constructor(speed: number = 6) {
     super();
     this.speed = speed;
   }
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
 
     this.transform = this.gameObject.getRequiredComponent(
       TransformComponent,
       this.constructor.name,
     );
-
-    window.addEventListener("keydown", this.onKeyDown);
-    window.addEventListener("keyup", this.onKeyUp);
+    this.input = this.requireContext().input;
   }
 
   override update(deltaTime: number): void {
-    if (!this.transform) {
-      return;
-    }
+    if (!this.transform || !this.input) return;
 
     let direction = 0;
-    if (this.keyLeft) {
-      direction -= 1;
-    }
-    if (this.keyRight) {
-      direction += 1;
-    }
+    if (this.input.isDown("left")) direction -= 1;
+    if (this.input.isDown("right")) direction += 1;
 
     if (direction !== 0) {
-      this.transform.setPosition(
-        this.transform.x + direction * this.speed * deltaTime,
-        this.transform.y,
-      );
+      this.transform.translate(direction * this.speed * deltaTime, 0);
     }
   }
 
-  override destroy(): void {
-    window.removeEventListener("keydown", this.onKeyDown);
-    window.removeEventListener("keyup", this.onKeyUp);
+  override onDestroy(): void {
     this.transform = null;
-    super.destroy();
+    this.input = null;
   }
 }

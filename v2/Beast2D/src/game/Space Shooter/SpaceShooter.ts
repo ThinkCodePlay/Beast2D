@@ -1,4 +1,3 @@
-import { Ticker } from "pixi.js";
 import { Level } from "../../core/Level";
 import { Globals } from "../../core/Globals";
 import { Spaceship } from "./Game Objects/Spaceship";
@@ -9,6 +8,12 @@ import { DialogUI } from "../../core/components/UI/DialogUI";
 import { ScoreUI } from "../../core/components/UI/ScoreUI";
 
 export class SpaceShooter extends Level {
+  override assets = [
+    "BeastShip.png",
+    "background/Stars-Big_1_1_PC.png",
+    "background/Stars-Big_1_2_PC.png",
+  ];
+
   protected init(): void {
     const startX = Globals.canvasWidth / 2;
     const startY = Globals.canvasHeight - 90;
@@ -52,9 +57,5 @@ export class SpaceShooter extends Level {
     DialogUI.setOnResume(() => {
       this.engine.gameManager?.resume();
     });
-  }
-
-  protected update(ticker: Ticker): void {
-    super.update(ticker);
   }
 }

@@ -10,7 +10,7 @@ export class VerticalMoveComponent extends Component {
     this.speedY = speedY;
   }
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
     this.transform = this.gameObject.getRequiredComponent(
       TransformComponent,

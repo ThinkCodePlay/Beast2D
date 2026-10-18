@@ -1,6 +1,5 @@
 import { Graphics, Sprite, Container } from "pixi.js";
 import { Component } from "../Component";
-import { TransformComponent } from "../Movement/TransformComponent";
 
 export interface RenderOptions {
   color?: number;
@@ -13,7 +12,6 @@ export interface RenderOptions {
 export abstract class RenderComponent extends Component {
   protected graphics: Graphics | Sprite | null = null;
   protected container: Container | null = null;
-  protected transform: TransformComponent | null = null;
   renderOptions: RenderOptions;
 
   constructor(renderOptions: RenderOptions = {}) {
@@ -28,36 +26,20 @@ export abstract class RenderComponent extends Component {
     };
   }
 
+  // Graphics are drawn at the GameObject origin; the TransformComponent
+  // positions the GameObject container itself.
   abstract createGraphics(): Graphics | Sprite;
 
-  override init(): void {
+  override onInit(): void {
     if (!this.gameObject) return;
 
     this.container = this.gameObject.container;
-    this.transform = this.gameObject.getRequiredComponent(
-      TransformComponent,
-      this.constructor.name,
-    );
     this.graphics = this.createGraphics();
 
-    this.updateTransform();
     this.graphics.alpha = this.renderOptions.alpha ?? 1;
     this.graphics.visible = this.renderOptions.visible ?? true;
 
     this.container.addChild(this.graphics);
-  }
-
-  override update(_deltaTime: number): void {
-    this.updateTransform();
-  }
-
-  protected updateTransform(): void {
-    if (!this.graphics || !this.transform) return;
-
-    this.graphics.x = this.transform.x;
-    this.graphics.y = this.transform.y;
-    this.graphics.rotation = this.transform.rotation;
-    this.graphics.scale.set(this.transform.scaleX, this.transform.scaleY);
   }
 
   setRenderOptions(options: Partial<RenderOptions>): void {
@@ -65,11 +47,11 @@ export abstract class RenderComponent extends Component {
     if (this.graphics && this.container) {
       this.container.removeChild(this.graphics);
       this.graphics.destroy();
-      this.init();
+      this.onInit();
     }
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     if (this.graphics && this.container) {
       this.container.removeChild(this.graphics);
       this.graphics.destroy();

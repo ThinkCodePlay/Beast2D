@@ -6,9 +6,10 @@ import { Box } from "../core/prefabs/Box";
 import { Circle } from "../core/prefabs/Circle";
 import { Player } from "../core/prefabs/Player";
 import { Globals } from "../core/Globals";
-import { Ticker } from "pixi.js";
 
 export class Level1 extends Level {
+  override assets = ["BeastShip.png"];
+
   private box: Box | null = null;
   private circle: Circle | null = null;
 
@@ -36,13 +37,13 @@ export class Level1 extends Level {
     this.levelRoot.addChild(new Player(X, Y));
   }
 
-  protected update(ticker: Ticker) {
-    super.update(ticker);
+  protected update(deltaTime: number) {
+    super.update(deltaTime);
 
     // Custom animations for Level 1
     this.box?.transform?.setRotation(
-      this.box.transform.rotation + 0.01 * ticker.deltaTime,
+      this.box.transform.rotation + 0.01 * deltaTime,
     );
-    this.circle?.transform?.setScale(1 + 0.3 * Math.sin(ticker.lastTime / 200));
+    this.circle?.transform?.setScale(1 + 0.3 * Math.sin(this.context.time.elapsed * 5));
   }
 }

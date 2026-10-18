@@ -1,60 +1,54 @@
 /* Globals.ts
-  Globals is a singleton class that holds global variables and settings
-  for the Beast2D game engine. It provides access to the canvas dimensions
-  and the root stage node, ensuring consistent references throughout the engine.
-  */
+  Thin static facade over the active EngineContext, kept for code that has no
+  GameObject yet, such as prefab constructors that need the canvas size.
+  Inside components prefer `this.context` / `gameObject.context`.
+*/
 
-import { Container } from "pixi.js";
+import type { Container } from "pixi.js";
+import type { EngineContext } from "./EngineContext";
 
 export class Globals {
-  private static _canvasWidth: number = 0;
-  private static _canvasHeight: number = 0;
-  private static _stage: Container | null = null;
+  private static _context: EngineContext | null = null;
   private static _debug: boolean = true;
 
-  // Canvas dimensions
+  static get context(): EngineContext {
+    if (!this._context) {
+      throw new Error("Globals accessed before engine initialization");
+    }
+    return this._context;
+  }
+
   static get canvasWidth(): number {
-    return this._canvasWidth;
+    return this._context?.width ?? 0;
   }
 
   static get canvasHeight(): number {
-    return this._canvasHeight;
+    return this._context?.height ?? 0;
   }
 
-  // Root stage node
   static get stage(): Container {
-    if (!this._stage) {
+    if (!this._context) {
       throw new Error("Globals.stage accessed before initialization");
     }
-    return this._stage;
+    return this._context.stage;
   }
 
   static get debug(): boolean {
-    return this._debug;
+    return this._context ? this._context.debug : this._debug;
   }
 
   static set debug(value: boolean) {
     this._debug = value;
+    if (this._context) this._context.debug = value;
   }
 
-  // Initialize globals (called by Engine)
-  static init(app: any): void {
-    this._canvasWidth = app.renderer.width;
-    this._canvasHeight = app.renderer.height;
-    this._stage = app.stage;
+  // Called by Engine
+  static init(context: EngineContext): void {
+    this._context = context;
   }
 
-  // Update dimensions if canvas is resized
-  static updateDimensions(width: number, height: number): void {
-    this._canvasWidth = width;
-    this._canvasHeight = height;
-  }
-
-  // Reset globals (useful for testing or cleanup)
   static reset(): void {
-    this._canvasWidth = 0;
-    this._canvasHeight = 0;
-    this._stage = null;
-    this._debug = false;
+    this._context = null;
+    this._debug = true;
   }
 }

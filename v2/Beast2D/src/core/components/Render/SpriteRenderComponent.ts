@@ -36,13 +36,13 @@ export class SpriteRenderComponent extends RenderComponent {
     return graphics;
   }
 
-  override destroy(): void {
+  override onDestroy(): void {
     this.isDestroyed = true;
 
     if (this.sprite) {
       this.sprite.destroy();
       this.sprite = null;
     }
-    super.destroy();
+    super.onDestroy();
   }
 }
