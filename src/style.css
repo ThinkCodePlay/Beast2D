@@ -14,10 +14,14 @@ html,body,#app {
 }
 
 .game-container {
-  width: 400px;
-  height: 300px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 6px 24px rgba(0,0,0,0.6);
   background: #000;
+}
+
+.game-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
