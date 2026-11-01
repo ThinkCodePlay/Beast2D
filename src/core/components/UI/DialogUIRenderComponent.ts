@@ -18,8 +18,8 @@ export class DialogUIRenderComponent extends RenderComponent {
   private onResume: (() => void) | null = null;
 
   constructor(
-    width: number = 320,
-    height: number = 140,
+    width: number = 240,
+    height: number = 120,
     message: string = "Game Over",
     score: number = 0,
     isOpen: boolean = false,
@@ -112,7 +112,7 @@ export class DialogUIRenderComponent extends RenderComponent {
       text: this.message,
       style: new TextStyle({
         fill: 0xffffff,
-        fontSize: 34,
+        fontSize: 18,
         fontWeight: "700",
         align: "center",
       }),
@@ -127,7 +127,7 @@ export class DialogUIRenderComponent extends RenderComponent {
       text: `Score: ${this.score}`,
       style: new TextStyle({
         fill: 0xffffff,
-        fontSize: 24,
+        fontSize: 13,
         fontWeight: "600",
         align: "center",
       }),
@@ -139,7 +139,7 @@ export class DialogUIRenderComponent extends RenderComponent {
     graphics.addChild(this.scoreTextNode);
 
     const buttonWidth = this.width * 0.55;
-    const buttonHeight = 42;
+    const buttonHeight = 28;
     const buttonX = (this.width - buttonWidth) / 2;
     const buttonY = this.height - buttonHeight - 14;
 
@@ -159,7 +159,7 @@ export class DialogUIRenderComponent extends RenderComponent {
       text: "Restart",
       style: new TextStyle({
         fill: 0xffffff,
-        fontSize: 22,
+        fontSize: 12,
         fontWeight: "700",
       }),
     });

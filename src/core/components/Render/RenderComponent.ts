@@ -7,6 +7,9 @@ export interface RenderOptions {
   strokeWidth?: number;
   alpha?: number;
   visible?: boolean;
+  /** Display size for sprites (logical canvas units). */
+  width?: number;
+  height?: number;
 }
 
 export abstract class RenderComponent extends Component {

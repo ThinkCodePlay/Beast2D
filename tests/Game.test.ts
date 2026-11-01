@@ -134,7 +134,7 @@ describe("space shooter gameplay", () => {
     // bullets are not children of the ship, so they do not follow it
     expect(bullet.parent).toBe(root);
     const shipPos = ship.getWorldPosition();
-    expect(bullet.getWorldPosition().x).toBeCloseTo(shipPos.x + 30);
+    expect(bullet.getWorldPosition().x).toBeCloseTo(shipPos.x + 16);
     expect(bullet.getWorldPosition().y).toBeLessThan(shipPos.y);
 
     // moving the ship does not move existing bullets

@@ -10,8 +10,8 @@ export class DialogUI extends GameObject {
   constructor(
     x: number,
     y: number,
-    width: number = 320,
-    height: number = 140,
+    width: number = 240,
+    height: number = 120,
     message: string = "Game Over",
     score: number = 0,
     isOpen: boolean = false,
