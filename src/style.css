@@ -13,11 +13,19 @@ html,body,#app {
   justify-content: center;
 }
 
+/* Virtual resolution 320×240; displayed at 2× integer scale (see DISPLAY_* in consts.ts). */
 .game-container {
-  width: 400px;
-  height: 300px;
+  width: 640px;
+  height: 480px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 6px 24px rgba(0,0,0,0.6);
   background: #000;
+}
+
+.game-container canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }

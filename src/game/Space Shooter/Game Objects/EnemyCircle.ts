@@ -7,14 +7,14 @@ import { CollisionLayers, ColliderModes } from "../../../core/consts";
 
 export class EnemyCircle extends Circle {
   constructor(x: number = 0, y: number = 0) {
-    super(x, y, 12, {
+    super(x, y, 10, {
       color: 0xff4444,
       strokeColor: 0xffffff,
       strokeWidth: 2,
     });
     this.addComponent(new VerticalMoveComponent(2));
     this.addComponent(
-      new CircleColliderComponent(12, {
+      new CircleColliderComponent(10, {
         layer: CollisionLayers.Enemy,
         mode: ColliderModes.Passive,
       }),

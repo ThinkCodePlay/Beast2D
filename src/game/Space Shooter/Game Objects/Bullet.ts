@@ -8,14 +8,14 @@ import { ScoreUI } from "../../../core/components/UI/ScoreUI";
 
 export class Bullet extends Circle {
   constructor(x: number = 0, y: number = 0) {
-    super(x, y, 5, {
+    super(x, y, 4, {
       color: 0xffff55,
       strokeColor: 0xffffff,
       strokeWidth: 1,
     });
     this.addComponent(new VerticalMoveComponent(-8));
     this.addComponent(
-      new CircleColliderComponent(5, {
+      new CircleColliderComponent(4, {
         layer: CollisionLayers.Bullet,
         mode: ColliderModes.Active,
         mask: [CollisionLayers.Enemy],

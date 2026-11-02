@@ -24,7 +24,7 @@ class MyLevel extends Level {
   }
 }
 
-const engine = new Engine({ width: 800, height: 600 });
+const engine = new Engine({ width: 320, height: 240 });
 const game = await engine.bootstrap(document.body);
 game.registerLevel("main", new MyLevel(engine));
 await game.loadLevel("main");

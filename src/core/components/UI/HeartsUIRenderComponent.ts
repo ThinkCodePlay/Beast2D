@@ -1,8 +1,9 @@
 import { Graphics, Sprite, Assets } from "pixi.js";
+import { SPRITE_SIZE, TEXTURE_HEART } from "../../consts";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
 
-const HEART_TEXTURE_PATH = "/HeartBeast.png";
+const HEART_TEXTURE_PATH = `/${TEXTURE_HEART}`;
 
 export class HeartsUIRenderComponent extends RenderComponent {
   private hearts: number;
@@ -11,7 +12,7 @@ export class HeartsUIRenderComponent extends RenderComponent {
 
   constructor(
     hearts: number = 3,
-    heartSize: number = 64,
+    heartSize: number = SPRITE_SIZE,
     spacing: number = 8,
     renderOptions: RenderOptions = {},
   ) {

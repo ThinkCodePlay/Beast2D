@@ -1,3 +1,4 @@
+import { PIXEL_GRID, SPRITE_SIZE } from "../../consts";
 import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { HeartsUIRenderComponent } from "./HeartsUIRenderComponent";
@@ -8,11 +9,11 @@ export class HeartsUI extends GameObject {
   private renderComponent: HeartsUIRenderComponent;
 
   constructor(
-    x: number = 16,
-    y: number = 16,
+    x: number = PIXEL_GRID,
+    y: number = PIXEL_GRID,
     hearts: number = 3,
-    heartSize: number = 32,
-    spacing: number = 8,
+    heartSize: number = SPRITE_SIZE,
+    spacing: number = PIXEL_GRID / 2,
     renderOptions: RenderOptions = {},
   ) {
     super();

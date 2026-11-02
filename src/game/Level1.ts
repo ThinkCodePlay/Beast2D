@@ -6,15 +6,16 @@ import { Box } from "../core/prefabs/Box";
 import { Circle } from "../core/prefabs/Circle";
 import { Player } from "../core/prefabs/Player";
 import { Globals } from "../core/Globals";
+import { PIXEL_GRID, TEXTURE_BEAST_SHIP } from "../core/consts";
 
 export class Level1 extends Level {
-  override assets = ["BeastShip.png"];
+  override assets = [TEXTURE_BEAST_SHIP];
 
   private box: Box | null = null;
   private circle: Circle | null = null;
 
   protected init() {
-    const SIZE = 100;
+    const SIZE = PIXEL_GRID * 5;
     const X = (Globals.canvasWidth - SIZE) / 2;
     const Y = (Globals.canvasHeight - SIZE) / 2;
 
@@ -27,7 +28,7 @@ export class Level1 extends Level {
     this.levelRoot.addChild(this.box);
 
     // Create a circle
-    this.circle = new Circle(50, 50, 40, {
+    this.circle = new Circle(PIXEL_GRID * 3, PIXEL_GRID * 3, PIXEL_GRID * 2 + PIXEL_GRID / 2, {
       color: 0x00ff00,
       strokeWidth: 2,
     });

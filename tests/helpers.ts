@@ -1,4 +1,5 @@
 import { Container } from "pixi.js";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../src/core/consts";
 import type { Engine } from "../src/core/Engine";
 import { EngineContext } from "../src/core/EngineContext";
 import { GameObject } from "../src/core/GameObject";
@@ -6,8 +7,8 @@ import { GameObject } from "../src/core/GameObject";
 export function createContext(): EngineContext {
   return new EngineContext({
     stage: new Container(),
-    width: 400,
-    height: 300,
+    width: DISPLAY_WIDTH,
+    height: DISPLAY_HEIGHT,
     inputTarget: null,
   });
 }

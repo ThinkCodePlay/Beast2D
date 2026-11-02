@@ -81,7 +81,7 @@ describe("example levels run on the updated engine", () => {
 
   it("SpaceShooter declares the assets it needs", () => {
     const level = new SpaceShooter(fakeEngine(context));
-    expect(level.assets).toContain("BeastShip.png");
+    expect(level.assets).toContain("BeastShip.32x32.png");
   });
 });
 

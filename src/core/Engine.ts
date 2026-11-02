@@ -9,6 +9,7 @@
 */
 
 import { Application, type Ticker } from "pixi.js";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./consts";
 import { EngineContext } from "./EngineContext";
 import { GameManager } from "./GameManager";
 import { Globals } from "./Globals";
@@ -24,23 +25,28 @@ export interface EngineOptions {
   antialias?: boolean;
   /** Draw collider outlines etc. */
   debug?: boolean;
+  /** Backing-store scale; use `1` for crisp pixel art + CSS integer upscale. */
+  resolution?: number;
 }
 
 export class Engine {
   app: Application;
   gameManager?: GameManager;
-  private readonly options: Required<EngineOptions>;
+  private readonly options: Required<Omit<EngineOptions, "resolution">> & {
+    resolution: number;
+  };
   private ready: Promise<void>;
   private _context: EngineContext | null = null;
   private destroyed = false;
 
   constructor(options: EngineOptions = {}) {
     this.options = {
-      width: options.width ?? 400,
-      height: options.height ?? 300,
+      width: options.width ?? DISPLAY_WIDTH,
+      height: options.height ?? DISPLAY_HEIGHT,
       backgroundColor: options.backgroundColor ?? 0x000000,
-      antialias: options.antialias ?? true,
+      antialias: options.antialias ?? false,
       debug: options.debug ?? true,
+      resolution: options.resolution ?? 1,
     };
 
     this.app = new Application();
@@ -50,7 +56,7 @@ export class Engine {
       height: this.options.height,
       background: this.options.backgroundColor,
       backgroundAlpha: 1,
-      resolution: globalThis.devicePixelRatio || 1,
+      resolution: this.options.resolution,
       antialias: this.options.antialias,
     });
   }

@@ -1,4 +1,5 @@
 import { Engine } from "./core/Engine";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./core/consts";
 import { Level1 } from "./game/Level1";
 import { Level2 } from "./game/Level2";
 import { SpaceShooter } from "./game/Space Shooter/SpaceShooter";
@@ -10,7 +11,11 @@ container.className = "game-container";
 container.style.position = "relative";
 appRoot.appendChild(container);
 
-const engine = new Engine({ width: 400, height: 300 });
+const engine = new Engine({
+  width: DISPLAY_WIDTH,
+  height: DISPLAY_HEIGHT,
+  antialias: false,
+});
 
 engine
   .bootstrap(container)

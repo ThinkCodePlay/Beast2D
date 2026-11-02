@@ -1,6 +1,20 @@
 /* consts.ts */
 // Core constants for the Beast2D engine
 
+/** Fixed virtual resolution (fantasy-console style). Keep in sync with `main.ts` and `style.css`. */
+export const DISPLAY_WIDTH = 320;
+export const DISPLAY_HEIGHT = 240;
+
+/** Art and layout snap to this pixel grid. Runtime sprite bitmaps are 32×32 (2×2 cells). Masters may stay at 64×64 in public/. */
+export const PIXEL_GRID = 16;
+export const SPRITE_SIZE = 32;
+
+/** Textures fitted for SPRITE_SIZE (see scripts/compress_display_png.py). */
+export const TEXTURE_BEAST_SHIP = "BeastShip.32x32.png";
+export const TEXTURE_HEART = "HeartBeast.32x32.png";
+export const TEXTURE_STARS_LAYER_1 = "background/Stars-Big_1_1_PC.320x240.png";
+export const TEXTURE_STARS_LAYER_2 = "background/Stars-Big_1_2_PC.320x240.png";
+
 export const ObjectNames = {
   LevelRoot: "LevelRoot",
   GameObject: "GameObject",

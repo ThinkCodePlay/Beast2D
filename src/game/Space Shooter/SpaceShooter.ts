@@ -1,4 +1,5 @@
 import { Level } from "../../core/Level";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH, PIXEL_GRID, SPRITE_SIZE, TEXTURE_BEAST_SHIP, TEXTURE_STARS_LAYER_1, TEXTURE_STARS_LAYER_2 } from "../../core/consts";
 import { Globals } from "../../core/Globals";
 import { Spaceship } from "./Game Objects/Spaceship";
 import { EnemyCircleSpawner } from "./Game Objects/EnemyCircleSpawner";
@@ -9,14 +10,14 @@ import { ScoreUI } from "../../core/components/UI/ScoreUI";
 
 export class SpaceShooter extends Level {
   override assets = [
-    "BeastShip.png",
-    "background/Stars-Big_1_1_PC.png",
-    "background/Stars-Big_1_2_PC.png",
+    TEXTURE_BEAST_SHIP,
+    TEXTURE_STARS_LAYER_1,
+    TEXTURE_STARS_LAYER_2,
   ];
 
   protected init(): void {
     const startX = Globals.canvasWidth / 2;
-    const startY = Globals.canvasHeight - 90;
+    const startY = Globals.canvasHeight - PIXEL_GRID * 4 - SPRITE_SIZE / 2;
 
     // background
     this.levelRoot.addChild(new ParallaxBackground());
@@ -28,16 +29,19 @@ export class SpaceShooter extends Level {
     this.levelRoot.addChild(new EnemyCircleSpawner());
 
     // UI
-    this.levelRoot.addChild(new HeartsUI(16, 16, 3, 32));
-    this.levelRoot.addChild(new ScoreUI(Globals.canvasWidth - 16, 16));
+    this.levelRoot.addChild(new HeartsUI(PIXEL_GRID, PIXEL_GRID, 3));
+    this.levelRoot.addChild(
+      new ScoreUI(Globals.canvasWidth - PIXEL_GRID, PIXEL_GRID),
+    );
 
-    // dialog (hidden by default)
+    const dialogWidth = DISPLAY_WIDTH - PIXEL_GRID * 2;
+    const dialogHeight = PIXEL_GRID * 7;
     this.levelRoot.addChild(
       new DialogUI(
-        Globals.canvasWidth / 2 - 160,
-        Globals.canvasHeight / 2 - 70,
-        320,
-        190,
+        PIXEL_GRID,
+        (DISPLAY_HEIGHT - dialogHeight) / 2,
+        dialogWidth,
+        dialogHeight,
         "Game Over",
         0,
         false,

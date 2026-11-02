@@ -4,15 +4,17 @@ import {
   type ParallaxLayerConfig,
 } from "../../../core/components/Render/ParallaxBackgroundRenderComponent";
 
+import { TEXTURE_STARS_LAYER_1, TEXTURE_STARS_LAYER_2 } from "../../../core/consts";
+
 const defaultLayers: ParallaxLayerConfig[] = [
   {
-    texturePath: "background/Stars-Big_1_1_PC.png",
+    texturePath: TEXTURE_STARS_LAYER_1,
     speedY: 0.35,
     direction: "vertical",
     alpha: 0.7,
   },
   {
-    texturePath: "background/Stars-Big_1_2_PC.png",
+    texturePath: TEXTURE_STARS_LAYER_2,
     speedY: 0.9,
     direction: "vertical",
     alpha: 1,

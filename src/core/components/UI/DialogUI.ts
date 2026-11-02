@@ -2,6 +2,7 @@ import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { DialogUIRenderComponent } from "./DialogUIRenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
+import { DISPLAY_WIDTH, PIXEL_GRID } from "../../consts";
 
 export class DialogUI extends GameObject {
   private static current: DialogUI | null = null;
@@ -10,8 +11,8 @@ export class DialogUI extends GameObject {
   constructor(
     x: number,
     y: number,
-    width: number = 320,
-    height: number = 140,
+    width: number = DISPLAY_WIDTH - PIXEL_GRID * 2,
+    height: number = PIXEL_GRID * 6,
     message: string = "Game Over",
     score: number = 0,
     isOpen: boolean = false,

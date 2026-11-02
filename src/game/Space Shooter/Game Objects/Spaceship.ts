@@ -5,6 +5,7 @@ import type { RenderOptions } from "../../../core/components/Render/RenderCompon
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
 import { HorizontalInputComponent } from "../../../core/components/Movement/HorizontalInputComponent";
 import { Globals } from "../../../core/Globals";
+import { SPRITE_SIZE, TEXTURE_BEAST_SHIP } from "../../../core/consts";
 import { BulletSpawner } from "./BulletSpawner";
 import { SquareColliderComponent } from "../../../core/components/Collision/SquareColliderComponent";
 import { CollisionLayers, ColliderModes } from "../../../core/consts";
@@ -15,12 +16,12 @@ import { ScoreUI } from "../../../core/components/UI/ScoreUI";
 export class Spaceship extends GameObject {
   constructor(x: number = 0, y: number = 0, renderOptions: RenderOptions = {}) {
     super();
-    const shipWidth = 64;
+    const shipWidth = SPRITE_SIZE;
     this.name = "Spaceship";
 
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(
-      new SpriteRenderComponent("BeastShip.png", renderOptions),
+      new SpriteRenderComponent(TEXTURE_BEAST_SHIP, renderOptions),
     );
     this.addComponent(
       new SquareColliderComponent(shipWidth, shipWidth, {

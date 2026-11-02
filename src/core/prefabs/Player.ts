@@ -3,17 +3,17 @@ import { TransformComponent } from "../components/Movement/TransformComponent";
 import { SpriteRenderComponent } from "../components/Render/SpriteRenderComponent";
 import { UserInputComponent } from "../components/Movement/UserInputComponent";
 import type { RenderOptions } from "../components/Render/RenderComponent";
-import { ObjectNames, CollisionLayers, ColliderModes } from "../consts";
+import { ObjectNames, CollisionLayers, ColliderModes, SPRITE_SIZE, TEXTURE_BEAST_SHIP } from "../consts";
 import { SquareColliderComponent } from "../components/Collision/SquareColliderComponent";
 
 export class Player extends GameObject {
   constructor(x: number = 0, y: number = 0, renderOptions: RenderOptions = {}) {
     super();
-    const playerSize = 64;
+    const playerSize = SPRITE_SIZE;
     this.name = ObjectNames.BoxObject;
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(
-      new SpriteRenderComponent("BeastShip.png", renderOptions),
+      new SpriteRenderComponent(TEXTURE_BEAST_SHIP, renderOptions),
     );
     this.addComponent(
       new SquareColliderComponent(playerSize, playerSize, {

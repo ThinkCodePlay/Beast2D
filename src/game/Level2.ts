@@ -5,6 +5,7 @@ import { Level } from "../core/Level";
 import { Circle } from "../core/prefabs/Circle";
 import { Box } from "../core/prefabs/Box";
 import { Globals } from "../core/Globals";
+import { PIXEL_GRID } from "../core/consts";
 
 export class Level2 extends Level {
   private circles: Circle[] = [];
@@ -12,11 +13,12 @@ export class Level2 extends Level {
 
   protected init() {
     // Create a centered box
+    const boxSize = PIXEL_GRID * 7 + PIXEL_GRID / 2;
     const box = new Box(
-      Globals.canvasWidth / 2 - 75,
-      Globals.canvasHeight / 2 - 75,
-      150,
-      150,
+      Globals.canvasWidth / 2 - boxSize / 2,
+      Globals.canvasHeight / 2 - boxSize / 2,
+      boxSize,
+      boxSize,
       {
         color: 0x3366ff,
         strokeColor: 0xffffff,
