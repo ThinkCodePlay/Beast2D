@@ -12,6 +12,11 @@ export const SPRITE_SIZE = 32;
 /** Textures fitted for SPRITE_SIZE (see scripts/compress_display_png.py). */
 export const TEXTURE_BEAST_SHIP = "BeastShip.32x32.png";
 export const TEXTURE_HEART = "HeartBeast.32x32.png";
+export const TEXTURE_BUNNY_MOVE_ANIMATION = "bunny-move-animation.64x64.png";
+/** Bunny Hop level uses 64×64 frames from the spritesheet above. */
+export const BUNNY_SPRITE_SIZE = 64;
+export const BUNNY_MOVE_ANIMATION_COLUMNS = 6;
+export const BUNNY_MOVE_ANIMATION_FRAME_COUNT = 36;
 export const TEXTURE_STARS_LAYER_1 = "background/Stars-Big_1_1_PC.320x240.png";
 export const TEXTURE_STARS_LAYER_2 = "background/Stars-Big_1_2_PC.320x240.png";
 
