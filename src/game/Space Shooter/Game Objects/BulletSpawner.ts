@@ -15,7 +15,7 @@ export class BulletSpawner extends GameObject {
   private readonly bulletRadius: number = 5;
   private debugSpawnMarker: Graphics | null = null;
 
-  constructor(offsetX: number = 16, offsetY: number = -6) {
+  constructor(offsetX: number = 30, offsetY: number = -8) {
     super();
     this.name = "BulletSpawner";
     this.addComponent(new TransformComponent(offsetX, offsetY));

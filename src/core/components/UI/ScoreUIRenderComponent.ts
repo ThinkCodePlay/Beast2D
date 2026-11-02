@@ -52,7 +52,7 @@ export class ScoreUIRenderComponent extends RenderComponent {
       text: `${this.label}: ${this.score}`,
       style: new TextStyle({
         fill: this.renderOptions.color,
-        fontSize: 14,
+        fontSize: 28,
         fontWeight: "700",
       }),
     });

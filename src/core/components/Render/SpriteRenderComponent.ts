@@ -25,12 +25,6 @@ export class SpriteRenderComponent extends RenderComponent {
 
         this.sprite = new Sprite(texture);
         //   this.sprite.anchor.set(0.5);
-        if (this.renderOptions.width !== undefined) {
-          this.sprite.width = this.renderOptions.width;
-        }
-        if (this.renderOptions.height !== undefined) {
-          this.sprite.height = this.renderOptions.height;
-        }
         this.sprite.alpha = this.renderOptions.alpha ?? 1;
         this.sprite.visible = this.renderOptions.visible ?? true;
         graphics.addChild(this.sprite);

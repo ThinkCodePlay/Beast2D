@@ -51,7 +51,6 @@ export class Engine {
       background: this.options.backgroundColor,
       backgroundAlpha: 1,
       resolution: globalThis.devicePixelRatio || 1,
-      autoDensity: true,
       antialias: this.options.antialias,
     });
   }

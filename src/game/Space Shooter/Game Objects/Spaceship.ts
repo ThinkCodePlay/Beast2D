@@ -15,16 +15,12 @@ import { ScoreUI } from "../../../core/components/UI/ScoreUI";
 export class Spaceship extends GameObject {
   constructor(x: number = 0, y: number = 0, renderOptions: RenderOptions = {}) {
     super();
-    const shipWidth = 32;
+    const shipWidth = 64;
     this.name = "Spaceship";
 
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(
-      new SpriteRenderComponent("BeastShip.png", {
-        ...renderOptions,
-        width: shipWidth,
-        height: shipWidth,
-      }),
+      new SpriteRenderComponent("BeastShip.png", renderOptions),
     );
     this.addComponent(
       new SquareColliderComponent(shipWidth, shipWidth, {
