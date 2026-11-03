@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# VitePress (docs)
+docs/.vitepress/dist
+docs/.vitepress/cache
+
+# Test / TypeScript
+coverage
+*.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

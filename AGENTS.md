@@ -79,3 +79,4 @@ Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `READM
 ## Documentation Status
 
 - `README.md` documents the engine concepts; this file is the quick-start guide for agents.
+- Human-facing API/syntax docs: `docs/` (VitePress — `npm run docs:dev`). Machine nav: `docs/meta/manifest.json`.

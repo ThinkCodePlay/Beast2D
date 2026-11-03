@@ -3,10 +3,43 @@ import { GameObject } from "../src/core/GameObject";
 import { InteractiveComponent } from "../src/core/components/Input/InteractiveComponent";
 import { UserInputComponent } from "../src/core/components/Movement/UserInputComponent";
 import { HorizontalInputComponent } from "../src/core/components/Movement/HorizontalInputComponent";
+import { HorizontalFacingComponent } from "../src/core/components/Movement/HorizontalFacingComponent";
+import { HorizontalLocomotionAnimationComponent } from "../src/core/components/Behavior/HorizontalLocomotionAnimationComponent";
+import {
+  SpritesheetAnimationRenderComponent,
+  type SpritesheetAnimationClipsOptions,
+} from "../src/core/components/Render/SpritesheetAnimationRenderComponent";
 import { SpaceShootInputComponent } from "../src/core/components/Input/SpaceShootInputComponent";
 import { SpawnerComponent } from "../src/core/components/Behavior/SpawnerComponent";
 import { TransformComponent } from "../src/core/components/Movement/TransformComponent";
+import { RenderComponent } from "../src/core/components/Render/RenderComponent";
+import { Graphics } from "pixi.js";
 import { createRoot, frame } from "./helpers";
+
+class RecordingSpritesheetAnimation extends SpritesheetAnimationRenderComponent {
+  played: string[] = [];
+
+  constructor(options: SpritesheetAnimationClipsOptions) {
+    super(options);
+  }
+
+  override playClip(name: string, options?: { restart?: boolean }): void {
+    this.played.push(name);
+    super.playClip(name, options);
+  }
+}
+
+class FlipProbeRender extends RenderComponent {
+  facing: 1 | -1 = 1;
+
+  createGraphics(): Graphics {
+    return new Graphics();
+  }
+
+  override setHorizontalFacing(direction: 1 | -1): void {
+    this.facing = direction;
+  }
+}
 
 function key(type: "keydown" | "keyup", code: string) {
   return Object.assign(new Event(type, { cancelable: true }), { code });
@@ -87,6 +120,69 @@ describe("input components use the Input service", () => {
     frame(root, 2);
     expect(go.transform!.x).toBe(92);
     expect(go.transform!.y).toBe(50);
+  });
+
+  it("HorizontalFacingComponent flips render without moving transform", () => {
+    const root = createRoot();
+    const target = new EventTarget();
+    root.context!.input.attach(target);
+    const render = new FlipProbeRender();
+    const go = new GameObject()
+      .with(new TransformComponent(100, 50))
+      .with(render)
+      .with(new HorizontalFacingComponent());
+    root.addChild(go);
+
+    target.dispatchEvent(key("keydown", "ArrowLeft"));
+    frame(root, 1);
+    expect(render.facing).toBe(-1);
+    expect(go.transform!.x).toBe(100);
+    expect(go.transform!.scaleX).toBe(1);
+
+    target.dispatchEvent(key("keyup", "ArrowLeft"));
+    target.dispatchEvent(key("keydown", "ArrowRight"));
+    frame(root, 1);
+    expect(render.facing).toBe(1);
+    expect(go.transform!.x).toBe(100);
+  });
+
+  it("HorizontalLocomotionAnimationComponent switches idle and walk clips", () => {
+    const root = createRoot();
+    const target = new EventTarget();
+    root.context!.input.attach(target);
+    const render = new RecordingSpritesheetAnimation({
+      defaultClip: "idle",
+      clips: {
+        idle: {
+          texturePath: "idle.png",
+          frameWidth: 64,
+          frameHeight: 64,
+          columns: 1,
+          frameCount: 1,
+        },
+        walk: {
+          texturePath: "walk.png",
+          frameWidth: 64,
+          frameHeight: 64,
+          columns: 1,
+          frameCount: 1,
+        },
+      },
+    });
+    const go = new GameObject()
+      .with(render)
+      .with(new HorizontalLocomotionAnimationComponent());
+    root.addChild(go);
+    frame(root);
+    expect(render.played.at(-1)).toBe("idle");
+
+    target.dispatchEvent(key("keydown", "ArrowRight"));
+    frame(root, 1);
+    expect(render.played.at(-1)).toBe("walk");
+
+    target.dispatchEvent(key("keyup", "ArrowRight"));
+    frame(root, 1);
+    expect(render.played.at(-1)).toBe("idle");
   });
 
   it("SpaceShootInputComponent enables the spawner while shooting", () => {

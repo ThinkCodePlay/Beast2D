@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "title": "Beast2D Documentation",
+  "root": "index.md",
+  "sections": [
+    {
+      "id": "guide",
+      "title": "Guide",
+      "kind": "guide",
+      "children": [
+        { "id": "getting-started", "title": "Getting started", "path": "guide/getting-started.md" },
+        { "id": "concepts", "title": "Core concepts", "path": "guide/concepts.md" },
+        { "id": "display-spec", "title": "Display spec", "path": "guide/display-spec.md" }
+      ]
+    },
+    {
+      "id": "syntax",
+      "title": "Syntax",
+      "kind": "syntax",
+      "children": [
+        { "id": "syntax-overview", "title": "Overview", "path": "syntax/overview.md" },
+        { "id": "levels", "title": "Levels and lifecycle", "path": "syntax/levels-and-lifecycle.md" },
+        { "id": "game-objects", "title": "GameObjects and components", "path": "syntax/game-objects-and-components.md" },
+        { "id": "prefabs", "title": "Prefabs and composition", "path": "syntax/prefabs-and-composition.md" }
+      ]
+    },
+    {
+      "id": "api",
+      "title": "API reference",
+      "kind": "api",
+      "children": [
+        { "id": "api-index", "title": "Overview", "path": "api/index.md" },
+        {
+          "id": "api-core",
+          "title": "Core",
+          "children": [
+            { "id": "engine", "title": "Engine", "path": "api/core/engine.md" },
+            { "id": "game-object", "title": "GameObject", "path": "api/core/game-object.md" },
+            { "id": "level", "title": "Level", "path": "api/core/level.md" },
+            { "id": "engine-context", "title": "EngineContext", "path": "api/core/engine-context.md" },
+            { "id": "game-management", "title": "Game management", "path": "api/core/game-management.md" },
+            { "id": "services", "title": "Services", "path": "api/core/services.md" },
+            { "id": "utilities", "title": "Utilities", "path": "api/core/utilities.md" },
+            { "id": "constants", "title": "Constants", "path": "api/constants.md" }
+          ]
+        },
+        {
+          "id": "api-components",
+          "title": "Components",
+          "children": [
+            { "id": "components-index", "title": "Overview", "path": "api/components/index.md" },
+            { "id": "movement", "title": "Movement", "path": "api/components/movement.md" },
+            { "id": "render", "title": "Render", "path": "api/components/render.md" },
+            { "id": "collision", "title": "Collision", "path": "api/components/collision.md" },
+            { "id": "input-behavior", "title": "Input and behavior", "path": "api/components/input-behavior.md" }
+          ]
+        },
+        { "id": "prefabs-api", "title": "Prefabs", "path": "api/prefabs.md" }
+      ]
+    },
+    {
+      "id": "meta",
+      "title": "Meta",
+      "kind": "meta",
+      "children": [
+        { "id": "integration", "title": "Integration and HTML", "path": "meta/integration.md" }
+      ]
+    }
+  ]
+}

@@ -13,6 +13,7 @@ export const SPRITE_SIZE = 32;
 export const TEXTURE_BEAST_SHIP = "BeastShip.32x32.png";
 export const TEXTURE_HEART = "HeartBeast.32x32.png";
 export const TEXTURE_BUNNY_WALK_ANIMATION = "bunny-walk-animation.64x64.png";
+export const TEXTURE_BUNNY_IDLE = "BunnyIdle.png";
 /** Bunny Hop level uses 64×64 frames from the walk spritesheet (1×18 strip). */
 export const BUNNY_SPRITE_SIZE = 64;
 export const BUNNY_WALK_ANIMATION_COLUMNS = 18;

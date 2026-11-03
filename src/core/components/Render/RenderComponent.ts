@@ -42,6 +42,9 @@ export abstract class RenderComponent extends Component {
     this.container.addChild(this.graphics);
   }
 
+  /** Mirror drawn content horizontally; default no-op for non-sprite renders. */
+  setHorizontalFacing(_direction: 1 | -1): void {}
+
   setRenderOptions(options: Partial<RenderOptions>): void {
     this.renderOptions = { ...this.renderOptions, ...options };
     if (this.graphics && this.container) {

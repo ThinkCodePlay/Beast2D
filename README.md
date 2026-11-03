@@ -8,7 +8,10 @@ npm run dev        # dev server
 npm run build      # type-check + production build
 npm run typecheck  # tsc only
 npm test           # Vitest
+npm run docs:dev   # engine documentation (VitePress)
 ```
+
+Full **API and syntax documentation** lives in [`docs/`](./docs/index.md) (build static HTML with `npm run docs:build`).
 
 ## Quick start
 

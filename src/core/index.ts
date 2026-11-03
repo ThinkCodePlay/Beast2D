@@ -20,6 +20,7 @@ export { TransformComponent } from "./components/Movement/TransformComponent";
 export { UserInputComponent } from "./components/Movement/UserInputComponent";
 export { HorizontalInputComponent } from "./components/Movement/HorizontalInputComponent";
 export { HorizontalClampComponent } from "./components/Movement/HorizontalClampComponent";
+export { HorizontalFacingComponent } from "./components/Movement/HorizontalFacingComponent";
 export { VerticalMoveComponent } from "./components/Movement/VerticalMoveComponent";
 export { SpaceShootInputComponent } from "./components/Input/SpaceShootInputComponent";
 export {
@@ -27,6 +28,7 @@ export {
   type InteractiveOptions,
 } from "./components/Input/InteractiveComponent";
 export { SpawnerComponent } from "./components/Behavior/SpawnerComponent";
+export { HorizontalLocomotionAnimationComponent } from "./components/Behavior/HorizontalLocomotionAnimationComponent";
 export {
   DestroyOutOfBoundsComponent,
   DestroyBelowScreenComponent,
@@ -41,6 +43,11 @@ export { RenderComponent } from "./components/Render/RenderComponent";
 export { BoxRenderComponent } from "./components/Render/BoxRenderComponent";
 export { CircleRenderComponent } from "./components/Render/CircleRenderComponent";
 export { SpriteRenderComponent } from "./components/Render/SpriteRenderComponent";
+export {
+  SpritesheetAnimationRenderComponent,
+  type SpritesheetAnimationClipsOptions,
+  type SpritesheetClipConfig,
+} from "./components/Render/SpritesheetAnimationRenderComponent";
 export { ParallaxBackgroundRenderComponent } from "./components/Render/ParallaxBackgroundRenderComponent";
 
 export { Box } from "./prefabs/Box";
