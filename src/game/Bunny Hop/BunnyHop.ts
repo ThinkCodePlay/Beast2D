@@ -3,12 +3,12 @@ import {
   BUNNY_SPRITE_SIZE,
   DISPLAY_HEIGHT,
   DISPLAY_WIDTH,
-  TEXTURE_BUNNY_MOVE_ANIMATION,
+  TEXTURE_BUNNY_WALK_ANIMATION,
 } from "../../core/consts";
 import { BunnyPlayer } from "./Game Objects/BunnyPlayer";
 
 export class BunnyHop extends Level {
-  override assets = [TEXTURE_BUNNY_MOVE_ANIMATION];
+  override assets = [TEXTURE_BUNNY_WALK_ANIMATION];
 
   protected init(): void {
     const startX = (DISPLAY_WIDTH - BUNNY_SPRITE_SIZE) / 2;

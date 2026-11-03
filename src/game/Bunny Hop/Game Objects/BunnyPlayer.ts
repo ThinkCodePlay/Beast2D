@@ -5,10 +5,10 @@ import { HorizontalInputComponent } from "../../../core/components/Movement/Hori
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
 import { Globals } from "../../../core/Globals";
 import {
-  BUNNY_MOVE_ANIMATION_COLUMNS,
-  BUNNY_MOVE_ANIMATION_FRAME_COUNT,
+  BUNNY_WALK_ANIMATION_COLUMNS,
+  BUNNY_WALK_ANIMATION_FRAME_COUNT,
   BUNNY_SPRITE_SIZE,
-  TEXTURE_BUNNY_MOVE_ANIMATION,
+  TEXTURE_BUNNY_WALK_ANIMATION,
 } from "../../../core/consts";
 
 export class BunnyPlayer extends GameObject {
@@ -19,12 +19,12 @@ export class BunnyPlayer extends GameObject {
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(
       new SpritesheetAnimationRenderComponent(
-        TEXTURE_BUNNY_MOVE_ANIMATION,
+        TEXTURE_BUNNY_WALK_ANIMATION,
         {
           frameWidth: BUNNY_SPRITE_SIZE,
           frameHeight: BUNNY_SPRITE_SIZE,
-          columns: BUNNY_MOVE_ANIMATION_COLUMNS,
-          frameCount: BUNNY_MOVE_ANIMATION_FRAME_COUNT,
+          columns: BUNNY_WALK_ANIMATION_COLUMNS,
+          frameCount: BUNNY_WALK_ANIMATION_FRAME_COUNT,
         },
       ),
     );
