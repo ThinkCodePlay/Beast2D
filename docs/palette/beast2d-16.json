@@ -1,0 +1,40 @@
+{
+  "name": "Beast2D 16",
+  "version": 4,
+  "colors": [
+    "#1f1424",
+    "#8a5a44",
+    "#3b2e3f",
+    "#746678",
+    "#f4ead2",
+    "#75273c",
+    "#c1386e",
+    "#e86c9a",
+    "#f7abcc",
+    "#cb4a50",
+    "#e28649",
+    "#f1c766",
+    "#4a784d",
+    "#93be64",
+    "#3a5b93",
+    "#7ab2d5"
+  ],
+  "names": [
+    "Plum Outline",
+    "Dirt Brown",
+    "Shadow",
+    "Stone Gray",
+    "Cream",
+    "Deep Rose",
+    "Magenta",
+    "Hot Pink",
+    "Light Pink",
+    "Red",
+    "Orange",
+    "Yellow",
+    "Moss Green",
+    "Leaf Green",
+    "Blue",
+    "Sky Blue"
+  ]
+}
