@@ -11,7 +11,7 @@ npm test           # Vitest
 npm run docs:dev   # engine documentation (VitePress)
 ```
 
-Full **API and syntax documentation** lives in [`docs/`](./docs/index.md) (build static HTML with `npm run docs:build`). The [Beast2D 16 color palette](./docs/palette.md) lives there too.
+Full **API and syntax documentation** lives in [`docs/`](./docs/index.md) (build static HTML with `npm run docs:build`). The [Beast2D 16 color palette](./docs/palette.md) and [display spec](./docs/display.md) live there too.
 
 ## Quick start
 
