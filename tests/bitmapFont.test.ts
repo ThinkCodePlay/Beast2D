@@ -4,15 +4,8 @@ import { describe, expect, it, beforeAll } from "vitest";
 import { useBitmapFont } from "../src/core/ui/bitmapFontRegistry";
 import { missingGlyphs } from "../src/core/ui/BitmapText";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../src/core/ui/defaultBitmapFont";
+import { UI_BITMAP_STRINGS } from "../src/core/ui/uiBitmapCopy";
 import { SHOOTER_BITMAP_FONT } from "../src/game/Space Shooter/shooterBitmapFont";
-
-const REQUIRED = [
-  "SPACE BEAST",
-  "SCORE 0",
-  "START",
-  "RESTART",
-  "GAME OVER",
-];
 
 describe("bitmap font atlas", () => {
   beforeAll(() => {
@@ -31,8 +24,8 @@ describe("bitmap font atlas", () => {
     expect(SHOOTER_BITMAP_FONT).toBe(DEFAULT_BEAST2D_BITMAP_FONT);
   });
 
-  it("covers all Space Shooter UI strings", () => {
-    for (const line of REQUIRED) {
+  it("covers all demo HUD/dialog/hint UI strings", () => {
+    for (const line of UI_BITMAP_STRINGS) {
       expect(missingGlyphs(line), line).toEqual([]);
     }
   });

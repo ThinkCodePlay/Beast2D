@@ -9,6 +9,7 @@ import {
   spawnBreakoutHud,
   START_LIVES,
 } from "./breakoutSetup";
+import { BreakoutPlayfieldHint } from "./BreakoutPlayfieldHint";
 import { BreakoutBackdrop } from "./Game Objects/BreakoutBackdrop";
 import { BrickWall } from "./Game Objects/BrickWall";
 import { BreakoutBallObj } from "./Game Objects/BreakoutBallObj";
@@ -68,6 +69,8 @@ export class BreakoutPaddle extends Level {
           phase: this.session.phase,
           lives: this.session.lives,
           dialogOpen: DialogUI.isOpen(),
+          dialogTextReady: DialogUI.isTextReady(),
+          hintTextReady: BreakoutPlayfieldHint.isTextReady(),
         };
     }
     tickBreakoutSession(

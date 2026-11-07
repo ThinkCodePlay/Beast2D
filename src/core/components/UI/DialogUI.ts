@@ -67,6 +67,10 @@ export class DialogUI extends GameObject {
     return DialogUI.current?.renderComponent.getOpenState() ?? false;
   }
 
+  static isTextReady(): boolean {
+    return DialogUIRenderComponent.isTextReady();
+  }
+
   protected override onDestroy(): void {
     if (DialogUI.current === this) {
       DialogUI.current = null;

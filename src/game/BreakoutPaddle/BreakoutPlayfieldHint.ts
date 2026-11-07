@@ -5,7 +5,9 @@
 import { GameObject } from "../../core/GameObject";
 import { DISPLAY_WIDTH, PLAYFIELD_TOP } from "../../core/consts";
 import { TransformComponent } from "../../core/components/Movement/TransformComponent";
-import { BreakoutPlayfieldHintRender } from "./BreakoutPlayfieldHintRender";
+import {
+  BreakoutPlayfieldHintRender,
+} from "./BreakoutPlayfieldHintRender";
 
 export class BreakoutPlayfieldHint extends GameObject {
   private static current: BreakoutPlayfieldHint | null = null;
@@ -22,6 +24,10 @@ export class BreakoutPlayfieldHint extends GameObject {
 
   static setMessage(message: string): void {
     BreakoutPlayfieldHint.current?.setMessage(message);
+  }
+
+  static isTextReady(): boolean {
+    return BreakoutPlayfieldHintRender.isTextReady();
   }
 
   setMessage(message: string): void {

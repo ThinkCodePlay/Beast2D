@@ -12,6 +12,12 @@ import { NineSliceSprite } from "../../ui/NineSliceSprite";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../consts";
 
 export class DialogUIRenderComponent extends RenderComponent {
+  private static dialogTextReady = false;
+
+  static isTextReady(): boolean {
+    return DialogUIRenderComponent.dialogTextReady;
+  }
+
   private width: number;
   private height: number;
   private message: string;
@@ -65,12 +71,14 @@ export class DialogUIRenderComponent extends RenderComponent {
     if (message !== undefined) this.message = message;
     if (score !== undefined) this.score = Math.max(0, score);
     this.isOpen = true;
+    DialogUIRenderComponent.dialogTextReady = false;
     this.onPause?.();
     this.refresh();
   }
 
   close(): void {
     this.isOpen = false;
+    DialogUIRenderComponent.dialogTextReady = false;
     this.onResume?.();
     this.refresh();
   }
@@ -178,6 +186,10 @@ export class DialogUIRenderComponent extends RenderComponent {
       Math.round((btnW - measureBitmapText(this.primaryLabel, labelOpts)) / 2);
     btnLabel.y = btnY + 4;
     this.panelHost.addChild(btnLabel);
+
+    if (token === this.redrawToken) {
+      DialogUIRenderComponent.dialogTextReady = true;
+    }
   }
 
   private destroyDynamicNodes(graphics: Graphics): void {

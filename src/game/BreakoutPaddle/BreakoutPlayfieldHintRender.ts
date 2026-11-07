@@ -1,12 +1,22 @@
 import { Graphics } from "pixi.js";
 import { Beast2D16 } from "../../core/palette/beast2d16";
-import { buildBitmapText, measureBitmapText } from "../../core/ui/BitmapText";
+import {
+  buildBitmapTextReady,
+  measureBitmapText,
+  preloadBitmapFont,
+} from "../../core/ui/BitmapText";
 import { HUD_LAYOUT } from "../../core/ui/hudContract";
 import { RenderComponent } from "../../core/components/Render/RenderComponent";
 
 export class BreakoutPlayfieldHintRender extends RenderComponent {
+  private static hintTextReady = false;
   private message: string;
   private textHost: Graphics | null = null;
+  private paintToken = 0;
+
+  static isTextReady(): boolean {
+    return BreakoutPlayfieldHintRender.hintTextReady;
+  }
 
   constructor(message: string) {
     super({ color: Beast2D16.Cream });
@@ -15,12 +25,13 @@ export class BreakoutPlayfieldHintRender extends RenderComponent {
 
   createGraphics(): Graphics {
     const graphics = new Graphics();
-    this.drawMessage(graphics);
+    void this.drawMessage(graphics);
     return graphics;
   }
 
   setMessage(message: string): void {
     this.message = message;
+    BreakoutPlayfieldHintRender.hintTextReady = false;
     this.refresh();
   }
 
@@ -31,27 +42,38 @@ export class BreakoutPlayfieldHintRender extends RenderComponent {
       this.textHost.destroy({ children: true });
       this.textHost = null;
     }
-    this.drawMessage(this.graphics);
+    void this.drawMessage(this.graphics);
   }
 
-  private drawMessage(graphics: Graphics): void {
+  private async drawMessage(graphics: Graphics): Promise<void> {
+    const token = ++this.paintToken;
     const host = new Graphics();
     if (!this.message) {
+      BreakoutPlayfieldHintRender.hintTextReady = true;
       graphics.addChild(host);
       this.textHost = host;
       return;
     }
+
+    await preloadBitmapFont();
+    if (token !== this.paintToken || graphics.destroyed) return;
+
     const line = this.message.toUpperCase();
     const opts = {
       scale: HUD_LAYOUT.fontScale,
       tint: Beast2D16.Cream,
       letterSpacing: HUD_LAYOUT.fontLetterSpacing,
     };
-    const text = buildBitmapText(line, opts);
+    const text = await buildBitmapTextReady(line, opts);
+    if (token !== this.paintToken || graphics.destroyed) {
+      text.destroy({ children: true });
+      return;
+    }
     text.x = -measureBitmapText(line, opts) / 2;
     host.addChild(text);
     graphics.addChild(host);
     this.textHost = host;
+    BreakoutPlayfieldHintRender.hintTextReady = true;
   }
 
   override onDestroy(): void {

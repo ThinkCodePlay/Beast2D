@@ -33,7 +33,13 @@ async function main() {
   await page.waitForFunction(
     () => {
       const s = globalThis.__beast2dBreakout;
-      return s && s.phase === "lost" && s.dialogOpen === true;
+      return (
+        s &&
+        s.phase === "lost" &&
+        s.dialogOpen === true &&
+        s.dialogTextReady === true &&
+        s.hintTextReady === true
+      );
     },
     { timeout: 90_000 },
   );
