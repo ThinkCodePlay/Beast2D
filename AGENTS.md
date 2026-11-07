@@ -69,6 +69,20 @@ Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `READM
 - Levels override `update(dt: number)` (call `super.update(dt)`), not a ticker callback. The game registers its levels in `src/main.ts`.
 - `GameObject.getWorldPosition()` composes parent transforms.
 
+## Temporary demo tooling (delete when demos are finished)
+
+**Owner intent (Yonatan):** Pipelines used only while building demo levels and art are **not** part of the long-term engine. Once demo levels and their shipped PNGs/fonts are done, **remove this tooling** and keep the repo focused on simplicity — do not grow new capture routes, generator scripts, or extra Vite entries unless demos are actively in progress.
+
+Treat as **temporary** (non-exhaustive; grep `generate-`, `capture`, `devCapture`, `scripts/pixel`, `assets:fit-display` before closing out demos):
+
+| Area | Examples | Keep after cleanup |
+|------|----------|-------------------|
+| Level / dev capture | `src/game/Space Shooter/devCapture.ts`, `space-shooter-capture.html`, `scripts/capture-screenshots.mjs`, extra `rollupOptions.input` in `vite.config.ts` | Runtime levels + `src/main.ts` only |
+| Per-level image generators | `src/game/Space Shooter/scripts/generate-*.ts`, `verify-palette.ts`, `upscale-contact-sheet.ts`, nested `scripts/package.json` capture/assets scripts | `public/…` art already committed; hand-edited sources like `shooterBitmapFont.ts` only if still needed |
+| Shared asset tooling | `scripts/pixel/`, `scripts/compress_display_png.py`, root `npm run assets:fit-display` | Fitted assets under `public/` |
+
+When removing generators, update docs that reference them (`docs/space-shooter-art.md`, `scripts/README.md`) so agents do not resurrect deleted workflows.
+
 ## Safe Change Workflow
 
 1. Start from an existing nearby prefab/component/level and mirror its style.

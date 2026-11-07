@@ -48,7 +48,7 @@ npm run dev   # separate terminal
 npm --prefix "src/game/Space Shooter/scripts" run capture
 ```
 
-Loads the game via dev-only `?level=spaceShooter`. Playwright uses SwiftShader so `canvas.toDataURL` returns real pixels.
+Loads `src/game/Space Shooter/space-shooter-capture.html` (registers only Space Shooter — see `devCapture.ts`). Playwright uses SwiftShader so `canvas.toDataURL` returns real pixels.
 
 ## Code layout
 

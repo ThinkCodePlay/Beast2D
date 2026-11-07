@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Dev-only Playwright captures for Space Shooter (run from repo root dev server).
- * Uses `?level=spaceShooter` (honored only in Vite dev builds).
+ * Loads Space Shooter capture HTML (dev-only; see `space-shooter-capture.html`).
  */
 import { chromium } from "playwright";
 import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
@@ -15,11 +15,12 @@ const base =
 const outDir = process.env.SHOOTER_ARTIFACT_DIR ?? "/opt/cursor/artifacts";
 mkdirSync(outDir, { recursive: true });
 
-const shooterQuery = "?level=spaceShooter";
+const shooterPath =
+  "/src/game/Space%20Shooter/space-shooter-capture.html";
 
 const scenes = [
-  { name: "title", query: shooterQuery, wait: 4000 },
-  { name: "gameplay", query: shooterQuery, wait: 2000, clickStart: true },
+  { name: "title", path: shooterPath, wait: 4000 },
+  { name: "gameplay", path: shooterPath, wait: 2000, clickStart: true },
 ];
 
 function upscaleNearest(input, scale) {
@@ -87,7 +88,7 @@ const browser = await chromium.launch({
 });
 
 for (const scene of scenes) {
-  const url = `${base}${scene.query}`;
+  const url = `${base.replace(/\/$/, "")}${scene.path}`;
   const ctx = await browser.newContext({
     viewport: { width: 640, height: 480 },
     deviceScaleFactor: 1,

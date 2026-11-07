@@ -1,5 +1,7 @@
 # Scripts
 
+> **Lifecycle:** Asset fit/generator scripts here are temporary while demo levels are being built. Remove them (and committed outputs stay in `public/`) once demos are finished — see **Temporary demo tooling** in [`AGENTS.md`](../AGENTS.md).
+
 ## `compress_display_png.py`
 
 Fits PNGs to the game display (or a custom size) using **nearest-neighbor** downsampling. Writes **`{stem}.{width}x{height}.png`** next to each source file unless you pass `--output-dir` or `--in-place`.
