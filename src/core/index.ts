@@ -29,6 +29,18 @@ export { HorizontalInputComponent } from "./components/Movement/HorizontalInputC
 export { HorizontalClampComponent } from "./components/Movement/HorizontalClampComponent";
 export { HorizontalFacingComponent } from "./components/Movement/HorizontalFacingComponent";
 export { VerticalMoveComponent } from "./components/Movement/VerticalMoveComponent";
+export {
+  MoveTowardsComponent,
+  type MoveTowardsTargetSource,
+} from "./components/Movement/MoveTowardsComponent";
+export { PlayfieldPointerTargetComponent } from "./components/Input/PlayfieldPointerTargetComponent";
+export { spawnPlayfieldPointerInput } from "./prefabs/PlayfieldPointerInput";
+export { stepMoveTowards, type MoveTowardsAxes } from "./moveTowards";
+export { clientToGameCoords } from "./pointer/clientToGameCoords";
+export {
+  wireUiPointerButton,
+  type WireUiPointerButtonOptions,
+} from "./ui/UiPointerButton";
 export { SpaceShootInputComponent } from "./components/Input/SpaceShootInputComponent";
 export {
   InteractiveComponent,

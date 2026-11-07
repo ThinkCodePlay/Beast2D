@@ -5,6 +5,10 @@ import { Box } from "../../../core/prefabs/Box";
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
 import { HorizontalInputComponent } from "../../../core/components/Movement/HorizontalInputComponent";
 import {
+  MoveTowardsComponent,
+  type MoveTowardsTargetSource,
+} from "../../../core/components/Movement/MoveTowardsComponent";
+import {
   defaultPaddleY,
   PADDLE_H,
   PADDLE_W,
@@ -16,7 +20,7 @@ const PADDLE_SPEED = 5.5;
 export class BreakoutPaddleObj extends GameObject {
   private readonly body: Box;
 
-  constructor() {
+  constructor(pointerTarget?: MoveTowardsTargetSource) {
     super();
     this.name = "BreakoutPaddle";
     const y = defaultPaddleY();
@@ -32,6 +36,11 @@ export class BreakoutPaddleObj extends GameObject {
       },
     );
     this.body.addComponent(new HorizontalInputComponent(PADDLE_SPEED));
+    if (pointerTarget) {
+      this.body.addComponent(
+        new MoveTowardsComponent(PADDLE_SPEED, pointerTarget, { x: true, y: false }),
+      );
+    }
     this.body.addComponent(
       new HorizontalClampComponent(
         PIXEL_GRID,

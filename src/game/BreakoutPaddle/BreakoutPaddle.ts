@@ -19,6 +19,7 @@ import {
   tickBreakoutSession,
   type BreakoutSession,
 } from "./breakoutSession";
+import { spawnPlayfieldPointerInput } from "../../core/prefabs/PlayfieldPointerInput";
 
 const LEVEL_NAME = "breakoutPaddle";
 
@@ -48,7 +49,11 @@ export class BreakoutPaddle extends Level {
     this.wall = new BrickWall();
     this.levelRoot.addChild(this.wall);
 
-    this.paddle = new BreakoutPaddleObj();
+    const { object: pointerInput, target: pointerTarget } =
+      spawnPlayfieldPointerInput();
+    this.levelRoot.addChild(pointerInput);
+
+    this.paddle = new BreakoutPaddleObj(pointerTarget);
     this.levelRoot.addChild(this.paddle);
 
     this.ball = new BreakoutBallObj();

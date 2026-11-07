@@ -37,6 +37,7 @@ import {
   SHOOTER_DIALOG_THEME,
   SHOOTER_HUD_THEME,
 } from "./shooterUiTheme";
+import { spawnPlayfieldPointerInput } from "../../core/prefabs/PlayfieldPointerInput";
 
 export class SpaceShooter extends Level {
   private static onGameOverRestart: (() => void) | null = null;
@@ -74,10 +75,14 @@ export class SpaceShooter extends Level {
 
     this.levelRoot.addChild(new ParallaxBackground());
 
+    const { object: pointerInput, target: pointerTarget } =
+      spawnPlayfieldPointerInput();
+    this.levelRoot.addChild(pointerInput);
+
     const playfield = new ShooterPlayfield();
     this.levelRoot.addChild(playfield);
 
-    playfield.addChild(new Spaceship(startX, startY));
+    playfield.addChild(new Spaceship(startX, startY, {}, pointerTarget));
     playfield.addChild(new ShooterEnemySpawner());
 
     this.levelRoot.addChild(new HudHeaderUI(0, 3, SHOOTER_HUD_THEME));

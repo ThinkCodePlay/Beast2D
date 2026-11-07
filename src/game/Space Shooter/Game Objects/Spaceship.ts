@@ -4,6 +4,10 @@ import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRen
 import type { RenderOptions } from "../../../core/components/Render/RenderComponent";
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
 import { HorizontalInputComponent } from "../../../core/components/Movement/HorizontalInputComponent";
+import {
+  MoveTowardsComponent,
+  type MoveTowardsTargetSource,
+} from "../../../core/components/Movement/MoveTowardsComponent";
 import { Globals } from "../../../core/Globals";
 import { SPRITE_SIZE } from "../../../core/consts";
 import { TEXTURE_BEAST_SHIP } from "../../publicAssets";
@@ -22,7 +26,12 @@ import type { EnemyKind } from "./ShooterEnemy";
 import { SpaceShooter } from "../SpaceShooter";
 
 export class Spaceship extends GameObject {
-  constructor(x: number = 0, y: number = 0, renderOptions: RenderOptions = {}) {
+  constructor(
+    x: number = 0,
+    y: number = 0,
+    renderOptions: RenderOptions = {},
+    pointerTarget?: MoveTowardsTargetSource,
+  ) {
     super();
     const shipWidth = SPRITE_SIZE;
     this.name = "Spaceship";
@@ -81,6 +90,11 @@ export class Spaceship extends GameObject {
       ),
     );
     this.addComponent(new HorizontalInputComponent(7));
+    if (pointerTarget) {
+      this.addComponent(
+        new MoveTowardsComponent(7, pointerTarget, { x: true, y: false }),
+      );
+    }
     this.addComponent(
       new HorizontalClampComponent(0, Globals.canvasWidth - shipWidth),
     );
