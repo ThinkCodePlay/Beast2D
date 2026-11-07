@@ -5,6 +5,8 @@ import {
   configurePixelArtRendering,
 } from "./core/displayScale";
 
+// Pixi global default: nearest-neighbor texture sampling (no blur when scaling).
+// Must run before any Assets.load / texture creation (level modules may load art).
 configurePixelArtRendering();
 import { Level1 } from "./game/Level1";
 import { Level2 } from "./game/Level2";
@@ -19,6 +21,9 @@ container.className = "game-container";
 container.style.position = "relative";
 appRoot.appendChild(container);
 
+// Size the wrapper to the largest whole-number upscale of 320×240 that fits the
+// window (16px inset). Pixi still renders at logical resolution; CSS + style.css
+// stretch the canvas crisply inside this box (see displayScale.ts).
 attachDisplayScaleFit(container, DISPLAY_WIDTH, DISPLAY_HEIGHT, {
   padding: 16,
 });
