@@ -9,6 +9,11 @@ export const DISPLAY_HEIGHT = 240;
 export const PIXEL_GRID = 16;
 export const SPRITE_SIZE = 32;
 
+/** Top HUD band (score, lives). Playfield begins at y = HUD_HEIGHT. */
+export const HUD_HEIGHT = PIXEL_GRID;
+export const PLAYFIELD_TOP = HUD_HEIGHT;
+export const PLAYFIELD_HEIGHT = DISPLAY_HEIGHT - HUD_HEIGHT;
+
 /** Textures fitted for SPRITE_SIZE (see scripts/compress_display_png.py). */
 export const TEXTURE_BEAST_SHIP = "BeastShip.32x32.png";
 export const TEXTURE_HEART = "HeartBeast.32x32.png";
@@ -20,8 +25,9 @@ export const BUNNY_WALK_ANIMATION_COLUMNS = 18;
 export const BUNNY_WALK_ANIMATION_FRAME_COUNT = 18;
 export const TEXTURE_STARS_LAYER_1 = "background/Stars-Big_1_1_PC.320x240.png";
 export const TEXTURE_STARS_LAYER_2 = "background/Stars-Big_1_2_PC.320x240.png";
-/** Shared 5×7 HUD bitmap font (`public/ui/font-atlas.5x7.png`). */
+/** Shared HUD assets under `public/ui/` (PR #8 mirrors under `space-shooter/ui/`). */
 export const TEXTURE_UI_FONT = "ui/font-atlas.5x7.png";
+export const TEXTURE_UI_HUD_BAND = "ui/hud-band.320x16.png";
 
 export const ObjectNames = {
   LevelRoot: "LevelRoot",

@@ -1,27 +1,20 @@
 import { Graphics } from "pixi.js";
 import { Beast2D16 } from "../../palette/beast2d16";
-import {
-  buildBitmapText,
-  estimateBitmapTextWidth,
-} from "../../ui/BitmapText";
-import {
-  formatHudScore,
-  HUD_LETTER_SPACING,
-  HUD_TEXT_SCALE,
-} from "../../ui/hudLayout";
+import { buildBitmapText, measureBitmapText } from "../../ui/BitmapText";
+import { HUD_CONTRACT } from "../../ui/hudContract";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
 
+/** Legacy per-object score label when `HudHeaderUI` is not active (e.g. main-branch Space Shooter). */
 export class ScoreUIRenderComponent extends RenderComponent {
   private score: number;
   private label: string;
-  private compactHud: boolean;
   private textHost: Graphics | null = null;
 
   constructor(
     score: number = 0,
     label: string = "SCORE",
-    renderOptions: RenderOptions & { compactHud?: boolean } = {},
+    renderOptions: RenderOptions = {},
   ) {
     super({
       color: Beast2D16.Cream,
@@ -29,7 +22,6 @@ export class ScoreUIRenderComponent extends RenderComponent {
     });
     this.score = score;
     this.label = label;
-    this.compactHud = renderOptions.compactHud ?? true;
   }
 
   createGraphics(): Graphics {
@@ -61,21 +53,16 @@ export class ScoreUIRenderComponent extends RenderComponent {
 
   private drawScore(graphics: Graphics): void {
     const host = new Graphics();
-    const line = this.compactHud
-      ? formatHudScore(this.score, this.label)
-      : `${this.label}: ${this.score}`;
-    const text = buildBitmapText(line, {
-      scale: HUD_TEXT_SCALE,
-      tint: this.renderOptions.color ?? Beast2D16.Cream,
-      letterSpacing: HUD_LETTER_SPACING,
-    });
-    const w = estimateBitmapTextWidth(
-      line,
-      HUD_LETTER_SPACING,
-      HUD_TEXT_SCALE,
-    );
-    text.x = this.compactHud ? -w : 0;
-    text.y = 0;
+    const line = `${this.label} ${this.score}`;
+    const opts = {
+      scale: HUD_CONTRACT.fontScale,
+      tint: HUD_CONTRACT.fontTint,
+      letterSpacing: HUD_CONTRACT.fontLetterSpacing,
+    };
+    const text = buildBitmapText(line, opts);
+    const w = measureBitmapText(line, opts);
+    text.x = -w;
+    text.y = HUD_CONTRACT.fontY;
     host.addChild(text);
     graphics.addChild(host);
     this.textHost = host;

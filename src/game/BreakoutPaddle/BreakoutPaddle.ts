@@ -1,8 +1,14 @@
 import { Level } from "../../core/Level";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH, PIXEL_GRID, TEXTURE_UI_FONT } from "../../core/consts";
+import {
+  DISPLAY_HEIGHT,
+  DISPLAY_WIDTH,
+  PIXEL_GRID,
+  TEXTURE_HEART,
+  TEXTURE_UI_FONT,
+  TEXTURE_UI_HUD_BAND,
+} from "../../core/consts";
 import { DialogUI } from "../../core/components/UI/DialogUI";
-import { HudBand } from "../../core/components/UI/HudBand";
-import { HudLivesUI } from "../../core/components/UI/HudLivesUI";
+import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
 import { PlayfieldHintUI } from "../../core/components/UI/PlayfieldHintUI";
 import { ScoreUI } from "../../core/components/UI/ScoreUI";
 import { Beast2D16 } from "../../core/palette/beast2d16";
@@ -31,7 +37,7 @@ const PADDLE_SPEED = 5.5;
 const LEVEL_NAME = "breakoutPaddle";
 
 export class BreakoutPaddle extends Level {
-  override assets = [TEXTURE_UI_FONT];
+  override assets = [TEXTURE_UI_FONT, TEXTURE_UI_HUD_BAND, TEXTURE_HEART];
 
   private phase: GamePhase = "ready";
   private lives = START_LIVES;
@@ -53,10 +59,8 @@ export class BreakoutPaddle extends Level {
     backdrop.runWhenPaused = true;
     this.levelRoot.addChild(backdrop);
 
-    this.levelRoot.addChild(new HudBand());
-    this.levelRoot.addChild(ScoreUI.forHudTop(0));
+    this.levelRoot.addChild(new HudHeaderUI(0, this.lives));
     ScoreUI.resetScore(0);
-    this.levelRoot.addChild(new HudLivesUI(this.lives));
 
     this.levelRoot.addChild(new PlayfieldHintUI("A/D MOVE  SPACE SERVE"));
 
@@ -150,7 +154,7 @@ export class BreakoutPaddle extends Level {
   }
 
   private refreshLives(): void {
-    HudLivesUI.setLives(this.lives);
+    HudHeaderUI.setHearts(this.lives);
   }
 
   private attachBallToPaddle(): void {

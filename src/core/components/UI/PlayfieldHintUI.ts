@@ -1,8 +1,7 @@
 import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { PlayfieldHintUIRenderComponent } from "./PlayfieldHintUIRenderComponent";
-import { DISPLAY_WIDTH } from "../../consts";
-import { HUD_HEIGHT } from "../../ui/hudLayout";
+import { DISPLAY_WIDTH, PLAYFIELD_TOP } from "../../consts";
 
 /** Short centered prompt below the HUD (not in the 16px header strip). */
 export class PlayfieldHintUI extends GameObject {
@@ -16,7 +15,7 @@ export class PlayfieldHintUI extends GameObject {
     PlayfieldHintUI.current = this;
 
     this.addComponent(
-      new TransformComponent(DISPLAY_WIDTH / 2, HUD_HEIGHT + 2),
+      new TransformComponent(DISPLAY_WIDTH / 2, PLAYFIELD_TOP + 2),
     );
     this.renderComponent = this.addComponent(
       new PlayfieldHintUIRenderComponent(message),

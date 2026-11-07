@@ -1,10 +1,6 @@
 import { Graphics } from "pixi.js";
-import { Beast2D16 } from "../../palette/beast2d16";
-import {
-  buildBitmapText,
-  estimateBitmapTextWidth,
-} from "../../ui/BitmapText";
-import { HUD_LETTER_SPACING, HUD_TEXT_SCALE } from "../../ui/hudLayout";
+import { HUD_CONTRACT } from "../../ui/hudContract";
+import { buildBitmapText, measureBitmapText } from "../../ui/BitmapText";
 import { RenderComponent } from "../Render/RenderComponent";
 
 export class PlayfieldHintUIRenderComponent extends RenderComponent {
@@ -12,7 +8,7 @@ export class PlayfieldHintUIRenderComponent extends RenderComponent {
   private textHost: Graphics | null = null;
 
   constructor(message: string) {
-    super({ color: Beast2D16.Cream });
+    super({ color: HUD_CONTRACT.fontTint });
     this.message = message;
   }
 
@@ -46,12 +42,13 @@ export class PlayfieldHintUIRenderComponent extends RenderComponent {
     }
 
     const line = this.message.toUpperCase();
-    const text = buildBitmapText(line, {
-      scale: HUD_TEXT_SCALE,
-      tint: Beast2D16.Cream,
-      letterSpacing: HUD_LETTER_SPACING,
-    });
-    const w = estimateBitmapTextWidth(line, HUD_LETTER_SPACING, HUD_TEXT_SCALE);
+    const opts = {
+      scale: HUD_CONTRACT.fontScale,
+      tint: HUD_CONTRACT.fontTint,
+      letterSpacing: HUD_CONTRACT.fontLetterSpacing,
+    };
+    const text = buildBitmapText(line, opts);
+    const w = measureBitmapText(line, opts);
     text.x = -w / 2;
     text.y = 0;
     host.addChild(text);

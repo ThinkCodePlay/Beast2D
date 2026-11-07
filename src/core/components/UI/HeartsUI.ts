@@ -3,6 +3,7 @@ import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { HeartsUIRenderComponent } from "./HeartsUIRenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
+import { HudHeaderUI } from "./HudHeaderUI";
 
 export class HeartsUI extends GameObject {
   private static current: HeartsUI | null = null;
@@ -28,6 +29,7 @@ export class HeartsUI extends GameObject {
   }
 
   static decreaseHearts(amount: number = 1): number {
+    if (HudHeaderUI.isActive()) return HudHeaderUI.decreaseHearts(amount);
     if (!HeartsUI.current) return 0;
 
     const next = HeartsUI.current.getHearts() - amount;
@@ -36,6 +38,7 @@ export class HeartsUI extends GameObject {
   }
 
   static getHearts(): number {
+    if (HudHeaderUI.isActive()) return HudHeaderUI.getHearts();
     return HeartsUI.current?.getHearts() ?? 0;
   }
 
