@@ -2,6 +2,7 @@ import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { ScoreUIRenderComponent } from "./ScoreUIRenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
+import { HudHeaderUI } from "./HudHeaderUI";
 
 export class ScoreUI extends GameObject {
   private static current: ScoreUI | null = null;
@@ -26,6 +27,7 @@ export class ScoreUI extends GameObject {
   }
 
   static addScore(amount: number): number {
+    if (HudHeaderUI.isActive()) return HudHeaderUI.addScore(amount);
     if (!ScoreUI.current) return 0;
 
     const next = ScoreUI.current.getScore() + amount;
@@ -34,10 +36,15 @@ export class ScoreUI extends GameObject {
   }
 
   static getScore(): number {
+    if (HudHeaderUI.isActive()) return HudHeaderUI.getScore();
     return ScoreUI.current?.getScore() ?? 0;
   }
 
   static resetScore(score: number = 0): void {
+    if (HudHeaderUI.isActive()) {
+      HudHeaderUI.resetScore(score);
+      return;
+    }
     ScoreUI.current?.setScore(score);
   }
 

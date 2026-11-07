@@ -9,6 +9,11 @@ export const DISPLAY_HEIGHT = 240;
 export const PIXEL_GRID = 16;
 export const SPRITE_SIZE = 32;
 
+/** Top HUD band (score, lives). Playfield begins at y = HUD_HEIGHT. */
+export const HUD_HEIGHT = PIXEL_GRID;
+export const PLAYFIELD_TOP = HUD_HEIGHT;
+export const PLAYFIELD_HEIGHT = DISPLAY_HEIGHT - HUD_HEIGHT;
+
 /** Textures fitted for SPRITE_SIZE (see scripts/compress_display_png.py). */
 export const TEXTURE_BEAST_SHIP = "BeastShip.32x32.png";
 export const TEXTURE_HEART = "HeartBeast.32x32.png";

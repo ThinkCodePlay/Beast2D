@@ -1,28 +1,35 @@
-import { Graphics, Text, TextStyle } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
+import { Beast2D16 } from "../../palette/beast2d16";
+import {
+  buildBitmapTextReady,
+  measureBitmapText,
+  preloadBitmapFont,
+} from "../../ui/BitmapText";
 
 export class ScoreUIRenderComponent extends RenderComponent {
   private score: number;
   private label: string;
-  private textNode: Text | null = null;
+  private textHost: Container | null = null;
+  private paintToken = 0;
 
   constructor(
     score: number = 0,
-    label: string = "Score",
+    label: string = "SCORE",
     renderOptions: RenderOptions = {},
   ) {
     super({
-      color: 0xfd62a7,
+      color: Beast2D16.HotPink,
       ...renderOptions,
     });
     this.score = score;
-    this.label = label;
+    this.label = label.toUpperCase();
   }
 
   createGraphics(): Graphics {
     const graphics = new Graphics();
-    this.drawScore(graphics);
+    void this.paint(graphics);
     return graphics;
   }
 
@@ -37,36 +44,32 @@ export class ScoreUIRenderComponent extends RenderComponent {
 
   private refresh(): void {
     if (!this.graphics || !(this.graphics instanceof Graphics)) return;
-
-    if (this.textNode && this.textNode.parent === this.graphics) {
-      this.graphics.removeChild(this.textNode);
-      this.textNode.destroy();
-      this.textNode = null;
+    if (this.textHost) {
+      this.graphics.removeChild(this.textHost);
+      this.textHost.destroy({ children: true });
+      this.textHost = null;
     }
-
-    this.drawScore(this.graphics);
+    void this.paint(this.graphics);
   }
 
-  private drawScore(graphics: Graphics): void {
-    this.textNode = new Text({
-      text: `${this.label}: ${this.score}`,
-      style: new TextStyle({
-        fill: this.renderOptions.color,
-        fontSize: 28,
-        fontWeight: "700",
-      }),
-    });
+  private async paint(graphics: Graphics): Promise<void> {
+    const token = ++this.paintToken;
+    await preloadBitmapFont();
+    if (token !== this.paintToken || graphics.destroyed) return;
 
-    this.textNode.anchor.set(1, 0);
-    this.textNode.x = 0;
-    this.textNode.y = 0;
-    graphics.addChild(this.textNode);
+    const line = `${this.label} ${this.score}`;
+    const opts = { scale: 1, tint: Beast2D16.Cream, letterSpacing: 1 };
+    const text = await buildBitmapTextReady(line, opts);
+    text.x = Math.round(-measureBitmapText(line, opts));
+    text.y = 2;
+    graphics.addChild(text);
+    this.textHost = text;
   }
 
   override onDestroy(): void {
-    if (this.textNode) {
-      this.textNode.destroy();
-      this.textNode = null;
+    if (this.textHost) {
+      this.textHost.destroy({ children: true });
+      this.textHost = null;
     }
     super.onDestroy();
   }

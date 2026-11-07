@@ -45,7 +45,7 @@ export class Engine {
       height: options.height ?? DISPLAY_HEIGHT,
       backgroundColor: options.backgroundColor ?? 0x000000,
       antialias: options.antialias ?? false,
-      debug: options.debug ?? true,
+      debug: options.debug ?? false,
       resolution: options.resolution ?? 1,
     };
 

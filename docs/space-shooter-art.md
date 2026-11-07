@@ -1,0 +1,66 @@
+# Space Shooter — art & regeneration
+
+Example-game visuals for Beast2D: palette-locked enemies, HUD chrome, and shared engine effects.
+
+## Palette
+
+All shooter PNGs use [Beast2D 16](./palette.md) indices only (alpha allowed). Shared palette helpers live in `scripts/pixel/`.
+
+## Layout
+
+See [display spec](./display.md) and [HUD header](./hud-header.md) (geometry in core; shooter band textures in `shooterAssets.ts`).
+
+| Region | Size | Notes |
+|--------|------|--------|
+| HUD | 320×16, y 0–15 | `HudHeaderUI` + `SHOOTER_HUD_THEME` |
+| Playfield | 320×224, y 16–239 | Ship, enemies, effects |
+
+## Regenerate assets (example scripts)
+
+From **repository root** (requires root `npm install` for `tsx` / `pngjs` / `playwright`):
+
+```bash
+npm --prefix "src/game/Space Shooter/scripts" run assets
+npm --prefix "src/game/Space Shooter/scripts" run verify
+```
+
+Equivalent direct invocations:
+
+```bash
+npx tsx "src/game/Space Shooter/scripts/generate-enemies.ts"
+npx tsx "src/game/Space Shooter/scripts/generate-ui.ts"
+npx tsx "src/game/Space Shooter/scripts/upscale-contact-sheet.ts"
+npx tsx "src/game/Space Shooter/scripts/verify-palette.ts"
+```
+
+`generate-ui.ts` rewrites `src/game/Space Shooter/shooterBitmapFont.ts` (kept in sync with `public/space-shooter/ui/font-glyphs.json`).
+
+Generators:
+
+- `src/game/Space Shooter/scripts/generate-enemies.ts`
+- `src/game/Space Shooter/scripts/generate-ui.ts`
+- `scripts/pixel/` — shared palette + PNG writer
+
+### Dev screenshots (not shipped in production)
+
+```bash
+npm run dev   # separate terminal
+npm --prefix "src/game/Space Shooter/scripts" run capture
+```
+
+Loads the game via dev-only `?level=spaceShooter`. Playwright uses SwiftShader so `canvas.toDataURL` returns real pixels.
+
+## Code layout
+
+| Concern | Location |
+|---------|----------|
+| Texture paths | `src/game/Space Shooter/shooterAssets.ts` |
+| HUD / dialog chrome | `shooterUiTheme.ts` |
+| Bitmap font | `shooterBitmapFont.ts` (generated) |
+| Enemy prefabs | `Game Objects/` |
+
+Engine reuse: `HudHeaderUI`, `DialogUI`, `BitmapText`, `NineSliceSprite`, `PixelBurstEffect`, palette in `src/core/`.
+
+## Effects
+
+Preset bursts in `src/core/effects/PixelEffectPresets.ts` (palette-only). Shooter wires them from `ShooterEnemy` / gameplay as needed.

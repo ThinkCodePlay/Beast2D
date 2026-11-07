@@ -1,6 +1,7 @@
 import { Graphics, Sprite, Assets } from "pixi.js";
 import { RenderComponent } from "./RenderComponent";
 import type { RenderOptions } from "./RenderComponent";
+import { textureNearest } from "../../ui/textureNearest";
 
 export class SpriteRenderComponent extends RenderComponent {
   private sprite: Sprite | null = null;
@@ -23,8 +24,9 @@ export class SpriteRenderComponent extends RenderComponent {
           return;
         }
 
+        textureNearest(texture);
         this.sprite = new Sprite(texture);
-        //   this.sprite.anchor.set(0.5);
+        this.sprite.roundPixels = true;
         this.sprite.alpha = this.renderOptions.alpha ?? 1;
         this.sprite.visible = this.renderOptions.visible ?? true;
         graphics.addChild(this.sprite);

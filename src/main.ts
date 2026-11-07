@@ -28,6 +28,14 @@ const engine = new Engine({
   antialias: false,
 });
 
+function resolveInitialLevel(): string {
+  if (import.meta.env.DEV) {
+    const level = new URLSearchParams(window.location.search).get("level");
+    if (level === "spaceShooter") return "spaceShooter";
+  }
+  return "bunnyHop";
+}
+
 engine
   .bootstrap(container)
   .then((game) => {
@@ -35,7 +43,7 @@ engine
     game.registerLevel("level2", new Level2(engine));
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     game.registerLevel("bunnyHop", new BunnyHop(engine));
-    return game.loadLevel("bunnyHop");
+    return game.loadLevel(resolveInitialLevel());
   })
   .catch((error) => {
     console.error("Failed to start Beast2D engine", error);

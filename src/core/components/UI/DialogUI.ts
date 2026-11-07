@@ -3,6 +3,7 @@ import { TransformComponent } from "../Movement/TransformComponent";
 import { DialogUIRenderComponent } from "./DialogUIRenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
 import { DISPLAY_WIDTH, PIXEL_GRID } from "../../consts";
+import type { DialogChromeTheme } from "../../ui/dialogTheme";
 
 export class DialogUI extends GameObject {
   private static current: DialogUI | null = null;
@@ -16,6 +17,7 @@ export class DialogUI extends GameObject {
     message: string = "Game Over",
     score: number = 0,
     isOpen: boolean = false,
+    chrome: DialogChromeTheme,
     renderOptions: RenderOptions = {},
   ) {
     super();
@@ -31,6 +33,7 @@ export class DialogUI extends GameObject {
         message,
         score,
         isOpen,
+        chrome,
         renderOptions,
       ),
     );
@@ -42,6 +45,10 @@ export class DialogUI extends GameObject {
 
   static close(): void {
     DialogUI.current?.renderComponent.close();
+  }
+
+  static setPrimaryLabel(label: string): void {
+    DialogUI.current?.renderComponent.setPrimaryLabel(label);
   }
 
   static setOnRestart(handler: (() => void) | null): void {

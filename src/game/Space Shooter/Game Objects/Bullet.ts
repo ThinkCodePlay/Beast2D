@@ -1,21 +1,33 @@
-import { Circle } from "../../../core/prefabs/Circle";
+import { GameObject } from "../../../core/GameObject";
+import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
+import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenderComponent";
 import { VerticalMoveComponent } from "../../../core/components/Movement/VerticalMoveComponent";
 import { DestroyOutOfBoundsComponent } from "../../../core/components/Behavior/DestroyBelowScreenComponent";
 import { Globals } from "../../../core/Globals";
 import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
-import { CollisionLayers, ColliderModes } from "../../../core/consts";
+import {
+  CollisionLayers,
+  ColliderModes,
+  PLAYFIELD_TOP,
+} from "../../../core/consts";
+import { TEXTURE_SHOOTER_BULLET } from "../shooterAssets";
 import { ScoreUI } from "../../../core/components/UI/ScoreUI";
+import { ShooterEnemy } from "./ShooterEnemy";
+import type { EnemyKind } from "./ShooterEnemy";
 
-export class Bullet extends Circle {
+export class Bullet extends GameObject {
   constructor(x: number = 0, y: number = 0) {
-    super(x, y, 4, {
-      color: 0xffff55,
-      strokeColor: 0xffffff,
-      strokeWidth: 1,
-    });
+    super();
+    this.name = "Bullet";
+    const size = 16;
+
+    this.addComponent(new TransformComponent(x - size / 2, y - size / 2));
+    this.addComponent(
+      new SpriteRenderComponent(TEXTURE_SHOOTER_BULLET, { alpha: 1 }),
+    );
     this.addComponent(new VerticalMoveComponent(-8));
     this.addComponent(
-      new CircleColliderComponent(4, {
+      new CircleColliderComponent(5, {
         layer: CollisionLayers.Bullet,
         mode: ColliderModes.Active,
         mask: [CollisionLayers.Enemy],
@@ -23,11 +35,14 @@ export class Bullet extends Circle {
           const enemy = other.gameObject;
           if (enemy) {
             ScoreUI.addScore(100);
+            const { x: ex, y: ey } = enemy
+              .getComponent(TransformComponent)
+              ?.getWorldPosition() ?? { x: 0, y: 0 };
+            const kind = enemy.name.replace("Enemy_", "") as EnemyKind;
+            ShooterEnemy.spawnBurst(kind, ex, ey);
             enemy.destroy();
           }
-
-          const bullet = this;
-          bullet.destroy();
+          this.destroy();
         },
       }),
     );
@@ -35,7 +50,7 @@ export class Bullet extends Circle {
       new DestroyOutOfBoundsComponent({
         minX: -20,
         maxX: Globals.canvasWidth + 20,
-        minY: -20,
+        minY: PLAYFIELD_TOP - 20,
         maxY: Globals.canvasHeight + 20,
       }),
     );
