@@ -3,8 +3,9 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { PNG } from "pngjs";
+import { REPO_ROOT } from "./repoRoot.ts";
 
-const src = join(process.cwd(), "public/space-shooter/enemies/contact-sheet.png");
+const src = join(REPO_ROOT, "public/space-shooter/enemies/contact-sheet.png");
 const scale = 4;
 const input = PNG.sync.read(readFileSync(src));
 const out = new PNG({
@@ -29,6 +30,6 @@ for (let y = 0; y < input.height; y += 1) {
   }
 }
 
-const dest = join(process.cwd(), "public/space-shooter/enemies/contact-sheet-4x.png");
+const dest = join(REPO_ROOT, "public/space-shooter/enemies/contact-sheet-4x.png");
 writeFileSync(dest, PNG.sync.write(out));
 console.log("Wrote", dest, `${out.width}x${out.height}`);

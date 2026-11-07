@@ -1,34 +1,40 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeAll } from "vitest";
 import {
-  HUD_CONTRACT,
+  HUD_LAYOUT,
   hudLivesReservedWidth,
   hudScoreMaxWidth,
 } from "../src/core/ui/hudContract";
+import { useBitmapFont } from "../src/core/ui/bitmapFontRegistry";
 import { measureBitmapText } from "../src/core/ui/BitmapText";
 import { formatHudScoreLine } from "../src/core/ui/formatHudScore";
+import { SHOOTER_BITMAP_FONT } from "../src/game/Space Shooter/shooterBitmapFont";
+
+beforeAll(() => {
+  useBitmapFont(SHOOTER_BITMAP_FONT);
+});
 
 const textOpts = {
-  scale: HUD_CONTRACT.fontScale,
-  letterSpacing: HUD_CONTRACT.fontLetterSpacing,
+  scale: HUD_LAYOUT.fontScale,
+  letterSpacing: HUD_LAYOUT.fontLetterSpacing,
 };
 
 describe("HUD header contract", () => {
   it("fits default score copy inside the score column at scale 1", () => {
-    const line = formatHudScoreLine(999_999, HUD_CONTRACT.defaultLives);
+    const line = formatHudScoreLine(999_999, HUD_LAYOUT.defaultLives);
     const w = measureBitmapText(line, textOpts);
-    expect(w).toBeLessThanOrEqual(hudScoreMaxWidth(HUD_CONTRACT.defaultLives));
-    expect(HUD_CONTRACT.fontScale).toBe(1);
+    expect(w).toBeLessThanOrEqual(hudScoreMaxWidth(HUD_LAYOUT.defaultLives));
+    expect(HUD_LAYOUT.fontScale).toBe(1);
   });
 
   it("fits showcase score 12800 at integer scale", () => {
-    const line = formatHudScoreLine(12_800, HUD_CONTRACT.defaultLives);
+    const line = formatHudScoreLine(12_800, HUD_LAYOUT.defaultLives);
     expect(line).toBe("SCORE 12800");
     expect(measureBitmapText(line, textOpts)).toBeLessThanOrEqual(
-      hudScoreMaxWidth(HUD_CONTRACT.defaultLives),
+      hudScoreMaxWidth(HUD_LAYOUT.defaultLives),
     );
   });
 
   it("reserves lives strip on the left", () => {
-    expect(hudLivesReservedWidth(3)).toBeLessThan(HUD_CONTRACT.scoreRightX / 2);
+    expect(hudLivesReservedWidth(3)).toBeLessThan(HUD_LAYOUT.scoreRightX / 2);
   });
 });

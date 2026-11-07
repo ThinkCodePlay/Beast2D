@@ -2,42 +2,39 @@
 
 Compact top band for single-screen Beast2D levels. Playfield begins at **y = 16** (`PLAYFIELD_TOP` / `HUD_HEIGHT`).
 
-## Layout
+## Layout geometry (engine)
+
+Defined in `src/core/ui/hudContract.ts` (`HUD_LAYOUT`): widths, padding, heart size, score column — **no game-specific textures**.
 
 | Zone | Position | Content |
 |------|----------|---------|
-| Band | `(0,0)` 320×16 | `space-shooter/ui/hud-band.320x16.png` — Shadow fill, Plum outline top/bottom |
-| Lives | Left | `HeartBeast.32x32.png` scaled to **12×12**, **2px** gap, inset **4px** from left |
-| Score | Right | Bitmap string `SCORE <n>`, right edge inset **4px**, grows left |
+| Band | `(0,0)` 320×16 | Per-game texture via `HudHeaderTheme.bandTexture` |
+| Lives | Left | `heartTexture` (default `HeartBeast.32x32.png` at 12×12, 2px gap, 4px inset) |
+| Score | Right | Bitmap `SCORE <n>`, right edge inset 4px |
 
-## Typography (HUD)
+## Typography
 
-Defined in code: `src/core/ui/hudContract.ts` (`HUD_CONTRACT`).
+Register a bitmap font with `useBitmapFont()` before `HudHeaderUI` renders. Layout assumes **5×7** glyphs at scale **1** (see `HUD_LAYOUT.fontY`).
 
-| Property | Value |
-|----------|--------|
-| Font | Generated `font-atlas.5x7.png` (mono cream ink, tinted at runtime) |
-| Scale | **1** (integer; shrinks only if string wider than reserved score column) |
-| Letter spacing | **1** px |
-| Tint | `#f4ead2` Cream (`Beast2D16.Cream`) |
-| Baseline Y | **4** px (`(16 − 7) / 2`) |
+Space Shooter sets `SHOOTER_BITMAP_FONT` and `SHOOTER_HUD_THEME` in `SpaceShooter.init()`.
 
 ## Integration
 
 ```ts
 import { HudHeaderUI } from ".../HudHeaderUI";
+import type { HudHeaderTheme } from ".../hudTheme";
 
-// In Level.init() — one instance at origin
-levelRoot.addChild(new HudHeaderUI(0, 3));
+const theme: HudHeaderTheme = {
+  bandTexture: "…/hud-band.png",
+  fontTint: 0xf4ead2,
+};
 
-// Gameplay code (static facades forward when header is active)
-ScoreUI.addScore(100);
-HeartsUI.decreaseHearts(1);
+levelRoot.addChild(new HudHeaderUI(0, 3, theme));
 ```
 
-Use **`HudHeaderUI`** instead of separate `HeartsUI` + `ScoreUI` + band sprites. `HeartsUI` / `ScoreUI` static methods delegate to the active header.
+`HeartsUI` / `ScoreUI` static methods delegate to the active `HudHeaderUI`.
 
-Breakout and other demos should import the same `HUD_CONTRACT` values rather than duplicating magic numbers.
+Breakout (PR #9) can reuse `HUD_LAYOUT` with its own `HudHeaderTheme` — no dependency on `space-shooter/` paths in core.
 
 ## Related
 

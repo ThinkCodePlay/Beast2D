@@ -9,10 +9,12 @@ import {
   ColliderModes,
   PLAYFIELD_TOP,
   SPRITE_SIZE,
+} from "../../../core/consts";
+import {
   TEXTURE_ENEMY_CRUISER_SHEET,
   TEXTURE_ENEMY_DRIFTER_SHEET,
   TEXTURE_ENEMY_SCOUT_SHEET,
-} from "../../../core/consts";
+} from "../shooterAssets";
 import { Globals } from "../../../core/Globals";
 import { EXHAUST_PUFF, EXPLOSION_SMALL } from "../../../core/effects/PixelEffectPresets";
 import { spawnPixelBurst } from "../../../core/effects/spawnEffect";

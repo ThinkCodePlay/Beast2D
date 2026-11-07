@@ -4,15 +4,16 @@
  * Output: public/space-shooter/enemies/*.png and contact-sheet.png
  */
 import { join } from "node:path";
-import { BEAST2D_16 } from "./pixel/beast2d-palette.ts";
+import { REPO_ROOT } from "./repoRoot.ts";
+import { BEAST2D_16 } from "../../../../scripts/pixel/beast2d-palette.ts";
 import {
   indicesToRgba,
   parseAsciiGrid,
   stitchFramesHorizontal,
   writeRgbaPng,
-} from "./pixel/write-rgba-png.ts";
+} from "../../../../scripts/pixel/write-rgba-png.ts";
 
-const OUT_DIR = join(process.cwd(), "public/space-shooter/enemies");
+const OUT_DIR = join(REPO_ROOT, "public/space-shooter/enemies");
 const FRAME = 32;
 
 function frameFromRows(...rows: string[]) {

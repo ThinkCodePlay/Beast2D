@@ -1,21 +1,25 @@
 #!/usr/bin/env node
 /**
- * Playwright + SwiftShader WebGL. Exports true 320×240 backing store + 2× nearest upscale.
+ * Dev-only Playwright captures for Space Shooter (run from repo root dev server).
+ * Uses `?level=spaceShooter` (honored only in Vite dev builds).
  */
 import { chromium } from "playwright";
 import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { PNG } from "pngjs";
 
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
 const base =
   process.argv[2] ?? process.env.SHOOTER_CAPTURE_URL ?? "http://127.0.0.1:5173";
 const outDir = process.env.SHOOTER_ARTIFACT_DIR ?? "/opt/cursor/artifacts";
 mkdirSync(outDir, { recursive: true });
 
+const shooterQuery = "?level=spaceShooter";
+
 const scenes = [
-  { name: "title", query: "?capture=shooter&scene=title", wait: 4000 },
-  { name: "gameplay", query: "?capture=shooter&scene=gameplay", wait: 1800 },
-  { name: "gameover", query: "?capture=shooter&scene=gameover", wait: 4000 },
+  { name: "title", query: shooterQuery, wait: 4000 },
+  { name: "gameplay", query: shooterQuery, wait: 2000, clickStart: true },
 ];
 
 function upscaleNearest(input, scale) {
@@ -61,6 +65,17 @@ async function readFramebufferPng(page) {
   return Buffer.from(b64, "base64");
 }
 
+async function clickDialogPrimary(page) {
+  const box = await page.evaluate(() => {
+    const c = document.querySelector("canvas");
+    if (!c) return null;
+    const r = c.getBoundingClientRect();
+    return { x: r.x + r.width / 2, y: r.y + r.height * 0.62 };
+  });
+  if (!box) throw new Error("no canvas for click");
+  await page.mouse.click(box.x, box.y);
+}
+
 const browser = await chromium.launch({
   headless: true,
   args: [
@@ -80,17 +95,19 @@ for (const scene of scenes) {
   const page = await ctx.newPage();
   await page.goto(url, { waitUntil: "networkidle", timeout: 90_000 });
   await page.waitForTimeout(scene.wait);
+  if (scene.clickStart) {
+    await clickDialogPrimary(page);
+    await page.waitForTimeout(scene.wait);
+  }
   await page.locator("canvas").first().waitFor({ state: "visible", timeout: 20_000 });
 
   const raw = await readFramebufferPng(page);
   const png = PNG.sync.read(raw);
-  if (png.width !== 320 || png.height !== 240) {
-    console.warn(scene.name, "unexpected backing size", png.width, png.height);
-  }
-
   const spread = luminanceSpread(png);
-  const nativePath = join(outDir, `shooter-${scene.name}-native-320x240.png`);
-  writeFileSync(nativePath, PNG.sync.write(png));
+  writeFileSync(
+    join(outDir, `shooter-${scene.name}-native-320x240.png`),
+    PNG.sync.write(png),
+  );
   writeFileSync(
     join(outDir, `shooter-${scene.name}-2x-640x480.png`),
     PNG.sync.write(upscaleNearest(png, 2)),
@@ -100,14 +117,7 @@ for (const scene of scenes) {
     fullPage: false,
   });
 
-  const enemyPixels = await page.evaluate(() => {
-    const c = document.querySelector("canvas");
-    if (!c) return 0;
-    const ctx = c.getContext("webgl2") || c.getContext("webgl");
-    return ctx ? 1 : 0;
-  });
-
-  console.log(scene.name, { url, spread, bytes: raw.length, webgl: enemyPixels });
+  console.log(scene.name, { url, spread, bytes: raw.length });
   if (spread < 5) {
     console.error(`BLANK ${scene.name}`);
     process.exitCode = 2;
@@ -119,6 +129,8 @@ await browser.close();
 
 writeFileSync(
   join(outDir, "enemy-contact-sheet-4x-review.png"),
-  readFileSync(join(process.cwd(), "public/space-shooter/enemies/contact-sheet-4x.png")),
+  readFileSync(
+    join(REPO_ROOT, "public/space-shooter/enemies/contact-sheet-4x.png"),
+  ),
 );
 console.log("Artifacts:", outDir);

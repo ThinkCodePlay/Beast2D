@@ -7,13 +7,9 @@ import {
   measureBitmapText,
   preloadBitmapFont,
 } from "../../ui/BitmapText";
+import type { DialogChromeTheme } from "../../ui/dialogTheme";
 import { NineSliceSprite } from "../../ui/NineSliceSprite";
-import {
-  DISPLAY_HEIGHT,
-  DISPLAY_WIDTH,
-  TEXTURE_SHOOTER_BUTTON,
-  TEXTURE_SHOOTER_PANEL,
-} from "../../consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../consts";
 
 export class DialogUIRenderComponent extends RenderComponent {
   private width: number;
@@ -21,6 +17,7 @@ export class DialogUIRenderComponent extends RenderComponent {
   private message: string;
   private score: number;
   private isOpen: boolean;
+  private readonly chrome: DialogChromeTheme;
   private primaryLabel = "RESTART";
   private panelHost: Container | null = null;
   private redrawToken = 0;
@@ -34,6 +31,7 @@ export class DialogUIRenderComponent extends RenderComponent {
     message: string = "Game Over",
     score: number = 0,
     isOpen: boolean = false,
+    chrome: DialogChromeTheme,
     renderOptions: RenderOptions = {},
   ) {
     super({
@@ -49,6 +47,7 @@ export class DialogUIRenderComponent extends RenderComponent {
     this.message = message;
     this.score = score;
     this.isOpen = isOpen;
+    this.chrome = chrome;
   }
 
   createGraphics(): Graphics {
@@ -126,7 +125,7 @@ export class DialogUIRenderComponent extends RenderComponent {
     graphics.addChild(this.panelHost);
 
     const panel = new NineSliceSprite({
-      texturePath: TEXTURE_SHOOTER_PANEL,
+      texturePath: this.chrome.panelTexture,
       width: this.width,
       height: this.height,
       slice: 8,
@@ -135,7 +134,9 @@ export class DialogUIRenderComponent extends RenderComponent {
 
     const titleOpts = { scale: 2, tint: Beast2D16.HotPink, letterSpacing: 1 };
     const title = await buildBitmapTextReady(this.message, titleOpts);
-    title.x = Math.round((this.width - measureBitmapText(this.message, titleOpts)) / 2);
+    title.x = Math.round(
+      (this.width - measureBitmapText(this.message, titleOpts)) / 2,
+    );
     title.y = 16;
     this.panelHost.addChild(title);
 
@@ -156,7 +157,7 @@ export class DialogUIRenderComponent extends RenderComponent {
     const btnY = this.height - btnH - 16;
 
     const btn = new NineSliceSprite({
-      texturePath: TEXTURE_SHOOTER_BUTTON,
+      texturePath: this.chrome.buttonTexture,
       width: btnW,
       height: btnH,
       slice: 4,
@@ -172,7 +173,9 @@ export class DialogUIRenderComponent extends RenderComponent {
 
     const labelOpts = { scale: 1, tint: Beast2D16.Cream, letterSpacing: 1 };
     const btnLabel = await buildBitmapTextReady(this.primaryLabel, labelOpts);
-    btnLabel.x = btnX + Math.round((btnW - measureBitmapText(this.primaryLabel, labelOpts)) / 2);
+    btnLabel.x =
+      btnX +
+      Math.round((btnW - measureBitmapText(this.primaryLabel, labelOpts)) / 2);
     btnLabel.y = btnY + 4;
     this.panelHost.addChild(btnLabel);
   }

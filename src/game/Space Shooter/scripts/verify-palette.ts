@@ -3,7 +3,8 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { PNG } from "pngjs";
-import { BEAST2D_16 } from "./pixel/beast2d-palette.ts";
+import { REPO_ROOT } from "./repoRoot.ts";
+import { BEAST2D_16 } from "../../../../scripts/pixel/beast2d-palette.ts";
 
 const PALETTE = new Set(BEAST2D_16);
 
@@ -37,7 +38,7 @@ function walk(dir: string): string[] {
   return files;
 }
 
-const root = join(process.cwd(), "public/space-shooter");
+const root = join(REPO_ROOT, "public/space-shooter");
 const allErrors: string[] = [];
 for (const f of walk(root)) {
   allErrors.push(...checkFile(f));

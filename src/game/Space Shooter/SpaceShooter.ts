@@ -6,38 +6,35 @@ import {
   PLAYFIELD_HEIGHT,
   SPRITE_SIZE,
   TEXTURE_BEAST_SHIP,
-  TEXTURE_ENEMY_CRUISER_SHEET,
-  TEXTURE_ENEMY_DRIFTER_SHEET,
-  TEXTURE_ENEMY_SCOUT_SHEET,
-  TEXTURE_ENEMY_SCOUT_FRAME,
-  TEXTURE_ENEMY_CRUISER_FRAME,
-  TEXTURE_ENEMY_DRIFTER_FRAME,
   TEXTURE_HEART,
-  TEXTURE_SHOOTER_BULLET,
-  TEXTURE_SHOOTER_BUTTON,
-  TEXTURE_SHOOTER_FONT,
-  TEXTURE_SHOOTER_HUD,
-  TEXTURE_SHOOTER_PANEL,
   TEXTURE_STARS_LAYER_1,
   TEXTURE_STARS_LAYER_2,
 } from "../../core/consts";
 import { Globals } from "../../core/Globals";
 import { Beast2D16 } from "../../core/palette/beast2d16";
-import { preloadBitmapFont } from "../../core/ui/BitmapText";
+import { useBitmapFont } from "../../core/ui/bitmapFontRegistry";
+import { resetBitmapTextAtlas, preloadBitmapFont } from "../../core/ui/BitmapText";
 import { Spaceship } from "./Game Objects/Spaceship";
 import { ShooterEnemySpawner } from "./Game Objects/ShooterEnemySpawner";
 import { ParallaxBackground } from "./Game Objects/ParallaxBackground";
 import { ShooterPlayfield } from "./Game Objects/ShooterPlayfield";
-import { CaptureEnemyMarker } from "./Game Objects/CaptureEnemyMarker";
 import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
 import { DialogUI } from "../../core/components/UI/DialogUI";
-import { getShooterCaptureScene } from "./captureMode";
-import { spawnPixelBurst } from "../../core/effects/spawnEffect";
 import {
-  EXHAUST_PUFF,
-  EXPLOSION_SMALL,
-  MUZZLE_FLASH,
-} from "../../core/effects/PixelEffectPresets";
+  TEXTURE_ENEMY_CRUISER_SHEET,
+  TEXTURE_ENEMY_DRIFTER_SHEET,
+  TEXTURE_ENEMY_SCOUT_SHEET,
+  TEXTURE_SHOOTER_BULLET,
+  TEXTURE_SHOOTER_BUTTON,
+  TEXTURE_SHOOTER_FONT,
+  TEXTURE_SHOOTER_HUD,
+  TEXTURE_SHOOTER_PANEL,
+} from "./shooterAssets";
+import { SHOOTER_BITMAP_FONT } from "./shooterBitmapFont";
+import {
+  SHOOTER_DIALOG_THEME,
+  SHOOTER_HUD_THEME,
+} from "./shooterUiTheme";
 
 export class SpaceShooter extends Level {
   private static onGameOverRestart: (() => void) | null = null;
@@ -63,15 +60,13 @@ export class SpaceShooter extends Level {
     TEXTURE_ENEMY_SCOUT_SHEET,
     TEXTURE_ENEMY_CRUISER_SHEET,
     TEXTURE_ENEMY_DRIFTER_SHEET,
-    TEXTURE_ENEMY_SCOUT_FRAME,
-    TEXTURE_ENEMY_CRUISER_FRAME,
-    TEXTURE_ENEMY_DRIFTER_FRAME,
   ];
 
   protected init(): void {
+    useBitmapFont(SHOOTER_BITMAP_FONT);
+    resetBitmapTextAtlas();
     void preloadBitmapFont();
 
-    const captureScene = getShooterCaptureScene();
     const startX = Globals.canvasWidth / 2 - SPRITE_SIZE / 2;
     const startY = PLAYFIELD_HEIGHT - PIXEL_GRID * 3 - SPRITE_SIZE / 2;
 
@@ -81,25 +76,9 @@ export class SpaceShooter extends Level {
     this.levelRoot.addChild(playfield);
 
     playfield.addChild(new Spaceship(startX, startY));
+    playfield.addChild(new ShooterEnemySpawner());
 
-    const showcaseScore =
-      captureScene === "gameplay"
-        ? 12_800
-        : captureScene === "gameover"
-          ? 1_200
-          : 0;
-    if (captureScene === "gameplay") {
-      playfield.addChild(new CaptureEnemyMarker(40, 36, TEXTURE_ENEMY_SCOUT_FRAME));
-      playfield.addChild(new CaptureEnemyMarker(132, 64, TEXTURE_ENEMY_CRUISER_FRAME));
-      playfield.addChild(new CaptureEnemyMarker(208, 48, TEXTURE_ENEMY_DRIFTER_FRAME));
-      spawnPixelBurst(playfield, startX + 16, startY - 8, MUZZLE_FLASH);
-      spawnPixelBurst(playfield, 144, 108, EXPLOSION_SMALL);
-      spawnPixelBurst(playfield, 200, 72, EXHAUST_PUFF);
-    } else {
-      playfield.addChild(new ShooterEnemySpawner());
-    }
-
-    this.levelRoot.addChild(new HudHeaderUI(showcaseScore, 3));
+    this.levelRoot.addChild(new HudHeaderUI(0, 3, SHOOTER_HUD_THEME));
 
     const dialogWidth = 256;
     const dialogHeight = 96;
@@ -109,9 +88,10 @@ export class SpaceShooter extends Level {
         Math.round((DISPLAY_HEIGHT - dialogHeight) / 2),
         dialogWidth,
         dialogHeight,
-        captureScene === "gameover" ? "GAME OVER" : "SPACE BEAST",
-        captureScene === "gameover" ? 1200 : 0,
-        captureScene !== "gameplay",
+        "SPACE BEAST",
+        0,
+        true,
+        SHOOTER_DIALOG_THEME,
         {
           color: Beast2D16.Shadow,
           strokeColor: Beast2D16.Magenta,
@@ -140,20 +120,7 @@ export class SpaceShooter extends Level {
       this.engine.gameManager?.resume();
     });
 
-    if (captureScene === "gameplay") {
-      DialogUI.close();
-      this.engine.gameManager?.resume();
-      this.engine.context.timers.after(0.35, () => {
-        this.engine.gameManager?.pause();
-      });
-      DialogUI.setPrimaryLabel("START");
-    } else if (captureScene === "gameover") {
-      DialogUI.setPrimaryLabel("RESTART");
-      this.engine.gameManager?.pause();
-    } else {
-      this.engine.gameManager?.pause();
-      DialogUI.setPrimaryLabel("START");
-    }
-
+    this.engine.gameManager?.pause();
+    DialogUI.setPrimaryLabel("START");
   }
 }

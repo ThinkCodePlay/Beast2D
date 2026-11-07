@@ -1,9 +1,9 @@
-import { HUD_CONTRACT, hudScoreMaxWidth } from "./hudContract";
+import { HUD_LAYOUT, hudScoreMaxWidth } from "./hudContract";
 import { measureBitmapText } from "./BitmapText";
 
 const textOpts = () => ({
-  scale: HUD_CONTRACT.fontScale,
-  letterSpacing: HUD_CONTRACT.fontLetterSpacing,
+  scale: HUD_LAYOUT.fontScale,
+  letterSpacing: HUD_LAYOUT.fontLetterSpacing,
 });
 
 /**
@@ -11,9 +11,9 @@ const textOpts = () => ({
  */
 export function formatHudScoreLine(
   score: number,
-  lives: number = HUD_CONTRACT.defaultLives,
+  lives: number = HUD_LAYOUT.defaultLives,
 ): string {
-  const label = HUD_CONTRACT.scoreLabel;
+  const label = HUD_LAYOUT.scoreLabel;
   const maxW = hudScoreMaxWidth(lives);
   const value = Math.max(0, Math.floor(score));
   let line = `${label} ${value}`;

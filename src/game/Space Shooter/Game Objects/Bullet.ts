@@ -9,8 +9,8 @@ import {
   CollisionLayers,
   ColliderModes,
   PLAYFIELD_TOP,
-  TEXTURE_SHOOTER_BULLET,
 } from "../../../core/consts";
+import { TEXTURE_SHOOTER_BULLET } from "../shooterAssets";
 import { ScoreUI } from "../../../core/components/UI/ScoreUI";
 import { ShooterEnemy } from "./ShooterEnemy";
 import type { EnemyKind } from "./ShooterEnemy";
