@@ -1,6 +1,7 @@
 import { Graphics } from "pixi.js";
-import { HUD_CONTRACT } from "../../ui/hudContract";
+import { Beast2D16 } from "../../palette/beast2d16";
 import { buildBitmapText, measureBitmapText } from "../../ui/BitmapText";
+import { HUD_LAYOUT } from "../../ui/hudContract";
 import { RenderComponent } from "../Render/RenderComponent";
 
 export class PlayfieldHintUIRenderComponent extends RenderComponent {
@@ -8,7 +9,7 @@ export class PlayfieldHintUIRenderComponent extends RenderComponent {
   private textHost: Graphics | null = null;
 
   constructor(message: string) {
-    super({ color: HUD_CONTRACT.fontTint });
+    super({ color: Beast2D16.Cream });
     this.message = message;
   }
 
@@ -43,9 +44,9 @@ export class PlayfieldHintUIRenderComponent extends RenderComponent {
 
     const line = this.message.toUpperCase();
     const opts = {
-      scale: HUD_CONTRACT.fontScale,
-      tint: HUD_CONTRACT.fontTint,
-      letterSpacing: HUD_CONTRACT.fontLetterSpacing,
+      scale: HUD_LAYOUT.fontScale,
+      tint: Beast2D16.Cream,
+      letterSpacing: HUD_LAYOUT.fontLetterSpacing,
     };
     const text = buildBitmapText(line, opts);
     const w = measureBitmapText(line, opts);

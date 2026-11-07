@@ -2,7 +2,8 @@ import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { HudHeaderUIRenderComponent } from "./HudHeaderUIRenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
-import { HUD_CONTRACT } from "../../ui/hudContract";
+import { HUD_LAYOUT } from "../../ui/hudContract";
+import type { HudHeaderTheme } from "../../ui/hudTheme";
 
 /**
  * Single 320×16 HUD band: lives left, `SCORE <n>` right-aligned.
@@ -14,7 +15,8 @@ export class HudHeaderUI extends GameObject {
 
   constructor(
     score: number = 0,
-    hearts: number = HUD_CONTRACT.defaultLives,
+    hearts: number = HUD_LAYOUT.defaultLives,
+    theme: HudHeaderTheme,
     renderOptions: RenderOptions = {},
   ) {
     super();
@@ -24,7 +26,7 @@ export class HudHeaderUI extends GameObject {
 
     this.addComponent(new TransformComponent(0, 0));
     this.renderComponent = this.addComponent(
-      new HudHeaderUIRenderComponent(hearts, score, renderOptions),
+      new HudHeaderUIRenderComponent(hearts, score, theme, renderOptions),
     );
   }
 
@@ -52,10 +54,6 @@ export class HudHeaderUI extends GameObject {
     const next = HudHeaderUI.current.getHearts() - amount;
     HudHeaderUI.current.setHearts(next);
     return next;
-  }
-
-  static setHearts(hearts: number): void {
-    HudHeaderUI.current?.setHearts(hearts);
   }
 
   static getHearts(): number {

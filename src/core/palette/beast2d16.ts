@@ -17,3 +17,29 @@ export const Beast2D16 = {
   Blue: 0x3a5b93,
   SkyBlue: 0x7ab2d5,
 } as const;
+
+export const BEAST2D16_LIST: readonly number[] = Object.freeze([
+  Beast2D16.PlumOutline,
+  Beast2D16.DirtBrown,
+  Beast2D16.Shadow,
+  Beast2D16.StoneGray,
+  Beast2D16.Cream,
+  Beast2D16.DeepRose,
+  Beast2D16.Magenta,
+  Beast2D16.HotPink,
+  Beast2D16.LightPink,
+  Beast2D16.Red,
+  Beast2D16.Orange,
+  Beast2D16.Yellow,
+  Beast2D16.MossGreen,
+  Beast2D16.LeafGreen,
+  Beast2D16.Blue,
+  Beast2D16.SkyBlue,
+]);
+
+const BEAST2D16_SET = new Set<number>(BEAST2D16_LIST);
+
+export function isBeast2D16Color(rgb: number, alpha = 255): boolean {
+  if (alpha === 0) return true;
+  return BEAST2D16_SET.has(rgb & 0xffffff);
+}

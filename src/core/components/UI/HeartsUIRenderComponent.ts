@@ -2,8 +2,7 @@ import { Graphics, Sprite, Assets } from "pixi.js";
 import { SPRITE_SIZE, TEXTURE_HEART } from "../../consts";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
-
-const HEART_TEXTURE_PATH = `/${TEXTURE_HEART}`;
+import { textureNearest } from "../../ui/textureNearest";
 
 export class HeartsUIRenderComponent extends RenderComponent {
   private hearts: number;
@@ -42,10 +41,12 @@ export class HeartsUIRenderComponent extends RenderComponent {
   }
 
   private loadAndDrawHearts(container: Graphics): void {
-    Assets.load(HEART_TEXTURE_PATH)
+    Assets.load(TEXTURE_HEART)
       .then((texture) => {
+        textureNearest(texture);
         for (let i = 0; i < this.hearts; i += 1) {
           const sprite = new Sprite(texture);
+          sprite.roundPixels = true;
           sprite.width = this.heartSize;
           sprite.height = this.heartSize;
           sprite.x = i * (this.heartSize + this.spacing);
@@ -55,7 +56,7 @@ export class HeartsUIRenderComponent extends RenderComponent {
       })
       .catch((error) => {
         console.error(
-          `Failed to load heart texture: ${HEART_TEXTURE_PATH}`,
+          `Failed to load heart texture: ${TEXTURE_HEART}`,
           error,
         );
       });

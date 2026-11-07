@@ -1,55 +1,44 @@
-import {
-  DISPLAY_WIDTH,
-  HUD_HEIGHT,
-  PIXEL_GRID,
-  TEXTURE_HEART,
-  TEXTURE_UI_FONT,
-  TEXTURE_UI_HUD_BAND,
-} from "../consts";
-import { Beast2D16 } from "../palette/beast2d16";
-import { BITMAP_FONT } from "./fontGlyphs";
+import { DISPLAY_WIDTH, HUD_HEIGHT, PIXEL_GRID } from "../consts";
+import { DEFAULT_BITMAP_GLYPH_H } from "./bitmapFontRegistry";
 
 /**
- * Beast2D compact playfield header (320×16). Shared with Space Shooter (PR #8)
- * and Breakout (PR #9). Gameplay must not overlap y 0–15.
+ * Beast2D compact playfield header geometry (320×16). Shared by demos;
+ * textures and font atlas are supplied per game via {@link HudHeaderTheme}.
  */
-export const HUD_CONTRACT = {
+export const HUD_LAYOUT = {
   width: DISPLAY_WIDTH,
   height: HUD_HEIGHT,
   playfieldTopY: HUD_HEIGHT,
 
-  bandTexture: TEXTURE_UI_HUD_BAND,
-  fontAtlas: TEXTURE_UI_FONT,
-
   edgePaddingX: PIXEL_GRID / 4,
 
-  heartTexture: TEXTURE_HEART,
   heartSize: 12,
   heartGap: 2,
   defaultLives: 3,
 
   fontScale: 1,
   fontLetterSpacing: 1,
-  fontTint: Beast2D16.Cream,
-  fontGlyphH: BITMAP_FONT.glyphH,
-  fontY: Math.floor((HUD_HEIGHT - BITMAP_FONT.glyphH) / 2),
+  fontGlyphH: DEFAULT_BITMAP_GLYPH_H,
+  fontY: Math.floor((HUD_HEIGHT - DEFAULT_BITMAP_GLYPH_H) / 2),
 
   scoreLabel: "SCORE",
-
   scoreRightX: DISPLAY_WIDTH - PIXEL_GRID / 4,
   livesLeftX: PIXEL_GRID / 4,
 } as const;
 
+/** @deprecated Use {@link HUD_LAYOUT} — kept for older imports during migration. */
+export const HUD_CONTRACT = HUD_LAYOUT;
+
 export function hudLivesReservedWidth(
-  lives: number = HUD_CONTRACT.defaultLives,
+  lives: number = HUD_LAYOUT.defaultLives,
 ): number {
-  const { heartSize, heartGap, livesLeftX, edgePaddingX } = HUD_CONTRACT;
+  const { heartSize, heartGap, livesLeftX } = HUD_LAYOUT;
   const strip = lives * heartSize + Math.max(0, lives - 1) * heartGap;
-  return livesLeftX + strip + edgePaddingX;
+  return livesLeftX + strip + HUD_LAYOUT.edgePaddingX;
 }
 
 export function hudScoreMaxWidth(
-  lives: number = HUD_CONTRACT.defaultLives,
+  lives: number = HUD_LAYOUT.defaultLives,
 ): number {
-  return HUD_CONTRACT.scoreRightX - hudLivesReservedWidth(lives);
+  return HUD_LAYOUT.scoreRightX - hudLivesReservedWidth(lives);
 }

@@ -8,6 +8,7 @@ import {
 } from "pixi.js";
 import { RenderComponent } from "./RenderComponent";
 import type { RenderOptions } from "./RenderComponent";
+import { textureNearest } from "../../ui/textureNearest";
 
 export interface SpritesheetClipConfig {
   texturePath: string;
@@ -35,17 +36,17 @@ function buildGridFrames(
     const frameIndex = start + i;
     const column = frameIndex % config.columns;
     const row = Math.floor(frameIndex / config.columns);
-    frames.push(
-      new Texture({
-        source: sheet.source,
-        frame: new Rectangle(
-          column * config.frameWidth,
-          row * config.frameHeight,
-          config.frameWidth,
-          config.frameHeight,
-        ),
-      }),
-    );
+    const frame = new Texture({
+      source: sheet.source,
+      frame: new Rectangle(
+        column * config.frameWidth,
+        row * config.frameHeight,
+        config.frameWidth,
+        config.frameHeight,
+      ),
+    });
+    textureNearest(frame);
+    frames.push(frame);
   }
   return frames;
 }

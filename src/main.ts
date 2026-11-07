@@ -1,5 +1,11 @@
 import { Engine } from "./core/Engine";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./core/consts";
+import {
+  attachDisplayScaleFit,
+  configurePixelArtRendering,
+} from "./core/displayScale";
+
+configurePixelArtRendering();
 import { Level1 } from "./game/Level1";
 import { Level2 } from "./game/Level2";
 import { SpaceShooter } from "./game/Space Shooter/SpaceShooter";
@@ -7,7 +13,6 @@ import { BunnyHop } from "./game/Bunny Hop/BunnyHop";
 import { BreakoutPaddle } from "./game/BreakoutPaddle/BreakoutPaddle";
 import "./style.css";
 
-/** Load with `?level=breakoutPaddle` (also level1, level2, spaceShooter, bunnyHop). */
 const LEVEL_IDS = [
   "level1",
   "level2",
@@ -16,16 +21,14 @@ const LEVEL_IDS = [
   "breakoutPaddle",
 ] as const;
 
-function initialLevelId(): (typeof LEVEL_IDS)[number] {
-  const params = new URLSearchParams(
-    typeof window !== "undefined" ? window.location.search : "",
-  );
-  const requested = params.get("level");
-  if (
-    requested &&
-    (LEVEL_IDS as readonly string[]).includes(requested)
-  ) {
-    return requested as (typeof LEVEL_IDS)[number];
+type LevelId = (typeof LEVEL_IDS)[number];
+
+function resolveInitialLevel(): LevelId {
+  if (import.meta.env.DEV) {
+    const requested = new URLSearchParams(window.location.search).get("level");
+    if (requested && (LEVEL_IDS as readonly string[]).includes(requested)) {
+      return requested as LevelId;
+    }
   }
   return "bunnyHop";
 }
@@ -35,6 +38,10 @@ const container = document.createElement("div");
 container.className = "game-container";
 container.style.position = "relative";
 appRoot.appendChild(container);
+
+attachDisplayScaleFit(container, DISPLAY_WIDTH, DISPLAY_HEIGHT, {
+  padding: 16,
+});
 
 const engine = new Engine({
   width: DISPLAY_WIDTH,
@@ -50,7 +57,7 @@ engine
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     game.registerLevel("bunnyHop", new BunnyHop(engine));
     game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
-    return game.loadLevel(initialLevelId());
+    return game.loadLevel(resolveInitialLevel());
   })
   .catch((error) => {
     console.error("Failed to start Beast2D engine", error);

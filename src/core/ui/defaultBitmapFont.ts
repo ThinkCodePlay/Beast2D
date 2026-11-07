@@ -1,0 +1,37 @@
+import type { BitmapFontDefinition } from "./bitmapFontRegistry";
+
+/** Shared HUD bitmap font (`public/ui/font-atlas.5x7.png`). Same glyph set as shooter UI gen. */
+export const DEFAULT_BEAST2D_BITMAP_FONT = {
+  glyphW: 5,
+  glyphH: 7,
+  cellW: 7,
+  cellH: 9,
+  atlasPath: "ui/font-atlas.5x7.png",
+  glyphs: {
+    "0": { x: 8, y: 1 },
+    "1": { x: 15, y: 1 },
+    "2": { x: 22, y: 1 },
+    "3": { x: 29, y: 1 },
+    "4": { x: 36, y: 1 },
+    "5": { x: 43, y: 1 },
+    "6": { x: 50, y: 1 },
+    "7": { x: 57, y: 1 },
+    "8": { x: 64, y: 1 },
+    "9": { x: 71, y: 1 },
+    " ": { x: 1, y: 1 },
+    ":": { x: 78, y: 1 },
+    A: { x: 85, y: 1 },
+    B: { x: 92, y: 1 },
+    C: { x: 99, y: 1 },
+    E: { x: 106, y: 1 },
+    G: { x: 1, y: 10 },
+    M: { x: 8, y: 10 },
+    O: { x: 15, y: 10 },
+    P: { x: 22, y: 10 },
+    R: { x: 29, y: 10 },
+    S: { x: 36, y: 10 },
+    T: { x: 43, y: 10 },
+    V: { x: 50, y: 10 },
+    Y: { x: 57, y: 10 },
+  } as Record<string, { x: number; y: number }>,
+} satisfies BitmapFontDefinition;

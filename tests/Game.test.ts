@@ -7,10 +7,12 @@ import { Level2 } from "../src/game/Level2";
 import { SpaceShooter } from "../src/game/Space Shooter/SpaceShooter";
 import { BreakoutPaddle } from "../src/game/BreakoutPaddle/BreakoutPaddle";
 import { Bullet } from "../src/game/Space Shooter/Game Objects/Bullet";
-import { EnemyCircle } from "../src/game/Space Shooter/Game Objects/EnemyCircle";
 import { Spaceship } from "../src/game/Space Shooter/Game Objects/Spaceship";
+import { ShooterEnemy } from "../src/game/Space Shooter/Game Objects/ShooterEnemy";
+import { ShooterPlayfield } from "../src/game/Space Shooter/Game Objects/ShooterPlayfield";
 import { HeartsUI } from "../src/core/components/UI/HeartsUI";
 import { ScoreUI } from "../src/core/components/UI/ScoreUI";
+import { DialogUI } from "../src/core/components/UI/DialogUI";
 import { createContext, fakeEngine } from "./helpers";
 
 function key(type: "keydown" | "keyup", code: string) {
@@ -35,6 +37,19 @@ function run(level: { tick(dt: number): void }, frames: number) {
     context.time.advance(1);
     level.tick(context.time.delta);
   }
+}
+
+function findPlayfield(root: GameObject): ShooterPlayfield {
+  const pf = root.children.find((c) => c instanceof ShooterPlayfield);
+  if (!pf) throw new Error("playfield missing");
+  return pf;
+}
+
+function findShip(root: GameObject): Spaceship {
+  const pf = findPlayfield(root);
+  const ship = pf.children.find((c) => c instanceof Spaceship);
+  if (!ship) throw new Error("ship missing");
+  return ship;
 }
 
 describe("example levels run on the updated engine", () => {
@@ -79,6 +94,7 @@ describe("example levels run on the updated engine", () => {
   it("SpaceShooter: ship, UI and restart work", () => {
     const level = new SpaceShooter(fakeEngine(context));
     level.start();
+    DialogUI.close();
     expect(() => run(level, 10)).not.toThrow();
     expect(HeartsUI.getHearts()).toBe(3);
     level.destroy();
@@ -91,6 +107,7 @@ describe("example levels run on the updated engine", () => {
   it("SpaceShooter declares the assets it needs", () => {
     const level = new SpaceShooter(fakeEngine(context));
     expect(level.assets).toContain("BeastShip.32x32.png");
+    expect(level.assets).toContain("space-shooter/enemies/scout-sheet.32x32.png");
   });
 });
 
@@ -98,34 +115,42 @@ describe("space shooter gameplay", () => {
   function setup() {
     const level = new SpaceShooter(fakeEngine(context));
     level.start();
+    DialogUI.close();
     run(level, 2);
     const root = (level as any).levelRoot as GameObject;
-    return { level, root };
+    return { level, root, playfield: findPlayfield(root) };
   }
 
   it("bullet destroys an enemy and scores", () => {
-    const { level, root } = setup();
-    root.addChild(new EnemyCircle(300, 100));
-    root.addChild(new Bullet(307, 117));
+    const { level, playfield } = setup();
+    playfield.addChild(new ShooterEnemy(300, 100, "scout"));
+    playfield.addChild(new Bullet(307, 117));
     const before = ScoreUI.getScore();
     run(level, 2);
     expect(ScoreUI.getScore()).toBe(before + 100);
     expect(
-      root.children.filter(
-        (c) => c instanceof Bullet || c instanceof EnemyCircle,
+      playfield.children.filter(
+        (c) => c instanceof Bullet || c instanceof ShooterEnemy,
       ),
     ).toHaveLength(0);
     level.destroy();
   });
 
   it("an enemy hitting the ship costs a heart and is removed", () => {
-    const { level, root } = setup();
-    const ship = root.children.find((c) => c instanceof Spaceship)!;
-    const { x, y } = ship.getWorldPosition();
-    root.addChild(new EnemyCircle(x + 10, y + 10));
-    run(level, 2);
+    const { level, root, playfield } = setup();
+    const ship = findShip(root);
+    playfield.children
+      .find((c) => c.name === "ShooterEnemySpawner")
+      ?.destroy();
+    const foe = new ShooterEnemy(
+      ship.transform!.x + 4,
+      ship.transform!.y + 4,
+      "scout",
+    );
+    playfield.addChild(foe);
+    run(level, 10);
     expect(HeartsUI.getHearts()).toBe(2);
-    expect(root.children.some((c) => c instanceof EnemyCircle)).toBe(false);
+    expect(foe.destroyed).toBe(true);
     level.destroy();
   });
 
@@ -133,20 +158,18 @@ describe("space shooter gameplay", () => {
     const target = new EventTarget();
     context.input.attach(target);
     const { level, root } = setup();
-    const ship = root.children.find((c) => c instanceof Spaceship)!;
+    const ship = findShip(root);
     target.dispatchEvent(key("keydown", "Space"));
     run(level, 30);
 
     const bullets = root.children.filter((c) => c instanceof Bullet);
     expect(bullets.length).toBeGreaterThan(0);
     const bullet = bullets[0];
-    // bullets are not children of the ship, so they do not follow it
     expect(bullet.parent).toBe(root);
     const shipPos = ship.getWorldPosition();
-    expect(bullet.getWorldPosition().x).toBeCloseTo(shipPos.x + 30);
+    expect(bullet.getWorldPosition().x).toBeCloseTo(shipPos.x + 4);
     expect(bullet.getWorldPosition().y).toBeLessThan(shipPos.y);
 
-    // moving the ship does not move existing bullets
     const bx = bullet.getWorldPosition().x;
     ship.transform!.translate(-50, 0);
     run(level, 1);
@@ -155,9 +178,9 @@ describe("space shooter gameplay", () => {
   });
 
   it("pausing freezes the game but not its UI", () => {
-    const { level, root } = setup();
-    root.addChild(new EnemyCircle(10, 10));
-    const enemy = root.children.find((c) => c instanceof EnemyCircle)!;
+    const { level, playfield } = setup();
+    playfield.addChild(new ShooterEnemy(10, 10, "drifter"));
+    const enemy = playfield.children.find((c) => c instanceof ShooterEnemy)!;
     run(level, 2);
     const y = enemy.transform!.y;
     context.time.paused = true;

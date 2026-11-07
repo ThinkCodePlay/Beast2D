@@ -4,14 +4,25 @@ import {
   DISPLAY_WIDTH,
   PIXEL_GRID,
   TEXTURE_HEART,
-  TEXTURE_UI_FONT,
-  TEXTURE_UI_HUD_BAND,
 } from "../../core/consts";
 import { DialogUI } from "../../core/components/UI/DialogUI";
 import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
 import { PlayfieldHintUI } from "../../core/components/UI/PlayfieldHintUI";
 import { ScoreUI } from "../../core/components/UI/ScoreUI";
 import { Beast2D16 } from "../../core/palette/beast2d16";
+import { useBitmapFont } from "../../core/ui/bitmapFontRegistry";
+import {
+  preloadBitmapFont,
+  resetBitmapTextAtlas,
+} from "../../core/ui/BitmapText";
+import { DEFAULT_BEAST2D_BITMAP_FONT } from "../../core/ui/defaultBitmapFont";
+import {
+  DEFAULT_BEAST2D_DIALOG_THEME,
+  DEFAULT_BEAST2D_HUD_THEME,
+  TEXTURE_DEFAULT_DIALOG_BUTTON,
+  TEXTURE_DEFAULT_DIALOG_PANEL,
+  TEXTURE_DEFAULT_HUD_BAND,
+} from "../../core/ui/defaultUiTheme";
 import { Box } from "../../core/prefabs/Box";
 import { Circle } from "../../core/prefabs/Circle";
 import { HorizontalClampComponent } from "../../core/components/Movement/HorizontalClampComponent";
@@ -37,10 +48,17 @@ const PADDLE_SPEED = 5.5;
 const LEVEL_NAME = "breakoutPaddle";
 
 export class BreakoutPaddle extends Level {
-  override assets = [TEXTURE_UI_FONT, TEXTURE_UI_HUD_BAND, TEXTURE_HEART];
+  override assets = [
+    TEXTURE_HEART,
+    TEXTURE_DEFAULT_HUD_BAND,
+    TEXTURE_DEFAULT_DIALOG_PANEL,
+    TEXTURE_DEFAULT_DIALOG_BUTTON,
+    DEFAULT_BEAST2D_BITMAP_FONT.atlasPath,
+  ];
 
   private phase: GamePhase = "ready";
   private lives = START_LIVES;
+  private hud: HudHeaderUI | null = null;
   private ball: BallState = { x: 0, y: 0, vx: 0, vy: 0 };
   private bricks: BrickState[] = [];
   private paddleBox: Box | null = null;
@@ -48,6 +66,10 @@ export class BreakoutPaddle extends Level {
   private brickObjects: Box[] = [];
 
   protected init(): void {
+    useBitmapFont(DEFAULT_BEAST2D_BITMAP_FONT);
+    resetBitmapTextAtlas();
+    void preloadBitmapFont();
+
     this.phase = "ready";
     this.lives = START_LIVES;
     this.bricks = createBrickGrid();
@@ -59,7 +81,8 @@ export class BreakoutPaddle extends Level {
     backdrop.runWhenPaused = true;
     this.levelRoot.addChild(backdrop);
 
-    this.levelRoot.addChild(new HudHeaderUI(0, this.lives));
+    this.hud = new HudHeaderUI(0, this.lives, DEFAULT_BEAST2D_HUD_THEME);
+    this.levelRoot.addChild(this.hud);
     ScoreUI.resetScore(0);
 
     this.levelRoot.addChild(new PlayfieldHintUI("A/D MOVE  SPACE SERVE"));
@@ -109,16 +132,22 @@ export class BreakoutPaddle extends Level {
       this.levelRoot.addChild(brickBox);
     }
 
+    const dialogWidth = DISPLAY_WIDTH - PIXEL_GRID * 2;
+    const dialogHeight = PIXEL_GRID * 6;
     this.levelRoot.addChild(
       new DialogUI(
         PIXEL_GRID,
-        DISPLAY_HEIGHT / 2 - PIXEL_GRID * 3,
-        DISPLAY_WIDTH - PIXEL_GRID * 2,
-        PIXEL_GRID * 6,
+        (DISPLAY_HEIGHT - dialogHeight) / 2,
+        dialogWidth,
+        dialogHeight,
         "",
         0,
         false,
-        { color: Beast2D16.Cream },
+        DEFAULT_BEAST2D_DIALOG_THEME,
+        {
+          color: Beast2D16.Shadow,
+          strokeColor: Beast2D16.Magenta,
+        },
       ),
     );
 
@@ -154,7 +183,7 @@ export class BreakoutPaddle extends Level {
   }
 
   private refreshLives(): void {
-    HudHeaderUI.setHearts(this.lives);
+    this.hud?.setHearts(this.lives);
   }
 
   private attachBallToPaddle(): void {
@@ -245,6 +274,7 @@ export class BreakoutPaddle extends Level {
 
   public override destroy(): void {
     DialogUI.setOnRestart(null);
+    this.hud = null;
     super.destroy();
   }
 }

@@ -9,7 +9,7 @@ import type { EngineContext } from "./EngineContext";
 
 export class Globals {
   private static _context: EngineContext | null = null;
-  private static _debug: boolean = true;
+  private static _debug: boolean = false;
 
   static get context(): EngineContext {
     if (!this._context) {
