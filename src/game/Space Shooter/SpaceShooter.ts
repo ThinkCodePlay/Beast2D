@@ -9,6 +9,9 @@ import {
   TEXTURE_ENEMY_CRUISER_SHEET,
   TEXTURE_ENEMY_DRIFTER_SHEET,
   TEXTURE_ENEMY_SCOUT_SHEET,
+  TEXTURE_ENEMY_SCOUT_FRAME,
+  TEXTURE_ENEMY_CRUISER_FRAME,
+  TEXTURE_ENEMY_DRIFTER_FRAME,
   TEXTURE_HEART,
   TEXTURE_SHOOTER_BULLET,
   TEXTURE_SHOOTER_BUTTON,
@@ -25,12 +28,16 @@ import { Spaceship } from "./Game Objects/Spaceship";
 import { ShooterEnemySpawner } from "./Game Objects/ShooterEnemySpawner";
 import { ParallaxBackground } from "./Game Objects/ParallaxBackground";
 import { ShooterPlayfield } from "./Game Objects/ShooterPlayfield";
-import { ShooterEnemy } from "./Game Objects/ShooterEnemy";
+import { CaptureEnemyMarker } from "./Game Objects/CaptureEnemyMarker";
 import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
 import { DialogUI } from "../../core/components/UI/DialogUI";
 import { getShooterCaptureScene } from "./captureMode";
 import { spawnPixelBurst } from "../../core/effects/spawnEffect";
-import { EXPLOSION_SMALL, MUZZLE_FLASH } from "../../core/effects/PixelEffectPresets";
+import {
+  EXHAUST_PUFF,
+  EXPLOSION_SMALL,
+  MUZZLE_FLASH,
+} from "../../core/effects/PixelEffectPresets";
 
 export class SpaceShooter extends Level {
   private static onGameOverRestart: (() => void) | null = null;
@@ -56,6 +63,9 @@ export class SpaceShooter extends Level {
     TEXTURE_ENEMY_SCOUT_SHEET,
     TEXTURE_ENEMY_CRUISER_SHEET,
     TEXTURE_ENEMY_DRIFTER_SHEET,
+    TEXTURE_ENEMY_SCOUT_FRAME,
+    TEXTURE_ENEMY_CRUISER_FRAME,
+    TEXTURE_ENEMY_DRIFTER_FRAME,
   ];
 
   protected init(): void {
@@ -79,11 +89,12 @@ export class SpaceShooter extends Level {
           ? 1_200
           : 0;
     if (captureScene === "gameplay") {
-      playfield.addChild(new ShooterEnemy(40, 28, "scout"));
-      playfield.addChild(new ShooterEnemy(132, 52, "cruiser"));
-      playfield.addChild(new ShooterEnemy(224, 36, "drifter"));
+      playfield.addChild(new CaptureEnemyMarker(40, 36, TEXTURE_ENEMY_SCOUT_FRAME));
+      playfield.addChild(new CaptureEnemyMarker(132, 64, TEXTURE_ENEMY_CRUISER_FRAME));
+      playfield.addChild(new CaptureEnemyMarker(208, 48, TEXTURE_ENEMY_DRIFTER_FRAME));
       spawnPixelBurst(playfield, startX + 16, startY - 8, MUZZLE_FLASH);
-      spawnPixelBurst(playfield, 160, 120, EXPLOSION_SMALL);
+      spawnPixelBurst(playfield, 144, 108, EXPLOSION_SMALL);
+      spawnPixelBurst(playfield, 200, 72, EXHAUST_PUFF);
     } else {
       playfield.addChild(new ShooterEnemySpawner());
     }
@@ -132,6 +143,9 @@ export class SpaceShooter extends Level {
     if (captureScene === "gameplay") {
       DialogUI.close();
       this.engine.gameManager?.resume();
+      this.engine.context.timers.after(0.35, () => {
+        this.engine.gameManager?.pause();
+      });
       DialogUI.setPrimaryLabel("START");
     } else if (captureScene === "gameover") {
       DialogUI.setPrimaryLabel("RESTART");

@@ -38,6 +38,12 @@ export const TEXTURE_ENEMY_CRUISER_SHEET =
   "space-shooter/enemies/cruiser-sheet.32x32.png";
 export const TEXTURE_ENEMY_DRIFTER_SHEET =
   "space-shooter/enemies/drifter-sheet.32x32.png";
+export const TEXTURE_ENEMY_SCOUT_FRAME =
+  "space-shooter/enemies/scout-f0.32x32.png";
+export const TEXTURE_ENEMY_CRUISER_FRAME =
+  "space-shooter/enemies/cruiser-f0.32x32.png";
+export const TEXTURE_ENEMY_DRIFTER_FRAME =
+  "space-shooter/enemies/drifter-f0.32x32.png";
 
 export const ObjectNames = {
   LevelRoot: "LevelRoot",

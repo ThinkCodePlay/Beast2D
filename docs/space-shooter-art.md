@@ -48,7 +48,7 @@ For review captures only (deterministic layout, labeled staged):
 | Scene | URL query |
 |-------|-----------|
 | Title | `?capture=shooter&scene=title` (default pause) |
-| Gameplay | `?capture=shooter&scene=gameplay` — all three enemy types + sample effects |
+| Gameplay | `?capture=shooter&scene=gameplay` — **staged**: static enemy frames + frozen burst particles at ~0.35s (not live spawner) |
 | Game over | `?capture=shooter&scene=gameover` |
 
 Enlarged enemy sheet (nearest 4×): `public/space-shooter/enemies/contact-sheet-4x.png`

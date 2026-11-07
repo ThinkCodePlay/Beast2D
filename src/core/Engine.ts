@@ -49,6 +49,7 @@ export class Engine {
       antialias: options.antialias ?? false,
       debug: options.debug ?? false,
       resolution: options.resolution ?? 1,
+      preserveDrawingBuffer: options.preserveDrawingBuffer ?? false,
     };
 
     this.app = new Application();

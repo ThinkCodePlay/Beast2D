@@ -15,6 +15,7 @@ export class PixelBurstEffect extends GameObject {
   ) {
     super();
     this.name = "PixelBurstEffect";
+    this.runWhenPaused = true;
     const graphics = new Graphics();
     this.container.addChild(graphics);
     this.addComponent(new TransformComponent(worldX, worldY));

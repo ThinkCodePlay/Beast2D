@@ -14,7 +14,7 @@ mkdirSync(outDir, { recursive: true });
 
 const scenes = [
   { name: "title", query: "?capture=shooter&scene=title", wait: 4000 },
-  { name: "gameplay", query: "?capture=shooter&scene=gameplay", wait: 6000 },
+  { name: "gameplay", query: "?capture=shooter&scene=gameplay", wait: 1800 },
   { name: "gameover", query: "?capture=shooter&scene=gameover", wait: 4000 },
 ];
 
