@@ -1,5 +1,4 @@
-/* consts.ts */
-// Core constants for the Beast2D engine
+/* consts.ts — engine layout and collision identifiers (no per-level art paths). */
 
 /** Fixed virtual resolution (fantasy-console style). Keep in sync with `main.ts` and `style.css`. */
 export const DISPLAY_WIDTH = 320;
@@ -13,18 +12,6 @@ export const SPRITE_SIZE = 32;
 export const HUD_HEIGHT = PIXEL_GRID;
 export const PLAYFIELD_TOP = HUD_HEIGHT;
 export const PLAYFIELD_HEIGHT = DISPLAY_HEIGHT - HUD_HEIGHT;
-
-/** Textures fitted for SPRITE_SIZE (see scripts/compress_display_png.py). */
-export const TEXTURE_BEAST_SHIP = "BeastShip.32x32.png";
-export const TEXTURE_HEART = "HeartBeast.32x32.png";
-export const TEXTURE_BUNNY_WALK_ANIMATION = "bunny-walk-animation.64x64.png";
-export const TEXTURE_BUNNY_IDLE = "BunnyIdle.png";
-/** Bunny Hop level uses 64×64 frames from the walk spritesheet (1×18 strip). */
-export const BUNNY_SPRITE_SIZE = 64;
-export const BUNNY_WALK_ANIMATION_COLUMNS = 18;
-export const BUNNY_WALK_ANIMATION_FRAME_COUNT = 18;
-export const TEXTURE_STARS_LAYER_1 = "background/Stars-Big_1_1_PC.320x240.png";
-export const TEXTURE_STARS_LAYER_2 = "background/Stars-Big_1_2_PC.320x240.png";
 
 export const ObjectNames = {
   LevelRoot: "LevelRoot",

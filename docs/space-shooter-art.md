@@ -20,6 +20,7 @@ See [display spec](./display.md) and [HUD header](./hud-header.md) (geometry in 
 From **repository root** (requires root `npm install` for `tsx` / `pngjs` / `playwright`):
 
 ```bash
+npm run assets:ui
 npm --prefix "src/game/Space Shooter/scripts" run assets
 npm --prefix "src/game/Space Shooter/scripts" run verify
 ```
@@ -27,18 +28,18 @@ npm --prefix "src/game/Space Shooter/scripts" run verify
 Equivalent direct invocations:
 
 ```bash
+npx tsx scripts/generate-beast2d-ui.ts
 npx tsx "src/game/Space Shooter/scripts/generate-enemies.ts"
-npx tsx "src/game/Space Shooter/scripts/generate-ui.ts"
 npx tsx "src/game/Space Shooter/scripts/upscale-contact-sheet.ts"
 npx tsx "src/game/Space Shooter/scripts/verify-palette.ts"
 ```
 
-`generate-ui.ts` rewrites `src/game/Space Shooter/shooterBitmapFont.ts` (kept in sync with `public/space-shooter/ui/font-glyphs.json`).
+`generate-beast2d-ui.ts` writes `public/ui/` and `src/core/ui/defaultBitmapFont.ts` (Shooter re-exports via `shooterBitmapFont.ts`).
 
 Generators:
 
+- `scripts/generate-beast2d-ui.ts` — shared HUD/dialog font + chrome
 - `src/game/Space Shooter/scripts/generate-enemies.ts`
-- `src/game/Space Shooter/scripts/generate-ui.ts`
 - `scripts/pixel/` — shared palette + PNG writer
 
 ### Dev screenshots (not shipped in production)

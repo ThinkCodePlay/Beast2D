@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Space Shooter asset generators and dev captures. Run from repo root after npm install.",
   "scripts": {
-    "assets": "tsx generate-enemies.ts && tsx generate-ui.ts && tsx upscale-contact-sheet.ts",
+    "assets": "tsx generate-enemies.ts && tsx ../../../../scripts/generate-beast2d-ui.ts && tsx upscale-contact-sheet.ts",
     "verify": "tsx verify-palette.ts",
     "capture": "node capture-screenshots.mjs"
   }

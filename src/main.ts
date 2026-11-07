@@ -10,6 +10,7 @@ import { Level1 } from "./game/Level1";
 import { Level2 } from "./game/Level2";
 import { SpaceShooter } from "./game/Space Shooter/SpaceShooter";
 import { BunnyHop } from "./game/Bunny Hop/BunnyHop";
+import { BreakoutPaddle } from "./game/BreakoutPaddle/BreakoutPaddle";
 import "./style.css";
 
 const appRoot = document.getElementById("app")!;
@@ -35,6 +36,7 @@ engine
     game.registerLevel("level2", new Level2(engine));
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     game.registerLevel("bunnyHop", new BunnyHop(engine));
+    game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
     return game.loadLevel("spaceShooter");
   })
   .catch((error) => {

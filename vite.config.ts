@@ -13,6 +13,10 @@ export default defineConfig({
           repoRoot,
           "src/game/Space Shooter/space-shooter-capture.html",
         ),
+        breakoutPaddleCapture: resolve(
+          repoRoot,
+          "src/game/BreakoutPaddle/breakout-capture.html",
+        ),
       },
     },
   },

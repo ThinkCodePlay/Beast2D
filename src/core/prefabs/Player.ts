@@ -3,7 +3,8 @@ import { TransformComponent } from "../components/Movement/TransformComponent";
 import { SpriteRenderComponent } from "../components/Render/SpriteRenderComponent";
 import { UserInputComponent } from "../components/Movement/UserInputComponent";
 import type { RenderOptions } from "../components/Render/RenderComponent";
-import { ObjectNames, CollisionLayers, ColliderModes, SPRITE_SIZE, TEXTURE_BEAST_SHIP } from "../consts";
+import { ObjectNames, CollisionLayers, ColliderModes, SPRITE_SIZE } from "../consts";
+import { TEXTURE_BEAST_SHIP } from "../../game/publicAssets";
 import { SquareColliderComponent } from "../components/Collision/SquareColliderComponent";
 
 export class Player extends GameObject {

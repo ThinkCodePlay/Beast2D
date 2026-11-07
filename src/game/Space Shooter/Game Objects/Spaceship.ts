@@ -5,7 +5,8 @@ import type { RenderOptions } from "../../../core/components/Render/RenderCompon
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
 import { HorizontalInputComponent } from "../../../core/components/Movement/HorizontalInputComponent";
 import { Globals } from "../../../core/Globals";
-import { SPRITE_SIZE, TEXTURE_BEAST_SHIP } from "../../../core/consts";
+import { SPRITE_SIZE } from "../../../core/consts";
+import { TEXTURE_BEAST_SHIP } from "../../publicAssets";
 import { BulletSpawner } from "./BulletSpawner";
 import { SquareColliderComponent } from "../../../core/components/Collision/SquareColliderComponent";
 import { CollisionLayers, ColliderModes } from "../../../core/consts";

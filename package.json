@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "assets:fit-display": "python scripts/compress_display_png.py --backgrounds",
+    "assets:ui": "tsx scripts/generate-beast2d-ui.ts",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
