@@ -19,9 +19,10 @@ import {
   tickBreakoutSession,
   type BreakoutSession,
 } from "./breakoutSession";
+import { attachHorizontalPointerSteer } from "../../core/prefabs/attachHorizontalPointerSteer";
 import { spawnPlayfieldPointerInput } from "../../core/prefabs/PlayfieldPointerInput";
-
 const LEVEL_NAME = "breakoutPaddle";
+const PADDLE_SPEED = 5.5;
 
 /**
  * Breakout paddle showcase — scene setup in {@link init}, rules in {@link breakoutSession}.
@@ -49,11 +50,16 @@ export class BreakoutPaddle extends Level {
     this.wall = new BrickWall();
     this.levelRoot.addChild(this.wall);
 
-    const { object: pointerInput, target: pointerTarget } =
+    const { object: pointerInput, target: playfieldPointer } =
       spawnPlayfieldPointerInput();
     this.levelRoot.addChild(pointerInput);
 
-    this.paddle = new BreakoutPaddleObj(pointerTarget);
+    this.paddle = new BreakoutPaddleObj();
+    attachHorizontalPointerSteer(
+      this.paddle.body,
+      PADDLE_SPEED,
+      playfieldPointer,
+    );
     this.levelRoot.addChild(this.paddle);
 
     this.ball = new BreakoutBallObj();

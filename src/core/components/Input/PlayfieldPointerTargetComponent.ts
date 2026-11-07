@@ -1,18 +1,14 @@
 import { DialogUI } from "../UI/DialogUI";
 import { clientToGameCoords } from "../../pointer/clientToGameCoords";
 import { Component } from "../Component";
-import type { MoveTowardsTargetSource } from "../Movement/MoveTowardsComponent";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../consts";
 
 /**
  * Tracks the primary pointer on the gameplay canvas and exposes game-space
- * coordinates for {@link MoveTowardsComponent}. Ignores gameplay steering
- * while the game is paused or a dialog is open (UI uses Pixi hit targets).
+ * coordinates for playfield steering. Ignores gameplay steering while the game
+ * is paused or a dialog is open (UI uses Pixi hit targets).
  */
-export class PlayfieldPointerTargetComponent
-  extends Component
-  implements MoveTowardsTargetSource
-{
+export class PlayfieldPointerTargetComponent extends Component {
   private target: { x: number; y: number } | null = null;
   private activePointerId: number | null = null;
   private canvas: HTMLCanvasElement | null = null;

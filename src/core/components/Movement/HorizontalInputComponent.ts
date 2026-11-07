@@ -1,6 +1,5 @@
 import { Component } from "../Component";
 import type { Input } from "../../Input";
-import { MoveTowardsComponent } from "./MoveTowardsComponent";
 import { TransformComponent } from "./TransformComponent";
 
 /** Moves the GameObject left/right using the left/right input actions. */
@@ -26,9 +25,6 @@ export class HorizontalInputComponent extends Component {
 
   override update(deltaTime: number): void {
     if (!this.transform || !this.input) return;
-
-    const moveTowards = this.gameObject?.getComponent(MoveTowardsComponent);
-    if (moveTowards?.hasActiveTarget()) return;
 
     let direction = 0;
     if (this.input.isDown("left")) direction -= 1;

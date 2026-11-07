@@ -1,7 +1,6 @@
 /**
  * Playwright / dev capture entry only — not used by the default game (`src/main.ts`).
  */
-import { Assets } from "pixi.js";
 import { Engine } from "../../core/Engine";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../core/consts";
 import {
@@ -29,8 +28,8 @@ const engine = new Engine({
   antialias: false,
 });
 
-void Assets.init({ basePath: `${window.location.origin}/` })
-  .then(() => engine.bootstrap(container))
+engine
+  .bootstrap(container)
   .then((game) => {
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     return game.loadLevel("spaceShooter");

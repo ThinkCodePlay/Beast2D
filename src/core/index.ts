@@ -26,13 +26,14 @@ export { Component } from "./components/Component";
 export { TransformComponent } from "./components/Movement/TransformComponent";
 export { UserInputComponent } from "./components/Movement/UserInputComponent";
 export { HorizontalInputComponent } from "./components/Movement/HorizontalInputComponent";
+export { MoveIntentComponent } from "./components/Movement/MoveIntentComponent";
+export { HorizontalKeyboardIntentComponent } from "./components/Movement/HorizontalKeyboardIntentComponent";
+export { PointerToMoveIntentComponent } from "./components/Input/PointerToMoveIntentComponent";
+export { attachHorizontalPointerSteer } from "./prefabs/attachHorizontalPointerSteer";
 export { HorizontalClampComponent } from "./components/Movement/HorizontalClampComponent";
 export { HorizontalFacingComponent } from "./components/Movement/HorizontalFacingComponent";
 export { VerticalMoveComponent } from "./components/Movement/VerticalMoveComponent";
-export {
-  MoveTowardsComponent,
-  type MoveTowardsTargetSource,
-} from "./components/Movement/MoveTowardsComponent";
+export { MoveTowardsComponent } from "./components/Movement/MoveTowardsComponent";
 export { PlayfieldPointerTargetComponent } from "./components/Input/PlayfieldPointerTargetComponent";
 export { spawnPlayfieldPointerInput } from "./prefabs/PlayfieldPointerInput";
 export { stepMoveTowards, type MoveTowardsAxes } from "./moveTowards";
