@@ -3,7 +3,7 @@ import { TransformComponent } from "../../../core/components/Movement/TransformC
 import { SpritesheetAnimationRenderComponent } from "../../../core/components/Render/SpritesheetAnimationRenderComponent";
 import { VerticalMoveComponent } from "../../../core/components/Movement/VerticalMoveComponent";
 import { DestroyOutOfBoundsComponent } from "../../../core/components/Behavior/DestroyBelowScreenComponent";
-import { SquareColliderComponent } from "../../../core/components/Collision/SquareColliderComponent";
+import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
 import {
   CollisionLayers,
   ColliderModes,
@@ -81,11 +81,19 @@ export class ShooterEnemy extends GameObject {
       }),
     );
     this.addComponent(new VerticalMoveComponent(def.speed));
+    const hitRadius = 10;
+    const hitCenter = SPRITE_SIZE / 2;
     this.addComponent(
-      new SquareColliderComponent(SPRITE_SIZE, SPRITE_SIZE, {
-        layer: CollisionLayers.Enemy,
-        mode: ColliderModes.Passive,
-      }),
+      new CircleColliderComponent(
+        hitRadius,
+        {
+          layer: CollisionLayers.Enemy,
+          mode: ColliderModes.Passive,
+        },
+        {},
+        hitCenter,
+        hitCenter,
+      ),
     );
     this.addComponent(
       new DestroyOutOfBoundsComponent({

@@ -32,9 +32,11 @@ On **GAME OVER**, a semi-transparent overlay appears beyond (or in addition to) 
 
 ### Acceptance criteria
 
-- [ ] Trigger game over in Space Shooter; overlay/panel look intentional—no visible “extra” overlay past panel border that looks like a bug.
-- [ ] START dialog (pre-game) still looks correct if it shares the same render path.
-- [ ] RESTART still reloads the level and resumes the game manager.
+- [x] Trigger game over in Space Shooter; overlay/panel look intentional—no visible “extra” overlay past panel border that looks like a bug.
+- [x] START dialog (pre-game) still looks correct if it shares the same render path.
+- [x] RESTART still reloads the level and resumes the game manager.
+
+**Resolution:** Game-over dimmer is drawn in display space by offsetting with `-getWorldPosition()` so a centered `DialogUI` no longer shifts the backdrop off-screen.
 
 ### Labels (suggested)
 
@@ -70,9 +72,11 @@ in `Spaceship.ts` (`shipWidth === SPRITE_SIZE`).
 
 ### Acceptance criteria
 
-- [ ] Player–enemy collisions register on a circular hitbox visually closer to the ship silhouette.
-- [ ] No regression to horizontal movement, clamping, or bullet spawning.
-- [ ] Game over / heart loss behavior unchanged aside from fairer hits.
+- [x] Player–enemy collisions register on a circular hitbox visually closer to the ship silhouette.
+- [x] No regression to horizontal movement, clamping, or bullet spawning.
+- [x] Game over / heart loss behavior unchanged aside from fairer hits.
+
+**Resolution:** `Spaceship` uses `CircleColliderComponent` radius `10`, center `(16, 16)` on the 32×32 sprite; optional `centerX`/`centerY` on `CircleColliderComponent` for sprite-centered hits.
 
 ### Labels (suggested)
 

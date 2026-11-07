@@ -124,7 +124,7 @@ describe("space shooter gameplay", () => {
   it("bullet destroys an enemy and scores", () => {
     const { level, playfield } = setup();
     playfield.addChild(new ShooterEnemy(300, 100, "scout"));
-    playfield.addChild(new Bullet(307, 117));
+    playfield.addChild(new Bullet(316, 116));
     const before = ScoreUI.getScore();
     run(level, 2);
     expect(ScoreUI.getScore()).toBe(before + 100);

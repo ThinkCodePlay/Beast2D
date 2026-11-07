@@ -32,6 +32,7 @@ const engine = new Engine({
   width: DISPLAY_WIDTH,
   height: DISPLAY_HEIGHT,
   antialias: false,
+  debug: true,
 });
 
 engine

@@ -6,24 +6,30 @@ import {
   type ColliderShape,
 } from "./ColliderComponent";
 
-/** Circle whose bounding box starts at the GameObject origin (like the Circle prefab). */
+/** Circle collider; default center is `(radius, radius)` like the Circle prefab. */
 export class CircleColliderComponent extends ColliderComponent {
   private radius: number;
+  private readonly centerX: number;
+  private readonly centerY: number;
 
   constructor(
     radius: number,
     collisionOptions: ColliderOptions = {},
     debugOptions: ColliderDebugOptions = {},
+    centerX: number = radius,
+    centerY: number = centerX,
   ) {
     super(collisionOptions, debugOptions);
     this.radius = radius;
+    this.centerX = centerX;
+    this.centerY = centerY;
   }
 
   override getShape(): ColliderShape | null {
     if (!this.transform) return null;
 
     const scale = this.transform.getWorldScale();
-    const center = this.transform.localToWorld(this.radius, this.radius);
+    const center = this.transform.localToWorld(this.centerX, this.centerY);
     return {
       type: "circle",
       x: center.x,
@@ -33,6 +39,6 @@ export class CircleColliderComponent extends ColliderComponent {
   }
 
   protected override drawDebugShape(graphics: Graphics): void {
-    graphics.circle(this.radius, this.radius, this.radius);
+    graphics.circle(this.centerX, this.centerY, this.radius);
   }
 }

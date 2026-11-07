@@ -120,10 +120,16 @@ export class DialogUIRenderComponent extends RenderComponent {
     graphics.clear();
 
     if (this.score > 0 || this.message.toUpperCase().includes("OVER")) {
+      const { x: wx, y: wy } = this.gameObject?.getWorldPosition() ?? {
+        x: 0,
+        y: 0,
+      };
+      const backdropX = -wx;
+      const backdropY = -wy;
       for (let y = 0; y < DISPLAY_HEIGHT; y += 8) {
         for (let x = 0; x < DISPLAY_WIDTH; x += 8) {
           graphics
-            .rect(x, y, 8, 8)
+            .rect(backdropX + x, backdropY + y, 8, 8)
             .fill({ color: Beast2D16.PlumOutline, alpha: 0.72 });
         }
       }

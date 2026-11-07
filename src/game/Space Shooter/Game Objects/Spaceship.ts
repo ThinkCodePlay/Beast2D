@@ -8,7 +8,7 @@ import { Globals } from "../../../core/Globals";
 import { SPRITE_SIZE } from "../../../core/consts";
 import { TEXTURE_BEAST_SHIP } from "../../publicAssets";
 import { BulletSpawner } from "./BulletSpawner";
-import { SquareColliderComponent } from "../../../core/components/Collision/SquareColliderComponent";
+import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
 import { CollisionLayers, ColliderModes } from "../../../core/consts";
 import { HeartsUI } from "../../../core/components/UI/HeartsUI";
 import { DialogUI } from "../../../core/components/UI/DialogUI";
@@ -32,45 +32,53 @@ export class Spaceship extends GameObject {
       new SpriteRenderComponent(TEXTURE_BEAST_SHIP, renderOptions),
     );
     const invuln = this.addComponent(new BlinkInvulnerabilityComponent(90));
+    const hitRadius = 10;
+    const hitCenter = shipWidth / 2;
     this.addComponent(
-      new SquareColliderComponent(shipWidth - 8, shipWidth - 10, {
-        layer: CollisionLayers.Player,
-        mode: ColliderModes.Active,
-        mask: [CollisionLayers.Enemy],
-        onCollisionEnter: (_self, other) => {
-          if (invuln.invulnerable) return;
+      new CircleColliderComponent(
+        hitRadius,
+        {
+          layer: CollisionLayers.Player,
+          mode: ColliderModes.Active,
+          mask: [CollisionLayers.Enemy],
+          onCollisionEnter: (_self, other) => {
+            if (invuln.invulnerable) return;
 
-          const hearts = HeartsUI.decreaseHearts(1);
-          invuln.trigger();
+            const hearts = HeartsUI.decreaseHearts(1);
+            invuln.trigger();
 
-          const { x: px, y: py } = this.getWorldPosition();
-          const host = ShooterPlayfield.current;
-          if (host) {
-            spawnPixelBurst(host, px + shipWidth / 2, py + shipWidth / 2, {
-              ...EXPLOSION_SMALL,
-              durationFrames: 8,
-            });
-            host.shake(8, 1);
-          }
+            const { x: px, y: py } = this.getWorldPosition();
+            const host = ShooterPlayfield.current;
+            if (host) {
+              spawnPixelBurst(host, px + shipWidth / 2, py + shipWidth / 2, {
+                ...EXPLOSION_SMALL,
+                durationFrames: 8,
+              });
+              host.shake(8, 1);
+            }
 
-          if (hearts <= 0) {
-            DialogUI.open("GAME OVER", ScoreUI.getScore());
-            DialogUI.setPrimaryLabel("RESTART");
-            DialogUI.setOnRestart(() => {
-              SpaceShooter.triggerGameOverRestart();
-            });
-            return;
-          }
+            if (hearts <= 0) {
+              DialogUI.open("GAME OVER", ScoreUI.getScore());
+              DialogUI.setPrimaryLabel("RESTART");
+              DialogUI.setOnRestart(() => {
+                SpaceShooter.triggerGameOverRestart();
+              });
+              return;
+            }
 
-          const enemy = other.gameObject;
-          if (!enemy || !host) return;
-          const { x: ex, y: ey } = enemy.getWorldPosition();
-          const kind = enemy.name.replace("Enemy_", "") as EnemyKind;
-          ShooterEnemy.spawnBurst(kind, ex, ey);
-          host.shake(4, 1);
-          enemy.destroy();
+            const enemy = other.gameObject;
+            if (!enemy || !host) return;
+            const { x: ex, y: ey } = enemy.getWorldPosition();
+            const kind = enemy.name.replace("Enemy_", "") as EnemyKind;
+            ShooterEnemy.spawnBurst(kind, ex, ey);
+            host.shake(4, 1);
+            enemy.destroy();
+          },
         },
-      }),
+        {},
+        hitCenter,
+        hitCenter,
+      ),
     );
     this.addComponent(new HorizontalInputComponent(7));
     this.addComponent(
