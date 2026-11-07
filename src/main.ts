@@ -1,8 +1,11 @@
-import { SCALE_MODES, TextureStyle } from "pixi.js";
 import { Engine } from "./core/Engine";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./core/consts";
+import {
+  attachDisplayScaleFit,
+  configurePixelArtRendering,
+} from "./core/displayScale";
 
-TextureStyle.defaultOptions.scaleMode = SCALE_MODES.NEAREST;
+configurePixelArtRendering();
 import { Level1 } from "./game/Level1";
 import { Level2 } from "./game/Level2";
 import { SpaceShooter } from "./game/Space Shooter/SpaceShooter";
@@ -15,11 +18,14 @@ container.className = "game-container";
 container.style.position = "relative";
 appRoot.appendChild(container);
 
+attachDisplayScaleFit(container, DISPLAY_WIDTH, DISPLAY_HEIGHT, {
+  padding: 16,
+});
+
 const engine = new Engine({
   width: DISPLAY_WIDTH,
   height: DISPLAY_HEIGHT,
   antialias: false,
-  debug: false,
 });
 
 engine
@@ -29,7 +35,7 @@ engine
     game.registerLevel("level2", new Level2(engine));
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     game.registerLevel("bunnyHop", new BunnyHop(engine));
-    return game.loadLevel("spaceShooter");
+    return game.loadLevel("bunnyHop");
   })
   .catch((error) => {
     console.error("Failed to start Beast2D engine", error);

@@ -14,6 +14,13 @@ export { FixedStepper } from "./FixedStepper";
 export { ObjectPool } from "./ObjectPool";
 export { CollisionSystem } from "./CollisionSystem";
 export * from "./consts";
+export {
+  attachDisplayScaleFit,
+  computeIntegerDisplayScale,
+  configurePixelArtRendering,
+  displayCssSize,
+  type DisplayScaleFitOptions,
+} from "./displayScale";
 
 export { Component } from "./components/Component";
 export { TransformComponent } from "./components/Movement/TransformComponent";
