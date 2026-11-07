@@ -1,8 +1,11 @@
-import { Text, TextStyle } from "pixi.js";
 import { Level } from "../../core/Level";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH, PIXEL_GRID } from "../../core/consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH, PIXEL_GRID, TEXTURE_UI_FONT } from "../../core/consts";
 import { DialogUI } from "../../core/components/UI/DialogUI";
+import { HudBand } from "../../core/components/UI/HudBand";
+import { HudLivesUI } from "../../core/components/UI/HudLivesUI";
+import { PlayfieldHintUI } from "../../core/components/UI/PlayfieldHintUI";
 import { ScoreUI } from "../../core/components/UI/ScoreUI";
+import { Beast2D16 } from "../../core/palette/beast2d16";
 import { Box } from "../../core/prefabs/Box";
 import { Circle } from "../../core/prefabs/Circle";
 import { HorizontalClampComponent } from "../../core/components/Movement/HorizontalClampComponent";
@@ -28,6 +31,8 @@ const PADDLE_SPEED = 5.5;
 const LEVEL_NAME = "breakoutPaddle";
 
 export class BreakoutPaddle extends Level {
+  override assets = [TEXTURE_UI_FONT];
+
   private phase: GamePhase = "ready";
   private lives = START_LIVES;
   private ball: BallState = { x: 0, y: 0, vx: 0, vy: 0 };
@@ -35,8 +40,6 @@ export class BreakoutPaddle extends Level {
   private paddleBox: Box | null = null;
   private ballCircle: Circle | null = null;
   private brickObjects: Box[] = [];
-  private hintText: Text | null = null;
-  private livesText: Text | null = null;
 
   protected init(): void {
     this.phase = "ready";
@@ -50,38 +53,12 @@ export class BreakoutPaddle extends Level {
     backdrop.runWhenPaused = true;
     this.levelRoot.addChild(backdrop);
 
-    this.levelRoot.addChild(
-      new ScoreUI(DISPLAY_WIDTH - PIXEL_GRID, PIXEL_GRID / 2, 0, "Score", {
-        color: C_CREAM,
-      }),
-    );
+    this.levelRoot.addChild(new HudBand());
+    this.levelRoot.addChild(ScoreUI.forHudTop(0));
     ScoreUI.resetScore(0);
+    this.levelRoot.addChild(new HudLivesUI(this.lives));
 
-    this.livesText = new Text({
-      text: this.livesLabel(),
-      style: new TextStyle({
-        fill: C_CREAM,
-        fontSize: 12,
-        fontFamily: "monospace",
-        fontWeight: "700",
-      }),
-    });
-    this.livesText.x = PIXEL_GRID / 2;
-    this.livesText.y = 2;
-    this.levelRoot.container.addChild(this.livesText);
-
-    this.hintText = new Text({
-      text: "A/D or arrows move · SPACE serve",
-      style: new TextStyle({
-        fill: C_CREAM,
-        fontSize: 10,
-        fontFamily: "monospace",
-      }),
-    });
-    this.hintText.anchor.set(0.5, 0);
-    this.hintText.x = DISPLAY_WIDTH / 2;
-    this.hintText.y = 2;
-    this.levelRoot.container.addChild(this.hintText);
+    this.levelRoot.addChild(new PlayfieldHintUI("A/D MOVE  SPACE SERVE"));
 
     const paddleY = defaultPaddleY();
     this.paddleBox = new Box(
@@ -137,17 +114,13 @@ export class BreakoutPaddle extends Level {
         "",
         0,
         false,
-        { color: C_CREAM },
+        { color: Beast2D16.Cream },
       ),
     );
 
     DialogUI.setOnRestart(() => {
       void this.restartLevel();
     });
-  }
-
-  private livesLabel(): string {
-    return `Lives: ${this.lives}`;
   }
 
   private readPaddle() {
@@ -173,11 +146,11 @@ export class BreakoutPaddle extends Level {
   }
 
   private setHint(text: string): void {
-    if (this.hintText) this.hintText.text = text;
+    PlayfieldHintUI.setMessage(text);
   }
 
   private refreshLives(): void {
-    if (this.livesText) this.livesText.text = this.livesLabel();
+    HudLivesUI.setLives(this.lives);
   }
 
   private attachBallToPaddle(): void {
@@ -215,7 +188,9 @@ export class BreakoutPaddle extends Level {
         const vel = launchBallVelocity();
         this.ball = { ...this.ball, ...vel };
         this.phase = "playing";
-        this.setHint("Clear all bricks!");
+        this.setHint("");
+      } else {
+        this.setHint("A/D MOVE  SPACE SERVE");
       }
       this.syncBallGraphics();
       return;
@@ -243,7 +218,7 @@ export class BreakoutPaddle extends Level {
         return;
       }
       this.phase = "ready";
-      this.setHint("Ball lost · SPACE serve");
+      this.setHint("BALL LOST  SPACE SERVE");
       this.attachBallToPaddle();
       return;
     }
@@ -261,7 +236,7 @@ export class BreakoutPaddle extends Level {
       won ? "You cleared the bricks!" : "Out of lives!",
       score,
     );
-    this.setHint("SPACE or R to restart");
+    this.setHint("SPACE OR R RESTART");
   }
 
   public override destroy(): void {

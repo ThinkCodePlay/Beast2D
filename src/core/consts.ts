@@ -20,6 +20,8 @@ export const BUNNY_WALK_ANIMATION_COLUMNS = 18;
 export const BUNNY_WALK_ANIMATION_FRAME_COUNT = 18;
 export const TEXTURE_STARS_LAYER_1 = "background/Stars-Big_1_1_PC.320x240.png";
 export const TEXTURE_STARS_LAYER_2 = "background/Stars-Big_1_2_PC.320x240.png";
+/** Shared 5×7 HUD bitmap font (`public/ui/font-atlas.5x7.png`). */
+export const TEXTURE_UI_FONT = "ui/font-atlas.5x7.png";
 
 export const ObjectNames = {
   LevelRoot: "LevelRoot",

@@ -7,7 +7,9 @@ import {
   C_YELLOW,
 } from "./palette";
 
-export const HUD_HEIGHT = 16;
+import { HUD_HEIGHT } from "../../core/ui/hudLayout";
+
+export { HUD_HEIGHT };
 export const PLAYFIELD_TOP = HUD_HEIGHT;
 export const PLAYFIELD_BOTTOM = 240;
 export const FIELD_WIDTH = 320;

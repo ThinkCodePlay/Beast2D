@@ -2,6 +2,10 @@ import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { ScoreUIRenderComponent } from "./ScoreUIRenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
+import {
+  hudScoreAnchorX,
+  hudTextY,
+} from "../../ui/hudLayout";
 
 export class ScoreUI extends GameObject {
   private static current: ScoreUI | null = null;
@@ -11,8 +15,8 @@ export class ScoreUI extends GameObject {
     x: number,
     y: number,
     score: number = 0,
-    label: string = "Score",
-    renderOptions: RenderOptions = {},
+    label: string = "SCORE",
+    renderOptions: RenderOptions & { compactHud?: boolean } = {},
   ) {
     super();
     this.name = "ScoreUI";
@@ -39,6 +43,21 @@ export class ScoreUI extends GameObject {
 
   static resetScore(score: number = 0): void {
     ScoreUI.current?.setScore(score);
+  }
+
+  /** Right-aligned score in the 320×16 HUD band (lives go on the left). */
+  static forHudTop(
+    score = 0,
+    label = "SCORE",
+    renderOptions: RenderOptions = {},
+  ): ScoreUI {
+    return new ScoreUI(
+      hudScoreAnchorX(),
+      hudTextY(),
+      score,
+      label,
+      { compactHud: true, ...renderOptions },
+    );
   }
 
   setScore(score: number): void {
