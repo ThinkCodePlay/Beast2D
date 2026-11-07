@@ -12,8 +12,8 @@ export class ScoreUI extends GameObject {
     x: number,
     y: number,
     score: number = 0,
-    label: string = "Score",
-    renderOptions: RenderOptions = {},
+    label: string = "SCORE",
+    renderOptions: RenderOptions & { compactHud?: boolean } = {},
   ) {
     super();
     this.name = "ScoreUI";

@@ -5,6 +5,7 @@ import { GameObject } from "../src/core/GameObject";
 import { Level1 } from "../src/game/Level1";
 import { Level2 } from "../src/game/Level2";
 import { SpaceShooter } from "../src/game/Space Shooter/SpaceShooter";
+import { BreakoutPaddle } from "../src/game/BreakoutPaddle/BreakoutPaddle";
 import { Bullet } from "../src/game/Space Shooter/Game Objects/Bullet";
 import { Spaceship } from "../src/game/Space Shooter/Game Objects/Spaceship";
 import { ShooterEnemy } from "../src/game/Space Shooter/Game Objects/ShooterEnemy";
@@ -79,6 +80,14 @@ describe("example levels run on the updated engine", () => {
     const level = new Level2(fakeEngine(context));
     level.start();
     expect(() => run(level, 30)).not.toThrow();
+    level.destroy();
+  });
+
+  it("BreakoutPaddle: HUD, bricks and teardown", () => {
+    const level = new BreakoutPaddle(fakeEngine(context));
+    level.start();
+    expect(() => run(level, 15)).not.toThrow();
+    expect(ScoreUI.getScore()).toBe(0);
     level.destroy();
   });
 

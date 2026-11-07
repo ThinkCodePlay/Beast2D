@@ -34,7 +34,7 @@ levelRoot.addChild(new HudHeaderUI(0, 3, theme));
 
 `HeartsUI` / `ScoreUI` static methods delegate to the active `HudHeaderUI`.
 
-Breakout (PR #9) can reuse `HUD_LAYOUT` with its own `HudHeaderTheme` — no dependency on `space-shooter/` paths in core.
+Non-shooter demos use `DEFAULT_BEAST2D_HUD_THEME` / `DEFAULT_BEAST2D_BITMAP_FONT` (`src/core/ui/defaultUiTheme.ts`, assets under `public/ui/`). Space Shooter keeps `SHOOTER_HUD_THEME` and generated fonts under `src/game/Space Shooter/`.
 
 ## Related
 
