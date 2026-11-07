@@ -62,6 +62,14 @@ export class BreakoutPaddle extends Level {
 
   protected update(deltaTime: number): void {
     super.update(deltaTime);
+    if (import.meta.env.DEV) {
+      (globalThis as typeof globalThis & { __beast2dBreakout?: object }).__beast2dBreakout =
+        {
+          phase: this.session.phase,
+          lives: this.session.lives,
+          dialogOpen: DialogUI.isOpen(),
+        };
+    }
     tickBreakoutSession(
       {
         context: this.context,

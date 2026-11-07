@@ -5,8 +5,8 @@ These Node scripts support **local development** only. They are not imported by 
 | Script | Purpose |
 |--------|---------|
 | `generate-beast2d-ui.ts` | Regenerates shared HUD/dialog PNGs under `public/ui/` and `defaultBitmapFont.ts` (`npm run assets:ui`). |
-| `capture-breakout-hud.mjs` | Playwright canvas screenshots for Breakout HUD QA (manual/CI optional). |
-| `capture-breakout-endstate.mjs` | Single game-over screenshot helper. |
+| `capture-breakout-hud.mjs` | Playwright canvas screenshots for Breakout HUD QA (serve, gameplay score, game-over dialog, restart). Uses dev-only `globalThis.__beast2dBreakout` probe; fails fast if game-over is not reached. |
+| `capture-breakout-endstate.mjs` | Single game-over screenshot (same lose-life inputs + probe). |
 | `capture-shooter-hud.mjs` | Shooter HUD smoke screenshots at multiple viewports. |
 | `smoke-levels.mjs` | Quick dev boot check for registered demo levels. |
 
