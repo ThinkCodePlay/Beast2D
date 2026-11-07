@@ -12,7 +12,6 @@ import {
   parseAsciiGrid,
   writeRgbaPng,
 } from "./pixel/write-rgba-png.ts";
-import { UI_BITMAP_STRINGS } from "../src/core/ui/uiBitmapCopy.ts";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(REPO_ROOT, "public/ui");
@@ -135,7 +134,8 @@ const GLYPHS: Record<string, string[]> = {
   "!": ["..4..", "..4..", "..4..", "..4..", "..4..", ".....", "..4.."],
 };
 
-const REQUIRED_UI_STRINGS = [...UI_BITMAP_STRINGS];
+/** Engine bitmap font charset (no demo copy — demo strings are checked in tests). */
+const REQUIRED_BITMAP_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 :!";
 
 const glyphW = 5;
 const glyphH = 7;
@@ -151,12 +151,10 @@ const atlas = new Int8Array(atlasW * atlasH).fill(-1);
 
 const glyphMap: Record<string, { x: number; y: number }> = {};
 
-for (const req of REQUIRED_UI_STRINGS) {
-  for (const ch of req.toUpperCase()) {
-    if (ch === " ") continue;
-    if (!GLYPHS[ch]) {
-      throw new Error(`Missing glyph for '${ch}' (required by UI copy)`);
-    }
+for (const ch of REQUIRED_BITMAP_CHARS) {
+  if (ch === " ") continue;
+  if (!GLYPHS[ch]) {
+    throw new Error(`Missing glyph for '${ch}' (required bitmap charset)`);
   }
 }
 

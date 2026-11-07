@@ -4,7 +4,7 @@ import { describe, expect, it, beforeAll } from "vitest";
 import { useBitmapFont } from "../src/core/ui/bitmapFontRegistry";
 import { missingGlyphs } from "../src/core/ui/BitmapText";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../src/core/ui/defaultBitmapFont";
-import { UI_BITMAP_STRINGS } from "../src/core/ui/uiBitmapCopy";
+import { UI_BITMAP_STRINGS } from "./fixtures/uiBitmapStrings";
 import { SHOOTER_BITMAP_FONT } from "../src/game/Space Shooter/shooterBitmapFont";
 
 describe("bitmap font atlas", () => {

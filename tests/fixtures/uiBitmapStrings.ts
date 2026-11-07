@@ -1,6 +1,5 @@
 /**
- * Uppercase bitmap UI strings used in shipped demos (HUD, dialog, hints).
- * Generator + tests must keep the atlas covering every character in these lines.
+ * Demo HUD/dialog/hint lines — regression corpus only (not shipped in core).
  */
 export const UI_BITMAP_STRINGS = [
   "SPACE BEAST",
