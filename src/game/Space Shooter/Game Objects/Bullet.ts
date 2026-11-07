@@ -23,7 +23,7 @@ export class Bullet extends GameObject {
 
     this.addComponent(new TransformComponent(x - size / 2, y - size / 2));
     this.addComponent(
-      new SpriteRenderComponent(`/${TEXTURE_SHOOTER_BULLET}`, { alpha: 1 }),
+      new SpriteRenderComponent(TEXTURE_SHOOTER_BULLET, { alpha: 1 }),
     );
     this.addComponent(new VerticalMoveComponent(-8));
     this.addComponent(

@@ -1,5 +1,6 @@
 import { Assets, Container, Rectangle, Sprite, Texture } from "pixi.js";
 import { BITMAP_FONT } from "./fontGlyphs";
+import { textureNearest } from "./textureNearest";
 
 let atlasTexture: Texture | null = null;
 let atlasLoad: Promise<Texture> | null = null;
@@ -9,6 +10,7 @@ function loadAtlas(): Promise<Texture> {
   if (!atlasLoad) {
     atlasLoad = Assets.load(BITMAP_FONT.atlasPath).then((tex) => {
       atlasTexture = tex as Texture;
+      textureNearest(atlasTexture);
       return atlasTexture;
     });
   }
@@ -17,45 +19,108 @@ function loadAtlas(): Promise<Texture> {
 
 export interface BitmapTextOptions {
   scale?: number;
+  /** Multiplies mono-ink glyphs; defaults to white (no change). */
   tint?: number;
   letterSpacing?: number;
 }
 
-/** Draw bitmap glyphs into a container (call after loadAtlas). */
+export function measureBitmapText(
+  text: string,
+  options: BitmapTextOptions = {},
+): number {
+  if (text.length === 0) return 0;
+  const scale = options.scale ?? 1;
+  const gap = options.letterSpacing ?? 1;
+  const advance = (BITMAP_FONT.glyphW + gap) * scale;
+  return (text.length - 1) * advance + BITMAP_FONT.glyphW * scale;
+}
+
+function glyphFrame(sheet: Texture, ch: string): Texture {
+  const key = ch.toUpperCase();
+  const glyphs = BITMAP_FONT.glyphs as Record<string, { x: number; y: number }>;
+  const pos = glyphs[key] ?? glyphs[" "];
+  if (!pos) {
+    return new Texture({
+      source: sheet.source,
+      frame: new Rectangle(0, 0, 1, 1),
+    });
+  }
+  return new Texture({
+    source: sheet.source,
+    frame: new Rectangle(
+      pos.x,
+      pos.y,
+      BITMAP_FONT.glyphW,
+      BITMAP_FONT.glyphH,
+    ),
+  });
+}
+
+/** Builds text synchronously when the atlas is already loaded. */
+export function buildBitmapTextFromSheet(
+  sheet: Texture,
+  text: string,
+  options: BitmapTextOptions = {},
+): Container {
+  textureNearest(sheet);
+  const scale = options.scale ?? 1;
+  const gap = options.letterSpacing ?? 1;
+  const advance = Math.round((BITMAP_FONT.glyphW + gap) * scale);
+  const tint = options.tint ?? 0xffffff;
+  const container = new Container();
+  let x = 0;
+  for (const ch of text.toUpperCase()) {
+    const frame = glyphFrame(sheet, ch);
+    const sprite = new Sprite(frame);
+    sprite.roundPixels = true;
+    sprite.scale.set(scale);
+    sprite.tint = tint;
+    sprite.x = Math.round(x);
+    sprite.y = 0;
+    textureNearest(sprite.texture);
+    container.addChild(sprite);
+    x += advance;
+  }
+  return container;
+}
+
+/** Async helper; prefer after `preloadBitmapFont()`. */
 export function buildBitmapText(
   text: string,
   options: BitmapTextOptions = {},
 ): Container {
-  const scale = options.scale ?? 1;
-  const spacing = (BITMAP_FONT.glyphW + (options.letterSpacing ?? 1)) * scale;
   const container = new Container();
   void loadAtlas().then((sheet) => {
     if (container.destroyed) return;
-    let x = 0;
-    for (const ch of text.toUpperCase()) {
-      const pos = BITMAP_FONT.glyphs[ch] ?? BITMAP_FONT.glyphs[" "];
-      if (!pos) continue;
-      const frame = new Texture({
-        source: sheet.source,
-        frame: new Rectangle(
-          pos.x,
-          pos.y,
-          BITMAP_FONT.glyphW,
-          BITMAP_FONT.glyphH,
-        ),
-      });
-      const sprite = new Sprite(frame);
-      sprite.scale.set(scale);
-      if (options.tint !== undefined) sprite.tint = options.tint;
-      sprite.x = x;
-      sprite.y = 0;
-      container.addChild(sprite);
-      x += spacing;
+    const built = buildBitmapTextFromSheet(sheet, text, options);
+    while (built.children.length > 0) {
+      const child = built.children[0]!;
+      built.removeChild(child);
+      container.addChild(child);
     }
   });
   return container;
 }
 
-export async function preloadBitmapFont(): Promise<void> {
-  await loadAtlas();
+export async function buildBitmapTextReady(
+  text: string,
+  options: BitmapTextOptions = {},
+): Promise<Container> {
+  const sheet = await loadAtlas();
+  return buildBitmapTextFromSheet(sheet, text, options);
+}
+
+export async function preloadBitmapFont(): Promise<Texture> {
+  return loadAtlas();
+}
+
+/** Returns uppercase chars in `text` missing from the shipped font. */
+export function missingGlyphs(text: string): string[] {
+  const need = new Set<string>();
+  for (const ch of text.toUpperCase()) {
+    if (ch === " ") continue;
+    const glyphs = BITMAP_FONT.glyphs as Record<string, { x: number; y: number }>;
+    if (!glyphs[ch]) need.add(ch);
+  }
+  return [...need].sort();
 }

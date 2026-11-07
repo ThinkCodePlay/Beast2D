@@ -11,7 +11,7 @@ export class ShooterHud extends GameObject {
     this.runWhenPaused = true;
     this.addComponent(new TransformComponent(0, 0));
     this.addComponent(
-      new SpriteRenderComponent(`/${TEXTURE_SHOOTER_HUD}`, { alpha: 1 }),
+      new SpriteRenderComponent(TEXTURE_SHOOTER_HUD, { alpha: 1 }),
     );
   }
 }

@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "assets:fit-display": "python scripts/compress_display_png.py --backgrounds",
-    "assets:shooter": "tsx scripts/generate-space-shooter-enemies.ts && tsx scripts/generate-space-shooter-ui.ts",
+    "assets:shooter": "tsx scripts/generate-space-shooter-enemies.ts && tsx scripts/generate-space-shooter-ui.ts && tsx scripts/upscale-contact-sheet.ts",
     "assets:verify-shooter": "tsx scripts/verify-shooter-palette.ts",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

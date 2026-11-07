@@ -25,19 +25,19 @@ const ENEMY_DEFS: Record<
   { texture: string; frames: number; speed: number; animSpeed: number }
 > = {
   scout: {
-    texture: `/${TEXTURE_ENEMY_SCOUT_SHEET}`,
+    texture: TEXTURE_ENEMY_SCOUT_SHEET,
     frames: 2,
     speed: 2.2,
     animSpeed: 0.25,
   },
   cruiser: {
-    texture: `/${TEXTURE_ENEMY_CRUISER_SHEET}`,
+    texture: TEXTURE_ENEMY_CRUISER_SHEET,
     frames: 2,
     speed: 1.4,
     animSpeed: 0.15,
   },
   drifter: {
-    texture: `/${TEXTURE_ENEMY_DRIFTER_SHEET}`,
+    texture: TEXTURE_ENEMY_DRIFTER_SHEET,
     frames: 3,
     speed: 1.8,
     animSpeed: 0.12,

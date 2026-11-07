@@ -12,7 +12,7 @@ See [display spec](./display.md):
 
 | Region | Size | Notes |
 |--------|------|--------|
-| HUD | 320×16, y 0–15 | Band texture + bitmap score/lives |
+| HUD | 320×16, y 0–15 | [`HudHeaderUI` / contract](./hud-header.md) — lives left, score right |
 | Playfield | 320×224, y 16–239 | Ship, enemies, effects |
 
 ## Sprite sizes
@@ -39,7 +39,19 @@ Sources:
 - `scripts/generate-space-shooter-ui.ts` — HUD band, 9-slice, font atlas
 - `scripts/pixel/` — shared palette + PNG writer (`pngjs`)
 
-After changing glyphs, sync `src/core/ui/fontGlyphs.ts` with `font-glyphs.json` (or re-run generator and copy positions).
+`npm run assets:shooter` rewrites `src/core/ui/fontGlyphs.ts` from the generator (kept in sync with `font-glyphs.json`).
+
+### Screenshot / capture URLs (staged)
+
+For review captures only (deterministic layout, labeled staged):
+
+| Scene | URL query |
+|-------|-----------|
+| Title | `?capture=shooter&scene=title` (default pause) |
+| Gameplay | `?capture=shooter&scene=gameplay` — all three enemy types + sample effects |
+| Game over | `?capture=shooter&scene=gameover` |
+
+Enlarged enemy sheet (nearest 4×): `public/space-shooter/enemies/contact-sheet-4x.png`
 
 ## Effects (engine)
 

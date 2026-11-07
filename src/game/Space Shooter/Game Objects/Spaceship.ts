@@ -28,7 +28,7 @@ export class Spaceship extends GameObject {
 
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(
-      new SpriteRenderComponent(`/${TEXTURE_BEAST_SHIP}`, renderOptions),
+      new SpriteRenderComponent(TEXTURE_BEAST_SHIP, renderOptions),
     );
     const invuln = this.addComponent(new BlinkInvulnerabilityComponent(90));
     this.addComponent(

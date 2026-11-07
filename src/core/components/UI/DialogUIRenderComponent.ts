@@ -2,9 +2,14 @@ import { Container, Graphics } from "pixi.js";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
 import { Beast2D16 } from "../../palette/beast2d16";
-import { buildBitmapText } from "../../ui/BitmapText";
+import {
+  buildBitmapTextReady,
+  measureBitmapText,
+  preloadBitmapFont,
+} from "../../ui/BitmapText";
 import { NineSliceSprite } from "../../ui/NineSliceSprite";
 import {
+  DISPLAY_HEIGHT,
   DISPLAY_WIDTH,
   TEXTURE_SHOOTER_BUTTON,
   TEXTURE_SHOOTER_PANEL,
@@ -18,6 +23,7 @@ export class DialogUIRenderComponent extends RenderComponent {
   private isOpen: boolean;
   private primaryLabel = "RESTART";
   private panelHost: Container | null = null;
+  private redrawToken = 0;
   private onRestart: (() => void) | null = null;
   private onPause: (() => void) | null = null;
   private onResume: (() => void) | null = null;
@@ -38,8 +44,8 @@ export class DialogUIRenderComponent extends RenderComponent {
       ...renderOptions,
     });
 
-    this.width = width;
-    this.height = height;
+    this.width = Math.round(width / 8) * 8;
+    this.height = Math.round(height / 8) * 8;
     this.message = message;
     this.score = score;
     this.isOpen = isOpen;
@@ -47,7 +53,7 @@ export class DialogUIRenderComponent extends RenderComponent {
 
   createGraphics(): Graphics {
     const graphics = new Graphics();
-    this.redraw(graphics);
+    void this.paint(graphics);
     return graphics;
   }
 
@@ -57,12 +63,8 @@ export class DialogUIRenderComponent extends RenderComponent {
   }
 
   open(message?: string, score?: number): void {
-    if (message !== undefined) {
-      this.message = message;
-    }
-    if (score !== undefined) {
-      this.score = Math.max(0, score);
-    }
+    if (message !== undefined) this.message = message;
+    if (score !== undefined) this.score = Math.max(0, score);
     this.isOpen = true;
     this.onPause?.();
     this.refresh();
@@ -94,62 +96,67 @@ export class DialogUIRenderComponent extends RenderComponent {
     if (!this.graphics || !(this.graphics instanceof Graphics)) return;
     this.destroyDynamicNodes(this.graphics);
     this.graphics.clear();
-    this.redraw(this.graphics);
+    void this.paint(this.graphics);
   }
 
-  private redraw(graphics: Graphics): void {
+  private async paint(graphics: Graphics): Promise<void> {
+    const token = ++this.redrawToken;
     if (!this.isOpen) {
       graphics.visible = false;
       return;
     }
 
+    await preloadBitmapFont();
+    if (token !== this.redrawToken || graphics.destroyed) return;
+
     graphics.visible = true;
+    graphics.clear();
 
     if (this.score > 0 || this.message.toUpperCase().includes("OVER")) {
-      graphics
-        .rect(0, 0, DISPLAY_WIDTH, 240)
-        .fill({ color: Beast2D16.PlumOutline, alpha: 0.55 });
+      for (let y = 0; y < DISPLAY_HEIGHT; y += 8) {
+        for (let x = 0; x < DISPLAY_WIDTH; x += 8) {
+          graphics
+            .rect(x, y, 8, 8)
+            .fill({ color: Beast2D16.PlumOutline, alpha: 0.72 });
+        }
+      }
     }
 
     this.panelHost = new Container();
-    this.panelHost.x = 0;
-    this.panelHost.y = 0;
     graphics.addChild(this.panelHost);
 
     const panel = new NineSliceSprite({
-      texturePath: `/${TEXTURE_SHOOTER_PANEL}`,
+      texturePath: TEXTURE_SHOOTER_PANEL,
       width: this.width,
       height: this.height,
       slice: 8,
     });
     this.panelHost.addChild(panel);
 
-    const title = buildBitmapText(this.message, {
-      scale: 2,
-      tint: Beast2D16.HotPink,
-      letterSpacing: 1,
-    });
-    title.x = Math.floor((this.width - this.message.length * 12) / 2);
-    title.y = 12;
+    const titleOpts = { scale: 2, tint: Beast2D16.HotPink, letterSpacing: 1 };
+    const title = await buildBitmapTextReady(this.message, titleOpts);
+    title.x = Math.round((this.width - measureBitmapText(this.message, titleOpts)) / 2);
+    title.y = 16;
     this.panelHost.addChild(title);
 
     if (this.score > 0) {
-      const scoreLine = buildBitmapText(`SCORE ${this.score}`, {
-        scale: 1,
-        tint: Beast2D16.Cream,
-      });
-      scoreLine.x = Math.floor((this.width - (`SCORE ${this.score}`).length * 7) / 2);
-      scoreLine.y = 40;
+      const scoreText = `SCORE ${this.score}`;
+      const scoreOpts = { scale: 1, tint: Beast2D16.Cream, letterSpacing: 1 };
+      const scoreLine = await buildBitmapTextReady(scoreText, scoreOpts);
+      scoreLine.x = Math.round(
+        (this.width - measureBitmapText(scoreText, scoreOpts)) / 2,
+      );
+      scoreLine.y = 44;
       this.panelHost.addChild(scoreLine);
     }
 
-    const btnW = 72;
+    const btnW = 80;
     const btnH = 16;
-    const btnX = (this.width - btnW) / 2;
-    const btnY = this.height - btnH - 12;
+    const btnX = Math.round((this.width - btnW) / 2);
+    const btnY = this.height - btnH - 16;
 
     const btn = new NineSliceSprite({
-      texturePath: `/${TEXTURE_SHOOTER_BUTTON}`,
+      texturePath: TEXTURE_SHOOTER_BUTTON,
       width: btnW,
       height: btnH,
       slice: 4,
@@ -163,18 +170,15 @@ export class DialogUIRenderComponent extends RenderComponent {
     });
     this.panelHost.addChild(btn);
 
-    const btnLabel = buildBitmapText(this.primaryLabel, {
-      scale: 1,
-      tint: Beast2D16.Cream,
-    });
-    btnLabel.x = btnX + Math.floor((btnW - this.primaryLabel.length * 7) / 2);
+    const labelOpts = { scale: 1, tint: Beast2D16.Cream, letterSpacing: 1 };
+    const btnLabel = await buildBitmapTextReady(this.primaryLabel, labelOpts);
+    btnLabel.x = btnX + Math.round((btnW - measureBitmapText(this.primaryLabel, labelOpts)) / 2);
     btnLabel.y = btnY + 4;
     this.panelHost.addChild(btnLabel);
   }
 
   private destroyDynamicNodes(graphics: Graphics): void {
     if (this.panelHost && this.panelHost.parent === graphics) {
-      this.panelHost.removeAllListeners();
       graphics.removeChild(this.panelHost);
       this.panelHost.destroy({ children: true });
       this.panelHost = null;

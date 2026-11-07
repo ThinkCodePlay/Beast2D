@@ -24,11 +24,13 @@ import { preloadBitmapFont } from "../../core/ui/BitmapText";
 import { Spaceship } from "./Game Objects/Spaceship";
 import { ShooterEnemySpawner } from "./Game Objects/ShooterEnemySpawner";
 import { ParallaxBackground } from "./Game Objects/ParallaxBackground";
-import { ShooterHud } from "./Game Objects/ShooterHud";
 import { ShooterPlayfield } from "./Game Objects/ShooterPlayfield";
-import { HeartsUI } from "../../core/components/UI/HeartsUI";
+import { ShooterEnemy } from "./Game Objects/ShooterEnemy";
+import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
 import { DialogUI } from "../../core/components/UI/DialogUI";
-import { ScoreUI } from "../../core/components/UI/ScoreUI";
+import { getShooterCaptureScene } from "./captureMode";
+import { spawnPixelBurst } from "../../core/effects/spawnEffect";
+import { EXPLOSION_SMALL, MUZZLE_FLASH } from "../../core/effects/PixelEffectPresets";
 
 export class SpaceShooter extends Level {
   private static onGameOverRestart: (() => void) | null = null;
@@ -59,35 +61,41 @@ export class SpaceShooter extends Level {
   protected init(): void {
     void preloadBitmapFont();
 
+    const captureScene = getShooterCaptureScene();
     const startX = Globals.canvasWidth / 2 - SPRITE_SIZE / 2;
-    const startY =
-      PLAYFIELD_HEIGHT - PIXEL_GRID * 3 - SPRITE_SIZE / 2;
+    const startY = PLAYFIELD_HEIGHT - PIXEL_GRID * 3 - SPRITE_SIZE / 2;
 
     this.levelRoot.addChild(new ParallaxBackground());
-    this.levelRoot.addChild(new ShooterHud());
 
     const playfield = new ShooterPlayfield();
     this.levelRoot.addChild(playfield);
 
     playfield.addChild(new Spaceship(startX, startY));
-    playfield.addChild(new ShooterEnemySpawner());
 
-    this.levelRoot.addChild(new HeartsUI(PIXEL_GRID / 2, 0, 3, 16, 4));
-    this.levelRoot.addChild(
-      new ScoreUI(Globals.canvasWidth - PIXEL_GRID / 2, 1, 0, "SCORE"),
-    );
+    const showcaseScore = captureScene === "gameplay" ? 12800 : 0;
+    if (captureScene === "gameplay") {
+      playfield.addChild(new ShooterEnemy(32, 56, "scout"));
+      playfield.addChild(new ShooterEnemy(144, 80, "cruiser"));
+      playfield.addChild(new ShooterEnemy(240, 64, "drifter"));
+      spawnPixelBurst(playfield, startX + 16, startY - 8, MUZZLE_FLASH);
+      spawnPixelBurst(playfield, 160, 120, EXPLOSION_SMALL);
+    } else {
+      playfield.addChild(new ShooterEnemySpawner());
+    }
 
-    const dialogWidth = DISPLAY_WIDTH - PIXEL_GRID * 4;
-    const dialogHeight = PIXEL_GRID * 8;
+    this.levelRoot.addChild(new HudHeaderUI(showcaseScore, 3));
+
+    const dialogWidth = 256;
+    const dialogHeight = 96;
     this.levelRoot.addChild(
       new DialogUI(
-        PIXEL_GRID * 2,
-        (DISPLAY_HEIGHT - dialogHeight) / 2,
+        Math.round((DISPLAY_WIDTH - dialogWidth) / 2),
+        Math.round((DISPLAY_HEIGHT - dialogHeight) / 2),
         dialogWidth,
         dialogHeight,
-        "SPACE BEAST",
-        0,
-        true,
+        captureScene === "gameover" ? "GAME OVER" : "SPACE BEAST",
+        captureScene === "gameover" ? 1200 : 0,
+        captureScene !== "gameplay",
         {
           color: Beast2D16.Shadow,
           strokeColor: Beast2D16.Magenta,
@@ -116,7 +124,17 @@ export class SpaceShooter extends Level {
       this.engine.gameManager?.resume();
     });
 
-    this.engine.gameManager?.pause();
-    DialogUI.setPrimaryLabel("START");
+    if (captureScene === "gameplay") {
+      DialogUI.close();
+      this.engine.gameManager?.resume();
+      DialogUI.setPrimaryLabel("START");
+    } else if (captureScene === "gameover") {
+      DialogUI.setPrimaryLabel("RESTART");
+      this.engine.gameManager?.pause();
+    } else {
+      this.engine.gameManager?.pause();
+      DialogUI.setPrimaryLabel("START");
+    }
+
   }
 }
