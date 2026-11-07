@@ -85,7 +85,7 @@ export class BreakoutPaddle extends Level {
     this.levelRoot.addChild(this.hud);
     ScoreUI.resetScore(0);
 
-    this.levelRoot.addChild(new PlayfieldHintUI("A/D MOVE  SPACE SERVE"));
+    this.levelRoot.addChild(new PlayfieldHintUI("ARROWS MOVE  SPACE SERVE"));
 
     const paddleY = defaultPaddleY();
     this.paddleBox = new Box(
@@ -223,7 +223,7 @@ export class BreakoutPaddle extends Level {
         this.phase = "playing";
         this.setHint("");
       } else {
-        this.setHint("A/D MOVE  SPACE SERVE");
+        this.setHint("ARROWS MOVE  SPACE SERVE");
       }
       this.syncBallGraphics();
       return;

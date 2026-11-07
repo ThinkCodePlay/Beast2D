@@ -1,10 +1,15 @@
-/** Space Shooter example textures (served from `public/space-shooter/`). */
+/** Space Shooter example textures (gameplay + enemy art under `public/space-shooter/`). */
 
 export const TEXTURE_SHOOTER_BULLET = "space-shooter/bullet.16x16.png";
-export const TEXTURE_SHOOTER_HUD = "space-shooter/ui/hud-band.320x16.png";
-export const TEXTURE_SHOOTER_PANEL = "space-shooter/ui/panel-9slice.24x24.png";
-export const TEXTURE_SHOOTER_BUTTON = "space-shooter/ui/button.48x16.png";
-export const TEXTURE_SHOOTER_FONT = "space-shooter/ui/font-atlas.5x7.png";
+
+/** Shared Beast2D HUD/dialog chrome (`public/ui/`). */
+export {
+  TEXTURE_DEFAULT_DIALOG_BUTTON as TEXTURE_SHOOTER_BUTTON,
+  TEXTURE_DEFAULT_DIALOG_PANEL as TEXTURE_SHOOTER_PANEL,
+  TEXTURE_DEFAULT_HUD_BAND as TEXTURE_SHOOTER_HUD,
+} from "../../core/ui/defaultUiTheme";
+
+export const TEXTURE_SHOOTER_FONT = "ui/font-atlas.5x7.png";
 
 export const TEXTURE_ENEMY_SCOUT_SHEET =
   "space-shooter/enemies/scout-sheet.32x32.png";

@@ -34,7 +34,7 @@ levelRoot.addChild(new HudHeaderUI(0, 3, theme));
 
 `HeartsUI` / `ScoreUI` static methods delegate to the active `HudHeaderUI`.
 
-Non-shooter demos use `DEFAULT_BEAST2D_HUD_THEME` / `DEFAULT_BEAST2D_BITMAP_FONT` (`src/core/ui/defaultUiTheme.ts`, assets under `public/ui/`). Space Shooter keeps `SHOOTER_HUD_THEME` and generated fonts under `src/game/Space Shooter/`.
+Shared UI chrome and the bitmap font live under **`public/ui/`** (generated via `npm --prefix "src/game/Space Shooter/scripts" run assets`). Register with `DEFAULT_BEAST2D_BITMAP_FONT` + `DEFAULT_BEAST2D_HUD_THEME`. Space Shooter aliases the same defaults via `SHOOTER_HUD_THEME` (override textures in `shooterUiTheme.ts` for a custom skin).
 
 ## Related
 

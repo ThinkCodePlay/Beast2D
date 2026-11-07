@@ -1,23 +1,9 @@
-import { Beast2D16 } from "../../core/palette/beast2d16";
-import type { DialogChromeTheme } from "../../core/ui/dialogTheme";
-import type { HudHeaderTheme } from "../../core/ui/hudTheme";
 import {
-  TEXTURE_SHOOTER_BUTTON,
-  TEXTURE_SHOOTER_HUD,
-  TEXTURE_SHOOTER_PANEL,
-} from "./shooterAssets";
-import { SHOOTER_BITMAP_FONT } from "./shooterBitmapFont";
+  DEFAULT_BEAST2D_DIALOG_THEME,
+  DEFAULT_BEAST2D_HUD_THEME,
+} from "../../core/ui/defaultUiTheme";
 
-export const SHOOTER_HUD_THEME: HudHeaderTheme = {
-  bandTexture: TEXTURE_SHOOTER_HUD,
-  fontTint: Beast2D16.Cream,
-  bitmapFont: {
-    glyphW: SHOOTER_BITMAP_FONT.glyphW,
-    glyphH: SHOOTER_BITMAP_FONT.glyphH,
-  },
-};
+/** Space Shooter uses shared default chrome; swap textures here for a custom skin. */
+export const SHOOTER_HUD_THEME = DEFAULT_BEAST2D_HUD_THEME;
 
-export const SHOOTER_DIALOG_THEME: DialogChromeTheme = {
-  panelTexture: TEXTURE_SHOOTER_PANEL,
-  buttonTexture: TEXTURE_SHOOTER_BUTTON,
-};
+export const SHOOTER_DIALOG_THEME = DEFAULT_BEAST2D_DIALOG_THEME;
