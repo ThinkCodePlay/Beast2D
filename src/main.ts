@@ -13,27 +13,6 @@ import { BunnyHop } from "./game/Bunny Hop/BunnyHop";
 import { BreakoutPaddle } from "./game/BreakoutPaddle/BreakoutPaddle";
 import "./style.css";
 
-/** Dev smoke/capture scripts use `?level=` against this list (see `scripts/README.md`). */
-const LEVEL_IDS = [
-  "level1",
-  "level2",
-  "spaceShooter",
-  "bunnyHop",
-  "breakoutPaddle",
-] as const;
-
-type LevelId = (typeof LEVEL_IDS)[number];
-
-function resolveInitialLevel(): LevelId {
-  if (import.meta.env.DEV) {
-    const requested = new URLSearchParams(window.location.search).get("level");
-    if (requested && (LEVEL_IDS as readonly string[]).includes(requested)) {
-      return requested as LevelId;
-    }
-  }
-  return "bunnyHop";
-}
-
 const appRoot = document.getElementById("app")!;
 const container = document.createElement("div");
 container.className = "game-container";
@@ -58,7 +37,7 @@ engine
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     game.registerLevel("bunnyHop", new BunnyHop(engine));
     game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
-    return game.loadLevel(resolveInitialLevel());
+    return game.loadLevel("spaceShooter");
   })
   .catch((error) => {
     console.error("Failed to start Beast2D engine", error);

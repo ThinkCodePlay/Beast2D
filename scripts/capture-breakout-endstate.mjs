@@ -19,9 +19,10 @@ async function main() {
     viewport: { width: 640, height: 560 },
     deviceScaleFactor: 2,
   });
-  await page.goto("http://127.0.0.1:5173/?level=breakoutPaddle", {
-    waitUntil: "networkidle",
-  });
+  await page.goto(
+    "http://127.0.0.1:5173/src/game/BreakoutPaddle/breakout-capture.html",
+    { waitUntil: "networkidle" },
+  );
   await page.waitForTimeout(1200);
 
   for (let life = 0; life < 3; life += 1) {

@@ -10,9 +10,10 @@ async function main() {
       viewport: { width: w, height: Math.round(w * 0.65) },
       deviceScaleFactor: 2,
     });
-    await page.goto("http://127.0.0.1:5173/?level=spaceShooter", {
-      waitUntil: "networkidle",
-    });
+    await page.goto(
+      "http://127.0.0.1:5173/src/game/Space%20Shooter/space-shooter-capture.html",
+      { waitUntil: "networkidle" },
+    );
     await page.waitForTimeout(2000);
     await mkdir(OUT, { recursive: true });
     await page.locator("canvas").screenshot({

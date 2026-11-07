@@ -1,7 +1,8 @@
 import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 
-const BASE = "http://127.0.0.1:5173/?level=breakoutPaddle";
+const BASE =
+  "http://127.0.0.1:5173/src/game/BreakoutPaddle/breakout-capture.html";
 const OUT = "/opt/cursor/artifacts";
 
 async function shot(page, name) {
