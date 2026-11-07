@@ -1,11 +1,10 @@
 import { Level } from "../../core/Level";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../core/consts";
 import {
   BUNNY_SPRITE_SIZE,
-  DISPLAY_HEIGHT,
-  DISPLAY_WIDTH,
   TEXTURE_BUNNY_IDLE,
   TEXTURE_BUNNY_WALK_ANIMATION,
-} from "../../core/consts";
+} from "../publicAssets";
 import { BunnyPlayer } from "./Game Objects/BunnyPlayer";
 
 export class BunnyHop extends Level {

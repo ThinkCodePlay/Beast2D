@@ -1,7 +1,7 @@
 import { Assets, Container, Graphics, Sprite } from "pixi.js";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
-import { TEXTURE_HEART } from "../../consts";
+import { TEXTURE_HEART } from "../../../game/publicAssets";
 import { HUD_LAYOUT } from "../../ui/hudContract";
 import type { HudHeaderTheme } from "../../ui/hudTheme";
 import {

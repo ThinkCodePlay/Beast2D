@@ -5,11 +5,13 @@ import {
   PIXEL_GRID,
   PLAYFIELD_HEIGHT,
   SPRITE_SIZE,
+} from "../../core/consts";
+import {
   TEXTURE_BEAST_SHIP,
   TEXTURE_HEART,
   TEXTURE_STARS_LAYER_1,
   TEXTURE_STARS_LAYER_2,
-} from "../../core/consts";
+} from "../publicAssets";
 import { Globals } from "../../core/Globals";
 import { Beast2D16 } from "../../core/palette/beast2d16";
 import { useBitmapFont } from "../../core/ui/bitmapFontRegistry";

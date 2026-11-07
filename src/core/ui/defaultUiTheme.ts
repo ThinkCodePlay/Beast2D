@@ -1,4 +1,4 @@
-import { TEXTURE_HEART } from "../consts";
+import { TEXTURE_HEART } from "../../game/publicAssets";
 import { Beast2D16 } from "../palette/beast2d16";
 import type { DialogChromeTheme } from "./dialogTheme";
 import type { HudHeaderTheme } from "./hudTheme";

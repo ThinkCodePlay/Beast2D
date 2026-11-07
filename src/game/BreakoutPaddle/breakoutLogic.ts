@@ -1,11 +1,4 @@
-import {
-  C_BLUE,
-  C_LEAF,
-  C_ORANGE,
-  C_RED,
-  C_SKY,
-  C_YELLOW,
-} from "./palette";
+import { Beast2D16 } from "../../core/palette/beast2d16";
 
 import { PLAYFIELD_TOP } from "../../core/consts";
 
@@ -54,7 +47,14 @@ export type PaddleState = {
   h: number;
 };
 
-const ROW_COLORS = [C_SKY, C_BLUE, C_LEAF, C_YELLOW, C_ORANGE, C_RED];
+const ROW_COLORS = [
+  Beast2D16.SkyBlue,
+  Beast2D16.Blue,
+  Beast2D16.LeafGreen,
+  Beast2D16.Yellow,
+  Beast2D16.Orange,
+  Beast2D16.Red,
+];
 
 const MIN_VERTICAL_SPEED = 1.15;
 

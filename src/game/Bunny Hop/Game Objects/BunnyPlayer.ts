@@ -12,7 +12,7 @@ import {
   BUNNY_SPRITE_SIZE,
   TEXTURE_BUNNY_IDLE,
   TEXTURE_BUNNY_WALK_ANIMATION,
-} from "../../../core/consts";
+} from "../../publicAssets";
 
 export class BunnyPlayer extends GameObject {
   constructor(x: number, y: number) {

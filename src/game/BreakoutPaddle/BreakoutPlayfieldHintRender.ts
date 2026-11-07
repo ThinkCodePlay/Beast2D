@@ -1,10 +1,10 @@
 import { Graphics } from "pixi.js";
-import { Beast2D16 } from "../../palette/beast2d16";
-import { buildBitmapText, measureBitmapText } from "../../ui/BitmapText";
-import { HUD_LAYOUT } from "../../ui/hudContract";
-import { RenderComponent } from "../Render/RenderComponent";
+import { Beast2D16 } from "../../core/palette/beast2d16";
+import { buildBitmapText, measureBitmapText } from "../../core/ui/BitmapText";
+import { HUD_LAYOUT } from "../../core/ui/hudContract";
+import { RenderComponent } from "../../core/components/Render/RenderComponent";
 
-export class PlayfieldHintUIRenderComponent extends RenderComponent {
+export class BreakoutPlayfieldHintRender extends RenderComponent {
   private message: string;
   private textHost: Graphics | null = null;
 
@@ -41,7 +41,6 @@ export class PlayfieldHintUIRenderComponent extends RenderComponent {
       this.textHost = host;
       return;
     }
-
     const line = this.message.toUpperCase();
     const opts = {
       scale: HUD_LAYOUT.fontScale,
@@ -49,9 +48,7 @@ export class PlayfieldHintUIRenderComponent extends RenderComponent {
       letterSpacing: HUD_LAYOUT.fontLetterSpacing,
     };
     const text = buildBitmapText(line, opts);
-    const w = measureBitmapText(line, opts);
-    text.x = -w / 2;
-    text.y = 0;
+    text.x = -measureBitmapText(line, opts) / 2;
     host.addChild(text);
     graphics.addChild(host);
     this.textHost = host;
@@ -59,7 +56,6 @@ export class PlayfieldHintUIRenderComponent extends RenderComponent {
 
   override onDestroy(): void {
     this.textHost?.destroy({ children: true });
-    this.textHost = null;
     super.onDestroy();
   }
 }

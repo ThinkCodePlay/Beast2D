@@ -6,7 +6,8 @@ import { Box } from "../core/prefabs/Box";
 import { Circle } from "../core/prefabs/Circle";
 import { Player } from "../core/prefabs/Player";
 import { Globals } from "../core/Globals";
-import { PIXEL_GRID, TEXTURE_BEAST_SHIP } from "../core/consts";
+import { PIXEL_GRID } from "../core/consts";
+import { TEXTURE_BEAST_SHIP } from "./publicAssets";
 
 export class Level1 extends Level {
   override assets = [TEXTURE_BEAST_SHIP];

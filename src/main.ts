@@ -13,6 +13,7 @@ import { BunnyHop } from "./game/Bunny Hop/BunnyHop";
 import { BreakoutPaddle } from "./game/BreakoutPaddle/BreakoutPaddle";
 import "./style.css";
 
+/** Dev smoke/capture scripts use `?level=` against this list (see `scripts/README.md`). */
 const LEVEL_IDS = [
   "level1",
   "level2",

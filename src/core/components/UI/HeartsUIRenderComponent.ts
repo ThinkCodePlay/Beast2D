@@ -1,5 +1,6 @@
 import { Graphics, Sprite, Assets } from "pixi.js";
-import { SPRITE_SIZE, TEXTURE_HEART } from "../../consts";
+import { SPRITE_SIZE } from "../../consts";
+import { TEXTURE_HEART } from "../../../game/publicAssets";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
 import { textureNearest } from "../../ui/textureNearest";
