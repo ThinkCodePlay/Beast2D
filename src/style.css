@@ -13,10 +13,11 @@ html,body,#app {
   justify-content: center;
 }
 
-/* Virtual resolution 320×240; displayed at 2× integer scale (see DISPLAY_* in consts.ts). */
+/* Virtual resolution 320×240; outer size set by displayScale.ts (integer CSS scale). */
 .game-container {
-  width: 640px;
-  height: 480px;
+  width: 320px;
+  height: 240px;
+  flex-shrink: 0;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 6px 24px rgba(0,0,0,0.6);
