@@ -53,6 +53,17 @@ For review captures only (deterministic layout, labeled staged):
 
 Enlarged enemy sheet (nearest 4×): `public/space-shooter/enemies/contact-sheet-4x.png`
 
+### Automated screenshots (CI / agent VM)
+
+Headless Chrome **without** SwiftShader leaves the WebGL framebuffer empty (~2KB PNGs). Use:
+
+```bash
+npm run dev   # separate terminal
+npm run capture:shooter
+```
+
+Playwright launches Chromium with `--enable-unsafe-swiftshader` and exports **true 320×240** frames via `canvas.toDataURL`, plus **2×** nearest upscale and **640×480** browser chrome shots to `/opt/cursor/artifacts/`.
+
 ## Effects (engine)
 
 Short palette bursts live in `src/core/effects/`:

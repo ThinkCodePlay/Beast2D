@@ -12,12 +12,14 @@
     "assets:fit-display": "python scripts/compress_display_png.py --backgrounds",
     "assets:shooter": "tsx scripts/generate-space-shooter-enemies.ts && tsx scripts/generate-space-shooter-ui.ts && tsx scripts/upscale-contact-sheet.ts",
     "assets:verify-shooter": "tsx scripts/verify-shooter-palette.ts",
+    "capture:shooter": "node scripts/capture-shooter-screenshots.mjs",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@types/pngjs": "^6.0.5",
+    "playwright": "^1.49.1",
     "pngjs": "^7.0.0",
     "tsx": "^4.23.15",
     "typescript": "~5.9.3",

@@ -1,12 +1,13 @@
 import { Assets, Container, Graphics, Sprite } from "pixi.js";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
-import { HUD_CONTRACT, hudScoreMaxWidth } from "../../ui/hudContract";
+import { HUD_CONTRACT } from "../../ui/hudContract";
 import {
   buildBitmapTextReady,
   measureBitmapText,
   preloadBitmapFont,
 } from "../../ui/BitmapText";
+import { formatHudScoreLine } from "../../ui/formatHudScore";
 import { textureNearest } from "../../ui/textureNearest";
 
 export class HudHeaderUIRenderComponent extends RenderComponent {
@@ -97,19 +98,12 @@ export class HudHeaderUIRenderComponent extends RenderComponent {
       }
     }
 
-    const line = `${HUD_CONTRACT.scoreLabel} ${this.score}`;
-    const baseOpts = {
+    const line = formatHudScoreLine(this.score, this.hearts);
+    const opts = {
       scale: HUD_CONTRACT.fontScale,
       tint: HUD_CONTRACT.fontTint,
       letterSpacing: HUD_CONTRACT.fontLetterSpacing,
     };
-    const maxW = hudScoreMaxWidth(this.hearts);
-    let scale: number = HUD_CONTRACT.fontScale;
-    const natural = measureBitmapText(line, baseOpts);
-    if (natural > maxW) {
-      scale = Math.max(1, Math.floor((maxW / natural) * HUD_CONTRACT.fontScale));
-    }
-    const opts = { ...baseOpts, scale };
     const drawn = await buildBitmapTextReady(line, opts);
     drawn.x = Math.round(HUD_CONTRACT.scoreRightX - measureBitmapText(line, opts));
     drawn.y = HUD_CONTRACT.fontY;

@@ -27,6 +27,8 @@ export interface EngineOptions {
   debug?: boolean;
   /** Backing-store scale; use `1` for crisp pixel art + CSS integer upscale. */
   resolution?: number;
+  /** Helps automated captures read the WebGL back buffer (e.g. `?capture=shooter`). */
+  preserveDrawingBuffer?: boolean;
 }
 
 export class Engine {

@@ -72,11 +72,16 @@ export class SpaceShooter extends Level {
 
     playfield.addChild(new Spaceship(startX, startY));
 
-    const showcaseScore = captureScene === "gameplay" ? 12800 : 0;
+    const showcaseScore =
+      captureScene === "gameplay"
+        ? 12_800
+        : captureScene === "gameover"
+          ? 1_200
+          : 0;
     if (captureScene === "gameplay") {
-      playfield.addChild(new ShooterEnemy(32, 56, "scout"));
-      playfield.addChild(new ShooterEnemy(144, 80, "cruiser"));
-      playfield.addChild(new ShooterEnemy(240, 64, "drifter"));
+      playfield.addChild(new ShooterEnemy(40, 28, "scout"));
+      playfield.addChild(new ShooterEnemy(132, 52, "cruiser"));
+      playfield.addChild(new ShooterEnemy(224, 36, "drifter"));
       spawnPixelBurst(playfield, startX + 16, startY - 8, MUZZLE_FLASH);
       spawnPixelBurst(playfield, 160, 120, EXPLOSION_SMALL);
     } else {
