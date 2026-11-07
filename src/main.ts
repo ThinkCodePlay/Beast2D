@@ -16,6 +16,7 @@ const engine = new Engine({
   width: DISPLAY_WIDTH,
   height: DISPLAY_HEIGHT,
   antialias: false,
+  debug: false,
 });
 
 engine
@@ -25,7 +26,7 @@ engine
     game.registerLevel("level2", new Level2(engine));
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     game.registerLevel("bunnyHop", new BunnyHop(engine));
-    return game.loadLevel("bunnyHop");
+    return game.loadLevel("spaceShooter");
   })
   .catch((error) => {
     console.error("Failed to start Beast2D engine", error);

@@ -44,6 +44,10 @@ export class DialogUI extends GameObject {
     DialogUI.current?.renderComponent.close();
   }
 
+  static setPrimaryLabel(label: string): void {
+    DialogUI.current?.renderComponent.setPrimaryLabel(label);
+  }
+
   static setOnRestart(handler: (() => void) | null): void {
     DialogUI.current?.renderComponent.setOnRestart(handler);
   }

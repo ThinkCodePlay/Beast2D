@@ -1,19 +1,21 @@
-import { Graphics, Text, TextStyle } from "pixi.js";
+import { Graphics } from "pixi.js";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
+import { Beast2D16 } from "../../palette/beast2d16";
+import { buildBitmapText } from "../../ui/BitmapText";
 
 export class ScoreUIRenderComponent extends RenderComponent {
   private score: number;
   private label: string;
-  private textNode: Text | null = null;
+  private textHost: Graphics | null = null;
 
   constructor(
     score: number = 0,
-    label: string = "Score",
+    label: string = "SCORE",
     renderOptions: RenderOptions = {},
   ) {
     super({
-      color: 0xfd62a7,
+      color: Beast2D16.HotPink,
       ...renderOptions,
     });
     this.score = score;
@@ -38,35 +40,35 @@ export class ScoreUIRenderComponent extends RenderComponent {
   private refresh(): void {
     if (!this.graphics || !(this.graphics instanceof Graphics)) return;
 
-    if (this.textNode && this.textNode.parent === this.graphics) {
-      this.graphics.removeChild(this.textNode);
-      this.textNode.destroy();
-      this.textNode = null;
+    if (this.textHost && this.textHost.parent === this.graphics) {
+      this.graphics.removeChild(this.textHost);
+      this.textHost.destroy({ children: true });
+      this.textHost = null;
     }
 
     this.drawScore(this.graphics);
   }
 
   private drawScore(graphics: Graphics): void {
-    this.textNode = new Text({
-      text: `${this.label}: ${this.score}`,
-      style: new TextStyle({
-        fill: this.renderOptions.color,
-        fontSize: 28,
-        fontWeight: "700",
-      }),
+    const line = `${this.label} ${this.score}`;
+    const host = new Graphics();
+    const text = buildBitmapText(line, {
+      scale: 1,
+      tint: Beast2D16.Cream,
+      letterSpacing: 0,
     });
-
-    this.textNode.anchor.set(1, 0);
-    this.textNode.x = 0;
-    this.textNode.y = 0;
-    graphics.addChild(this.textNode);
+    const approxW = line.length * 7;
+    text.x = -approxW;
+    text.y = 0;
+    host.addChild(text);
+    graphics.addChild(host);
+    this.textHost = host;
   }
 
   override onDestroy(): void {
-    if (this.textNode) {
-      this.textNode.destroy();
-      this.textNode = null;
+    if (this.textHost) {
+      this.textHost.destroy({ children: true });
+      this.textHost = null;
     }
     super.onDestroy();
   }
