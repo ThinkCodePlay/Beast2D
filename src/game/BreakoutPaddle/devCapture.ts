@@ -1,6 +1,7 @@
 /**
  * Playwright / dev capture entry only — not used by the default game (`src/main.ts`).
  */
+import { Assets } from "pixi.js";
 import { Engine } from "../../core/Engine";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../core/consts";
 import {
@@ -28,8 +29,9 @@ const engine = new Engine({
   antialias: false,
 });
 
-engine
-  .bootstrap(container)
+// Nested capture HTML lives under `/src/...`; Pixi must resolve `public/` from site root.
+void Assets.init({ basePath: `${window.location.origin}/` })
+  .then(() => engine.bootstrap(container))
   .then((game) => {
     game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
     return game.loadLevel("breakoutPaddle");

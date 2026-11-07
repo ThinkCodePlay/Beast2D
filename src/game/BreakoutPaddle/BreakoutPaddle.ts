@@ -73,6 +73,7 @@ export class BreakoutPaddle extends Level {
         {
           phase: this.session.phase,
           lives: this.session.lives,
+          paddleX: this.paddle.readState().x,
           dialogOpen: DialogUI.isOpen(),
           dialogTextReady: DialogUI.isTextReady(),
           hintTextReady: BreakoutPlayfieldHint.isTextReady(),

@@ -119,7 +119,9 @@ describe("MoveTowardsComponent + clamp pipeline", () => {
 
     canvas.dispatchType("pointerup", { pointerId: 3 });
     const xAfterRelease = player.transform!.x;
-    frame(root, 5);
-    expect(player.transform!.x).toBeCloseTo(xAfterRelease);
+    for (let i = 0; i < 10; i++) {
+      frame(root, 1);
+      expect(player.transform!.x).toBeCloseTo(xAfterRelease);
+    }
   });
 });
