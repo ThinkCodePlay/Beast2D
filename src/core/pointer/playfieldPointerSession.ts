@@ -1,17 +1,16 @@
-import { DialogUI } from "../UI/DialogUI";
-import { clientToGameCoords } from "../../pointer/clientToGameCoords";
-import { Component } from "../Component";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../consts";
+import { DialogUI } from "../components/UI/DialogUI";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../consts";
+import type { EngineContext } from "../EngineContext";
+import { clientToGameCoords } from "./clientToGameCoords";
 
-/**
- * Tracks the primary pointer on the gameplay canvas and exposes game-space
- * coordinates for playfield steering. Ignores gameplay steering while the game
- * is paused or a dialog is open (UI uses Pixi hit targets).
- */
-export class PlayfieldPointerTargetComponent extends Component {
+/** Shared primary-pointer state for every {@link PointerMovement} on the canvas. */
+class PlayfieldPointerSessionImpl {
+  private refCount = 0;
+  private canvas: HTMLCanvasElement | null = null;
+  private context: EngineContext | null = null;
   private target: { x: number; y: number } | null = null;
   private activePointerId: number | null = null;
-  private canvas: HTMLCanvasElement | null = null;
+
   private readonly onWindowBlur = () => this.clearPointer();
   private readonly onPointerDown = (event: PointerEvent) => this.handleDown(event);
   private readonly onPointerMove = (event: PointerEvent) => this.handleMove(event);
@@ -19,15 +18,15 @@ export class PlayfieldPointerTargetComponent extends Component {
   private readonly onPointerCancel = (event: PointerEvent) => this.handleUp(event);
   private readonly onLostCapture = (event: PointerEvent) => this.handleUp(event);
 
-  getMoveTarget(): { x: number; y: number } | null {
-    return this.target;
-  }
+  acquire(context: EngineContext): void {
+    this.refCount += 1;
+    if (this.refCount !== 1) return;
 
-  override onInit(): void {
-    const canvas = this.requireContext().canvas;
+    const canvas = context.canvas;
     if (!canvas) return;
-    this.canvas = canvas;
 
+    this.context = context;
+    this.canvas = canvas;
     canvas.style.touchAction = "none";
     canvas.addEventListener("pointerdown", this.onPointerDown, { capture: true });
     canvas.addEventListener("pointermove", this.onPointerMove, { capture: true });
@@ -43,7 +42,10 @@ export class PlayfieldPointerTargetComponent extends Component {
     }
   }
 
-  override onDestroy(): void {
+  release(): void {
+    this.refCount = Math.max(0, this.refCount - 1);
+    if (this.refCount !== 0) return;
+
     const canvas = this.canvas;
     if (canvas) {
       canvas.removeEventListener("pointerdown", this.onPointerDown, {
@@ -65,12 +67,16 @@ export class PlayfieldPointerTargetComponent extends Component {
     }
     this.clearPointer();
     this.canvas = null;
+    this.context = null;
+  }
+
+  getTarget(): { x: number; y: number } | null {
+    return this.target;
   }
 
   private allowsGameplaySteer(): boolean {
-    const context = this.context;
-    if (!context) return false;
-    if (context.time.paused) return false;
+    if (!this.context) return false;
+    if (this.context.time.paused) return false;
     if (DialogUI.isOpen()) return false;
     return true;
   }
@@ -86,7 +92,7 @@ export class PlayfieldPointerTargetComponent extends Component {
     try {
       this.canvas?.setPointerCapture(event.pointerId);
     } catch {
-      // setPointerCapture may fail on detached canvases in tests
+      // ignore in headless tests
     }
     this.target = this.eventToGame(event);
   }
@@ -122,3 +128,5 @@ export class PlayfieldPointerTargetComponent extends Component {
     );
   }
 }
+
+export const playfieldPointerSession = new PlayfieldPointerSessionImpl();

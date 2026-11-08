@@ -37,8 +37,9 @@ import {
   SHOOTER_DIALOG_THEME,
   SHOOTER_HUD_THEME,
 } from "./shooterUiTheme";
-import { attachHorizontalPointerSteer } from "../../core/prefabs/attachHorizontalPointerSteer";
-import { spawnPlayfieldPointerInput } from "../../core/prefabs/PlayfieldPointerInput";
+import { Movement } from "../../core/components/Movement/Movement";
+import { KeyboardMovement } from "../../core/components/Movement/KeyboardMovement";
+import { PointerMovement } from "../../core/components/Movement/PointerMovement";
 
 export class SpaceShooter extends Level {
   private static onGameOverRestart: (() => void) | null = null;
@@ -76,15 +77,13 @@ export class SpaceShooter extends Level {
 
     this.levelRoot.addChild(new ParallaxBackground());
 
-    const { object: pointerInput, target: playfieldPointer } =
-      spawnPlayfieldPointerInput();
-    this.levelRoot.addChild(pointerInput);
-
     const playfield = new ShooterPlayfield();
     this.levelRoot.addChild(playfield);
 
     const ship = new Spaceship(startX, startY);
-    attachHorizontalPointerSteer(ship, 7, playfieldPointer);
+    ship.addComponent(new Movement(7, { x: true, y: false }));
+    ship.addComponent(new KeyboardMovement());
+    ship.addComponent(new PointerMovement());
     playfield.addChild(ship);
     playfield.addChild(new ShooterEnemySpawner());
 
