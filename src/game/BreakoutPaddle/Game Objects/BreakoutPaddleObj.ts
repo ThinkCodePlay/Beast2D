@@ -3,7 +3,6 @@ import { DISPLAY_WIDTH, PIXEL_GRID } from "../../../core/consts";
 import { Beast2D16 } from "../../../core/palette/beast2d16";
 import { Box } from "../../../core/prefabs/Box";
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
-import { HorizontalInputComponent } from "../../../core/components/Movement/HorizontalInputComponent";
 import {
   defaultPaddleY,
   PADDLE_H,
@@ -11,10 +10,8 @@ import {
   type PaddleState,
 } from "../breakoutLogic";
 
-const PADDLE_SPEED = 5.5;
-
 export class BreakoutPaddleObj extends GameObject {
-  private readonly body: Box;
+  readonly body: Box;
 
   constructor() {
     super();
@@ -31,7 +28,6 @@ export class BreakoutPaddleObj extends GameObject {
         strokeWidth: 1,
       },
     );
-    this.body.addComponent(new HorizontalInputComponent(PADDLE_SPEED));
     this.body.addComponent(
       new HorizontalClampComponent(
         PIXEL_GRID,

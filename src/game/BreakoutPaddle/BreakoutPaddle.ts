@@ -19,8 +19,11 @@ import {
   tickBreakoutSession,
   type BreakoutSession,
 } from "./breakoutSession";
-
+import { Movement } from "../../core/components/Movement/Movement";
+import { KeyboardMovement } from "../../core/components/Movement/KeyboardMovement";
+import { PointerMovement } from "../../core/components/Movement/PointerMovement";
 const LEVEL_NAME = "breakoutPaddle";
+const PADDLE_SPEED = 5.5;
 
 /**
  * Breakout paddle showcase — scene setup in {@link init}, rules in {@link breakoutSession}.
@@ -49,6 +52,10 @@ export class BreakoutPaddle extends Level {
     this.levelRoot.addChild(this.wall);
 
     this.paddle = new BreakoutPaddleObj();
+    const paddleBody = this.paddle.body;
+    paddleBody.addComponent(new Movement(PADDLE_SPEED, { x: true, y: false }));
+    paddleBody.addComponent(new KeyboardMovement());
+    paddleBody.addComponent(new PointerMovement());
     this.levelRoot.addChild(this.paddle);
 
     this.ball = new BreakoutBallObj();
@@ -68,6 +75,7 @@ export class BreakoutPaddle extends Level {
         {
           phase: this.session.phase,
           lives: this.session.lives,
+          paddleX: this.paddle.readState().x,
           dialogOpen: DialogUI.isOpen(),
           dialogTextReady: DialogUI.isTextReady(),
           hintTextReady: BreakoutPlayfieldHint.isTextReady(),

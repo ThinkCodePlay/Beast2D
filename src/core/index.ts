@@ -29,6 +29,21 @@ export { HorizontalInputComponent } from "./components/Movement/HorizontalInputC
 export { HorizontalClampComponent } from "./components/Movement/HorizontalClampComponent";
 export { HorizontalFacingComponent } from "./components/Movement/HorizontalFacingComponent";
 export { VerticalMoveComponent } from "./components/Movement/VerticalMoveComponent";
+export { Movement } from "./components/Movement/Movement";
+export { KeyboardMovement } from "./components/Movement/KeyboardMovement";
+export { PointerMovement } from "./components/Movement/PointerMovement";
+export { MovementDirectionSource } from "./components/Movement/MovementDirectionSource";
+export { stepMoveTowards, type MoveTowardsAxes } from "./moveTowards";
+export {
+  combineDirections,
+  type MovementDirection,
+} from "./movement/combineDirections";
+export { pointerArrivalDirection } from "./movement/pointerArrivalDirection";
+export { clientToGameCoords } from "./pointer/clientToGameCoords";
+export {
+  wireUiPointerButton,
+  type WireUiPointerButtonOptions,
+} from "./ui/UiPointerButton";
 export { SpaceShootInputComponent } from "./components/Input/SpaceShootInputComponent";
 export {
   InteractiveComponent,

@@ -3,7 +3,6 @@ import { TransformComponent } from "../../../core/components/Movement/TransformC
 import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenderComponent";
 import type { RenderOptions } from "../../../core/components/Render/RenderComponent";
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
-import { HorizontalInputComponent } from "../../../core/components/Movement/HorizontalInputComponent";
 import { Globals } from "../../../core/Globals";
 import { SPRITE_SIZE } from "../../../core/consts";
 import { TEXTURE_BEAST_SHIP } from "../../publicAssets";
@@ -80,7 +79,6 @@ export class Spaceship extends GameObject {
         hitCenter,
       ),
     );
-    this.addComponent(new HorizontalInputComponent(7));
     this.addComponent(
       new HorizontalClampComponent(0, Globals.canvasWidth - shipWidth),
     );

@@ -22,6 +22,8 @@ export interface EngineContextOptions {
 
 export class EngineContext {
   readonly stage: Container;
+  /** Game canvas in the DOM (for pointer → logical coordinate mapping). */
+  canvas: HTMLCanvasElement | null = null;
   width: number;
   height: number;
   debug: boolean;
