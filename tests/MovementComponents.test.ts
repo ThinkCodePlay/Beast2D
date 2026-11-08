@@ -158,6 +158,35 @@ describe("Movement + independent sources", () => {
     player.getComponent(PointerMovement)!.onDestroy();
   });
 
+  it("pointer converges when hold target is inside one movement step", () => {
+    const root = createRoot();
+    const canvas = mockCanvas();
+    root.context!.canvas = canvas;
+
+    const player = new GameObject()
+      .with(new TransformComponent(50, 100))
+      .with(new PointerMovement())
+      .with(new Movement(10, { x: true, y: false }));
+    root.addChild(player);
+    frame(root);
+
+    const rect = canvas.getBoundingClientRect();
+    const targetGameX = 53;
+    const clientX =
+      rect.left + (targetGameX / 320) * rect.width;
+    const clientY = rect.top + (100 / 240) * rect.height;
+
+    canvas.dispatchType("pointerdown", {
+      clientX,
+      clientY,
+      pointerId: 9,
+    });
+    frame(root, 2);
+    expect(player.transform!.x).toBeCloseTo(targetGameX, 2);
+    expect(player.transform!.x).toBeLessThanOrEqual(targetGameX);
+    player.getComponent(PointerMovement)!.onDestroy();
+  });
+
   it("ignores pointer steer while dialog open", () => {
     const root = createRoot();
     const canvas = mockCanvas();
