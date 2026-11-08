@@ -20,7 +20,7 @@ Sprites, backgrounds, enemy art, bullets, and HUD/dialog chrome for the Space Sh
 | Bullet | `TEXTURE_SHOOTER_BULLET` |
 | HUD / dialog | `TEXTURE_SHOOTER_*` from `shooterAssets.ts` / shared `public/ui/` |
 | Hearts | `TEXTURE_HEART` |
-| Optional tooling | `src/game/Space Shooter/scripts/generate-ui.ts`, `scripts/compress_display_png.py` |
+| Optional tooling | `devtools/levels/space-shooter/generate-enemies.ts`, `devtools/assets/compress_display_png.py` |
 
 ### Expected behavior
 

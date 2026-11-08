@@ -9,14 +9,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PNG } from "pngjs";
 
-const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const base =
   process.argv[2] ?? process.env.SHOOTER_CAPTURE_URL ?? "http://127.0.0.1:5173";
 const outDir = process.env.SHOOTER_ARTIFACT_DIR ?? "/opt/cursor/artifacts";
 mkdirSync(outDir, { recursive: true });
 
 const shooterPath =
-  "/src/game/Space%20Shooter/space-shooter-capture.html";
+  "/devtools/levels/space-shooter/capture/space-shooter-capture.html";
 
 const scenes = [
   { name: "title", path: shooterPath, wait: 4000 },

@@ -5,38 +5,38 @@ Downscales with nearest-neighbor (good for pixel art). By default writes a
 copy next to the source (e.g. stars.png -> stars.320x240.png) and leaves
 the original untouched. Requires Pillow:
 
-  pip install -r scripts/requirements.txt
+  pip install -r devtools/assets/requirements.txt
 
 Keep DISPLAY_WIDTH / DISPLAY_HEIGHT in sync with src/core/consts.ts.
 
 Examples:
   # Fit backgrounds; copies land beside each source PNG
-  python scripts/compress_display_png.py --backgrounds
+  python devtools/assets/compress_display_png.py --backgrounds
   npm run assets:fit-display
 
   # One full-screen layer (default 320x240 copy)
-  python scripts/compress_display_png.py public/background/huge-stars.png
+  python devtools/assets/compress_display_png.py public/background/huge-stars.png
 
   # Sprites (then wire paths in src/core/consts.ts TEXTURE_*)
-  python scripts/compress_display_png.py --width 32 --height 32 public/BeastShip.png
-  python scripts/compress_display_png.py --width 384 --height 384 public/bunny-move-animation.png
+  python devtools/assets/compress_display_png.py --width 32 --height 32 public/BeastShip.png
+  python devtools/assets/compress_display_png.py --width 384 --height 384 public/bunny-move-animation.png
 
   # Custom size
-  python scripts/compress_display_png.py --width 320 --height 240 my.png
+  python devtools/assets/compress_display_png.py --width 320 --height 240 my.png
 
   # All outputs into one folder
-  python scripts/compress_display_png.py --output-dir public/background/fitted huge-stars.png
+  python devtools/assets/compress_display_png.py --output-dir public/background/fitted huge-stars.png
 
   # Overwrite sources instead of writing a copy
-  python scripts/compress_display_png.py --in-place public/background/huge-stars.png
+  python devtools/assets/compress_display_png.py --in-place public/background/huge-stars.png
 
   # Preview
-  python scripts/compress_display_png.py --dry-run public/background/*.png
+  python devtools/assets/compress_display_png.py --dry-run public/background/*.png
 
   # Replace procedural star placeholders (writes game filenames in public/background/)
-  python scripts/compress_display_png.py --regenerate-placeholder-stars
+  python devtools/assets/compress_display_png.py --regenerate-placeholder-stars
 
-All flags: python scripts/compress_display_png.py --help
+All flags: python devtools/assets/compress_display_png.py --help
 """
 
 from __future__ import annotations
@@ -67,7 +67,7 @@ def require_pillow():
         return Image
     except ImportError as err:
         raise SystemExit(
-            "Pillow is required. Install with: pip install -r scripts/requirements.txt",
+            "Pillow is required. Install with: pip install -r devtools/assets/requirements.txt",
         ) from err
 
 

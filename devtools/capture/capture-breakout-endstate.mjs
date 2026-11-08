@@ -20,7 +20,7 @@ async function main() {
     deviceScaleFactor: 2,
   });
   await page.goto(
-    "http://127.0.0.1:5173/src/game/BreakoutPaddle/breakout-capture.html",
+    "http://127.0.0.1:5173/devtools/levels/breakout-paddle/capture/breakout-capture.html",
     { waitUntil: "networkidle" },
   );
   await page.waitForTimeout(1200);

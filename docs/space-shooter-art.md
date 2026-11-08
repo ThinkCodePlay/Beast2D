@@ -4,7 +4,7 @@ Example-game visuals for Beast2D: palette-locked enemies, HUD chrome, and shared
 
 ## Palette
 
-All shooter PNGs use [Beast2D 16](./palette.md) indices only (alpha allowed). Shared palette helpers live in `scripts/pixel/`.
+All shooter PNGs use [Beast2D 16](./palette.md) indices only (alpha allowed). Shared palette helpers live in `devtools/assets/pixel/`.
 
 ## Layout
 
@@ -21,35 +21,35 @@ From **repository root** (requires root `npm install` for `tsx` / `pngjs` / `pla
 
 ```bash
 npm run assets:ui
-npm --prefix "src/game/Space Shooter/scripts" run assets
-npm --prefix "src/game/Space Shooter/scripts" run verify
+npm --prefix devtools/levels/space-shooter run assets
+npm --prefix devtools/levels/space-shooter run verify
 ```
 
 Equivalent direct invocations:
 
 ```bash
-npx tsx scripts/generate-beast2d-ui.ts
-npx tsx "src/game/Space Shooter/scripts/generate-enemies.ts"
-npx tsx "src/game/Space Shooter/scripts/upscale-contact-sheet.ts"
-npx tsx "src/game/Space Shooter/scripts/verify-palette.ts"
+npx tsx devtools/assets/generate-beast2d-ui.ts
+npx tsx devtools/levels/space-shooter/generate-enemies.ts
+npx tsx devtools/levels/space-shooter/upscale-contact-sheet.ts
+npx tsx devtools/levels/space-shooter/verify-palette.ts
 ```
 
 `generate-beast2d-ui.ts` writes `public/ui/` and `src/core/ui/defaultBitmapFont.ts` (Shooter re-exports via `shooterBitmapFont.ts`).
 
 Generators:
 
-- `scripts/generate-beast2d-ui.ts` — shared HUD/dialog font + chrome
-- `src/game/Space Shooter/scripts/generate-enemies.ts`
-- `scripts/pixel/` — shared palette + PNG writer
+- `devtools/assets/generate-beast2d-ui.ts` — shared HUD/dialog font + chrome
+- `devtools/levels/space-shooter/generate-enemies.ts`
+- `devtools/assets/pixel/` — shared palette + PNG writer
 
 ### Dev screenshots (not shipped in production)
 
 ```bash
 npm run dev   # separate terminal
-npm --prefix "src/game/Space Shooter/scripts" run capture
+npm --prefix devtools/levels/space-shooter run capture
 ```
 
-Loads `src/game/Space Shooter/space-shooter-capture.html` (registers only Space Shooter — see `devCapture.ts`). Playwright uses SwiftShader so `canvas.toDataURL` returns real pixels.
+Loads `devtools/levels/space-shooter/capture/space-shooter-capture.html` (registers only Space Shooter — see `devCapture.ts`). Playwright uses SwiftShader so `canvas.toDataURL` returns real pixels.
 
 ## Code layout
 

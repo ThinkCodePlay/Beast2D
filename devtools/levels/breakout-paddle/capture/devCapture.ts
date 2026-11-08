@@ -1,14 +1,16 @@
 /**
  * Playwright / dev capture entry only — not used by the default game (`src/main.ts`).
  */
-import { Engine } from "../../core/Engine";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../core/consts";
+import { Engine } from "../../../../src/core/Engine";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../../../src/core/consts";
 import {
   attachDisplayScaleFit,
   configurePixelArtRendering,
-} from "../../core/displayScale";
-import { BreakoutPaddle } from "./BreakoutPaddle";
-import "../../style.css";
+} from "../../../../src/core/displayScale";
+import { exposePixiAppForCapture } from "../../../capture/exposePixiApp";
+import { BreakoutPaddle } from "../../../../src/game/BreakoutPaddle/BreakoutPaddle";
+import { attachBreakoutQaProbe } from "./attachBreakoutQaProbe";
+import "../../../../src/style.css";
 
 configurePixelArtRendering();
 
@@ -30,9 +32,11 @@ const engine = new Engine({
 
 engine
   .bootstrap(container)
-  .then((game) => {
+  .then(async (game) => {
+    exposePixiAppForCapture(engine);
     game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
-    return game.loadLevel("breakoutPaddle");
+    await game.loadLevel("breakoutPaddle");
+    attachBreakoutQaProbe(engine);
   })
   .catch((error) => {
     console.error("Failed to start Breakout capture", error);

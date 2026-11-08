@@ -5,13 +5,13 @@
  */
 import { join } from "node:path";
 import { REPO_ROOT } from "./repoRoot.ts";
-import { BEAST2D_16 } from "../../../../scripts/pixel/beast2d-palette.ts";
+import { BEAST2D_16 } from "../../assets/pixel/beast2d-palette.ts";
 import {
   indicesToRgba,
   parseAsciiGrid,
   stitchFramesHorizontal,
   writeRgbaPng,
-} from "../../../../scripts/pixel/write-rgba-png.ts";
+} from "../../assets/pixel/write-rgba-png.ts";
 
 const OUT_DIR = join(REPO_ROOT, "public/space-shooter/enemies");
 const FRAME = 32;

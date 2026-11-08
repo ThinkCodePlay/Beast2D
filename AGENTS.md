@@ -61,7 +61,7 @@ Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `READM
 
 ## Repo Gotchas
 
-- **Display spec**: fixed **320×240** (4∶3), **16 px** grid, runtime sprites **32×32** (`SPRITE_SIZE`; fitted copies like `BeastShip.32x32.png`) — see `DISPLAY_*`, `PIXEL_GRID`, `SPRITE_SIZE`, `TEXTURE_*` in `src/core/consts.ts`. Window integer CSS scale via `src/core/displayScale.ts` + `image-rendering: pixelated`. **PNG fit tool**: `scripts/compress_display_png.py` (docstring + `--help`); `npm run assets:fit-display` fits `public/background/` to 320×240 copies. Default behavior writes **`name.WxH.png`** and keeps originals; use `--in-place` only to overwrite. Requires `pip install -r scripts/requirements.txt`.
+- **Display spec**: fixed **320×240** (4∶3), **16 px** grid, runtime sprites **32×32** (`SPRITE_SIZE`; fitted copies like `BeastShip.32x32.png`) — see `DISPLAY_*`, `PIXEL_GRID`, `SPRITE_SIZE`, `TEXTURE_*` in `src/core/consts.ts`. Window integer CSS scale via `src/core/displayScale.ts` + `image-rendering: pixelated`. **PNG fit tool**: `devtools/assets/compress_display_png.py` (docstring + `--help`); `npm run assets:fit-display` fits `public/background/` to 320×240 copies. Default behavior writes **`name.WxH.png`** and keeps originals; use `--in-place` only to overwrite. Requires `pip install -r devtools/assets/requirements.txt`.
 - Paths with spaces exist and are valid (for example `src/game/Space Shooter/` and nested `Game Objects/`). Keep import paths exact.
 - Components are keyed by class reference; adding a second component of the same class returns the existing one. `getComponent(Base)` finds subclasses.
 - `TransformComponent` drives the GameObject container (applied after updates). Render/collider graphics are drawn at the object origin. Children inherit the parent transform, so spawn world-space objects (bullets) into the level root (`this.root`), not under a moving parent.
@@ -73,15 +73,15 @@ Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `READM
 
 **Owner intent (Yonatan):** Pipelines used only while building demo levels and art are **not** part of the long-term engine. Once demo levels and their shipped PNGs/fonts are done, **remove this tooling** and keep the repo focused on simplicity — do not grow new capture routes, generator scripts, or extra Vite entries unless demos are actively in progress.
 
-Treat as **temporary** (non-exhaustive; grep `generate-`, `capture`, `devCapture`, `scripts/pixel`, `assets:fit-display` before closing out demos):
+Treat as **temporary** (non-exhaustive; grep `generate-`, `capture`, `devCapture`, `devtools/`, `assets:fit-display` before closing out demos):
 
 | Area | Examples | Keep after cleanup |
 |------|----------|-------------------|
-| Level / dev capture | `src/game/Space Shooter/devCapture.ts`, `space-shooter-capture.html`, `src/game/BreakoutPaddle/devCapture.ts`, `breakout-capture.html`, `scripts/capture-screenshots.mjs`, extra `rollupOptions.input` in `vite.config.ts` | Runtime levels + `src/main.ts` only |
-| Per-level image generators | `src/game/Space Shooter/scripts/generate-*.ts`, `verify-palette.ts`, `upscale-contact-sheet.ts`, nested `scripts/package.json` capture/assets scripts | `public/…` art already committed; hand-edited sources like `shooterBitmapFont.ts` only if still needed |
-| Shared asset tooling | `scripts/pixel/`, `scripts/compress_display_png.py`, root `npm run assets:fit-display` | Fitted assets under `public/` |
+| Level / dev capture | `devtools/levels/*/capture/` (`devCapture.ts`, `*-capture.html`), `devtools/levels/space-shooter/capture-screenshots.mjs`, `devtools/capture/`, `devtools/e2e/`, extra `rollupOptions.input` in `vite.config.ts` | Runtime levels + `src/main.ts` only |
+| Per-level image generators | `devtools/levels/space-shooter/generate-*.ts`, `verify-palette.ts`, `upscale-contact-sheet.ts`, nested `package.json` capture/assets scripts | `public/…` art already committed; hand-edited sources like `shooterBitmapFont.ts` only if still needed |
+| Shared asset tooling | `devtools/assets/pixel/`, `devtools/assets/compress_display_png.py`, root `npm run assets:fit-display` | Fitted assets under `public/` |
 
-When removing generators, update docs that reference them (`docs/space-shooter-art.md`, `scripts/README.md`) so agents do not resurrect deleted workflows.
+When removing generators, update docs that reference them (`docs/space-shooter-art.md`, `devtools/assets/README.md`) so agents do not resurrect deleted workflows.
 
 ## Safe Change Workflow
 

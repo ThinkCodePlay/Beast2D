@@ -4,11 +4,11 @@ import { chromium } from "playwright";
 const levels = [
   {
     name: "spaceShooter",
-    path: "/src/game/Space%20Shooter/space-shooter-capture.html",
+    path: "/devtools/levels/space-shooter/capture/space-shooter-capture.html",
   },
   {
     name: "breakoutPaddle",
-    path: "/src/game/BreakoutPaddle/breakout-capture.html",
+    path: "/devtools/levels/breakout-paddle/capture/breakout-capture.html",
   },
 ];
 const widths = [480, 640, 800];

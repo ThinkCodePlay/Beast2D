@@ -4,7 +4,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { PNG } from "pngjs";
 import { REPO_ROOT } from "./repoRoot.ts";
-import { BEAST2D_16 } from "../../../../scripts/pixel/beast2d-palette.ts";
+import { BEAST2D_16 } from "../../assets/pixel/beast2d-palette.ts";
 
 const PALETTE = new Set(BEAST2D_16);
 

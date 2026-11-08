@@ -1,14 +1,15 @@
 /**
  * Playwright / dev capture entry only — not used by the default game (`src/main.ts`).
  */
-import { Engine } from "../../core/Engine";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../core/consts";
+import { Engine } from "../../../../src/core/Engine";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../../../src/core/consts";
 import {
   attachDisplayScaleFit,
   configurePixelArtRendering,
-} from "../../core/displayScale";
-import { SpaceShooter } from "./SpaceShooter";
-import "../../style.css";
+} from "../../../../src/core/displayScale";
+import { exposePixiAppForCapture } from "../../../capture/exposePixiApp";
+import { SpaceShooter } from "../../../../src/game/Space Shooter/SpaceShooter";
+import "../../../../src/style.css";
 
 configurePixelArtRendering();
 
@@ -31,6 +32,7 @@ const engine = new Engine({
 engine
   .bootstrap(container)
   .then((game) => {
+    exposePixiAppForCapture(engine);
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     return game.loadLevel("spaceShooter");
   })

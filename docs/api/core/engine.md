@@ -38,7 +38,7 @@ After bootstrap:
 
 ## Global debug hook
 
-Pixi app is exposed as `globalThis.__PIXI_APP__` for devtools.
+Capture Vite entries under `devtools/levels/*/capture/` call `exposePixiAppForCapture` so `globalThis.__PIXI_APP__` is available for Pixi browser extensions during dev screenshots. The default `index.html` boot path does not set it.
 
 ## Related
 

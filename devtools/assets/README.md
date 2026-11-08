@@ -9,7 +9,7 @@ Fits PNGs to the game display (or a custom size) using **nearest-neighbor** down
 **Setup**
 
 ```bash
-pip install -r scripts/requirements.txt
+pip install -r devtools/assets/requirements.txt
 ```
 
 **Common commands**
@@ -17,9 +17,9 @@ pip install -r scripts/requirements.txt
 | Goal | Command |
 |------|---------|
 | All background layers | `npm run assets:fit-display` |
-| One file → 320×240 copy | `python scripts/compress_display_png.py public/background/layer.png` |
-| Ship / UI → 32×32 copy | `python scripts/compress_display_png.py --width 32 --height 32 public/BeastShip.png` |
-| Sprite sheet (12×12 @ 32px) | `python scripts/compress_display_png.py --width 384 --height 384 public/bunny-move-animation.png` |
+| One file → 320×240 copy | `python devtools/assets/compress_display_png.py public/background/layer.png` |
+| Ship / UI → 32×32 copy | `python devtools/assets/compress_display_png.py --width 32 --height 32 public/BeastShip.png` |
+| Sprite sheet (12×12 @ 32px) | `python devtools/assets/compress_display_png.py --width 384 --height 384 public/bunny-move-animation.png` |
 | Preview only | add `--dry-run` |
 | Overwrite source | add `--in-place` |
 
@@ -28,7 +28,7 @@ After generating fitted sprites, point `TEXTURE_*` in `src/core/consts.ts` at th
 Full option list:
 
 ```bash
-python scripts/compress_display_png.py --help
+python devtools/assets/compress_display_png.py --help
 ```
 
 Display width/height defaults match `DISPLAY_WIDTH` / `DISPLAY_HEIGHT` in `src/core/consts.ts` (keep in sync with the script constants at the top of the file).

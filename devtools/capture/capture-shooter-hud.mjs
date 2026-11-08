@@ -11,7 +11,7 @@ async function main() {
       deviceScaleFactor: 2,
     });
     await page.goto(
-      "http://127.0.0.1:5173/src/game/Space%20Shooter/space-shooter-capture.html",
+      "http://127.0.0.1:5173/devtools/levels/space-shooter/capture/space-shooter-capture.html",
       { waitUntil: "networkidle" },
     );
     await page.waitForTimeout(2000);

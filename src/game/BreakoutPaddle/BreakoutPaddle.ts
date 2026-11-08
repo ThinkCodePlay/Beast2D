@@ -25,6 +25,16 @@ import { PointerMovement } from "../../core/components/Movement/PointerMovement"
 const LEVEL_NAME = "breakoutPaddle";
 const PADDLE_SPEED = 5.5;
 
+/** Playwright / capture tooling snapshot (see `devtools/levels/breakout-paddle/capture/`). */
+export type BreakoutQaSnapshot = {
+  phase: BreakoutSession["phase"];
+  lives: number;
+  paddleX: number;
+  dialogOpen: boolean;
+  dialogTextReady: boolean;
+  hintTextReady: boolean;
+};
+
 /**
  * Breakout paddle showcase — scene setup in {@link init}, rules in {@link breakoutSession}.
  */
@@ -68,19 +78,20 @@ export class BreakoutPaddle extends Level {
     );
   }
 
+  /** @internal Used by capture devtools (`attachBreakoutQaProbe`). */
+  readQaSnapshot(): BreakoutQaSnapshot {
+    return {
+      phase: this.session.phase,
+      lives: this.session.lives,
+      paddleX: this.paddle.readState().x,
+      dialogOpen: DialogUI.isOpen(),
+      dialogTextReady: DialogUI.isTextReady(),
+      hintTextReady: BreakoutPlayfieldHint.isTextReady(),
+    };
+  }
+
   protected update(deltaTime: number): void {
     super.update(deltaTime);
-    if (import.meta.env.DEV) {
-      (globalThis as typeof globalThis & { __beast2dBreakout?: object }).__beast2dBreakout =
-        {
-          phase: this.session.phase,
-          lives: this.session.lives,
-          paddleX: this.paddle.readState().x,
-          dialogOpen: DialogUI.isOpen(),
-          dialogTextReady: DialogUI.isTextReady(),
-          hintTextReady: BreakoutPlayfieldHint.isTextReady(),
-        };
-    }
     tickBreakoutSession(
       {
         context: this.context,

@@ -14,10 +14,6 @@ import { EngineContext } from "./EngineContext";
 import { GameManager } from "./GameManager";
 import { Globals } from "./Globals";
 
-declare global {
-  var __PIXI_APP__: Application;
-}
-
 export interface EngineOptions {
   width?: number;
   height?: number;
@@ -50,7 +46,6 @@ export class Engine {
     };
 
     this.app = new Application();
-    globalThis.__PIXI_APP__ = this.app; // Expose app globally for debugging
     this.ready = this.app.init({
       width: this.options.width,
       height: this.options.height,

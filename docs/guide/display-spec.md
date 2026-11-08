@@ -39,7 +39,7 @@ Keep `Engine` options, `main.ts`, and `style.css` aligned with these values.
 
 - Place files under `public/`; load paths are URL paths (for example `"BeastShip.32x32.png"`).
 - Fitted copies often use `name.WxH.png`; originals can remain in repo.
-- Fit tool: `npm run assets:fit-display` (see `scripts/compress_display_png.py`).
+- Fit tool: `npm run assets:fit-display` (see `devtools/assets/compress_display_png.py`).
 
 ## Texture name constants
 
