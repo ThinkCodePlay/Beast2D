@@ -1,10 +1,12 @@
-export interface Direction2 {
+export interface MovementDirection {
   x: number;
   y: number;
 }
 
 /** Sums direction vectors and clamps magnitude to at most 1. */
-export function combineDirections(vectors: readonly Direction2[]): Direction2 {
+export function combineDirections(
+  vectors: readonly MovementDirection[],
+): MovementDirection {
   let x = 0;
   let y = 0;
   for (const v of vectors) {

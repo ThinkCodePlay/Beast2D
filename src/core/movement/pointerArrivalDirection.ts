@@ -1,4 +1,4 @@
-import type { Direction2 } from "./combineDirections";
+import type { MovementDirection } from "./combineDirections";
 
 export interface PointerArrivalOptions {
   /** Logical units; ease-in only while farther than this distance. */
@@ -20,7 +20,7 @@ export function pointerArrivalDirection(
   targetY: number,
   options: PointerArrivalOptions,
   axes: { x: boolean; y: boolean },
-): Direction2 {
+): MovementDirection {
   let dx = axes.x ? targetX - fromX : 0;
   let dy = axes.y ? targetY - fromY : 0;
   const dist = Math.hypot(dx, dy);

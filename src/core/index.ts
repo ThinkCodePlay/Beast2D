@@ -34,7 +34,10 @@ export { KeyboardMovement } from "./components/Movement/KeyboardMovement";
 export { PointerMovement } from "./components/Movement/PointerMovement";
 export { MovementDirectionSource } from "./components/Movement/MovementDirectionSource";
 export { stepMoveTowards, type MoveTowardsAxes } from "./moveTowards";
-export { combineDirections } from "./movement/combineDirections";
+export {
+  combineDirections,
+  type MovementDirection,
+} from "./movement/combineDirections";
 export { pointerArrivalDirection } from "./movement/pointerArrivalDirection";
 export { clientToGameCoords } from "./pointer/clientToGameCoords";
 export {
