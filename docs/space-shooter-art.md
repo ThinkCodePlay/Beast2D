@@ -1,4 +1,4 @@
-# Space Shooter — art & regeneration
+# Space Shooter — art
 
 Example-game visuals for Beast2D: palette-locked enemies, HUD chrome, and shared engine effects.
 
@@ -8,56 +8,32 @@ All shooter PNGs use [Beast2D 16](./palette.md) indices only (alpha allowed). Sh
 
 ## Layout
 
-See [display spec](./display.md) and [HUD header](./hud-header.md) (geometry in core; shooter band textures in `shooterAssets.ts`).
+See [display spec](./display.md) and [HUD header](./hud-header.md) (geometry in core; texture paths in `shooterAssets.ts`).
 
 | Region | Size | Notes |
 |--------|------|--------|
-| HUD | 320×16, y 0–15 | `HudHeaderUI` + `SHOOTER_HUD_THEME` |
+| HUD | 320×16, y 0–15 | `HudHeaderUI` + `DEFAULT_BEAST2D_HUD_THEME` |
 | Playfield | 320×224, y 16–239 | Ship, enemies, effects |
 
-## Regenerate assets (example scripts)
+## Regenerate shared UI
 
-From **repository root** (requires root `npm install` for `tsx` / `pngjs` / `playwright`):
+From **repository root**:
 
 ```bash
 npm run assets:ui
-npm --prefix "src/game/Space Shooter/scripts" run assets
-npm --prefix "src/game/Space Shooter/scripts" run verify
 ```
 
-Equivalent direct invocations:
+Writes `public/ui/` and `src/core/ui/defaultBitmapFont.ts`.
 
-```bash
-npx tsx scripts/generate-beast2d-ui.ts
-npx tsx "src/game/Space Shooter/scripts/generate-enemies.ts"
-npx tsx "src/game/Space Shooter/scripts/upscale-contact-sheet.ts"
-npx tsx "src/game/Space Shooter/scripts/verify-palette.ts"
-```
-
-`generate-beast2d-ui.ts` writes `public/ui/` and `src/core/ui/defaultBitmapFont.ts` (Shooter re-exports via `shooterBitmapFont.ts`).
-
-Generators:
-
-- `scripts/generate-beast2d-ui.ts` — shared HUD/dialog font + chrome
-- `src/game/Space Shooter/scripts/generate-enemies.ts`
-- `scripts/pixel/` — shared palette + PNG writer
-
-### Dev screenshots (not shipped in production)
-
-```bash
-npm run dev   # separate terminal
-npm --prefix "src/game/Space Shooter/scripts" run capture
-```
-
-Loads `src/game/Space Shooter/space-shooter-capture.html` (registers only Space Shooter — see `devCapture.ts`). Playwright uses SwiftShader so `canvas.toDataURL` returns real pixels.
+Enemy and bullet PNGs under `public/space-shooter/` are committed sources (no in-repo generator).
 
 ## Code layout
 
 | Concern | Location |
 |---------|----------|
 | Texture paths | `src/game/Space Shooter/shooterAssets.ts` |
-| HUD / dialog chrome | `shooterUiTheme.ts` |
-| Bitmap font | `shooterBitmapFont.ts` (generated) |
+| HUD / dialog chrome | `src/core/ui/defaultUiTheme.ts` |
+| Bitmap font | `src/core/ui/defaultBitmapFont.ts` (generated) |
 | Enemy prefabs | `Game Objects/` |
 
 Engine reuse: `HudHeaderUI`, `DialogUI`, `BitmapText`, `NineSliceSprite`, `PixelBurstEffect`, palette in `src/core/`.

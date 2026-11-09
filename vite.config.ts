@@ -9,14 +9,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(repoRoot, "index.html"),
-        spaceShooterCapture: resolve(
-          repoRoot,
-          "src/game/Space Shooter/space-shooter-capture.html",
-        ),
-        breakoutPaddleCapture: resolve(
-          repoRoot,
-          "src/game/BreakoutPaddle/breakout-capture.html",
-        ),
       },
     },
   },

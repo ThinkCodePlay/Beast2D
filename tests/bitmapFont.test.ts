@@ -5,8 +5,6 @@ import { useBitmapFont } from "../src/core/ui/bitmapFontRegistry";
 import { missingGlyphs } from "../src/core/ui/BitmapText";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../src/core/ui/defaultBitmapFont";
 import { UI_BITMAP_STRINGS } from "./fixtures/uiBitmapStrings";
-import { SHOOTER_BITMAP_FONT } from "../src/game/Space Shooter/shooterBitmapFont";
-
 describe("bitmap font atlas", () => {
   beforeAll(() => {
     useBitmapFont(DEFAULT_BEAST2D_BITMAP_FONT);
@@ -18,10 +16,6 @@ describe("bitmap font atlas", () => {
     ) as { glyphs: Record<string, { x: number; y: number }> };
     expect(DEFAULT_BEAST2D_BITMAP_FONT.glyphW).toBe(json.glyphW);
     expect(DEFAULT_BEAST2D_BITMAP_FONT.glyphs).toEqual(json.glyphs);
-  });
-
-  it("shooter re-exports the shared default font", () => {
-    expect(SHOOTER_BITMAP_FONT).toBe(DEFAULT_BEAST2D_BITMAP_FONT);
   });
 
   it("covers all demo HUD/dialog/hint UI strings", () => {

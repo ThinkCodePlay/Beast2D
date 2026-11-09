@@ -7,10 +7,10 @@ import {
 import { useBitmapFont } from "../src/core/ui/bitmapFontRegistry";
 import { measureBitmapText } from "../src/core/ui/BitmapText";
 import { formatHudScoreLine } from "../src/core/ui/formatHudScore";
-import { SHOOTER_BITMAP_FONT } from "../src/game/Space Shooter/shooterBitmapFont";
+import { DEFAULT_BEAST2D_BITMAP_FONT } from "../src/core/ui/defaultBitmapFont";
 
 beforeAll(() => {
-  useBitmapFont(SHOOTER_BITMAP_FONT);
+  useBitmapFont(DEFAULT_BEAST2D_BITMAP_FONT);
 });
 
 const textOpts = {

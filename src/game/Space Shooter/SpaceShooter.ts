@@ -14,6 +14,11 @@ import {
 } from "../publicAssets";
 import { Globals } from "../../core/Globals";
 import { Beast2D16 } from "../../core/palette/beast2d16";
+import { DEFAULT_BEAST2D_BITMAP_FONT } from "../../core/ui/defaultBitmapFont";
+import {
+  DEFAULT_BEAST2D_DIALOG_THEME,
+  DEFAULT_BEAST2D_HUD_THEME,
+} from "../../core/ui/defaultUiTheme";
 import { useBitmapFont } from "../../core/ui/bitmapFontRegistry";
 import { resetBitmapTextAtlas, preloadBitmapFont } from "../../core/ui/BitmapText";
 import { Spaceship } from "./Game Objects/Spaceship";
@@ -32,11 +37,6 @@ import {
   TEXTURE_SHOOTER_HUD,
   TEXTURE_SHOOTER_PANEL,
 } from "./shooterAssets";
-import { SHOOTER_BITMAP_FONT } from "./shooterBitmapFont";
-import {
-  SHOOTER_DIALOG_THEME,
-  SHOOTER_HUD_THEME,
-} from "./shooterUiTheme";
 
 export class SpaceShooter extends Level {
   private static onGameOverRestart: (() => void) | null = null;
@@ -65,7 +65,7 @@ export class SpaceShooter extends Level {
   ];
 
   protected init(): void {
-    useBitmapFont(SHOOTER_BITMAP_FONT);
+    useBitmapFont(DEFAULT_BEAST2D_BITMAP_FONT);
     resetBitmapTextAtlas();
     void preloadBitmapFont();
 
@@ -80,7 +80,7 @@ export class SpaceShooter extends Level {
     playfield.addChild(new Spaceship(startX, startY));
     playfield.addChild(new ShooterEnemySpawner());
 
-    this.levelRoot.addChild(new HudHeaderUI(0, 3, SHOOTER_HUD_THEME));
+    this.levelRoot.addChild(new HudHeaderUI(0, 3, DEFAULT_BEAST2D_HUD_THEME));
 
     const dialogWidth = 256;
     const dialogHeight = 96;
@@ -93,7 +93,7 @@ export class SpaceShooter extends Level {
         "SPACE BEAST",
         0,
         true,
-        SHOOTER_DIALOG_THEME,
+        DEFAULT_BEAST2D_DIALOG_THEME,
         {
           color: Beast2D16.Shadow,
           strokeColor: Beast2D16.Magenta,

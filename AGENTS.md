@@ -77,8 +77,8 @@ Treat as **temporary** (non-exhaustive; grep `generate-`, `capture`, `devCapture
 
 | Area | Examples | Keep after cleanup |
 |------|----------|-------------------|
-| Level / dev capture | `src/game/Space Shooter/devCapture.ts`, `space-shooter-capture.html`, `src/game/BreakoutPaddle/devCapture.ts`, `breakout-capture.html`, `scripts/capture-screenshots.mjs`, extra `rollupOptions.input` in `vite.config.ts` | Runtime levels + `src/main.ts` only |
-| Per-level image generators | `src/game/Space Shooter/scripts/generate-*.ts`, `verify-palette.ts`, `upscale-contact-sheet.ts`, nested `scripts/package.json` capture/assets scripts | `public/…` art already committed; hand-edited sources like `shooterBitmapFont.ts` only if still needed |
+| Level / dev capture | (removed from `src/game/`) | Runtime levels + `src/main.ts` only |
+| Per-level image generators | (removed from `src/game/Space Shooter/scripts/`) | `public/…` art already committed |
 | Shared asset tooling | `scripts/pixel/`, `scripts/compress_display_png.py`, root `npm run assets:fit-display` | Fitted assets under `public/` |
 
 When removing generators, update docs that reference them (`docs/space-shooter-art.md`, `scripts/README.md`) so agents do not resurrect deleted workflows.
