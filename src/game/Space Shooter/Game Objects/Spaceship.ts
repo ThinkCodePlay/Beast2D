@@ -4,11 +4,14 @@ import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRen
 import type { RenderOptions } from "../../../core/components/Render/RenderComponent";
 import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
 import { Globals } from "../../../core/Globals";
-import { SPRITE_SIZE } from "../../../core/consts";
+import {
+  ColliderModes,
+  CollisionLayers,
+  SPRITE_SIZE,
+} from "../../../core/consts";
 import { TEXTURE_BEAST_SHIP } from "../../publicAssets";
 import { BulletSpawner } from "./BulletSpawner";
 import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
-import { CollisionLayers, ColliderModes } from "../../../core/consts";
 import { HeartsUI } from "../../../core/components/UI/HeartsUI";
 import { DialogUI } from "../../../core/components/UI/DialogUI";
 import { ScoreUI } from "../../../core/components/UI/ScoreUI";

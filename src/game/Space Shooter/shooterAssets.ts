@@ -9,17 +9,9 @@ export {
   TEXTURE_DEFAULT_HUD_BAND as TEXTURE_SHOOTER_HUD,
 } from "../../core/ui/defaultUiTheme";
 
-export const TEXTURE_SHOOTER_FONT = "ui/font-atlas.5x7.png";
-
 export const TEXTURE_ENEMY_SCOUT_SHEET =
   "space-shooter/enemies/scout-sheet.32x32.png";
 export const TEXTURE_ENEMY_CRUISER_SHEET =
   "space-shooter/enemies/cruiser-sheet.32x32.png";
 export const TEXTURE_ENEMY_DRIFTER_SHEET =
   "space-shooter/enemies/drifter-sheet.32x32.png";
-export const TEXTURE_ENEMY_SCOUT_FRAME =
-  "space-shooter/enemies/scout-f0.32x32.png";
-export const TEXTURE_ENEMY_CRUISER_FRAME =
-  "space-shooter/enemies/cruiser-f0.32x32.png";
-export const TEXTURE_ENEMY_DRIFTER_FRAME =
-  "space-shooter/enemies/drifter-f0.32x32.png";

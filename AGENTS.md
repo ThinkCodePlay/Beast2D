@@ -61,7 +61,7 @@ Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `READM
 
 ## Repo Gotchas
 
-- **Display spec**: fixed **320×240** (4∶3), **16 px** grid, runtime sprites **32×32** (`SPRITE_SIZE`; fitted copies like `BeastShip.32x32.png`) — see `DISPLAY_*`, `PIXEL_GRID`, `SPRITE_SIZE`, `TEXTURE_*` in `src/core/consts.ts`. Window integer CSS scale via `src/core/displayScale.ts` + `image-rendering: pixelated`. Fitted PNGs live in `public/` (edit or replace by hand).
+- **Display spec**: fixed **320×240** (4∶3), **16 px** grid, runtime sprites **32×32** (`SPRITE_SIZE`; fitted copies like `BeastShip.32x32.png`) — see `DISPLAY_*`, `PIXEL_GRID`, `SPRITE_SIZE`, `TEXTURE_*` in `src/core/consts.ts`. Window integer CSS scale via `src/core/displayScale.ts` + `image-rendering: pixelated`. **`public/`** = only assets loaded at runtime (Vite serves them at `/…`). **`assets/`** = source masters / lossless (not shipped).
 - Paths with spaces exist and are valid (for example `src/game/Space Shooter/` and nested `Game Objects/`). Keep import paths exact.
 - Components are keyed by class reference; adding a second component of the same class returns the existing one. `getComponent(Base)` finds subclasses.
 - `TransformComponent` drives the GameObject container (applied after updates). Render/collider graphics are drawn at the object origin. Children inherit the parent transform, so spawn world-space objects (bullets) into the level root (`this.root`), not under a moving parent.
