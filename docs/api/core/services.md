@@ -1,6 +1,6 @@
 # Services
 
-Services live on `EngineContext`. Components should prefer `this.requireContext()` over `Globals` during gameplay.
+Services live on `EngineContext`. Components should prefer `this.requireContext()` over `CanvasSize` during gameplay.
 
 ## Time
 
@@ -55,9 +55,9 @@ Collider components register on init. The system:
 
 See [Collision components](../components/collision.md).
 
-## FixedStepper
+## FixedTick
 
-Export: `FixedStepper`.
+Export: `FixedTick`.
 
 Accumulates frame `dt` and returns how many fixed steps to run. Used for deterministic collision.
 

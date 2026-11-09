@@ -1,6 +1,6 @@
 /**
  * Paths to bitmaps under `public/` used by shipped demo levels.
- * Engine layout constants live in `src/core/consts.ts`.
+ * Engine layout constants live in `src/core/display.ts`.
  */
 
 export const TEXTURE_BEAST_SHIP = "BeastShip.32x32.png";

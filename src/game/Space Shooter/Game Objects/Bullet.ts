@@ -3,13 +3,13 @@ import { TransformComponent } from "../../../core/components/Movement/TransformC
 import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenderComponent";
 import { ConstantMoveComponent } from "../../../core/components/Movement/ConstantMoveComponent";
 import { DestroyOutOfBoundsComponent } from "../../../core/components/Behavior/DestroyOutOfBoundsComponent";
-import { Globals } from "../../../core/Globals";
+import { CanvasSize } from "../../../core/canvasSize";
 import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
 import {
   CollisionLayers,
   ColliderModes,
   PLAYFIELD_TOP,
-} from "../../../core/consts";
+} from "../../../core/display";
 import { TEXTURE_SHOOTER_BULLET } from "../shooterAssets";
 import { HudHeaderUI } from "../../../core/components/UI/HudHeaderUI";
 import { ShooterEnemy } from "./ShooterEnemy";
@@ -49,9 +49,9 @@ export class Bullet extends GameObject {
     this.addComponent(
       new DestroyOutOfBoundsComponent({
         minX: -20,
-        maxX: Globals.canvasWidth + 20,
+        maxX: CanvasSize.canvasWidth + 20,
         minY: PLAYFIELD_TOP - 20,
-        maxY: Globals.canvasHeight + 20,
+        maxY: CanvasSize.canvasHeight + 20,
       }),
     );
   }

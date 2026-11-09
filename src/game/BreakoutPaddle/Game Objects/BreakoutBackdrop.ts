@@ -1,6 +1,6 @@
 import { GameObject } from "../../../core/GameObject";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../../core/consts";
-import { Beast2D16 } from "../../../core/palette/beast2d16";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../../core/display";
+import { Beast2D16 } from "../../../core/ui/palette";
 import { Box } from "../../../core/prefabs/Box";
 
 export class BreakoutBackdrop extends GameObject {

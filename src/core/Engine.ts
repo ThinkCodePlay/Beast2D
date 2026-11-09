@@ -9,10 +9,10 @@
 */
 
 import { Application, type Ticker } from "pixi.js";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./display";
 import { EngineContext } from "./EngineContext";
 import { GameManager } from "./GameManager";
-import { Globals } from "./Globals";
+import { CanvasSize } from "./canvasSize";
 
 declare global {
   var __PIXI_APP__: Application;
@@ -77,7 +77,7 @@ export class Engine {
       height: this.app.screen.height,
       debug: this.options.debug,
     });
-    Globals.init(this._context);
+    CanvasSize.init(this._context);
 
     domElement.appendChild(this.app.canvas);
     this._context.canvas = this.app.canvas as HTMLCanvasElement;
@@ -103,7 +103,7 @@ export class Engine {
     this.gameManager?.getCurrentLevel()?.destroy();
     this._context?.dispose();
     this._context = null;
-    Globals.reset();
+    CanvasSize.reset();
     void this.ready.then(() => this.app.destroy(true, { children: true }));
   }
 

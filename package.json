@@ -9,12 +9,15 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "crap": "vitest run --coverage && node scripts/crap-report.mjs",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@types/pngjs": "^6.0.5",
+    "@vitest/coverage-v8": "^5.0.5",
     "pngjs": "^7.0.0",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",

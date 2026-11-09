@@ -5,15 +5,15 @@ import {
   PIXEL_GRID,
   PLAYFIELD_HEIGHT,
   SPRITE_SIZE,
-} from "../../core/consts";
+} from "../../core/display";
 import {
   TEXTURE_BEAST_SHIP,
   TEXTURE_HEART,
   TEXTURE_STARS_LAYER_1,
   TEXTURE_STARS_LAYER_2,
 } from "../publicAssets";
-import { Globals } from "../../core/Globals";
-import { Beast2D16 } from "../../core/palette/beast2d16";
+import { CanvasSize } from "../../core/canvasSize";
+import { Beast2D16 } from "../../core/ui/palette";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../../core/ui/defaultBitmapFont";
 import { DEFAULT_BEAST2D_DIALOG_THEME } from "../../core/ui/defaultUiTheme";
 import { useBitmapFont } from "../../core/ui/bitmapFontRegistry";
@@ -67,7 +67,7 @@ export class SpaceShooter extends Level {
     resetBitmapTextAtlas();
     void preloadBitmapFont();
 
-    const startX = Globals.canvasWidth / 2 - SPRITE_SIZE / 2;
+    const startX = CanvasSize.canvasWidth / 2 - SPRITE_SIZE / 2;
     const startY = PLAYFIELD_HEIGHT - PIXEL_GRID * 3 - SPRITE_SIZE / 2;
 
     this.levelRoot.addChild(new ParallaxBackground());

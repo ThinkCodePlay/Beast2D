@@ -3,7 +3,7 @@
  * Not a general engine widget — keeps prompts out of the score/lives header band.
  */
 import { GameObject } from "../../core/GameObject";
-import { DISPLAY_WIDTH, PLAYFIELD_TOP } from "../../core/consts";
+import { DISPLAY_WIDTH, PLAYFIELD_TOP } from "../../core/display";
 import { TransformComponent } from "../../core/components/Movement/TransformComponent";
 import {
   BreakoutPlayfieldHintRender,

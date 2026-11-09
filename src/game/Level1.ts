@@ -4,9 +4,9 @@
 import { Level } from "../core/Level";
 import { Box } from "../core/prefabs/Box";
 import { Circle } from "../core/prefabs/Circle";
-import { Player } from "../core/prefabs/Player";
-import { Globals } from "../core/Globals";
-import { PIXEL_GRID } from "../core/consts";
+import { Player } from "./Player";
+import { CanvasSize } from "../core/canvasSize";
+import { PIXEL_GRID } from "../core/display";
 import { TEXTURE_BEAST_SHIP } from "./publicAssets";
 
 export class Level1 extends Level {
@@ -17,8 +17,8 @@ export class Level1 extends Level {
 
   protected init() {
     const SIZE = PIXEL_GRID * 5;
-    const X = (Globals.canvasWidth - SIZE) / 2;
-    const Y = (Globals.canvasHeight - SIZE) / 2;
+    const X = (CanvasSize.canvasWidth - SIZE) / 2;
+    const Y = (CanvasSize.canvasHeight - SIZE) / 2;
 
     // Create a box
     this.box = new Box(X, Y, SIZE, SIZE, {

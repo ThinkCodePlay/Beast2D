@@ -37,12 +37,8 @@ spawnerComponentCallback: (x, y) => {
 
 Pass `levelRoot` via closure or store a reference on the level class.
 
-## Object pooling
-
-`ObjectPool<T>` helps reuse plain data or lightweight structs. **Destroyed `GameObject`s are not revived**; create new instances or pool non-node state.
-
 ## Anti-patterns
 
 - Mega-components that render, move, collide, and read input in one class
 - Spawning gameplay objects under rotating parents when world alignment matters
-- Relying on `Globals` inside per-frame logic instead of `context`
+- Relying on `CanvasSize` inside per-frame logic instead of `context`

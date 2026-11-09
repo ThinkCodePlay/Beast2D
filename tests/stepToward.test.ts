@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { stepMoveTowards } from "../src/core/moveTowards";
+import { stepToward } from "../src/core/components/Movement/stepToward";
 import { FRAMES_PER_SECOND } from "../src/core/Time";
 
-describe("stepMoveTowards", () => {
+describe("stepToward", () => {
   it("reaches the target without overshooting", () => {
     const dt = 1;
     const speed = 4;
     let pos = { x: 0, y: 0 };
     const target = { x: 10, y: 0 };
     for (let i = 0; i < 100; i++) {
-      pos = stepMoveTowards(pos, target, speed * dt);
+      pos = stepToward(pos, target, speed * dt);
       expect(pos.x).toBeLessThanOrEqual(10);
       if (pos.x >= 10) break;
     }
@@ -18,7 +18,7 @@ describe("stepMoveTowards", () => {
   });
 
   it("respects axis mask", () => {
-    const next = stepMoveTowards(
+    const next = stepToward(
       { x: 0, y: 0 },
       { x: 20, y: 20 },
       5,
@@ -32,8 +32,8 @@ describe("stepMoveTowards", () => {
     const from = { x: 0, y: 0 };
     const to = { x: 60, y: 0 };
     const speed = 5;
-    const oneFrame = stepMoveTowards(from, to, speed * 1);
-    const half = stepMoveTowards(from, to, speed * 0.5);
+    const oneFrame = stepToward(from, to, speed * 1);
+    const half = stepToward(from, to, speed * 0.5);
     expect(oneFrame.x).toBeCloseTo(speed);
     expect(half.x).toBeCloseTo(speed * 0.5);
     expect(oneFrame.x).toBeCloseTo(half.x * 2);

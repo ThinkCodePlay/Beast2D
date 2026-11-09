@@ -29,10 +29,6 @@ new Circle(
 
 Adds `TransformComponent` + `CircleRenderComponent`. Name: `CircleObject`.
 
-## Player
-
-Space-shooter style player ship (texture + movement + shooting). See `src/core/prefabs/Player.ts` for the exact component stack.
-
 ## Spawner
 
 GameObject wrapping `SpawnerComponent` with constructor args forwarded to the component.

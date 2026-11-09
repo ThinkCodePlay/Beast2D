@@ -1,6 +1,6 @@
 import { Assets, Container, Rectangle, Sprite, Texture } from "pixi.js";
 import { getBitmapFont, tryGetBitmapFont } from "./bitmapFontRegistry";
-import { textureNearest } from "./textureNearest";
+import { pixelTexture } from "./pixelTexture";
 
 let atlasTexture: Texture | null = null;
 let atlasLoad: Promise<Texture> | null = null;
@@ -21,7 +21,7 @@ function loadAtlas(): Promise<Texture> {
     loadedAtlasPath = font.atlasPath;
     atlasLoad = Assets.load(font.atlasPath).then((tex) => {
       atlasTexture = tex as Texture;
-      textureNearest(atlasTexture);
+      pixelTexture(atlasTexture);
       return atlasTexture;
     });
   }
@@ -71,7 +71,7 @@ export function buildBitmapTextFromSheet(
   text: string,
   options: BitmapTextOptions = {},
 ): Container {
-  textureNearest(sheet);
+  pixelTexture(sheet);
   const font = getBitmapFont();
   const scale = options.scale ?? 1;
   const gap = options.letterSpacing ?? 1;
@@ -87,7 +87,7 @@ export function buildBitmapTextFromSheet(
     sprite.tint = tint;
     sprite.x = Math.round(x);
     sprite.y = 0;
-    textureNearest(sprite.texture);
+    pixelTexture(sprite.texture);
     container.addChild(sprite);
     x += advance;
   }

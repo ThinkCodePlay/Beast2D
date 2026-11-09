@@ -1,7 +1,7 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import { CameraShakeComponent } from "../components/CameraShakeComponent";
-import { PLAYFIELD_TOP } from "../../../core/consts";
+import { PLAYFIELD_TOP } from "../../../core/display";
 
 /** World root for gameplay (below HUD). Camera shake attaches here. */
 export class ShooterPlayfield extends GameObject {

@@ -5,7 +5,7 @@ import { KeyboardMovement } from "../src/core/components/Movement/KeyboardMoveme
 import { PointerMovement } from "../src/core/components/Movement/PointerMovement";
 import { TransformComponent } from "../src/core/components/Movement/TransformComponent";
 import { ClampComponent } from "../src/core/components/Movement/ClampComponent";
-import { playfieldPointerSession } from "../src/core/pointer/playfieldPointerSession";
+import { pointerTarget } from "../src/core/components/Movement/pointerTarget";
 import { DialogUI } from "../src/core/components/UI/DialogUI";
 import { createRoot, frame } from "./helpers";
 
@@ -207,7 +207,7 @@ describe("Movement + independent sources", () => {
     });
     frame(root, 3);
     expect(player.transform!.x).toBe(80);
-    expect(playfieldPointerSession.getTarget()).toBeNull();
+    expect(pointerTarget.getTarget()).toBeNull();
     vi.restoreAllMocks();
     player.getComponent(PointerMovement)!.onDestroy();
   });

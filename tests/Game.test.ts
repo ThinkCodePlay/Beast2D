@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Assets, Texture } from "pixi.js";
-import { Globals } from "../src/core/Globals";
+import { CanvasSize } from "../src/core/canvasSize";
 import { GameObject } from "../src/core/GameObject";
 import { Level1 } from "../src/game/Level1";
 import { Level2 } from "../src/game/Level2";
@@ -11,7 +11,7 @@ import { Spaceship } from "../src/game/Space Shooter/Game Objects/Spaceship";
 import { ShooterEnemy } from "../src/game/Space Shooter/Game Objects/ShooterEnemy";
 import { ShooterPlayfield } from "../src/game/Space Shooter/Game Objects/ShooterPlayfield";
 import { HudHeaderUI } from "../src/core/components/UI/HudHeaderUI";
-import { Player } from "../src/core/prefabs/Player";
+import { Player } from "../src/game/Player";
 import { DialogUI } from "../src/core/components/UI/DialogUI";
 import { createContext, fakeEngine } from "./helpers";
 
@@ -23,12 +23,12 @@ let context = createContext();
 
 beforeEach(() => {
   context = createContext();
-  Globals.init(context);
+  CanvasSize.init(context);
   vi.spyOn(Assets, "load").mockResolvedValue(Texture.EMPTY);
 });
 
 afterEach(() => {
-  Globals.reset();
+  CanvasSize.reset();
   vi.restoreAllMocks();
 });
 

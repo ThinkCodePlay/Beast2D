@@ -4,11 +4,11 @@ Compact top band for single-screen Beast2D levels. Playfield begins at **y = 16*
 
 ## Layout geometry (engine)
 
-Defined in `src/core/ui/hudContract.ts` (`HUD_LAYOUT`): widths, padding, heart size, score column — **no game-specific textures**.
+Defined in `src/core/ui/hudLayout.ts` (`HUD_LAYOUT`): widths, padding, heart size, score column — **no game-specific textures**.
 
 | Zone | Position | Content |
 |------|----------|---------|
-| Band | `(0,0)` 320×16 | Per-game texture via `HudHeaderTheme.bandTexture` |
+| Band | `(0,0)` 320×16 | Per-game texture via `HudStyle.bandTexture` |
 | Lives | Left | `heartTexture` (default `HeartBeast.32x32.png` at 12×12, 2px gap, 4px inset) |
 | Score | Right | Bitmap `SCORE <n>`, right edge inset 4px |
 
@@ -22,9 +22,9 @@ Space Shooter sets `SHOOTER_BITMAP_FONT` and `SHOOTER_HUD_THEME` in `SpaceShoote
 
 ```ts
 import { HudHeaderUI } from ".../HudHeaderUI";
-import type { HudHeaderTheme } from ".../hudTheme";
+import type { HudStyle } from ".../hudStyle";
 
-const theme: HudHeaderTheme = {
+const theme: HudStyle = {
   bandTexture: "…/hud-band.png",
   fontTint: 0xf4ead2,
 };

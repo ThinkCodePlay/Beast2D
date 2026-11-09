@@ -1,6 +1,6 @@
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH, PIXEL_GRID } from "../../core/consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH, PIXEL_GRID } from "../../core/display";
 import { DialogUI } from "../../core/components/UI/DialogUI";
-import { Beast2D16 } from "../../core/palette/beast2d16";
+import { Beast2D16 } from "../../core/ui/palette";
 import { useBitmapFont } from "../../core/ui/bitmapFontRegistry";
 import {
   preloadBitmapFont,

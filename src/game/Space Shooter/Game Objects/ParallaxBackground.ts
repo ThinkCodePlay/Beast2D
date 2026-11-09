@@ -1,8 +1,8 @@
 import { GameObject } from "../../../core/GameObject";
 import {
-  ParallaxBackgroundRenderComponent,
+  ScrollingBackgroundComponent,
   type ParallaxLayerConfig,
-} from "../../../core/components/Render/ParallaxBackgroundRenderComponent";
+} from "../../../core/components/Render/ScrollingBackgroundComponent";
 
 import { TEXTURE_STARS_LAYER_1, TEXTURE_STARS_LAYER_2 } from "../../publicAssets";
 
@@ -26,6 +26,6 @@ export class ParallaxBackground extends GameObject {
     super();
     this.name = "ParallaxBackground";
 
-    this.addComponent(new ParallaxBackgroundRenderComponent(layersConfig));
+    this.addComponent(new ScrollingBackgroundComponent(layersConfig));
   }
 }

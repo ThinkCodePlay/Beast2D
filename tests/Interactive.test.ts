@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 import { GameObject } from "../src/core/GameObject";
-import { InteractiveComponent } from "../src/core/components/Input/InteractiveComponent";
+import { ClickableComponent } from "../src/core/components/Input/ClickableComponent";
 import { Movement } from "../src/core/components/Movement/Movement";
 import { KeyboardMovement } from "../src/core/components/Movement/KeyboardMovement";
 import { HorizontalFacingComponent } from "../src/game/Bunny Hop/components/HorizontalFacingComponent";
 import { HorizontalLocomotionAnimationComponent } from "../src/game/Bunny Hop/components/HorizontalLocomotionAnimationComponent";
 import {
-  SpritesheetAnimationRenderComponent,
+  SpriteAnimationComponent,
   type SpritesheetAnimationClipsOptions,
-} from "../src/core/components/Render/SpritesheetAnimationRenderComponent";
+} from "../src/core/components/Render/SpriteAnimationComponent";
 import { SpaceShootInputComponent } from "../src/game/Space Shooter/components/SpaceShootInputComponent";
 import { SpawnerComponent } from "../src/core/components/Behavior/SpawnerComponent";
 import { TransformComponent } from "../src/core/components/Movement/TransformComponent";
@@ -16,7 +16,7 @@ import { RenderComponent } from "../src/core/components/Render/RenderComponent";
 import { Graphics } from "pixi.js";
 import { createRoot, frame } from "./helpers";
 
-class RecordingSpritesheetAnimation extends SpritesheetAnimationRenderComponent {
+class RecordingSpritesheetAnimation extends SpriteAnimationComponent {
   played: string[] = [];
 
   constructor(options: SpritesheetAnimationClipsOptions) {
@@ -45,14 +45,14 @@ function key(type: "keydown" | "keyup", code: string) {
   return Object.assign(new Event(type, { cancelable: true }), { code });
 }
 
-describe("InteractiveComponent", () => {
+describe("ClickableComponent", () => {
   it("routes pointer events and cleans up", () => {
     const click = vi.fn();
     const over = vi.fn();
     const out = vi.fn();
     const root = createRoot();
     const go = new GameObject().with(
-      new InteractiveComponent({
+      new ClickableComponent({
         onClick: click,
         onHoverStart: over,
         onHoverEnd: out,
@@ -69,12 +69,12 @@ describe("InteractiveComponent", () => {
     go.container.emit("pointerout", {} as never);
     expect([click, over, out].map((f) => f.mock.calls.length)).toEqual([1, 1, 1]);
 
-    go.getComponent(InteractiveComponent)!.enabled = false;
+    go.getComponent(ClickableComponent)!.enabled = false;
     go.container.emit("pointertap", {} as never);
     expect(click).toHaveBeenCalledTimes(1);
 
-    go.removeComponent(InteractiveComponent);
-    go.getComponent(InteractiveComponent);
+    go.removeComponent(ClickableComponent);
+    go.getComponent(ClickableComponent);
     go.container.emit("pointertap", {} as never);
     expect(click).toHaveBeenCalledTimes(1);
   });

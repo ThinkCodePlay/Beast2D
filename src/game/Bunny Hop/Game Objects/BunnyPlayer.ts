@@ -1,12 +1,12 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
-import { SpritesheetAnimationRenderComponent } from "../../../core/components/Render/SpritesheetAnimationRenderComponent";
+import { SpriteAnimationComponent } from "../../../core/components/Render/SpriteAnimationComponent";
 import { Movement } from "../../../core/components/Movement/Movement";
 import { KeyboardMovement } from "../../../core/components/Movement/KeyboardMovement";
 import { ClampComponent } from "../../../core/components/Movement/ClampComponent";
 import { HorizontalFacingComponent } from "../components/HorizontalFacingComponent";
 import { HorizontalLocomotionAnimationComponent } from "../components/HorizontalLocomotionAnimationComponent";
-import { Globals } from "../../../core/Globals";
+import { CanvasSize } from "../../../core/canvasSize";
 import {
   BUNNY_WALK_ANIMATION_COLUMNS,
   BUNNY_WALK_ANIMATION_FRAME_COUNT,
@@ -22,7 +22,7 @@ export class BunnyPlayer extends GameObject {
 
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(
-      new SpritesheetAnimationRenderComponent({
+      new SpriteAnimationComponent({
         defaultClip: "idle",
         clips: {
           idle: {
@@ -52,7 +52,7 @@ export class BunnyPlayer extends GameObject {
     this.addComponent(
       new ClampComponent({
         minX: 0,
-        maxX: Globals.canvasWidth - BUNNY_SPRITE_SIZE,
+        maxX: CanvasSize.canvasWidth - BUNNY_SPRITE_SIZE,
       }),
     );
   }

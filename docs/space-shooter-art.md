@@ -36,7 +36,7 @@ Enemy and bullet PNGs under `public/space-shooter/` are committed sources (no in
 | Bitmap font | `src/core/ui/defaultBitmapFont.ts` (generated) |
 | Enemy prefabs | `Game Objects/` |
 
-Engine reuse: `HudHeaderUI`, `DialogUI`, `BitmapText`, `NineSliceSprite`, `PixelBurstEffect`, palette in `src/core/`.
+Engine reuse: `HudHeaderUI`, `DialogUI`, `BitmapText`, `SlicedSprite`, `PixelBurstEffect`, palette in `src/core/`.
 
 ## Effects
 

@@ -3,12 +3,12 @@ import { TransformComponent } from "../../../core/components/Movement/TransformC
 import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenderComponent";
 import type { RenderOptions } from "../../../core/components/Render/RenderComponent";
 import { ClampComponent } from "../../../core/components/Movement/ClampComponent";
-import { Globals } from "../../../core/Globals";
+import { CanvasSize } from "../../../core/canvasSize";
 import {
   ColliderModes,
   CollisionLayers,
   SPRITE_SIZE,
-} from "../../../core/consts";
+} from "../../../core/display";
 import { TEXTURE_BEAST_SHIP } from "../../publicAssets";
 import { BulletSpawner } from "./BulletSpawner";
 import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
@@ -84,7 +84,7 @@ export class Spaceship extends GameObject {
     this.addComponent(
       new ClampComponent({
         minX: 0,
-        maxX: Globals.canvasWidth - shipWidth,
+        maxX: CanvasSize.canvasWidth - shipWidth,
       }),
     );
 

@@ -1,6 +1,6 @@
 import { GameObject } from "../../../core/GameObject";
-import { DISPLAY_WIDTH, PIXEL_GRID } from "../../../core/consts";
-import { Beast2D16 } from "../../../core/palette/beast2d16";
+import { DISPLAY_WIDTH, PIXEL_GRID } from "../../../core/display";
+import { Beast2D16 } from "../../../core/ui/palette";
 import { Box } from "../../../core/prefabs/Box";
 import { ClampComponent } from "../../../core/components/Movement/ClampComponent";
 import {

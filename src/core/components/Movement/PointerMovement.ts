@@ -1,16 +1,16 @@
-import { playfieldPointerSession } from "../../pointer/playfieldPointerSession";
-import { pointerArrivalDirection } from "../../movement/pointerArrivalDirection";
+import { pointerTarget } from "./pointerTarget";
+import { directionToPointer } from "./directionToPointer";
 import { TransformComponent } from "./TransformComponent";
 import { Movement } from "./Movement";
-import { MovementDirectionSource } from "./MovementDirectionSource";
+import { MovementInput } from "./MovementInput";
 
 const DEFAULT_ARRIVE_RADIUS = 24;
 
 /**
  * Playfield pointer hold → direction request toward logical hold position.
- * Registers shared canvas listeners via {@link playfieldPointerSession}.
+ * Registers shared canvas listeners via {@link pointerTarget}.
  */
-export class PointerMovement extends MovementDirectionSource {
+export class PointerMovement extends MovementInput {
   private transform: TransformComponent | null = null;
   private arriveRadius = DEFAULT_ARRIVE_RADIUS;
 
@@ -20,11 +20,11 @@ export class PointerMovement extends MovementDirectionSource {
       TransformComponent,
       this.constructor.name,
     );
-    playfieldPointerSession.acquire(this.requireContext());
+    pointerTarget.acquire(this.requireContext());
   }
 
   protected override computeDirection(deltaTime: number): { x: number; y: number } {
-    const target = playfieldPointerSession.getTarget();
+    const target = pointerTarget.getTarget();
     if (!target || !this.transform) return { x: 0, y: 0 };
 
     const movement = this.gameObject?.getComponent(Movement);
@@ -35,7 +35,7 @@ export class PointerMovement extends MovementDirectionSource {
       y: axes.y !== false,
     };
 
-    return pointerArrivalDirection(
+    return directionToPointer(
       this.transform.x,
       this.transform.y,
       target.x,
@@ -49,7 +49,7 @@ export class PointerMovement extends MovementDirectionSource {
   }
 
   override onDestroy(): void {
-    playfieldPointerSession.release();
+    pointerTarget.release();
     this.transform = null;
   }
 }

@@ -1,5 +1,5 @@
 import { GameObject } from "../../../core/GameObject";
-import { Beast2D16 } from "../../../core/palette/beast2d16";
+import { Beast2D16 } from "../../../core/ui/palette";
 import { Box } from "../../../core/prefabs/Box";
 import { createBrickGrid, type BrickState } from "../breakoutLogic";
 

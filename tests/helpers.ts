@@ -1,5 +1,5 @@
 import { Container } from "pixi.js";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../src/core/consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../src/core/display";
 import type { Engine } from "../src/core/Engine";
 import { EngineContext } from "../src/core/EngineContext";
 import { GameObject } from "../src/core/GameObject";

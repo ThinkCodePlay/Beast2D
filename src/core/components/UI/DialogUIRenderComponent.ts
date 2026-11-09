@@ -1,15 +1,15 @@
 import { Container, Graphics } from "pixi.js";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
-import { Beast2D16 } from "../../palette/beast2d16";
+import { Beast2D16 } from "../../ui/palette";
 import {
   buildBitmapTextReady,
   measureBitmapText,
   preloadBitmapFont,
 } from "../../ui/BitmapText";
 import type { DialogChromeTheme } from "../../ui/dialogTheme";
-import { NineSliceSprite } from "../../ui/NineSliceSprite";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../consts";
+import { SlicedSprite } from "../../ui/slicedSprite";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../display";
 import { wireUiPointerButton } from "../../ui/UiPointerButton";
 
 export class DialogUIRenderComponent extends RenderComponent {
@@ -162,7 +162,7 @@ export class DialogUIRenderComponent extends RenderComponent {
     this.panelHost = new Container();
     graphics.addChild(this.panelHost);
 
-    const panel = new NineSliceSprite({
+    const panel = new SlicedSprite({
       texturePath: this.chrome.panelTexture,
       width: this.width,
       height: this.height,
@@ -194,7 +194,7 @@ export class DialogUIRenderComponent extends RenderComponent {
     const btnX = Math.round((this.width - btnW) / 2);
     const btnY = this.height - btnH - 16;
 
-    const btn = new NineSliceSprite({
+    const btn = new SlicedSprite({
       texturePath: this.chrome.buttonTexture,
       width: btnW,
       height: btnH,

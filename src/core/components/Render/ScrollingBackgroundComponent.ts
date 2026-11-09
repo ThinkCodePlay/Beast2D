@@ -17,7 +17,7 @@ interface LayerRuntime {
   sprites: [Sprite, Sprite];
 }
 
-export class ParallaxBackgroundRenderComponent extends Component {
+export class ScrollingBackgroundComponent extends Component {
   private layerContainer: Container | null = null;
   private readonly layersConfig: ParallaxLayerConfig[];
   private layers: LayerRuntime[] = [];

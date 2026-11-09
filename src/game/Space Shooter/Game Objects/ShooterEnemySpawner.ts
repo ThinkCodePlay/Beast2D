@@ -1,6 +1,6 @@
 import { GameObject } from "../../../core/GameObject";
 import { SpawnerComponent } from "../../../core/components/Behavior/SpawnerComponent";
-import { Globals } from "../../../core/Globals";
+import { CanvasSize } from "../../../core/canvasSize";
 import { ShooterEnemy } from "./ShooterEnemy";
 
 export class ShooterEnemySpawner extends GameObject {
@@ -10,7 +10,7 @@ export class ShooterEnemySpawner extends GameObject {
     this.addComponent(
       new SpawnerComponent(
         { min: 0.8, max: 2.2 },
-        { min: 0, max: Globals.canvasWidth - 32 },
+        { min: 0, max: CanvasSize.canvasWidth - 32 },
         0,
         (x, y) => {
           const parent = this.parent ?? this;

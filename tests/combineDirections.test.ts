@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { combineDirections } from "../src/core/movement/combineDirections";
+import { combineDirections } from "../src/core/components/Movement/combineDirections";
 
 describe("combineDirections", () => {
   it("sums opposing horizontal to zero", () => {

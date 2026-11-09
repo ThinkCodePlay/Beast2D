@@ -8,7 +8,7 @@ import {
 } from "pixi.js";
 import { RenderComponent } from "./RenderComponent";
 import type { RenderOptions } from "./RenderComponent";
-import { textureNearest } from "../../ui/textureNearest";
+import { pixelTexture } from "../../ui/pixelTexture";
 
 export interface SpritesheetClipConfig {
   texturePath: string;
@@ -45,13 +45,13 @@ function buildGridFrames(
         config.frameHeight,
       ),
     });
-    textureNearest(frame);
+    pixelTexture(frame);
     frames.push(frame);
   }
   return frames;
 }
 
-export class SpritesheetAnimationRenderComponent extends RenderComponent {
+export class SpriteAnimationComponent extends RenderComponent {
   private animated: AnimatedSprite | null = null;
   private readonly clipsOptions: SpritesheetAnimationClipsOptions;
   private readonly clipFrames = new Map<string, Texture[]>();
@@ -67,7 +67,7 @@ export class SpritesheetAnimationRenderComponent extends RenderComponent {
     super(renderOptions);
     if (!clipsOptions.clips[clipsOptions.defaultClip]) {
       throw new Error(
-        `SpritesheetAnimationRenderComponent: unknown defaultClip "${clipsOptions.defaultClip}"`,
+        `SpriteAnimationComponent: unknown defaultClip "${clipsOptions.defaultClip}"`,
       );
     }
     this.clipsOptions = clipsOptions;
@@ -86,7 +86,7 @@ export class SpritesheetAnimationRenderComponent extends RenderComponent {
   playClip(name: string, options: { restart?: boolean } = {}): void {
     if (!this.clipsOptions.clips[name]) {
       throw new Error(
-        `SpritesheetAnimationRenderComponent: unknown clip "${name}"`,
+        `SpriteAnimationComponent: unknown clip "${name}"`,
       );
     }
 

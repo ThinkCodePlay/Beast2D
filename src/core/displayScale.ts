@@ -1,5 +1,5 @@
 import { TextureStyle } from "pixi.js";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./display";
 
 export interface DisplayScaleFitOptions {
   /** Inset from the window edges in CSS pixels (both axes). */

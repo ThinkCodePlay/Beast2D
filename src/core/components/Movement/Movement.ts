@@ -1,11 +1,11 @@
 import { Component } from "../Component";
-import { combineDirections } from "../../movement/combineDirections";
-import type { MoveTowardsAxes } from "../../moveTowards";
+import { combineDirections } from "./combineDirections";
+import type { MoveTowardsAxes } from "./stepToward";
 import { TransformComponent } from "./TransformComponent";
-import { MovementDirectionSource } from "./MovementDirectionSource";
+import { MovementInput } from "./MovementInput";
 
 /**
- * Applies summed movement requests from {@link MovementDirectionSource} siblings
+ * Applies summed movement requests from {@link MovementInput} siblings
  * on the same GameObject. Requests are combined by vector sum with magnitude
  * clamped to 1; this component is the only transform writer for that path.
  */
@@ -32,7 +32,7 @@ export class Movement extends Component {
     if (!this.transform || !this.gameObject) return;
 
     const sources = this.gameObject
-      .getComponents(MovementDirectionSource)
+      .getComponents(MovementInput)
       .filter((src) => src.enabled && !src.destroyed);
     if (sources.length === 0) return;
 

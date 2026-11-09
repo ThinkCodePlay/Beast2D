@@ -2,7 +2,7 @@ import { GameObject } from "../GameObject";
 import { TransformComponent } from "../components/Movement/TransformComponent";
 import { CircleRenderComponent } from "../components/Render/CircleRenderComponent";
 import type { RenderOptions } from "../components/Render/RenderComponent";
-import { ObjectNames } from "../consts";
+import { ObjectNames } from "../display";
 
 export class Circle extends GameObject {
   constructor(

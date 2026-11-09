@@ -1,6 +1,6 @@
 # Display spec
 
-Beast2D games render in a fixed **320×240** virtual framebuffer (`DISPLAY_WIDTH`, `DISPLAY_HEIGHT` in `src/core/consts.ts`). The engine defaults to one backing-store pixel per logical pixel (`Engine` `resolution: 1`, `antialias: false` in `main.ts`).
+Beast2D games render in a fixed **320×240** virtual framebuffer (`DISPLAY_WIDTH`, `DISPLAY_HEIGHT` in `src/core/display.ts`). The engine defaults to one backing-store pixel per logical pixel (`Engine` `resolution: 1`, `antialias: false` in `main.ts`).
 
 That framebuffer is scaled up to the browser window by **whole numbers only** (1×, 2×, 3×, …) with **nearest-neighbor** sampling—`configurePixelArtRendering()` sets Pixi `TextureStyle.defaultOptions.scaleMode = 'nearest'` before loads. The canvas uses crisp CSS integer scaling (`image-rendering: pixelated` / `crisp-edges` in `style.css`); `attachDisplayScaleFit()` in `main.ts` picks the largest integer that fits the window (centered in `#app`).
 

@@ -1,7 +1,7 @@
-import { DialogUI } from "../components/UI/DialogUI";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../consts";
-import type { EngineContext } from "../EngineContext";
-import { clientToGameCoords } from "./clientToGameCoords";
+import { DialogUI } from "../UI/DialogUI";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../display";
+import type { EngineContext } from "../../EngineContext";
+import { pointerToGame } from "./pointerToGame";
 
 /** Shared primary-pointer state for every {@link PointerMovement} on the canvas. */
 class PlayfieldPointerSessionImpl {
@@ -119,7 +119,7 @@ class PlayfieldPointerSessionImpl {
   private eventToGame(event: PointerEvent): { x: number; y: number } {
     const canvas = this.canvas;
     if (!canvas) return { x: 0, y: 0 };
-    return clientToGameCoords(
+    return pointerToGame(
       event.clientX,
       event.clientY,
       canvas,
@@ -129,4 +129,4 @@ class PlayfieldPointerSessionImpl {
   }
 }
 
-export const playfieldPointerSession = new PlayfieldPointerSessionImpl();
+export const pointerTarget = new PlayfieldPointerSessionImpl();

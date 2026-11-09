@@ -1,7 +1,7 @@
 import { Assets, Container, Rectangle, Sprite, Texture } from "pixi.js";
-import { textureNearest } from "./textureNearest";
+import { pixelTexture } from "./pixelTexture";
 
-export interface NineSliceOptions {
+export interface SlicedSpriteOptions {
   texturePath: string;
   width: number;
   height: number;
@@ -16,10 +16,10 @@ function round8(n: number): number {
 /**
  * Stretchable panel from a square source texture with uniform slice borders.
  */
-export class NineSliceSprite extends Container {
-  private readonly options: NineSliceOptions;
+export class SlicedSprite extends Container {
+  private readonly options: SlicedSpriteOptions;
 
-  constructor(options: NineSliceOptions) {
+  constructor(options: SlicedSpriteOptions) {
     super();
     this.options = {
       ...options,
@@ -31,7 +31,7 @@ export class NineSliceSprite extends Container {
 
   private async build(): Promise<void> {
     const sheet = (await Assets.load(this.options.texturePath)) as Texture;
-    textureNearest(sheet);
+    pixelTexture(sheet);
     if (this.destroyed) return;
     const s = this.options.slice;
     const texW = sheet.width;
@@ -119,7 +119,7 @@ export class NineSliceSprite extends Container {
         source: sheet.source,
         frame: new Rectangle(r.sx, r.sy, r.sw, r.sh),
       });
-      textureNearest(frame);
+      pixelTexture(frame);
       const spr = new Sprite(frame);
       spr.roundPixels = true;
       spr.x = Math.round(r.dx);

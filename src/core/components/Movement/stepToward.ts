@@ -12,7 +12,7 @@ export interface MoveTowardsAxes {
  * Moves `from` toward `to` by at most `maxStep` (same units as positions).
  * Never overshoots; returns `to` when within one step.
  */
-export function stepMoveTowards(
+export function stepToward(
   from: Point2,
   to: Point2,
   maxStep: number,

@@ -1,10 +1,10 @@
-/* FixedStepper.ts
+/* FixedTick.ts
   Accumulates variable frame deltas and reports how many fixed steps are due.
   Used so systems such as collision run at a stable rate regardless of the
   display refresh rate. Units are frame units (1 = 1/60 s).
 */
 
-export class FixedStepper {
+export class FixedTick {
   private accumulator = 0;
 
   readonly step: number;

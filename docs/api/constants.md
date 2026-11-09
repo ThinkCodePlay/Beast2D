@@ -1,6 +1,6 @@
 # Constants
 
-Exported from `./core` (`src/core/consts.ts`).
+Exported from `./core` (`src/core/display.ts`).
 
 ## Display
 

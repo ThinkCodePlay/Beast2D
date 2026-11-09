@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { PNG } from "pngjs";
-import { BEAST2D16_LIST, isBeast2D16Color } from "../src/core/palette/beast2d16";
+import { BEAST2D16_LIST, isBeast2D16Color } from "../src/core/ui/palette";
 
 describe("Beast2D16 palette", () => {
   it("lists 16 colors", () => {

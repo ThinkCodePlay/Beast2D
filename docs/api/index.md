@@ -12,7 +12,7 @@ All symbols listed here are exported from `src/core/index.ts`.
 | Shared services | [EngineContext](./core/engine-context.md) |
 | GameManager & LevelManager | [Game management](./core/game-management.md) |
 | Time, input, timers, collisions | [Services](./core/services.md) |
-| Globals, pooling, fixed step | [Utilities](./core/utilities.md) |
+| CanvasSize, pooling, fixed step | [Utilities](./core/utilities.md) |
 | Constants & layers | [Constants](./constants.md) |
 
 ## Components

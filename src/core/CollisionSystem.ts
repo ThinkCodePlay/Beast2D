@@ -12,7 +12,7 @@ import {
   intersectsShapes,
   shapeBounds,
   type ColliderShape,
-} from "./components/Collision/shapes";
+} from "./components/Collision/collisionMath";
 
 export class CollisionSystem {
   private colliders: ColliderComponent[] = [];

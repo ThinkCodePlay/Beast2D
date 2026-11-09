@@ -1,17 +1,17 @@
 # Input and behavior components
 
-## InteractiveComponent
+## ClickableComponent
 
 Pointer hit area on the GameObject container.
 
 ```ts
-type InteractiveOptions = {
+type ClickableOptions = {
   onClick?: () => void;
   onHoverStart?: () => void;
   onHoverEnd?: () => void;
 };
 
-new InteractiveComponent(options?: InteractiveOptions)
+new ClickableComponent(options?: ClickableOptions)
 ```
 
 ## SpaceShootInputComponent
@@ -42,7 +42,7 @@ Pass a single number for fixed interval or position; or `{ min, max }` for rando
 
 ## HorizontalLocomotionAnimationComponent
 
-Drives `SpritesheetAnimationRenderComponent` clips from horizontal movement.
+Drives `SpriteAnimationComponent` clips from horizontal movement.
 
 ```ts
 new HorizontalLocomotionAnimationComponent(
@@ -51,7 +51,7 @@ new HorizontalLocomotionAnimationComponent(
 )
 ```
 
-Requires sibling `SpritesheetAnimationRenderComponent` and horizontal motion (input or velocity).
+Requires sibling `SpriteAnimationComponent` and horizontal motion (input or velocity).
 
 ## DestroyOutOfBoundsComponent
 
@@ -74,7 +74,7 @@ Specialization: destroy when below the screen.
 
 ```ts
 new DestroyBelowScreenComponent(
-  screenHeight?: number,  // default Globals.canvasHeight
+  screenHeight?: number,  // default CanvasSize.canvasHeight
   offset?: number,
 )
 ```

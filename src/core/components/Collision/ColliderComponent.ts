@@ -1,10 +1,10 @@
 import { Graphics } from "pixi.js";
 import { Component } from "../Component";
 import { TransformComponent } from "../Movement/TransformComponent";
-import { CollisionLayers, ColliderModes } from "../../consts";
-import type { ColliderShape } from "./shapes";
+import { CollisionLayers, ColliderModes } from "../../display";
+import type { ColliderShape } from "./collisionMath";
 
-export type { ColliderShape } from "./shapes";
+export type { ColliderShape } from "./collisionMath";
 export type ColliderMode = (typeof ColliderModes)[keyof typeof ColliderModes];
 export type CollisionLayer =
   (typeof CollisionLayers)[keyof typeof CollisionLayers];

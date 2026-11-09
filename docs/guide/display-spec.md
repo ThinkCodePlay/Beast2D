@@ -16,7 +16,7 @@ The Pixi renderer stays at 320×240 backing pixels (`Engine` `resolution: 1`); o
 
 ## Constants
 
-Defined in `src/core/consts.ts` (also exported from `./core`):
+Defined in `src/core/display.ts` (also exported from `./core`):
 
 | Constant | Value | Meaning |
 | --- | --- | --- |

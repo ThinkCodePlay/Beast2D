@@ -1,5 +1,5 @@
 import { Level } from "../../core/Level";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../core/consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../core/display";
 import {
   BUNNY_SPRITE_SIZE,
   TEXTURE_BUNNY_IDLE,

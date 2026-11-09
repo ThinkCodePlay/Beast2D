@@ -17,7 +17,7 @@ Created by `Engine` on mount with stage size and optional `inputTarget` (default
 | `input` | `Input` | Keyboard actions |
 | `timers` | `Timers` | Scheduled callbacks |
 | `collisions` | `CollisionSystem` | Collider registry & pairs |
-| `collisionStepper` | `FixedStepper` | Fixed 60 Hz collision consumption |
+| `collisionStepper` | `FixedTick` | Fixed 60 Hz collision consumption |
 
 ## Methods
 

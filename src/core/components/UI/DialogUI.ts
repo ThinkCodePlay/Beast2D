@@ -2,7 +2,7 @@ import { GameObject } from "../../GameObject";
 import { TransformComponent } from "../Movement/TransformComponent";
 import { DialogUIRenderComponent } from "./DialogUIRenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
-import { DISPLAY_WIDTH, PIXEL_GRID } from "../../consts";
+import { DISPLAY_WIDTH, PIXEL_GRID } from "../../display";
 import type { DialogChromeTheme } from "../../ui/dialogTheme";
 
 export class DialogUI extends GameObject {

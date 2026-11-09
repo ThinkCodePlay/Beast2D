@@ -1,11 +1,11 @@
 import { Graphics } from "pixi.js";
-import { Beast2D16 } from "../../core/palette/beast2d16";
+import { Beast2D16 } from "../../core/ui/palette";
 import {
   buildBitmapTextReady,
   measureBitmapText,
   preloadBitmapFont,
 } from "../../core/ui/BitmapText";
-import { HUD_LAYOUT } from "../../core/ui/hudContract";
+import { HUD_LAYOUT } from "../../core/ui/hudLayout";
 import { RenderComponent } from "../../core/components/Render/RenderComponent";
 
 export class BreakoutPlayfieldHintRender extends RenderComponent {

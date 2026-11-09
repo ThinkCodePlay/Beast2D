@@ -2,9 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Input } from "../src/core/Input";
 import { Time } from "../src/core/Time";
 import { Timers } from "../src/core/Timers";
-import { FixedStepper } from "../src/core/FixedStepper";
-import { ObjectPool } from "../src/core/ObjectPool";
-
+import { FixedTick } from "../src/core/fixedTick";
 function key(type: "keydown" | "keyup", code: string) {
   const event = Object.assign(new Event(type, { cancelable: true }), { code });
   return event;
@@ -152,59 +150,23 @@ describe("Timers", () => {
   });
 });
 
-describe("FixedStepper", () => {
+describe("FixedTick", () => {
   it("accumulates fractional deltas", () => {
-    const stepper = new FixedStepper(1);
+    const stepper = new FixedTick(1);
     expect(stepper.consume(0.4)).toBe(0);
     expect(stepper.consume(0.4)).toBe(0);
     expect(stepper.consume(0.4)).toBe(1);
   });
 
   it("runs several steps after a long frame and caps them", () => {
-    const stepper = new FixedStepper(1, 3);
+    const stepper = new FixedTick(1, 3);
     expect(stepper.consume(2)).toBe(2);
     expect(stepper.consume(100)).toBe(3);
     expect(stepper.consume(0)).toBe(0); // backlog dropped
   });
 
   it("tolerates float error around 1", () => {
-    const stepper = new FixedStepper(1);
+    const stepper = new FixedTick(1);
     expect(stepper.consume(0.9999999)).toBe(1);
-  });
-});
-
-describe("ObjectPool", () => {
-  it("reuses released objects and resets them", () => {
-    let created = 0;
-    const pool = new ObjectPool(
-      () => ({ id: ++created, dirty: false }),
-      (o) => (o.dirty = false),
-    );
-    const a = pool.acquire();
-    a.dirty = true;
-    expect(pool.release(a)).toBe(true);
-    const b = pool.acquire();
-    expect(b).toBe(a);
-    expect(b.dirty).toBe(false);
-    expect(created).toBe(1);
-  });
-
-  it("ignores double release and respects maxSize", () => {
-    const pool = new ObjectPool(() => ({}), undefined, 1);
-    const a = pool.acquire();
-    const b = pool.acquire();
-    expect(pool.release(a)).toBe(true);
-    expect(pool.release(a)).toBe(false);
-    expect(pool.release(b)).toBe(false);
-    expect(pool.size).toBe(1);
-  });
-
-  it("clear disposes pooled items", () => {
-    const pool = new ObjectPool(() => ({}));
-    pool.release(pool.acquire());
-    const dispose = vi.fn();
-    pool.clear(dispose);
-    expect(dispose).toHaveBeenCalledTimes(1);
-    expect(pool.size).toBe(0);
   });
 });

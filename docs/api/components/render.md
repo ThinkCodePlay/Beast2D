@@ -38,7 +38,7 @@ Static texture from `public/`.
 new SpriteRenderComponent(texturePath: string, renderOptions?: RenderOptions)
 ```
 
-## SpritesheetAnimationRenderComponent
+## SpriteAnimationComponent
 
 Multi-clip spritesheet animation using Pixi `AnimatedSprite`.
 
@@ -57,7 +57,7 @@ type SpritesheetAnimationClipsOptions = {
   clips: Record<string, SpritesheetClipConfig>;
 };
 
-new SpritesheetAnimationRenderComponent(
+new SpriteAnimationComponent(
   clipsOptions: SpritesheetAnimationClipsOptions,
   renderOptions?: RenderOptions,
 )
@@ -70,7 +70,7 @@ new SpritesheetAnimationRenderComponent(
 
 Works with `HorizontalFacingComponent` / `HorizontalLocomotionAnimationComponent`.
 
-## ParallaxBackgroundRenderComponent
+## ScrollingBackgroundComponent
 
 Scrolling layered backgrounds.
 
@@ -82,7 +82,7 @@ type ParallaxLayerConfig = {
   zIndex?: number;
 };
 
-new ParallaxBackgroundRenderComponent(layersConfig: ParallaxLayerConfig[])
+new ScrollingBackgroundComponent(layersConfig: ParallaxLayerConfig[])
 ```
 
 ## Related

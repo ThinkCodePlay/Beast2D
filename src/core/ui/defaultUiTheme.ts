@@ -1,7 +1,7 @@
 import { TEXTURE_HEART } from "../../game/publicAssets";
-import { Beast2D16 } from "../palette/beast2d16";
+import { Beast2D16 } from "./palette";
 import type { DialogChromeTheme } from "./dialogTheme";
-import type { HudHeaderTheme } from "./hudTheme";
+import type { HudStyle } from "./hudStyle";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "./defaultBitmapFont";
 
 export const TEXTURE_DEFAULT_HUD_BAND = "ui/hud-band.320x16.png";
@@ -24,7 +24,7 @@ export const ENGINE_FRAME_ASSETS = [
   DEFAULT_BEAST2D_BITMAP_FONT.atlasPath,
 ] as const;
 
-export const DEFAULT_BEAST2D_HUD_THEME: HudHeaderTheme = {
+export const DEFAULT_BEAST2D_HUD_THEME: HudStyle = {
   bandTexture: TEXTURE_DEFAULT_HUD_BAND,
   heartTexture: TEXTURE_HEART,
   fontTint: Beast2D16.Cream,

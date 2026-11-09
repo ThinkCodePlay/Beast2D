@@ -10,8 +10,8 @@ import { SquareColliderComponent } from "../src/core/components/Collision/Square
 import {
   intersectsShapes,
   shapeBounds,
-} from "../src/core/components/Collision/shapes";
-import { ColliderModes, CollisionLayers } from "../src/core/consts";
+} from "../src/core/components/Collision/collisionMath";
+import { ColliderModes, CollisionLayers } from "../src/core/display";
 import { createRoot, frame } from "./helpers";
 
 describe("shapes", () => {

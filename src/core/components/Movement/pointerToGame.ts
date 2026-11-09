@@ -2,7 +2,7 @@
  * Maps a viewport `clientX`/`clientY` to logical game space inside a canvas
  * that may be integer-scaled via CSS (see displayScale.ts).
  */
-export function clientToGameCoords(
+export function pointerToGame(
   clientX: number,
   clientY: number,
   canvas: HTMLCanvasElement,

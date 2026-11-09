@@ -1,6 +1,6 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
-import { SpritesheetAnimationRenderComponent } from "../../../core/components/Render/SpritesheetAnimationRenderComponent";
+import { SpriteAnimationComponent } from "../../../core/components/Render/SpriteAnimationComponent";
 import { ConstantMoveComponent } from "../../../core/components/Movement/ConstantMoveComponent";
 import { DestroyOutOfBoundsComponent } from "../../../core/components/Behavior/DestroyOutOfBoundsComponent";
 import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
@@ -9,13 +9,13 @@ import {
   ColliderModes,
   PLAYFIELD_TOP,
   SPRITE_SIZE,
-} from "../../../core/consts";
+} from "../../../core/display";
 import {
   TEXTURE_ENEMY_CRUISER_SHEET,
   TEXTURE_ENEMY_DRIFTER_SHEET,
   TEXTURE_ENEMY_SCOUT_SHEET,
 } from "../shooterAssets";
-import { Globals } from "../../../core/Globals";
+import { CanvasSize } from "../../../core/canvasSize";
 import { EXHAUST_PUFF, EXPLOSION_SMALL } from "../effects/PixelEffectPresets";
 import { spawnPixelBurst } from "../effects/spawnEffect";
 import { ShooterPlayfield } from "./ShooterPlayfield";
@@ -65,7 +65,7 @@ export class ShooterEnemy extends GameObject {
 
     this.addComponent(new TransformComponent(x, y));
     this.addComponent(
-      new SpritesheetAnimationRenderComponent({
+      new SpriteAnimationComponent({
         defaultClip: "fly",
         clips: {
           fly: {
@@ -98,9 +98,9 @@ export class ShooterEnemy extends GameObject {
     this.addComponent(
       new DestroyOutOfBoundsComponent({
         minX: -SPRITE_SIZE,
-        maxX: Globals.canvasWidth + SPRITE_SIZE,
+        maxX: CanvasSize.canvasWidth + SPRITE_SIZE,
         minY: PLAYFIELD_TOP - SPRITE_SIZE,
-        maxY: Globals.canvasHeight + SPRITE_SIZE,
+        maxY: CanvasSize.canvasHeight + SPRITE_SIZE,
       }),
     );
   }

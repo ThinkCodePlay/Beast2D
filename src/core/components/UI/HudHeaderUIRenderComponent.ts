@@ -2,27 +2,27 @@ import { Assets, Container, Graphics, Sprite } from "pixi.js";
 import { RenderComponent } from "../Render/RenderComponent";
 import type { RenderOptions } from "../Render/RenderComponent";
 import { TEXTURE_HEART } from "../../../game/publicAssets";
-import { HUD_LAYOUT } from "../../ui/hudContract";
-import type { HudHeaderTheme } from "../../ui/hudTheme";
+import { HUD_LAYOUT } from "../../ui/hudLayout";
+import type { HudStyle } from "../../ui/hudStyle";
 import {
   buildBitmapTextReady,
   measureBitmapText,
   preloadBitmapFont,
 } from "../../ui/BitmapText";
 import { formatHudScoreLine } from "../../ui/formatHudScore";
-import { textureNearest } from "../../ui/textureNearest";
+import { pixelTexture } from "../../ui/pixelTexture";
 
 export class HudHeaderUIRenderComponent extends RenderComponent {
   private hearts: number;
   private score: number;
-  private readonly theme: HudHeaderTheme;
+  private readonly theme: HudStyle;
   private scoreHost: Container | null = null;
   private paintToken = 0;
 
   constructor(
     hearts: number = HUD_LAYOUT.defaultLives,
     score: number = 0,
-    theme: HudHeaderTheme,
+    theme: HudStyle,
     renderOptions: RenderOptions = {},
   ) {
     super(renderOptions);
@@ -78,7 +78,7 @@ export class HudHeaderUIRenderComponent extends RenderComponent {
 
     const bandTex = Assets.get(this.theme.bandTexture);
     if (bandTex) {
-      textureNearest(bandTex);
+      pixelTexture(bandTex);
       const band = new Sprite(bandTex);
       band.width = HUD_LAYOUT.width;
       band.height = HUD_LAYOUT.height;
@@ -87,7 +87,7 @@ export class HudHeaderUIRenderComponent extends RenderComponent {
 
     const heartTex = Assets.get(heartTexture);
     if (heartTex) {
-      textureNearest(heartTex);
+      pixelTexture(heartTex);
       const heartY = Math.floor(
         (HUD_LAYOUT.height - HUD_LAYOUT.heartSize) / 2,
       );

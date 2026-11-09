@@ -1,7 +1,7 @@
 import type { FederatedPointerEvent } from "pixi.js";
 import { Component } from "../Component";
 
-export interface InteractiveOptions {
+export interface ClickableOptions {
   onClick?: (event: FederatedPointerEvent) => void;
   onHoverStart?: (event: FederatedPointerEvent) => void;
   onHoverEnd?: (event: FederatedPointerEvent) => void;
@@ -9,10 +9,10 @@ export interface InteractiveOptions {
 }
 
 /** Makes a GameObject react to pointer click and hover (hit area = its graphics). */
-export class InteractiveComponent extends Component {
-  private readonly options: InteractiveOptions;
+export class ClickableComponent extends Component {
+  private readonly options: ClickableOptions;
 
-  constructor(options: InteractiveOptions = {}) {
+  constructor(options: ClickableOptions = {}) {
     super();
     this.options = options;
   }

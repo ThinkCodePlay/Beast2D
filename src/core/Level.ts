@@ -7,12 +7,12 @@
 */
 
 import { Container } from "pixi.js";
-import { ObjectNames } from "./consts";
+import { ObjectNames } from "./display";
 import type { Engine } from "./Engine";
 import type { EngineContext } from "./EngineContext";
 import { GameObject } from "./GameObject";
 import { HudHeaderUI } from "./components/UI/HudHeaderUI";
-import { HUD_LAYOUT } from "./ui/hudContract";
+import { HUD_LAYOUT } from "./ui/hudLayout";
 import { DEFAULT_BEAST2D_HUD_THEME } from "./ui/defaultUiTheme";
 import { useBitmapFont } from "./ui/bitmapFontRegistry";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "./ui/defaultBitmapFont";

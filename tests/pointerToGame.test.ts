@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { clientToGameCoords } from "../src/core/pointer/clientToGameCoords";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../src/core/consts";
+import { pointerToGame } from "../src/core/components/Movement/pointerToGame";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../src/core/display";
 
 function mockCanvas(rect: {
   left: number;
@@ -20,10 +20,10 @@ function mockCanvas(rect: {
   } as HTMLCanvasElement;
 }
 
-describe("clientToGameCoords", () => {
+describe("pointerToGame", () => {
   it("maps CSS-scaled canvas pixels to logical 320×240", () => {
     const canvas = mockCanvas({ left: 100, top: 50, width: 640, height: 480 });
-    const center = clientToGameCoords(
+    const center = pointerToGame(
       100 + 320,
       50 + 240,
       canvas,

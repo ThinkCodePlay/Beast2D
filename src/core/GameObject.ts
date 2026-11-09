@@ -11,7 +11,7 @@
 import { Container } from "pixi.js";
 import { Component } from "./components/Component";
 import { TransformComponent } from "./components/Movement/TransformComponent";
-import { ObjectNames } from "./consts";
+import { ObjectNames } from "./display";
 import type { EngineContext } from "./EngineContext";
 
 type ComponentClass<T extends Component> = abstract new (...args: any[]) => T;

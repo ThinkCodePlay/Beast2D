@@ -45,12 +45,12 @@ await game.loadLevel("main");
 - **Destroying**: `gameObject.destroy()` is safe anywhere (also inside `update` and collision callbacks). The object is detached immediately; teardown (`onDestroy`) happens at the end of the frame. `GameObject` subclasses can override `onDestroy()` for object-level cleanup.
 - **TransformComponent**: local position/rotation/scale. The engine applies it to the object's container after all updates, so children inherit it. Use `getWorldPosition()` / `localToWorld()` for world space. Render graphics are drawn at the object origin.
 - **Components are looked up by class**: `getComponent(Collider)` also finds subclasses. One component per class per object.
-- **EngineContext** (`gameObject.context`, `component.context`): `time`, `input`, `timers`, `collisions`, `stage`, `width`, `height`, `debug`. Available once the object is part of a level; `Globals` is a thin static facade for code that runs before that (e.g. prefab constructors).
+- **EngineContext** (`gameObject.context`, `component.context`): `time`, `input`, `timers`, `collisions`, `stage`, `width`, `height`, `debug`. Available once the object is part of a level; `CanvasSize` is a thin static facade for code that runs before that (e.g. prefab constructors).
 - **Input**: named actions (`left`, `right`, `up`, `down`, `shoot`, plus your own via `input.bind`). Keys are tracked by `KeyboardEvent.code`; keys are released on window blur.
 - **Collisions**: `CollisionSystem` (grid broadphase, deterministic order, fixed 60 Hz). Colliders have `layer`, `mode` (active/passive/both), `mask` and `onCollisionEnter/Stay/Exit`.
 - **Time / pause**: `GameManager.pause()` freezes game time (delta 0). Objects with `runWhenPaused = true` (UI) keep updating; rendering continues. `time.timeScale` gives slow motion. `context.timers.after/every` schedule callbacks on game time.
 - **Levels**: the game registers its levels (see `src/main.ts`). `level.assets` lists assets preloaded before `init()`. Switching levels while a level is ticking is deferred to the end of the tick.
-- **Pointer events**: `InteractiveComponent({ onClick, onHoverStart, onHoverEnd })`.
-- **Pooling**: `ObjectPool<T>` is a generic helper. Destroyed `GameObject`s cannot be reused; pool lightweight data or recreate objects.
+- **Pointer events**: `ClickableComponent({ onClick, onHoverStart, onHoverEnd })`.
+- **Destroyed objects**: `destroy()` detaches immediately and does not revive the object. Spawn a new one.
 
 Everything public is exported from `src/core/index.ts`.

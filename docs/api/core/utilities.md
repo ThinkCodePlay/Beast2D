@@ -1,18 +1,12 @@
 # Utilities
 
-## Globals
+## CanvasSize
 
-Static facade initialized when the engine mounts. Use for construction-time values before `context` exists (for example `Globals.canvasHeight` in a component constructor).
+Static facade initialized when the engine mounts. Use for construction-time values before `context` exists (for example `CanvasSize.canvasHeight` in a component constructor).
 
 Prefer `requireContext()` in `update` / `onInit` when the object is always in a level.
 
-## ObjectPool
-
-Export: `ObjectPool<T>`.
-
-Generic pool for reusable **non-GameObject** data. Does not resurrect destroyed nodes.
-
-## FixedStepper
+## FixedTick
 
 See [Services](./services.md#fixedstepper).
 

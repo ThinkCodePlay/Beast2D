@@ -1,6 +1,6 @@
-import { Beast2D16 } from "../../core/palette/beast2d16";
+import { Beast2D16 } from "../../core/ui/palette";
 
-import { PLAYFIELD_TOP } from "../../core/consts";
+import { PLAYFIELD_TOP } from "../../core/display";
 
 export { PLAYFIELD_TOP };
 export const PLAYFIELD_BOTTOM = 240;

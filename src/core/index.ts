@@ -6,14 +6,13 @@ export { GameManager } from "./GameManager";
 export { Level } from "./Level";
 export { LevelManager } from "./LevelManager";
 export { GameObject } from "./GameObject";
-export { Globals } from "./Globals";
+export { CanvasSize } from "./canvasSize";
 export { Time, FRAMES_PER_SECOND } from "./Time";
 export { Timers, type TimerHandle } from "./Timers";
 export { Input, DefaultBindings } from "./Input";
-export { FixedStepper } from "./FixedStepper";
-export { ObjectPool } from "./ObjectPool";
+export { FixedTick } from "./fixedTick";
 export { CollisionSystem } from "./CollisionSystem";
-export * from "./consts";
+export * from "./display";
 export {
   attachDisplayScaleFit,
   computeIntegerDisplayScale,
@@ -29,22 +28,22 @@ export { ConstantMoveComponent } from "./components/Movement/ConstantMoveCompone
 export { Movement } from "./components/Movement/Movement";
 export { KeyboardMovement } from "./components/Movement/KeyboardMovement";
 export { PointerMovement } from "./components/Movement/PointerMovement";
-export { MovementDirectionSource } from "./components/Movement/MovementDirectionSource";
-export { stepMoveTowards, type MoveTowardsAxes } from "./moveTowards";
+export { MovementInput } from "./components/Movement/MovementInput";
+export { stepToward, type MoveTowardsAxes } from "./components/Movement/stepToward";
 export {
   combineDirections,
   type MovementDirection,
-} from "./movement/combineDirections";
-export { pointerArrivalDirection } from "./movement/pointerArrivalDirection";
-export { clientToGameCoords } from "./pointer/clientToGameCoords";
+} from "./components/Movement/combineDirections";
+export { directionToPointer } from "./components/Movement/directionToPointer";
+export { pointerToGame } from "./components/Movement/pointerToGame";
 export {
   wireUiPointerButton,
   type WireUiPointerButtonOptions,
 } from "./ui/UiPointerButton";
 export {
-  InteractiveComponent,
-  type InteractiveOptions,
-} from "./components/Input/InteractiveComponent";
+  ClickableComponent,
+  type ClickableOptions,
+} from "./components/Input/ClickableComponent";
 export { SpawnerComponent } from "./components/Behavior/SpawnerComponent";
 export {
   DestroyOutOfBoundsComponent,
@@ -61,13 +60,12 @@ export { BoxRenderComponent } from "./components/Render/BoxRenderComponent";
 export { CircleRenderComponent } from "./components/Render/CircleRenderComponent";
 export { SpriteRenderComponent } from "./components/Render/SpriteRenderComponent";
 export {
-  SpritesheetAnimationRenderComponent,
+  SpriteAnimationComponent,
   type SpritesheetAnimationClipsOptions,
   type SpritesheetClipConfig,
-} from "./components/Render/SpritesheetAnimationRenderComponent";
-export { ParallaxBackgroundRenderComponent } from "./components/Render/ParallaxBackgroundRenderComponent";
+} from "./components/Render/SpriteAnimationComponent";
+export { ScrollingBackgroundComponent } from "./components/Render/ScrollingBackgroundComponent";
 
 export { Box } from "./prefabs/Box";
 export { Circle } from "./prefabs/Circle";
-export { Player } from "./prefabs/Player";
 export { Spawner } from "./prefabs/Spawner";

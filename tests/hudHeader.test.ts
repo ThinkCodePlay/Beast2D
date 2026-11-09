@@ -3,7 +3,7 @@ import {
   HUD_LAYOUT,
   hudLivesReservedWidth,
   hudScoreMaxWidth,
-} from "../src/core/ui/hudContract";
+} from "../src/core/ui/hudLayout";
 import { useBitmapFont } from "../src/core/ui/bitmapFontRegistry";
 import { measureBitmapText } from "../src/core/ui/BitmapText";
 import { formatHudScoreLine } from "../src/core/ui/formatHudScore";

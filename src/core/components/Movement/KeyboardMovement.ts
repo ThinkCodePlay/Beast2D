@@ -1,8 +1,8 @@
 import type { Input } from "../../Input";
-import { MovementDirectionSource } from "./MovementDirectionSource";
+import { MovementInput } from "./MovementInput";
 
 /** Arrow / WASD actions → movement request. {@link Movement} applies it and can lock an axis. */
-export class KeyboardMovement extends MovementDirectionSource {
+export class KeyboardMovement extends MovementInput {
   private input: Input | null = null;
 
   override onInit(): void {

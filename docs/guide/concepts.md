@@ -40,7 +40,7 @@ Once an object is part of a level, `gameObject.context` (and `component.context`
 - `collisions` — broadphase and collision resolution
 - `stage`, `width`, `height`, `debug`
 
-Use `requireContext()` in components when absence is a programming error. `Globals` is a thin facade for values needed before an object is in a level (for example prefab constructors).
+Use `requireContext()` in components when absence is a programming error. `CanvasSize` is a thin facade for values needed before an object is in a level (for example prefab constructors).
 
 ## Time units
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { Assets, Texture } from "pixi.js";
 import { GameObject } from "../src/core/GameObject";
-import { SpritesheetAnimationRenderComponent } from "../src/core/components/Render/SpritesheetAnimationRenderComponent";
+import { SpriteAnimationComponent } from "../src/core/components/Render/SpriteAnimationComponent";
 import { createRoot, frame } from "./helpers";
 
 const clipOptions = {
@@ -29,13 +29,13 @@ async function flushAsyncLoads(): Promise<void> {
   await Promise.resolve();
 }
 
-describe("SpritesheetAnimationRenderComponent", () => {
+describe("SpriteAnimationComponent", () => {
   it("loads default clip then playClip switches currentClip", async () => {
     vi.spyOn(Assets, "get").mockReturnValue(Texture.EMPTY);
     vi.spyOn(Assets, "load").mockResolvedValue(Texture.EMPTY);
 
     const root = createRoot();
-    const render = new SpritesheetAnimationRenderComponent(clipOptions);
+    const render = new SpriteAnimationComponent(clipOptions);
     root.addChild(new GameObject().with(render));
     frame(root);
 
@@ -47,7 +47,7 @@ describe("SpritesheetAnimationRenderComponent", () => {
   });
 
   it("throws for unknown clip names", () => {
-    const render = new SpritesheetAnimationRenderComponent(clipOptions);
+    const render = new SpriteAnimationComponent(clipOptions);
     expect(() => render.playClip("jump")).toThrow(/unknown clip/);
   });
 });

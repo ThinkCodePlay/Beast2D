@@ -2,7 +2,7 @@ import { GameObject } from "../GameObject";
 import { TransformComponent } from "../components/Movement/TransformComponent";
 import { BoxRenderComponent } from "../components/Render/BoxRenderComponent";
 import type { RenderOptions } from "../components/Render/RenderComponent";
-import { ObjectNames } from "../consts";
+import { ObjectNames } from "../display";
 
 export class Box extends GameObject {
   constructor(

@@ -3,7 +3,7 @@ import {
   computeIntegerDisplayScale,
   displayCssSize,
 } from "../src/core/displayScale";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../src/core/consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../src/core/display";
 
 describe("computeIntegerDisplayScale", () => {
   it("picks the uniform integer that fits both axes", () => {

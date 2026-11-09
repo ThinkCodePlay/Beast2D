@@ -1,4 +1,4 @@
-import { Beast2D16 } from "../../../core/palette/beast2d16";
+import { Beast2D16 } from "../../../core/ui/palette";
 
 export type PixelParticle = {
   dx: number;

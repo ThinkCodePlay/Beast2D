@@ -1,9 +1,9 @@
-import { DISPLAY_WIDTH, HUD_HEIGHT, PIXEL_GRID } from "../consts";
+import { DISPLAY_WIDTH, HUD_HEIGHT, PIXEL_GRID } from "../display";
 import { DEFAULT_BITMAP_GLYPH_H } from "./bitmapFontRegistry";
 
 /**
  * Beast2D compact playfield header geometry (320×16). Shared by demos;
- * textures and font atlas are supplied per game via {@link HudHeaderTheme}.
+ * textures and font atlas are supplied per game via {@link HudStyle}.
  */
 export const HUD_LAYOUT = {
   width: DISPLAY_WIDTH,

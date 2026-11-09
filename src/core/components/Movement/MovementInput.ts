@@ -4,7 +4,7 @@ import { Component } from "../Component";
  * Per-frame movement request in normalized analog space (typically |v| ≤ 1).
  * {@link Movement} calls {@link prepareDirection} before applying motion.
  */
-export abstract class MovementDirectionSource extends Component {
+export abstract class MovementInput extends Component {
   private readonly direction = { x: 0, y: 0 };
 
   /** Refreshes cached direction for this frame (invoked by {@link Movement}). */

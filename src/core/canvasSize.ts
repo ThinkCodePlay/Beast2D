@@ -1,4 +1,4 @@
-/* Globals.ts
+/* CanvasSize.ts
   Thin static facade over the active EngineContext, kept for code that has no
   GameObject yet, such as prefab constructors that need the canvas size.
   Inside components prefer `this.context` / `gameObject.context`.
@@ -7,13 +7,13 @@
 import type { Container } from "pixi.js";
 import type { EngineContext } from "./EngineContext";
 
-export class Globals {
+export class CanvasSize {
   private static _context: EngineContext | null = null;
   private static _debug: boolean = false;
 
   static get context(): EngineContext {
     if (!this._context) {
-      throw new Error("Globals accessed before engine initialization");
+      throw new Error("CanvasSize accessed before engine initialization");
     }
     return this._context;
   }
@@ -28,7 +28,7 @@ export class Globals {
 
   static get stage(): Container {
     if (!this._context) {
-      throw new Error("Globals.stage accessed before initialization");
+      throw new Error("CanvasSize.stage accessed before initialization");
     }
     return this._context.stage;
   }

@@ -1,10 +1,10 @@
 import { Component } from "../../../core/components/Component";
 import type { Input } from "../../../core/Input";
-import { SpritesheetAnimationRenderComponent } from "../../../core/components/Render/SpritesheetAnimationRenderComponent";
+import { SpriteAnimationComponent } from "../../../core/components/Render/SpriteAnimationComponent";
 
 /** Plays walk while left/right is held, idle otherwise. */
 export class HorizontalLocomotionAnimationComponent extends Component {
-  private render: SpritesheetAnimationRenderComponent | null = null;
+  private render: SpriteAnimationComponent | null = null;
   private input: Input | null = null;
   private moving = false;
   private readonly idleClip: string;
@@ -20,7 +20,7 @@ export class HorizontalLocomotionAnimationComponent extends Component {
     if (!this.gameObject) return;
 
     this.render = this.gameObject.getRequiredComponent(
-      SpritesheetAnimationRenderComponent,
+      SpriteAnimationComponent,
       this.constructor.name,
     );
     this.input = this.requireContext().input;

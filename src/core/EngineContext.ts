@@ -6,7 +6,7 @@
 
 import type { Container } from "pixi.js";
 import { CollisionSystem } from "./CollisionSystem";
-import { FixedStepper } from "./FixedStepper";
+import { FixedTick } from "./fixedTick";
 import { Input } from "./Input";
 import { Time } from "./Time";
 import { Timers } from "./Timers";
@@ -33,7 +33,7 @@ export class EngineContext {
   readonly timers = new Timers();
   readonly collisions = new CollisionSystem();
   /** Collisions run at a fixed 60 Hz regardless of display refresh rate. */
-  readonly collisionStepper = new FixedStepper(1);
+  readonly collisionStepper = new FixedTick(1);
 
   constructor(options: EngineContextOptions) {
     this.stage = options.stage;

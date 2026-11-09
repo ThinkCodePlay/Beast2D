@@ -1,4 +1,4 @@
-import { HUD_LAYOUT, hudScoreMaxWidth } from "./hudContract";
+import { HUD_LAYOUT, hudScoreMaxWidth } from "./hudLayout";
 import { measureBitmapText } from "./BitmapText";
 
 const textOpts = () => ({

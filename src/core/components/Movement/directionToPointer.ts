@@ -13,7 +13,7 @@ export interface PointerArrivalOptions {
  * the hold point. Farther than `arriveRadius`, magnitude is also eased by
  * `dist / arriveRadius`.
  */
-export function pointerArrivalDirection(
+export function directionToPointer(
   fromX: number,
   fromY: number,
   targetX: number,

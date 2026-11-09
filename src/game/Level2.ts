@@ -4,8 +4,8 @@
 import { Level } from "../core/Level";
 import { Circle } from "../core/prefabs/Circle";
 import { Box } from "../core/prefabs/Box";
-import { Globals } from "../core/Globals";
-import { PIXEL_GRID, PLAYFIELD_TOP } from "../core/consts";
+import { CanvasSize } from "../core/canvasSize";
+import { PIXEL_GRID, PLAYFIELD_TOP } from "../core/display";
 
 export class Level2 extends Level {
   private circles: Circle[] = [];
@@ -15,8 +15,8 @@ export class Level2 extends Level {
     // Create a centered box
     const boxSize = PIXEL_GRID * 7 + PIXEL_GRID / 2;
     const box = new Box(
-      Globals.canvasWidth / 2 - boxSize / 2,
-      Globals.canvasHeight / 2 - boxSize / 2,
+      CanvasSize.canvasWidth / 2 - boxSize / 2,
+      CanvasSize.canvasHeight / 2 - boxSize / 2,
       boxSize,
       boxSize,
       {
@@ -31,8 +31,8 @@ export class Level2 extends Level {
     const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
     for (let i = 0; i < 5; i++) {
       const circle = new Circle(
-        Math.random() * Globals.canvasWidth,
-        Math.random() * Globals.canvasHeight,
+        Math.random() * CanvasSize.canvasWidth,
+        Math.random() * CanvasSize.canvasHeight,
         20 + Math.random() * 20,
         { color: colors[i % colors.length], strokeWidth: 2 },
       );

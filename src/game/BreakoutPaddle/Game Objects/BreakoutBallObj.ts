@@ -1,5 +1,5 @@
 import { GameObject } from "../../../core/GameObject";
-import { Beast2D16 } from "../../../core/palette/beast2d16";
+import { Beast2D16 } from "../../../core/ui/palette";
 import { Circle } from "../../../core/prefabs/Circle";
 import { BALL_RADIUS, type BallState } from "../breakoutLogic";
 

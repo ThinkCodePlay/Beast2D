@@ -1,5 +1,5 @@
 import { Engine } from "./core/Engine";
-import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./core/consts";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./core/display";
 import {
   attachDisplayScaleFit,
   configurePixelArtRendering,

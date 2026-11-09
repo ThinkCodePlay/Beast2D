@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { pointerArrivalDirection } from "../src/core/movement/pointerArrivalDirection";
-import { combineDirections } from "../src/core/movement/combineDirections";
+import { directionToPointer } from "../src/core/components/Movement/directionToPointer";
+import { combineDirections } from "../src/core/components/Movement/combineDirections";
 
 function applyPointerFrame(
   pos: { x: number; y: number },
@@ -11,7 +11,7 @@ function applyPointerFrame(
   axes = { x: true, y: false as const },
 ): { x: number; y: number } {
   const maxStep = speed * dt;
-  const d = pointerArrivalDirection(
+  const d = directionToPointer(
     pos.x,
     pos.y,
     target.x,
@@ -30,9 +30,9 @@ function applyPointerFrame(
   };
 }
 
-describe("pointerArrivalDirection", () => {
+describe("directionToPointer", () => {
   it("requests partial magnitude when target is less than one step away", () => {
-    const d = pointerArrivalDirection(0, 0, 5, 0, { arriveRadius: 24, maxStep: 8 }, {
+    const d = directionToPointer(0, 0, 5, 0, { arriveRadius: 24, maxStep: 8 }, {
       x: true,
       y: false,
     });
@@ -43,7 +43,7 @@ describe("pointerArrivalDirection", () => {
   });
 
   it("uses full magnitude when just above one step", () => {
-    const d = pointerArrivalDirection(0, 0, 9, 0, { arriveRadius: 24, maxStep: 8 }, {
+    const d = directionToPointer(0, 0, 9, 0, { arriveRadius: 24, maxStep: 8 }, {
       x: true,
       y: false,
     });
@@ -51,7 +51,7 @@ describe("pointerArrivalDirection", () => {
   });
 
   it("respects axis mask with vertical offset", () => {
-    const d = pointerArrivalDirection(0, 0, 10, 40, { arriveRadius: 24, maxStep: 4 }, {
+    const d = directionToPointer(0, 0, 10, 40, { arriveRadius: 24, maxStep: 4 }, {
       x: true,
       y: false,
     });
