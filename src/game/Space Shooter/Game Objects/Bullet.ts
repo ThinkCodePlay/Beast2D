@@ -1,8 +1,8 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenderComponent";
-import { VerticalMoveComponent } from "../../../core/components/Movement/VerticalMoveComponent";
-import { DestroyOutOfBoundsComponent } from "../../../core/components/Behavior/DestroyBelowScreenComponent";
+import { ConstantMoveComponent } from "../../../core/components/Movement/ConstantMoveComponent";
+import { DestroyOutOfBoundsComponent } from "../../../core/components/Behavior/DestroyOutOfBoundsComponent";
 import { Globals } from "../../../core/Globals";
 import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
 import {
@@ -11,7 +11,7 @@ import {
   PLAYFIELD_TOP,
 } from "../../../core/consts";
 import { TEXTURE_SHOOTER_BULLET } from "../shooterAssets";
-import { ScoreUI } from "../../../core/components/UI/ScoreUI";
+import { HudHeaderUI } from "../../../core/components/UI/HudHeaderUI";
 import { ShooterEnemy } from "./ShooterEnemy";
 import type { EnemyKind } from "./ShooterEnemy";
 
@@ -25,7 +25,7 @@ export class Bullet extends GameObject {
     this.addComponent(
       new SpriteRenderComponent(TEXTURE_SHOOTER_BULLET, { alpha: 1 }),
     );
-    this.addComponent(new VerticalMoveComponent(-8));
+    this.addComponent(new ConstantMoveComponent(0, -8));
     this.addComponent(
       new CircleColliderComponent(5, {
         layer: CollisionLayers.Bullet,
@@ -34,7 +34,7 @@ export class Bullet extends GameObject {
         onCollisionEnter: (_self, other) => {
           const enemy = other.gameObject;
           if (enemy) {
-            ScoreUI.addScore(100);
+            HudHeaderUI.addScore(100);
             const { x: ex, y: ey } = enemy
               .getComponent(TransformComponent)
               ?.getWorldPosition() ?? { x: 0, y: 0 };

@@ -5,7 +5,7 @@ import { Level } from "../core/Level";
 import { Circle } from "../core/prefabs/Circle";
 import { Box } from "../core/prefabs/Box";
 import { Globals } from "../core/Globals";
-import { PIXEL_GRID } from "../core/consts";
+import { PIXEL_GRID, PLAYFIELD_TOP } from "../core/consts";
 
 export class Level2 extends Level {
   private circles: Circle[] = [];
@@ -62,7 +62,7 @@ export class Level2 extends Level {
 
       // Bounce off walls
       if (newX < 0 || newX > this.context.width) vel.x *= -1;
-      if (newY < 0 || newY > this.context.height) vel.y *= -1;
+      if (newY < PLAYFIELD_TOP || newY > this.context.height) vel.y *= -1;
 
       circle.transform.setPosition(newX, newY);
     });

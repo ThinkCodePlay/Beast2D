@@ -6,6 +6,7 @@
 
 import { Assets } from "pixi.js";
 import type { Level } from "./Level";
+import { ENGINE_FRAME_ASSETS } from "./ui/defaultUiTheme";
 
 export class LevelManager {
   private currentLevel: Level | null = null;
@@ -27,7 +28,7 @@ export class LevelManager {
 
     const token = ++this.loadToken;
     if (level.assets.length > 0) {
-      await Assets.load(level.assets);
+      await Assets.load([...new Set([...ENGINE_FRAME_ASSETS, ...level.assets])]);
       // A newer loadLevel call superseded this one while loading.
       if (token !== this.loadToken) return;
     }

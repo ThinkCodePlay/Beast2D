@@ -15,6 +15,15 @@ export const DEFAULT_BEAST2D_DIALOG_THEME: DialogChromeTheme = {
   buttonTexture: TEXTURE_DEFAULT_DIALOG_BUTTON,
 };
 
+/** Textures every level preloads so the engine HUD and dialog can draw. */
+export const ENGINE_FRAME_ASSETS = [
+  TEXTURE_HEART,
+  TEXTURE_DEFAULT_HUD_BAND,
+  TEXTURE_DEFAULT_DIALOG_PANEL,
+  TEXTURE_DEFAULT_DIALOG_BUTTON,
+  DEFAULT_BEAST2D_BITMAP_FONT.atlasPath,
+] as const;
+
 export const DEFAULT_BEAST2D_HUD_THEME: HudHeaderTheme = {
   bandTexture: TEXTURE_DEFAULT_HUD_BAND,
   heartTexture: TEXTURE_HEART,

@@ -15,17 +15,13 @@ import {
 import { Globals } from "../../core/Globals";
 import { Beast2D16 } from "../../core/palette/beast2d16";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../../core/ui/defaultBitmapFont";
-import {
-  DEFAULT_BEAST2D_DIALOG_THEME,
-  DEFAULT_BEAST2D_HUD_THEME,
-} from "../../core/ui/defaultUiTheme";
+import { DEFAULT_BEAST2D_DIALOG_THEME } from "../../core/ui/defaultUiTheme";
 import { useBitmapFont } from "../../core/ui/bitmapFontRegistry";
 import { resetBitmapTextAtlas, preloadBitmapFont } from "../../core/ui/BitmapText";
 import { Spaceship } from "./Game Objects/Spaceship";
 import { ShooterEnemySpawner } from "./Game Objects/ShooterEnemySpawner";
 import { ParallaxBackground } from "./Game Objects/ParallaxBackground";
 import { ShooterPlayfield } from "./Game Objects/ShooterPlayfield";
-import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
 import { DialogUI } from "../../core/components/UI/DialogUI";
 import {
   TEXTURE_ENEMY_CRUISER_SHEET,
@@ -85,8 +81,6 @@ export class SpaceShooter extends Level {
     ship.addComponent(new PointerMovement());
     playfield.addChild(ship);
     playfield.addChild(new ShooterEnemySpawner());
-
-    this.levelRoot.addChild(new HudHeaderUI(0, 3, DEFAULT_BEAST2D_HUD_THEME));
 
     const dialogWidth = 256;
     const dialogHeight = 96;

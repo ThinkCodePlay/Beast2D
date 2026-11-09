@@ -2,7 +2,7 @@ import { GameObject } from "../../../core/GameObject";
 import { DISPLAY_WIDTH, PIXEL_GRID } from "../../../core/consts";
 import { Beast2D16 } from "../../../core/palette/beast2d16";
 import { Box } from "../../../core/prefabs/Box";
-import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
+import { ClampComponent } from "../../../core/components/Movement/ClampComponent";
 import {
   defaultPaddleY,
   PADDLE_H,
@@ -29,10 +29,10 @@ export class BreakoutPaddleObj extends GameObject {
       },
     );
     this.body.addComponent(
-      new HorizontalClampComponent(
-        PIXEL_GRID,
-        DISPLAY_WIDTH - PIXEL_GRID - PADDLE_W,
-      ),
+      new ClampComponent({
+        minX: PIXEL_GRID,
+        maxX: DISPLAY_WIDTH - PIXEL_GRID - PADDLE_W,
+      }),
     );
     this.addChild(this.body);
   }

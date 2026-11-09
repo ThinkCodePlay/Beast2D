@@ -1,9 +1,9 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import { SpawnerComponent } from "../../../core/components/Behavior/SpawnerComponent";
-import { SpaceShootInputComponent } from "../../../core/components/Input/SpaceShootInputComponent";
-import { MUZZLE_FLASH } from "../../../core/effects/PixelEffectPresets";
-import { spawnPixelBurst } from "../../../core/effects/spawnEffect";
+import { SpaceShootInputComponent } from "../components/SpaceShootInputComponent";
+import { MUZZLE_FLASH } from "../effects/PixelEffectPresets";
+import { spawnPixelBurst } from "../effects/spawnEffect";
 import { ShooterPlayfield } from "./ShooterPlayfield";
 import { Bullet } from "./Bullet";
 

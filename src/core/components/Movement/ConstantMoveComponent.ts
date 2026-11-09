@@ -1,13 +1,16 @@
 import { Component } from "../Component";
 import { TransformComponent } from "./TransformComponent";
 
-export class VerticalMoveComponent extends Component {
-  private readonly speedY: number;
+/** Constant velocity in pixels per frame-unit. Either axis may be 0. */
+export class ConstantMoveComponent extends Component {
+  private readonly velocityX: number;
+  private readonly velocityY: number;
   private transform: TransformComponent | null = null;
 
-  constructor(speedY: number) {
+  constructor(velocityX: number, velocityY: number) {
     super();
-    this.speedY = speedY;
+    this.velocityX = velocityX;
+    this.velocityY = velocityY;
   }
 
   override onInit(): void {
@@ -20,6 +23,7 @@ export class VerticalMoveComponent extends Component {
 
   override update(deltaTime: number): void {
     if (!this.transform) return;
-    this.transform.y += this.speedY * deltaTime;
+    this.transform.x += this.velocityX * deltaTime;
+    this.transform.y += this.velocityY * deltaTime;
   }
 }

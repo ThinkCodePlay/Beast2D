@@ -2,7 +2,7 @@ import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import { SpriteRenderComponent } from "../../../core/components/Render/SpriteRenderComponent";
 import type { RenderOptions } from "../../../core/components/Render/RenderComponent";
-import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
+import { ClampComponent } from "../../../core/components/Movement/ClampComponent";
 import { Globals } from "../../../core/Globals";
 import {
   ColliderModes,
@@ -12,12 +12,11 @@ import {
 import { TEXTURE_BEAST_SHIP } from "../../publicAssets";
 import { BulletSpawner } from "./BulletSpawner";
 import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
-import { HeartsUI } from "../../../core/components/UI/HeartsUI";
+import { HudHeaderUI } from "../../../core/components/UI/HudHeaderUI";
 import { DialogUI } from "../../../core/components/UI/DialogUI";
-import { ScoreUI } from "../../../core/components/UI/ScoreUI";
-import { BlinkInvulnerabilityComponent } from "../../../core/components/Behavior/BlinkInvulnerabilityComponent";
-import { EXPLOSION_SMALL } from "../../../core/effects/PixelEffectPresets";
-import { spawnPixelBurst } from "../../../core/effects/spawnEffect";
+import { BlinkInvulnerabilityComponent } from "../components/BlinkInvulnerabilityComponent";
+import { EXPLOSION_SMALL } from "../effects/PixelEffectPresets";
+import { spawnPixelBurst } from "../effects/spawnEffect";
 import { ShooterPlayfield } from "./ShooterPlayfield";
 import { ShooterEnemy } from "./ShooterEnemy";
 import type { EnemyKind } from "./ShooterEnemy";
@@ -46,7 +45,7 @@ export class Spaceship extends GameObject {
           onCollisionEnter: (_self, other) => {
             if (invuln.invulnerable) return;
 
-            const hearts = HeartsUI.decreaseHearts(1);
+            const hearts = HudHeaderUI.decreaseHearts(1);
             invuln.trigger();
 
             const { x: px, y: py } = this.getWorldPosition();
@@ -60,7 +59,7 @@ export class Spaceship extends GameObject {
             }
 
             if (hearts <= 0) {
-              DialogUI.open("GAME OVER", ScoreUI.getScore());
+              DialogUI.open("GAME OVER", HudHeaderUI.getScore());
               DialogUI.setPrimaryLabel("RESTART");
               DialogUI.setOnRestart(() => {
                 SpaceShooter.triggerGameOverRestart();
@@ -83,7 +82,10 @@ export class Spaceship extends GameObject {
       ),
     );
     this.addComponent(
-      new HorizontalClampComponent(0, Globals.canvasWidth - shipWidth),
+      new ClampComponent({
+        minX: 0,
+        maxX: Globals.canvasWidth - shipWidth,
+      }),
     );
 
     this.addChild(new BulletSpawner());

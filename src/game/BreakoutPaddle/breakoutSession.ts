@@ -1,7 +1,6 @@
 import type { EngineContext } from "../../core/EngineContext";
 import { DialogUI } from "../../core/components/UI/DialogUI";
 import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
-import { ScoreUI } from "../../core/components/UI/ScoreUI";
 import type { BrickWall } from "./Game Objects/BrickWall";
 import type { BreakoutBallObj } from "./Game Objects/BreakoutBallObj";
 import type { BreakoutPaddleObj } from "./Game Objects/BreakoutPaddleObj";
@@ -75,7 +74,7 @@ export function tickBreakoutSession(deps: FrameDeps, deltaTime: number): void {
   deps.wall.applyStates(result.bricks);
   deps.ball.sync(session.ball);
   if (result.scoreDelta > 0) {
-    ScoreUI.addScore(result.scoreDelta);
+    HudHeaderUI.addScore(result.scoreDelta);
   }
 
   if (result.lostLife) {
@@ -104,7 +103,7 @@ function endBreakout(
   deps.pauseGame();
   DialogUI.open(
     won ? "You cleared the bricks!" : "Out of lives!",
-    ScoreUI.getScore(),
+    HudHeaderUI.getScore(),
   );
   BreakoutPlayfieldHint.setMessage("SPACE OR R RESTART");
 }

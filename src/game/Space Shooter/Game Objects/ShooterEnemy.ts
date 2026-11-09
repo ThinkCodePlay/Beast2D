@@ -1,8 +1,8 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import { SpritesheetAnimationRenderComponent } from "../../../core/components/Render/SpritesheetAnimationRenderComponent";
-import { VerticalMoveComponent } from "../../../core/components/Movement/VerticalMoveComponent";
-import { DestroyOutOfBoundsComponent } from "../../../core/components/Behavior/DestroyBelowScreenComponent";
+import { ConstantMoveComponent } from "../../../core/components/Movement/ConstantMoveComponent";
+import { DestroyOutOfBoundsComponent } from "../../../core/components/Behavior/DestroyOutOfBoundsComponent";
 import { CircleColliderComponent } from "../../../core/components/Collision/CircleColliderComponent";
 import {
   CollisionLayers,
@@ -16,8 +16,8 @@ import {
   TEXTURE_ENEMY_SCOUT_SHEET,
 } from "../shooterAssets";
 import { Globals } from "../../../core/Globals";
-import { EXHAUST_PUFF, EXPLOSION_SMALL } from "../../../core/effects/PixelEffectPresets";
-import { spawnPixelBurst } from "../../../core/effects/spawnEffect";
+import { EXHAUST_PUFF, EXPLOSION_SMALL } from "../effects/PixelEffectPresets";
+import { spawnPixelBurst } from "../effects/spawnEffect";
 import { ShooterPlayfield } from "./ShooterPlayfield";
 
 export type EnemyKind = "scout" | "cruiser" | "drifter";
@@ -80,7 +80,7 @@ export class ShooterEnemy extends GameObject {
         },
       }),
     );
-    this.addComponent(new VerticalMoveComponent(def.speed));
+    this.addComponent(new ConstantMoveComponent(0, def.speed));
     const hitRadius = 10;
     const hitCenter = SPRITE_SIZE / 2;
     this.addComponent(

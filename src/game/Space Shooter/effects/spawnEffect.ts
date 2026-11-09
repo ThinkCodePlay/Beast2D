@@ -1,4 +1,4 @@
-import type { GameObject } from "../GameObject";
+import type { GameObject } from "../../../core/GameObject";
 import { PixelBurstEffect } from "./PixelBurstEffect";
 import type { PixelBurstPreset } from "./PixelEffectPresets";
 

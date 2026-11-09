@@ -1,4 +1,4 @@
-import { Component } from "../Component";
+import { Component } from "../../../core/components/Component";
 
 export type CameraShakeOptions = {
   /** Max offset in pixels (whole numbers). */
@@ -8,9 +8,7 @@ export type CameraShakeOptions = {
   enabled?: boolean;
 };
 
-/**
- * Applies random integer offsets to the host GameObject container (attach to playfield root).
- */
+/** Applies random integer offsets to the host GameObject container (attach to playfield root). */
 export class CameraShakeComponent extends Component {
   private intensity: number;
   private respectReducedMotion: boolean;

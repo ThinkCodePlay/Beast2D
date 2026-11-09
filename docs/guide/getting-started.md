@@ -30,12 +30,12 @@ Open the URL Vite prints (usually `http://localhost:5173`). Levels registered in
 Import from `./core` (or your project’s alias). Subclass `Level`, populate `levelRoot` in `init()`, and call `super.update(dt)` in `update()`.
 
 ```ts
-import { Engine, Level, Box, UserInputComponent } from "./core";
+import { Engine, Level, Box, Movement, KeyboardMovement } from "./core";
 
 class MyLevel extends Level {
   protected init() {
     this.levelRoot.addChild(
-      new Box(100, 100, 32, 32).with(new UserInputComponent(4)),
+      new Box(100, 100, 32, 32).with(new Movement(4)).with(new KeyboardMovement()),
     );
   }
 

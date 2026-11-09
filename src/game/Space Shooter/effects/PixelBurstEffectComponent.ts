@@ -1,5 +1,5 @@
 import { Graphics } from "pixi.js";
-import { Component } from "../components/Component";
+import { Component } from "../../../core/components/Component";
 import type { PixelBurstPreset } from "./PixelEffectPresets";
 
 export class PixelBurstEffectComponent extends Component {
@@ -28,9 +28,7 @@ export class PixelBurstEffectComponent extends Component {
       const px = Math.round(p.dx * spread);
       const py = Math.round(p.dy * spread);
       const alpha = 1 - t;
-      this.graphics
-        .rect(px, py, 2, 2)
-        .fill({ color: p.color, alpha });
+      this.graphics.rect(px, py, 2, 2).fill({ color: p.color, alpha });
     }
   }
 }

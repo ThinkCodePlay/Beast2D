@@ -1,13 +1,10 @@
 import { Level } from "../../core/Level";
-import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
 import { DialogUI } from "../../core/components/UI/DialogUI";
 import { BREAKOUT_ASSETS } from "./breakoutAssets";
 import {
   registerBreakoutUiFont,
   spawnBreakoutDialog,
   spawnBreakoutHint,
-  spawnBreakoutHud,
-  START_LIVES,
 } from "./breakoutSetup";
 import { BreakoutPlayfieldHint } from "./BreakoutPlayfieldHint";
 import { BreakoutBackdrop } from "./Game Objects/BreakoutBackdrop";
@@ -32,7 +29,6 @@ export class BreakoutPaddle extends Level {
   override assets = [...BREAKOUT_ASSETS];
 
   private session: BreakoutSession = newBreakoutSession();
-  private hud!: HudHeaderUI;
   private wall!: BrickWall;
   private paddle!: BreakoutPaddleObj;
   private ball!: BreakoutBallObj;
@@ -42,9 +38,6 @@ export class BreakoutPaddle extends Level {
     this.session = newBreakoutSession();
 
     this.levelRoot.addChild(new BreakoutBackdrop());
-
-    this.hud = spawnBreakoutHud(START_LIVES);
-    this.levelRoot.addChild(this.hud);
 
     this.levelRoot.addChild(spawnBreakoutHint("ARROWS MOVE  SPACE SERVE"));
 

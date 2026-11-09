@@ -24,11 +24,8 @@ export {
 
 export { Component } from "./components/Component";
 export { TransformComponent } from "./components/Movement/TransformComponent";
-export { UserInputComponent } from "./components/Movement/UserInputComponent";
-export { HorizontalInputComponent } from "./components/Movement/HorizontalInputComponent";
-export { HorizontalClampComponent } from "./components/Movement/HorizontalClampComponent";
-export { HorizontalFacingComponent } from "./components/Movement/HorizontalFacingComponent";
-export { VerticalMoveComponent } from "./components/Movement/VerticalMoveComponent";
+export { ClampComponent, type ClampEdges } from "./components/Movement/ClampComponent";
+export { ConstantMoveComponent } from "./components/Movement/ConstantMoveComponent";
 export { Movement } from "./components/Movement/Movement";
 export { KeyboardMovement } from "./components/Movement/KeyboardMovement";
 export { PointerMovement } from "./components/Movement/PointerMovement";
@@ -44,16 +41,14 @@ export {
   wireUiPointerButton,
   type WireUiPointerButtonOptions,
 } from "./ui/UiPointerButton";
-export { SpaceShootInputComponent } from "./components/Input/SpaceShootInputComponent";
 export {
   InteractiveComponent,
   type InteractiveOptions,
 } from "./components/Input/InteractiveComponent";
 export { SpawnerComponent } from "./components/Behavior/SpawnerComponent";
-export { HorizontalLocomotionAnimationComponent } from "./components/Behavior/HorizontalLocomotionAnimationComponent";
 export {
   DestroyOutOfBoundsComponent,
-  DestroyBelowScreenComponent,
+  type DestroyBounds,
 } from "./components/Behavior/DestroyOutOfBoundsComponent";
 export {
   ColliderComponent,

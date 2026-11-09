@@ -1,6 +1,6 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
-import { CameraShakeComponent } from "../../../core/components/Behavior/CameraShakeComponent";
+import { CameraShakeComponent } from "../components/CameraShakeComponent";
 import { PLAYFIELD_TOP } from "../../../core/consts";
 
 /** World root for gameplay (below HUD). Camera shake attaches here. */

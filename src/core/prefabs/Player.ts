@@ -1,7 +1,8 @@
 import { GameObject } from "../GameObject";
 import { TransformComponent } from "../components/Movement/TransformComponent";
 import { SpriteRenderComponent } from "../components/Render/SpriteRenderComponent";
-import { UserInputComponent } from "../components/Movement/UserInputComponent";
+import { Movement } from "../components/Movement/Movement";
+import { KeyboardMovement } from "../components/Movement/KeyboardMovement";
 import type { RenderOptions } from "../components/Render/RenderComponent";
 import { ObjectNames, CollisionLayers, ColliderModes, SPRITE_SIZE } from "../consts";
 import { TEXTURE_BEAST_SHIP } from "../../game/publicAssets";
@@ -22,6 +23,7 @@ export class Player extends GameObject {
         mode: ColliderModes.Passive,
       }),
     );
-    this.addComponent(new UserInputComponent());
+    this.addComponent(new Movement(5));
+    this.addComponent(new KeyboardMovement());
   }
 }

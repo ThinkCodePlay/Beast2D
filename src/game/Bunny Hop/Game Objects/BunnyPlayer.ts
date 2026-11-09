@@ -1,10 +1,11 @@
 import { GameObject } from "../../../core/GameObject";
 import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import { SpritesheetAnimationRenderComponent } from "../../../core/components/Render/SpritesheetAnimationRenderComponent";
-import { HorizontalInputComponent } from "../../../core/components/Movement/HorizontalInputComponent";
-import { HorizontalFacingComponent } from "../../../core/components/Movement/HorizontalFacingComponent";
-import { HorizontalLocomotionAnimationComponent } from "../../../core/components/Behavior/HorizontalLocomotionAnimationComponent";
-import { HorizontalClampComponent } from "../../../core/components/Movement/HorizontalClampComponent";
+import { Movement } from "../../../core/components/Movement/Movement";
+import { KeyboardMovement } from "../../../core/components/Movement/KeyboardMovement";
+import { ClampComponent } from "../../../core/components/Movement/ClampComponent";
+import { HorizontalFacingComponent } from "../components/HorizontalFacingComponent";
+import { HorizontalLocomotionAnimationComponent } from "../components/HorizontalLocomotionAnimationComponent";
 import { Globals } from "../../../core/Globals";
 import {
   BUNNY_WALK_ANIMATION_COLUMNS,
@@ -44,14 +45,15 @@ export class BunnyPlayer extends GameObject {
         },
       }),
     );
-    this.addComponent(new HorizontalInputComponent(1));
+    this.addComponent(new Movement(1, { x: true, y: false }));
+    this.addComponent(new KeyboardMovement());
     this.addComponent(new HorizontalFacingComponent());
     this.addComponent(new HorizontalLocomotionAnimationComponent());
     this.addComponent(
-      new HorizontalClampComponent(
-        0,
-        Globals.canvasWidth - BUNNY_SPRITE_SIZE,
-      ),
+      new ClampComponent({
+        minX: 0,
+        maxX: Globals.canvasWidth - BUNNY_SPRITE_SIZE,
+      }),
     );
   }
 }

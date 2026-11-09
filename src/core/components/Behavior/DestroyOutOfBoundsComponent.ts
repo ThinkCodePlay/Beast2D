@@ -1,6 +1,5 @@
 import { Component } from "../Component";
 import { TransformComponent } from "../Movement/TransformComponent";
-import { Globals } from "../../Globals";
 
 export type DestroyBounds = {
   minX?: number;
@@ -46,11 +45,5 @@ export class DestroyOutOfBoundsComponent extends Component {
   private destroyGameObject(): void {
     this.enabled = false;
     this.gameObject?.destroy();
-  }
-}
-
-export class DestroyBelowScreenComponent extends DestroyOutOfBoundsComponent {
-  constructor(screenHeight: number = Globals.canvasHeight, offset: number = 0) {
-    super({ maxY: screenHeight + offset });
   }
 }

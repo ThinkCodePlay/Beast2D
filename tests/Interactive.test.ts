@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { GameObject } from "../src/core/GameObject";
 import { InteractiveComponent } from "../src/core/components/Input/InteractiveComponent";
-import { UserInputComponent } from "../src/core/components/Movement/UserInputComponent";
-import { HorizontalInputComponent } from "../src/core/components/Movement/HorizontalInputComponent";
-import { HorizontalFacingComponent } from "../src/core/components/Movement/HorizontalFacingComponent";
-import { HorizontalLocomotionAnimationComponent } from "../src/core/components/Behavior/HorizontalLocomotionAnimationComponent";
+import { Movement } from "../src/core/components/Movement/Movement";
+import { KeyboardMovement } from "../src/core/components/Movement/KeyboardMovement";
+import { HorizontalFacingComponent } from "../src/game/Bunny Hop/components/HorizontalFacingComponent";
+import { HorizontalLocomotionAnimationComponent } from "../src/game/Bunny Hop/components/HorizontalLocomotionAnimationComponent";
 import {
   SpritesheetAnimationRenderComponent,
   type SpritesheetAnimationClipsOptions,
 } from "../src/core/components/Render/SpritesheetAnimationRenderComponent";
-import { SpaceShootInputComponent } from "../src/core/components/Input/SpaceShootInputComponent";
+import { SpaceShootInputComponent } from "../src/game/Space Shooter/components/SpaceShootInputComponent";
 import { SpawnerComponent } from "../src/core/components/Behavior/SpawnerComponent";
 import { TransformComponent } from "../src/core/components/Movement/TransformComponent";
 import { RenderComponent } from "../src/core/components/Render/RenderComponent";
@@ -81,13 +81,14 @@ describe("InteractiveComponent", () => {
 });
 
 describe("input components use the Input service", () => {
-  it("UserInputComponent moves with normalized speed * delta", () => {
+  it("KeyboardMovement moves with normalized speed * delta", () => {
     const root = createRoot();
     const target = new EventTarget();
     root.context!.input.attach(target);
     const go = new GameObject()
       .with(new TransformComponent(0, 0))
-      .with(new UserInputComponent(10));
+      .with(new Movement(10))
+      .with(new KeyboardMovement());
     root.addChild(go);
 
     target.dispatchEvent(key("keydown", "ArrowRight"));
@@ -106,13 +107,14 @@ describe("input components use the Input service", () => {
     expect(go.transform!.x).toBe(x);
   });
 
-  it("HorizontalInputComponent moves left/right only", () => {
+  it("Movement can lock to the x axis", () => {
     const root = createRoot();
     const target = new EventTarget();
     root.context!.input.attach(target);
     const go = new GameObject()
       .with(new TransformComponent(100, 50))
-      .with(new HorizontalInputComponent(4));
+      .with(new Movement(4, { x: true, y: false }))
+      .with(new KeyboardMovement());
     root.addChild(go);
 
     target.dispatchEvent(key("keydown", "KeyA"));
@@ -207,7 +209,7 @@ describe("input components use the Input service", () => {
   it("input components fail clearly outside a level", () => {
     const go = new GameObject()
       .with(new TransformComponent())
-      .with(new UserInputComponent());
+      .with(new KeyboardMovement());
     expect(() => go.update(1)).toThrow(/EngineContext/);
   });
 });

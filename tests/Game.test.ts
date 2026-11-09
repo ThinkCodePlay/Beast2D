@@ -10,8 +10,8 @@ import { Bullet } from "../src/game/Space Shooter/Game Objects/Bullet";
 import { Spaceship } from "../src/game/Space Shooter/Game Objects/Spaceship";
 import { ShooterEnemy } from "../src/game/Space Shooter/Game Objects/ShooterEnemy";
 import { ShooterPlayfield } from "../src/game/Space Shooter/Game Objects/ShooterPlayfield";
-import { HeartsUI } from "../src/core/components/UI/HeartsUI";
-import { ScoreUI } from "../src/core/components/UI/ScoreUI";
+import { HudHeaderUI } from "../src/core/components/UI/HudHeaderUI";
+import { Player } from "../src/core/prefabs/Player";
 import { DialogUI } from "../src/core/components/UI/DialogUI";
 import { createContext, fakeEngine } from "./helpers";
 
@@ -57,7 +57,7 @@ describe("example levels run on the updated engine", () => {
     const level = new Level1(fakeEngine(context));
     level.start();
     run(level, 5);
-    expect(level.getHierarchy()!.children.length).toBe(3);
+    expect(level.getHierarchy()!.children.length).toBe(4);
     level.destroy();
     expect(context.stage.children).toHaveLength(0);
   });
@@ -68,7 +68,9 @@ describe("example levels run on the updated engine", () => {
     const level = new Level1(fakeEngine(context));
     level.start();
     run(level, 1);
-    const player = (level as any).levelRoot.children.at(-1) as GameObject;
+    const player = (level as any).levelRoot.children.find(
+      (child: GameObject) => child instanceof Player,
+    ) as GameObject;
     const startX = player.transform!.x;
     target.dispatchEvent(key("keydown", "ArrowRight"));
     run(level, 2);
@@ -87,7 +89,7 @@ describe("example levels run on the updated engine", () => {
     const level = new BreakoutPaddle(fakeEngine(context));
     level.start();
     expect(() => run(level, 15)).not.toThrow();
-    expect(ScoreUI.getScore()).toBe(0);
+    expect(HudHeaderUI.getScore()).toBe(0);
     level.destroy();
   });
 
@@ -96,11 +98,11 @@ describe("example levels run on the updated engine", () => {
     level.start();
     DialogUI.close();
     expect(() => run(level, 10)).not.toThrow();
-    expect(HeartsUI.getHearts()).toBe(3);
+    expect(HudHeaderUI.getHearts()).toBe(3);
     level.destroy();
-    expect(HeartsUI.getHearts()).toBe(0);
+    expect(HudHeaderUI.getHearts()).toBe(0);
     level.start();
-    expect(HeartsUI.getHearts()).toBe(3);
+    expect(HudHeaderUI.getHearts()).toBe(3);
     level.destroy();
   });
 
@@ -125,9 +127,9 @@ describe("space shooter gameplay", () => {
     const { level, playfield } = setup();
     playfield.addChild(new ShooterEnemy(300, 100, "scout"));
     playfield.addChild(new Bullet(316, 116));
-    const before = ScoreUI.getScore();
+    const before = HudHeaderUI.getScore();
     run(level, 2);
-    expect(ScoreUI.getScore()).toBe(before + 100);
+    expect(HudHeaderUI.getScore()).toBe(before + 100);
     expect(
       playfield.children.filter(
         (c) => c instanceof Bullet || c instanceof ShooterEnemy,
@@ -149,7 +151,7 @@ describe("space shooter gameplay", () => {
     );
     playfield.addChild(foe);
     run(level, 10);
-    expect(HeartsUI.getHearts()).toBe(2);
+    expect(HudHeaderUI.getHearts()).toBe(2);
     expect(foe.destroyed).toBe(true);
     level.destroy();
   });

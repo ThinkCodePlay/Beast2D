@@ -1,6 +1,6 @@
-import { Component } from "../Component";
-import type { Input } from "../../Input";
-import { RenderComponent } from "../Render/RenderComponent";
+import { Component } from "../../../core/components/Component";
+import type { Input } from "../../../core/Input";
+import { RenderComponent } from "../../../core/components/Render/RenderComponent";
 
 /** Flips render content horizontally to match left/right input (keeps last facing when idle). */
 export class HorizontalFacingComponent extends Component {

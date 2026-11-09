@@ -1,6 +1,6 @@
-import { Component } from "../Component";
-import type { Input } from "../../Input";
-import { SpawnerComponent } from "../Behavior/SpawnerComponent";
+import { Component } from "../../../core/components/Component";
+import type { Input } from "../../../core/Input";
+import { SpawnerComponent } from "../../../core/components/Behavior/SpawnerComponent";
 
 /** Enables the spawner while the "shoot" action is held. */
 export class SpaceShootInputComponent extends Component {

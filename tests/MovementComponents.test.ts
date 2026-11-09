@@ -4,7 +4,7 @@ import { Movement } from "../src/core/components/Movement/Movement";
 import { KeyboardMovement } from "../src/core/components/Movement/KeyboardMovement";
 import { PointerMovement } from "../src/core/components/Movement/PointerMovement";
 import { TransformComponent } from "../src/core/components/Movement/TransformComponent";
-import { HorizontalClampComponent } from "../src/core/components/Movement/HorizontalClampComponent";
+import { ClampComponent } from "../src/core/components/Movement/ClampComponent";
 import { playfieldPointerSession } from "../src/core/pointer/playfieldPointerSession";
 import { DialogUI } from "../src/core/components/UI/DialogUI";
 import { createRoot, frame } from "./helpers";
@@ -138,7 +138,7 @@ describe("Movement + independent sources", () => {
       .with(new TransformComponent(50, 50))
       .with(new PointerMovement())
       .with(new Movement(10, { x: true, y: false }))
-      .with(new HorizontalClampComponent(16, 200));
+      .with(new ClampComponent({ minX: 16, maxX: 200 }));
     root.addChild(player);
     frame(root);
 

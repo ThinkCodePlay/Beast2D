@@ -11,10 +11,17 @@ import { ObjectNames } from "./consts";
 import type { Engine } from "./Engine";
 import type { EngineContext } from "./EngineContext";
 import { GameObject } from "./GameObject";
+import { HudHeaderUI } from "./components/UI/HudHeaderUI";
+import { HUD_LAYOUT } from "./ui/hudContract";
+import { DEFAULT_BEAST2D_HUD_THEME } from "./ui/defaultUiTheme";
+import { useBitmapFont } from "./ui/bitmapFontRegistry";
+import { DEFAULT_BEAST2D_BITMAP_FONT } from "./ui/defaultBitmapFont";
 
 export abstract class Level {
   protected engine: Engine;
   protected levelRoot!: GameObject;
+  /** Lives and score band. Created after {@link init} so it draws above the playfield. */
+  protected hud!: HudHeaderUI;
   private started = false;
 
   /** Asset paths that LevelManager preloads before `start()`. */
@@ -38,8 +45,12 @@ export abstract class Level {
     this.levelRoot.context = context;
     context.stage.addChild(this.levelRoot.container);
 
+    useBitmapFont(DEFAULT_BEAST2D_BITMAP_FONT);
     this.started = true;
     this.init();
+
+    this.hud = new HudHeaderUI(0, HUD_LAYOUT.defaultLives, DEFAULT_BEAST2D_HUD_THEME);
+    this.levelRoot.addChild(this.hud);
   }
 
   // Clean up the level when switching

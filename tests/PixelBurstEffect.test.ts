@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { GameObject } from "../src/core/GameObject";
-import { PixelBurstEffectComponent } from "../src/core/effects/PixelBurstEffectComponent";
-import { MUZZLE_FLASH } from "../src/core/effects/PixelEffectPresets";
+import { PixelBurstEffectComponent } from "../src/game/Space Shooter/effects/PixelBurstEffectComponent";
+import { MUZZLE_FLASH } from "../src/game/Space Shooter/effects/PixelEffectPresets";
 import { TransformComponent } from "../src/core/components/Movement/TransformComponent";
 import { Graphics } from "pixi.js";
 import { createRoot, frame } from "./helpers";

@@ -1,6 +1,6 @@
-import { Component } from "../Component";
-import type { Input } from "../../Input";
-import { SpritesheetAnimationRenderComponent } from "../Render/SpritesheetAnimationRenderComponent";
+import { Component } from "../../../core/components/Component";
+import type { Input } from "../../../core/Input";
+import { SpritesheetAnimationRenderComponent } from "../../../core/components/Render/SpritesheetAnimationRenderComponent";
 
 /** Plays walk while left/right is held, idle otherwise. */
 export class HorizontalLocomotionAnimationComponent extends Component {
@@ -30,8 +30,7 @@ export class HorizontalLocomotionAnimationComponent extends Component {
   override update(_deltaTime: number): void {
     if (!this.render || !this.input) return;
 
-    const moving =
-      this.input.isDown("left") || this.input.isDown("right");
+    const moving = this.input.isDown("left") || this.input.isDown("right");
     if (moving === this.moving) return;
 
     this.moving = moving;

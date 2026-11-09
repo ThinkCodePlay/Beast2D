@@ -16,11 +16,13 @@ Full **API and syntax documentation** lives in [`docs/`](./docs/index.md) (build
 ## Quick start
 
 ```ts
-import { Engine, Level, Box, UserInputComponent } from "./core";
+import { Engine, Level, Box, Movement, KeyboardMovement } from "./core";
 
 class MyLevel extends Level {
   protected init() {
-    this.levelRoot.addChild(new Box(100, 100, 50, 50).with(new UserInputComponent(4)));
+    this.levelRoot.addChild(
+      new Box(100, 100, 50, 50).with(new Movement(4)).with(new KeyboardMovement()),
+    );
   }
   protected update(dt: number) {
     super.update(dt); // always call super first

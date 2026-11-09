@@ -1,18 +1,12 @@
 import { Graphics } from "pixi.js";
-import { GameObject } from "../GameObject";
-import { TransformComponent } from "../components/Movement/TransformComponent";
+import { GameObject } from "../../../core/GameObject";
+import { TransformComponent } from "../../../core/components/Movement/TransformComponent";
 import type { PixelBurstPreset } from "./PixelEffectPresets";
 import { PixelBurstEffectComponent } from "./PixelBurstEffectComponent";
 
-/**
- * Short-lived palette pixel burst drawn in world space. Spawn into level root.
- */
+/** Short-lived palette pixel burst drawn in world space. */
 export class PixelBurstEffect extends GameObject {
-  constructor(
-    worldX: number,
-    worldY: number,
-    preset: PixelBurstPreset,
-  ) {
+  constructor(worldX: number, worldY: number, preset: PixelBurstPreset) {
     super();
     this.name = "PixelBurstEffect";
     this.runWhenPaused = true;

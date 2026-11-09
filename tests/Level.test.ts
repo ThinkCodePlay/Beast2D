@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { Assets } from "pixi.js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Assets, Texture } from "pixi.js";
 import { Level } from "../src/core/Level";
 import { LevelManager } from "../src/core/LevelManager";
 import { GameObject } from "../src/core/GameObject";
@@ -37,6 +37,10 @@ class TestLevel extends Level {
     return this.levelRoot;
   }
 }
+
+beforeEach(() => {
+  vi.spyOn(Assets, "load").mockResolvedValue(Texture.EMPTY);
+});
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -166,7 +170,7 @@ describe("LevelManager", () => {
     const engine = fakeEngine();
     const resolvers: (() => void)[] = [];
     vi.spyOn(Assets, "load").mockImplementation(
-      () => new Promise<any>((resolve) => resolvers.push(() => resolve({}))),
+      () => new Promise<any>((resolve) => resolvers.push(() => resolve(Texture.EMPTY))),
     );
 
     const a = new TestLevel(engine);

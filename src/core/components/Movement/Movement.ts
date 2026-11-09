@@ -39,11 +39,15 @@ export class Movement extends Component {
     for (const src of sources) {
       src.prepareDirection(deltaTime);
     }
-    const requests = sources.map((src) => src.getMovementDirection());
+    const requests = sources.map((src) => {
+      const direction = src.getMovementDirection();
+      return {
+        x: this.axes.x === false ? 0 : direction.x,
+        y: this.axes.y === false ? 0 : direction.y,
+      };
+    });
 
-    let combined = combineDirections(requests);
-    if (this.axes.x === false) combined = { ...combined, x: 0 };
-    if (this.axes.y === false) combined = { ...combined, y: 0 };
+    const combined = combineDirections(requests);
 
     const mag = Math.hypot(combined.x, combined.y);
     if (mag === 0) return;
