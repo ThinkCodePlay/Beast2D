@@ -21,6 +21,7 @@ Open the URL Vite prints (usually `http://localhost:5173`). Levels registered in
 | `npm run build` | Type-check (`tsc`) + production game build |
 | `npm run typecheck` | TypeScript only |
 | `npm test` | Vitest (`tests/`) |
+| `npm run preview` | Preview production build |
 | `npm run docs:dev` | Documentation dev server |
 | `npm run docs:build` | Static documentation site |
 

@@ -10,6 +10,7 @@ import {
 import type { DialogChromeTheme } from "../../ui/dialogTheme";
 import { NineSliceSprite } from "../../ui/NineSliceSprite";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../consts";
+import { wireUiPointerButton } from "../../ui/UiPointerButton";
 
 export class DialogUIRenderComponent extends RenderComponent {
   private static dialogTextReady = false;
@@ -30,6 +31,8 @@ export class DialogUIRenderComponent extends RenderComponent {
   private onRestart: (() => void) | null = null;
   private onPause: (() => void) | null = null;
   private onResume: (() => void) | null = null;
+  private unloadButtonPointer: (() => void) | null = null;
+  private enterWasDown = false;
 
   constructor(
     width: number = 320,
@@ -97,6 +100,27 @@ export class DialogUIRenderComponent extends RenderComponent {
 
   setOnResume(handler: (() => void) | null): void {
     this.onResume = handler;
+  }
+
+  override update(_deltaTime: number): void {
+    if (!this.isOpen) {
+      this.enterWasDown = false;
+      return;
+    }
+    const input = this.requireContext().input;
+    if (input.wasPressed("shoot")) {
+      this.activatePrimary();
+      return;
+    }
+    const enterDown = input.isKeyDown("Enter");
+    if (enterDown && !this.enterWasDown) {
+      this.activatePrimary();
+    }
+    this.enterWasDown = enterDown;
+  }
+
+  private activatePrimary(): void {
+    this.onRestart?.();
   }
 
   private refresh(): void {
@@ -178,10 +202,9 @@ export class DialogUIRenderComponent extends RenderComponent {
     });
     btn.x = btnX;
     btn.y = btnY;
-    btn.eventMode = "static";
-    btn.cursor = "pointer";
-    btn.on("pointertap", () => {
-      this.onRestart?.();
+    this.unloadButtonPointer?.();
+    this.unloadButtonPointer = wireUiPointerButton(btn, {
+      onActivate: () => this.activatePrimary(),
     });
     this.panelHost.addChild(btn);
 
@@ -199,6 +222,8 @@ export class DialogUIRenderComponent extends RenderComponent {
   }
 
   private destroyDynamicNodes(graphics: Graphics): void {
+    this.unloadButtonPointer?.();
+    this.unloadButtonPointer = null;
     if (this.panelHost && this.panelHost.parent === graphics) {
       graphics.removeChild(this.panelHost);
       this.panelHost.destroy({ children: true });
@@ -207,6 +232,8 @@ export class DialogUIRenderComponent extends RenderComponent {
   }
 
   override onDestroy(): void {
+    this.unloadButtonPointer?.();
+    this.unloadButtonPointer = null;
     if (this.graphics && this.graphics instanceof Graphics) {
       this.destroyDynamicNodes(this.graphics);
     }

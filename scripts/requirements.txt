@@ -1,2 +1,0 @@
-# Optional: PNG fit script (scripts/compress_display_png.py)
-pillow>=10.0.0

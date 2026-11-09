@@ -9,8 +9,6 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "assets:fit-display": "python scripts/compress_display_png.py --backgrounds",
-    "assets:ui": "tsx scripts/generate-beast2d-ui.ts",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
@@ -18,7 +16,6 @@
   "devDependencies": {
     "@types/pngjs": "^6.0.5",
     "pngjs": "^7.0.0",
-    "tsx": "^4.23.15",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",
     "vitepress": "^1.6.3",

@@ -8,7 +8,7 @@ Backlog items to file on GitHub when ready. Repo: `ThinkCodePlay/Beast2D`.
 
 ### Summary
 
-Sprites, backgrounds, enemy art, bullets, and HUD/dialog chrome for the Space Shooter sample should be upgraded for a cohesive **320×240 / 32×32** pixel look (see `AGENTS.md` display spec and `npm run assets:fit-display`).
+Sprites, backgrounds, enemy art, bullets, and HUD/dialog chrome for the Space Shooter sample should be upgraded for a cohesive **320×240 / 32×32** pixel look (see `AGENTS.md` display spec).
 
 ### Scope (non-exhaustive)
 
@@ -20,7 +20,7 @@ Sprites, backgrounds, enemy art, bullets, and HUD/dialog chrome for the Space Sh
 | Bullet | `TEXTURE_SHOOTER_BULLET` |
 | HUD / dialog | `TEXTURE_SHOOTER_*` from `shooterAssets.ts` / shared `public/ui/` |
 | Hearts | `TEXTURE_HEART` |
-| Optional tooling | `npm run assets:ui`, `scripts/compress_display_png.py` |
+| Optional tooling | `npx tsx scripts/generate-beast2d-ui.ts` |
 
 ### Expected behavior
 

@@ -37,6 +37,9 @@ import {
   TEXTURE_SHOOTER_HUD,
   TEXTURE_SHOOTER_PANEL,
 } from "./shooterAssets";
+import { Movement } from "../../core/components/Movement/Movement";
+import { KeyboardMovement } from "../../core/components/Movement/KeyboardMovement";
+import { PointerMovement } from "../../core/components/Movement/PointerMovement";
 
 export class SpaceShooter extends Level {
   private static onGameOverRestart: (() => void) | null = null;
@@ -77,7 +80,11 @@ export class SpaceShooter extends Level {
     const playfield = new ShooterPlayfield();
     this.levelRoot.addChild(playfield);
 
-    playfield.addChild(new Spaceship(startX, startY));
+    const ship = new Spaceship(startX, startY);
+    ship.addComponent(new Movement(7, { x: true, y: false }));
+    ship.addComponent(new KeyboardMovement());
+    ship.addComponent(new PointerMovement());
+    playfield.addChild(ship);
     playfield.addChild(new ShooterEnemySpawner());
 
     this.levelRoot.addChild(new HudHeaderUI(0, 3, DEFAULT_BEAST2D_HUD_THEME));

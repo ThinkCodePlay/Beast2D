@@ -80,6 +80,7 @@ export class Engine {
     Globals.init(this._context);
 
     domElement.appendChild(this.app.canvas);
+    this._context.canvas = this.app.canvas as HTMLCanvasElement;
     this.gameManager = new GameManager(this);
     this.app.ticker.add(this.tick, this);
   }
