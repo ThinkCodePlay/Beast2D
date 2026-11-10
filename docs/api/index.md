@@ -9,6 +9,7 @@ All symbols listed here are exported from `src/core/index.ts`.
 | Engine bootstrap & options | [Engine](./core/engine.md) |
 | GameObject scene graph | [GameObject](./core/game-object.md) |
 | Level base class | [Level](./core/level.md) |
+| Cart level | [Cart mode](../syntax/cart.md) |
 | Shared services | [EngineContext](./core/engine-context.md) |
 | GameManager & LevelManager | [Game management](./core/game-management.md) |
 | Time, input, timers, collisions | [Services](./core/services.md) |

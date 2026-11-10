@@ -33,6 +33,7 @@ export default defineConfig({
               link: "/syntax/game-objects-and-components",
             },
             { text: "Prefabs and composition", link: "/syntax/prefabs-and-composition" },
+            { text: "Cart mode", link: "/syntax/cart" },
           ],
         },
       ],

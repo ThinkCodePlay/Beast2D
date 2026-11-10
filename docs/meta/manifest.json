@@ -21,7 +21,8 @@
         { "id": "syntax-overview", "title": "Overview", "path": "syntax/overview.md" },
         { "id": "levels", "title": "Levels and lifecycle", "path": "syntax/levels-and-lifecycle.md" },
         { "id": "game-objects", "title": "GameObjects and components", "path": "syntax/game-objects-and-components.md" },
-        { "id": "prefabs", "title": "Prefabs and composition", "path": "syntax/prefabs-and-composition.md" }
+        { "id": "prefabs", "title": "Prefabs and composition", "path": "syntax/prefabs-and-composition.md" },
+        { "id": "cart", "title": "Cart mode", "path": "syntax/cart.md" }
       ]
     },
     {

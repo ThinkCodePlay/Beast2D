@@ -13,6 +13,8 @@ import { Level2 } from "./game/Level2";
 import { SpaceShooter } from "./game/Space Shooter/SpaceShooter";
 import { BunnyHop } from "./game/Bunny Hop/BunnyHop";
 import { BreakoutPaddle } from "./game/BreakoutPaddle/BreakoutPaddle";
+import { helloCart } from "./game/carts/HelloCart";
+import { CartLevel } from "./core/cart/CartLevel";
 import "./style.css";
 
 const appRoot = document.getElementById("app")!;
@@ -43,7 +45,8 @@ engine
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     game.registerLevel("bunnyHop", new BunnyHop(engine));
     game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
-    return game.loadLevel("spaceShooter");
+    game.registerLevel("helloCart", new CartLevel(engine, helloCart));
+    return game.loadLevel("helloCart");
   })
   .catch((error) => {
     console.error("Failed to start Beast2D engine", error);
