@@ -4,7 +4,16 @@ import { javascript } from "@codemirror/lang-javascript";
 import { foldGutter, foldKeymap } from "@codemirror/language";
 import { linter, type Diagnostic } from "@codemirror/lint";
 import { EditorState, type Extension } from "@codemirror/state";
-import { EditorView, keymap, lineNumbers, tooltips, type ViewUpdate } from "@codemirror/view";
+import {
+  drawSelection,
+  EditorView,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  keymap,
+  lineNumbers,
+  tooltips,
+  type ViewUpdate,
+} from "@codemirror/view";
 import type { Cart } from "../core/cart/Cart";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 import { computeIntegerDisplayScale, displayCssSize } from "../core/displayScale";
@@ -94,6 +103,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   runLabel.className = "beast2d-bitmap";
   runButton.appendChild(runLabel);
 
+  const clock = document.createElement("canvas");
+  clock.className = "beast2d-bitmap beast2d-clock";
+  clock.hidden = true;
+
+  actions.appendChild(clock);
   actions.appendChild(editButton);
   actions.appendChild(saveButton);
   actions.appendChild(runButton);
@@ -123,14 +137,38 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   appRoot.classList.add("beast2d-app");
 
+  let clockKey = "";
+
+  const clockText = (now = new Date()) => {
+    const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    let hour = now.getHours();
+    const suffix = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12;
+    if (hour === 0) hour = 12;
+    const minute = String(now.getMinutes()).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${days[now.getDay()]} ${day} ${hour}:${minute}${suffix}`;
+  };
+
+  const displayScale = () =>
+    computeIntegerDisplayScale(window.innerWidth, window.innerHeight, DISPLAY_WIDTH, DISPLAY_HEIGHT + 16, 16);
+
+  const paintClock = (scale: number) => {
+    if (mode !== "code") {
+      clock.hidden = true;
+      clockKey = "";
+      return;
+    }
+    clock.hidden = false;
+    const nextClock = `${scale}:${clockText()}`;
+    if (nextClock === clockKey) return;
+    clockKey = nextClock;
+    void paintBitmapLabel(clock, clockText(), scale, "#93be64");
+  };
+
   const paintChrome = () => {
-    const scale = computeIntegerDisplayScale(
-      window.innerWidth,
-      window.innerHeight,
-      DISPLAY_WIDTH,
-      DISPLAY_HEIGHT + 16,
-      16,
-    );
+    const scale = displayScale();
+    document.documentElement.style.setProperty("--beast-scale", String(scale));
     const stageSize = displayCssSize(scale, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     stage.style.width = `${stageSize.width}px`;
     stage.style.height = `${stageSize.height}px`;
@@ -140,7 +178,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     const cream = "#f4ead2";
     const plum = "#1f1424";
     if (mode === "code") {
-      void paintBitmapLabel(title, "CODE", scale, cream);
+      void paintBitmapLabel(title, "CODE JS", scale, cream);
       void paintBitmapLabel(saveLabel, "SAVE", scale, saveButton.disabled ? "#746678" : cream);
       void paintBitmapLabel(runLabel, "RUN", scale, plum);
       editButton.hidden = true;
@@ -153,20 +191,26 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       saveButton.hidden = true;
       runButton.hidden = true;
     }
+    paintClock(scale);
   };
   paintChrome();
   window.addEventListener("resize", paintChrome);
+  window.setInterval(() => paintClock(displayScale()), 1000);
 
   const stored = localStorage.getItem(STORAGE_KEY);
   const startSource = stored ?? initialSource;
 
   const extensions: Extension[] = [
     lineNumbers(),
+    highlightActiveLineGutter(),
+    highlightActiveLine(),
+    drawSelection(),
     foldGutter(),
     history(),
     javascript(),
     beast2dEditorTheme,
     beast2dSyntax,
+    EditorView.lineWrapping,
     tooltips({ parent: document.body }),
     autocompletion({ override: [cartHelperCompletion] }),
     cartSignatureHints,
@@ -204,6 +248,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     state: EditorState.create({ doc: startSource, extensions }),
     parent: editorMount,
   });
+  void document.fonts.load('9px "Pixeloid Mono"').then(() => view.requestMeasure());
 
   const shell: CartEditorShell = {
     getSource: () => view.state.doc.toString(),

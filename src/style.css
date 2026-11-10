@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Pixeloid Mono";
+  src: url("/ui/pixeloid-mono.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
 html,
 body,
 #app {
@@ -7,6 +15,7 @@ body,
   background: #ffcbdd;
   color: #f4ead2;
   font-family: Inter, system-ui, sans-serif;
+  --beast-scale: 2;
 }
 
 #app {
@@ -22,10 +31,11 @@ body,
 .beast2d-console {
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
-  background: #1f1424;
+  background: #3b2e3f;
+  outline: calc(2px * var(--beast-scale)) solid #524658;
+  box-shadow: calc(4px * var(--beast-scale)) calc(4px * var(--beast-scale)) 0 #1f1424;
 }
 
 .beast2d-stage {
@@ -37,9 +47,14 @@ body,
   position: absolute;
   inset: 0;
   z-index: 2;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: #1f1424;
+  padding: calc(6px * var(--beast-scale));
+  background: #3b2e3f;
+  box-shadow:
+    inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #524658,
+    inset calc(-2px * var(--beast-scale)) calc(-2px * var(--beast-scale)) 0 #120c16;
 }
 
 /* Author `display` wins over the `hidden` attribute unless we override it. */
@@ -52,9 +67,14 @@ body,
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
-  padding: 0 12px;
+  padding: 0 calc(6px * var(--beast-scale));
   background: #3b2e3f;
   flex-shrink: 0;
+  box-shadow: inset 0 calc(-2px * var(--beast-scale)) 0 #1f1424;
+}
+
+.beast2d-clock[hidden] {
+  display: none !important;
 }
 
 .beast2d-bitmap {
@@ -66,18 +86,19 @@ body,
 .beast2d-code-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: calc(6px * var(--beast-scale));
 }
 
 .beast2d-btn {
   font: inherit;
   border: none;
   cursor: pointer;
-  padding: 0 8px;
-  border-radius: 2px;
+  padding: 0 calc(4px * var(--beast-scale));
+  border-radius: 0;
   background: transparent;
   display: flex;
   align-items: center;
+  outline: none;
 }
 
 .beast2d-btn-save {
@@ -99,35 +120,95 @@ body,
 }
 
 .beast2d-code-error {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-family: ui-monospace, monospace;
+  flex-shrink: 0;
+  padding: calc(2px * var(--beast-scale)) calc(4px * var(--beast-scale));
+  font-family: "Pixeloid Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: calc(9px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
   color: #f4ead2;
-  background: #3b2e3f;
-  box-shadow: inset 0 2px 0 #cb4a50;
+  background: #75273c;
+  box-shadow: inset calc(3px * var(--beast-scale)) 0 0 #cb4a50;
+}
+
+.beast2d-code-error[hidden] {
+  display: none !important;
 }
 
 .beast2d-code-editor {
   flex: 1;
   min-height: 0;
+  background: #1f1424;
+  box-shadow: inset 0 0 0 calc(2px * var(--beast-scale)) #120c16;
 }
 
 .beast2d-code-editor .cm-editor {
   height: 100%;
 }
 
+.beast2d-code-editor .cm-content,
+.beast2d-code-editor .cm-gutters {
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.beast2d-code-editor .cm-cursor,
+.beast2d-code-editor .cm-dropCursor {
+  border-left-width: calc(6px * var(--beast-scale)) !important;
+  border-left-style: solid !important;
+  border-left-color: #f4ead2 !important;
+  width: 0;
+  margin-left: 0;
+  background: transparent;
+  mix-blend-mode: normal;
+}
+
+.beast2d-code-editor .cm-scroller {
+  scrollbar-color: #f1c766 #1f1424;
+  scrollbar-width: auto;
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar {
+  width: calc(8px * var(--beast-scale));
+  height: calc(8px * var(--beast-scale));
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar-track {
+  background-color: #1f1424;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #3b2e3f 0,
+    #3b2e3f calc(2px * var(--beast-scale)),
+    #1f1424 calc(2px * var(--beast-scale)),
+    #1f1424 calc(4px * var(--beast-scale))
+  );
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar-thumb {
+  background: #f1c766;
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar-button:vertical:start:decrement,
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar-button:vertical:end:increment {
+  display: block;
+  height: calc(8px * var(--beast-scale));
+  background: #f1c766;
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+}
+
 .beast2d-signature {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 13px;
-  line-height: 1.4;
+  font-family: "Pixeloid Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: calc(9px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
   color: #f4ead2;
   background: #3b2e3f;
-  border: 1px solid #746678;
-  padding: 2px 8px;
+  border: calc(2px * var(--beast-scale)) solid #f1c766;
+  border-radius: 0;
+  padding: calc(2px * var(--beast-scale)) calc(4px * var(--beast-scale));
 }
 
 .beast2d-signature-active {
