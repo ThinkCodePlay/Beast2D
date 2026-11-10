@@ -1,5 +1,5 @@
 const SPEED = 60;
-const SIZE = 32;
+const SIZE = 10;
 const WIDTH = 320;
 const HEIGHT = 240;
 
@@ -9,6 +9,10 @@ let y = 33333;
 function init() {
   x = 112;
   y = 104;
+}
+
+function mine(a: number) {
+  return "hi"
 }
 
 function update(dt: number) {
@@ -25,6 +29,5 @@ function draw() {
   cls(0);
   rectfill(Math.round(x), Math.round(y), SIZE, SIZE, 10);
   print("HELLO", 8, 8, 4);
-  rect(30,30)
-  rect(0,as,aaa,asd)
+  rectfill(x, y, 1,2, ); 
 }

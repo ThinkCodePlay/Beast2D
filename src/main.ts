@@ -42,10 +42,10 @@ engine
     let shell!: ReturnType<typeof mountCartEditor>;
 
     const loadCart = async (cart: typeof helloCart) => {
-      const guarded = guardCart(cart, (message) => {
+      const guarded = guardCart(cart, (message, line) => {
         game.pause();
-        shell.setError(message);
         shell.showCode();
+        shell.setError(message, line, true);
       });
       game.registerLevel("helloCart", new CartLevel(engine, guarded));
       await game.loadLevel("helloCart");

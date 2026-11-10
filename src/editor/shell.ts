@@ -2,7 +2,7 @@ import { acceptCompletion, autocompletion, nextSnippetField, prevSnippetField } 
 import { defaultKeymap, history, historyKeymap, indentLess, indentMore } from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
 import { foldGutter, foldKeymap } from "@codemirror/language";
-import { linter, type Diagnostic } from "@codemirror/lint";
+import { linter, setDiagnostics, type Diagnostic } from "@codemirror/lint";
 import { EditorState, type Extension } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers, tooltips, type ViewUpdate } from "@codemirror/view";
 import type { Cart } from "../core/cart/Cart";
@@ -30,7 +30,7 @@ export type CartEditorOptions = {
 
 export type CartEditorShell = {
   getSource: () => string;
-  setError: (message: string) => void;
+  setError: (message: string, line?: number, runtime?: boolean) => void;
   clearError: () => void;
   showCode: () => void;
   showRun: () => void;
@@ -39,19 +39,27 @@ export type CartEditorShell = {
   boot: () => Promise<void>;
 };
 
-function cartSyntaxDiagnostics(view: EditorView): Diagnostic[] {
+function lineDiagnostic(view: EditorView, line: number | undefined, message: string): Diagnostic | null {
+  if (!line || view.state.doc.lines < 1) return null;
+  const lineObj = view.state.doc.line(Math.min(line, view.state.doc.lines));
+  return { from: lineObj.from, to: lineObj.to, severity: "error", message };
+}
+
+function cartDiagnostics(
+  view: EditorView,
+  runError: { message: string; line?: number } | null,
+): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
   const syntax = checkCartSyntax(view.state.doc.toString());
-  if (syntax.ok) return [];
-  const line = Math.min(syntax.line ?? 1, view.state.doc.lines);
-  const lineObj = view.state.doc.line(line);
-  return [
-    {
-      from: lineObj.from,
-      to: lineObj.to,
-      severity: "error",
-      message: syntax.message,
-    },
-  ];
+  if (!syntax.ok) {
+    const mark = lineDiagnostic(view, syntax.line ?? 1, syntax.message);
+    if (mark) diagnostics.push(mark);
+  }
+  if (runError) {
+    const mark = lineDiagnostic(view, runError.line, runError.message);
+    if (mark) diagnostics.push(mark);
+  }
+  return diagnostics;
 }
 
 export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
@@ -59,6 +67,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   let saveEnabled = false;
   let mode: "run" | "code" = "run";
+  let runError: { message: string; line?: number } | null = null;
 
   const consoleFrame = document.createElement("div");
   consoleFrame.className = "beast2d-console";
@@ -170,7 +179,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     tooltips({ parent: document.body }),
     autocompletion({ override: [cartHelperCompletion] }),
     cartSignatureHints,
-    linter(cartSyntaxDiagnostics, { delay: 350 }),
+    linter((view) => cartDiagnostics(view, runError), { delay: 350 }),
     keymap.of([
       { key: "Tab", run: acceptCompletion, shift: prevSnippetField },
       { key: "Tab", run: nextSnippetField, shift: indentLess },
@@ -194,9 +203,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       },
     ]),
     EditorView.updateListener.of((update: ViewUpdate) => {
-      if (update.docChanged) {
-        localStorage.setItem(STORAGE_KEY, update.state.doc.toString());
-      }
+      if (!update.docChanged) return;
+      localStorage.setItem(STORAGE_KEY, update.state.doc.toString());
+      // The banner is the result of the last Run. Editing the script retires it.
+      // Defer so this does not dispatch while the editor update is still running.
+      if (!errorStrip.hidden) queueMicrotask(() => shell.clearError());
     }),
   ];
 
@@ -207,13 +218,28 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   const shell: CartEditorShell = {
     getSource: () => view.state.doc.toString(),
-    setError(message) {
-      errorStrip.textContent = message;
+    setError(message, line, runtime = false) {
+      runError = runtime ? { message, line } : null;
+      errorStrip.textContent = line ? `Line ${line}: ${message}` : message;
       errorStrip.hidden = false;
+      const mark = () => {
+        view.dispatch(setDiagnostics(view.state, cartDiagnostics(view, runError)));
+        if (!line || view.state.doc.lines < 1) return;
+        const lineObj = view.state.doc.line(Math.min(line, view.state.doc.lines));
+        view.dispatch({
+          selection: { anchor: lineObj.from },
+          effects: EditorView.scrollIntoView(lineObj.from, { y: "center" }),
+        });
+      };
+      mark();
+      // The code panel may still be hidden when a running cart fails.
+      requestAnimationFrame(mark);
     },
     clearError() {
+      runError = null;
       errorStrip.hidden = true;
       errorStrip.textContent = "";
+      view.dispatch(setDiagnostics(view.state, cartDiagnostics(view, null)));
     },
     showCode() {
       if (mode === "code") return;
@@ -234,7 +260,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       shell.clearError();
       const result = compileCart(shell.getSource());
       if (!result.ok) {
-        shell.setError(result.message);
+        shell.setError(result.message, result.line);
         return false;
       }
       try {

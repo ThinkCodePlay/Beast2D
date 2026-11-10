@@ -84,7 +84,22 @@ export function compileCart(source: string): CompileResult {
   }
 }
 
-export function guardCart(cart: Cart, onRuntimeError: (message: string) => void): Cart {
+/**
+ * 1-based line in the script. V8 numbers `new Function` bodies two lines
+ * below the start of the source we pass in.
+ */
+export function runtimeErrorLine(error: unknown): number | undefined {
+  if (!(error instanceof Error) || !error.stack) return undefined;
+  const match = /<anonymous>:(\d+):\d+/.exec(error.stack);
+  if (!match) return undefined;
+  const line = Number(match[1]) - 2;
+  return line >= 1 ? line : undefined;
+}
+
+export function guardCart(
+  cart: Cart,
+  onRuntimeError: (message: string, line?: number) => void,
+): Cart {
   let reported = false;
 
   const run = (fn: () => void) => {
@@ -93,7 +108,7 @@ export function guardCart(cart: Cart, onRuntimeError: (message: string) => void)
     } catch (error) {
       if (!reported) {
         reported = true;
-        onRuntimeError(errorMessage(error));
+        onRuntimeError(errorMessage(error), runtimeErrorLine(error));
       }
     }
   };
