@@ -3,13 +3,13 @@
 ## Prerequisites
 
 - Node.js (LTS recommended)
-- npm
+- pnpm (enable via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`, or install from [pnpm.io](https://pnpm.io/installation))
 
 ## Install and run
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Open the URL Vite prints (usually `http://localhost:5173`). Levels registered in `src/main.ts` determine what loads.
@@ -18,12 +18,12 @@ Open the URL Vite prints (usually `http://localhost:5173`). Levels registered in
 
 | Command | Description |
 | --- | --- |
-| `npm run build` | Type-check (`tsc`) + production game build |
-| `npm run typecheck` | TypeScript only |
-| `npm test` | Vitest (`tests/`) |
-| `npm run preview` | Preview production build |
-| `npm run docs:dev` | Documentation dev server |
-| `npm run docs:build` | Static documentation site |
+| `pnpm run build` | Type-check (`tsc`) + production game build |
+| `pnpm run typecheck` | TypeScript only |
+| `pnpm test` | Vitest (`tests/`) |
+| `pnpm run preview` | Preview production build |
+| `pnpm run docs:dev` | Documentation dev server |
+| `pnpm run docs:build` | Static documentation site |
 
 ## Minimal level
 

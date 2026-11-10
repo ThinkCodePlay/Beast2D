@@ -4,6 +4,17 @@
   `input.isDown("left")` instead of registering their own listeners.
 */
 
+function isTextEntry(event: Event): boolean {
+  const target = event.target as {
+    isContentEditable?: boolean;
+    tagName?: string;
+  } | null;
+  if (!target) return false;
+  if (target.isContentEditable) return true;
+  const tag = target.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+}
+
 export const DefaultBindings: Record<string, string[]> = {
   left: ["ArrowLeft", "KeyA"],
   right: ["ArrowRight", "KeyD"],
@@ -89,6 +100,9 @@ export class Input {
   private onKeyDown = (event: Event): void => {
     const code = (event as KeyboardEvent).code;
     if (!code) return;
+    // Let the code editor (and other text fields) receive the key. Space is
+    // bound to shoot, and preventDefault would swallow the character.
+    if (isTextEntry(event)) return;
     if (this.isBound(code)) event.preventDefault();
     if (!this.down.has(code)) {
       this.down.add(code);

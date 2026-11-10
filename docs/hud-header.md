@@ -34,7 +34,7 @@ levelRoot.addChild(new HudHeaderUI(0, 3, theme));
 
 Every level creates one `HudHeaderUI` after `init()`. Gameplay reads and writes score and lives through that class.
 
-Shared UI chrome and the bitmap font live under **`public/ui/`** (regenerate with `npx tsx scripts/generate-beast2d-ui.ts` when needed). Register with `DEFAULT_BEAST2D_BITMAP_FONT` + `DEFAULT_BEAST2D_HUD_THEME`.
+Shared UI chrome and the bitmap font live under **`public/ui/`** (regenerate with `pnpm dlx tsx scripts/generate-beast2d-ui.ts` when needed). Register with `DEFAULT_BEAST2D_BITMAP_FONT` + `DEFAULT_BEAST2D_HUD_THEME`.
 
 ## Related
 

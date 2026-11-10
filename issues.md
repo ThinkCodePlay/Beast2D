@@ -20,7 +20,7 @@ Sprites, backgrounds, enemy art, bullets, and HUD/dialog chrome for the Space Sh
 | Bullet | `TEXTURE_SHOOTER_BULLET` |
 | HUD / dialog | `TEXTURE_SHOOTER_*` from `shooterAssets.ts` / shared `public/ui/` |
 | Hearts | `TEXTURE_HEART` |
-| Optional tooling | `npx tsx scripts/generate-beast2d-ui.ts` |
+| Optional tooling | `pnpm dlx tsx scripts/generate-beast2d-ui.ts` |
 
 ### Expected behavior
 

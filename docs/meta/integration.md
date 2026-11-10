@@ -7,9 +7,9 @@ This page describes how to publish these docs as HTML and how a future **visual 
 | Goal | Approach |
 | --- | --- |
 | Authoring | Markdown in `docs/` |
-| Local preview | `npm run docs:dev` |
-| Static HTML | `npm run docs:build` → `docs/.vitepress/dist` |
-| Hosting | Upload `dist` to any static host, or `npm run docs:preview` |
+| Local preview | `pnpm run docs:dev` |
+| Static HTML | `pnpm run docs:build` → `docs/.vitepress/dist` |
+| Hosting | Upload `dist` to any static host, or `pnpm run docs:preview` |
 
 VitePress fits the repo because the game already uses **Vite**. The sidebar mirrors the hierarchy in `docs/.vitepress/config.ts`.
 
@@ -58,7 +58,7 @@ Add YAML frontmatter to pages (`summary`, `symbols`, `since`) and generate JSON 
 
 1. Treat `src/core/index.ts` as the API boundary when editing [API reference](../api/index.md).
 2. When adding exports, add a row to the relevant component page and optionally `manifest.json`.
-3. Run `npm run docs:build` in CI alongside `npm run build` if docs are published.
+3. Run `pnpm run docs:build` in CI alongside `pnpm run build` if docs are published.
 
 ## AGENTS.md
 

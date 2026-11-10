@@ -31,13 +31,13 @@ Beast2D is a component-based 2D engine (TypeScript, Vite, PixiJS). These pages d
 Run the documentation site locally:
 
 ```bash
-npm run docs:dev
+pnpm run docs:dev
 ```
 
 Build static HTML (for hosting or embedding):
 
 ```bash
-npm run docs:build
+pnpm run docs:build
 ```
 
 Output directory: `docs/.vitepress/dist`.

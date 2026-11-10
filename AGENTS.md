@@ -11,12 +11,12 @@ Guidance for AI coding agents working in this repository.
 
 ## Runbook
 
-- Install: `npm install`
-- Dev server: `npm run dev`
-- Build (also type-checks): `npm run build`
-- Type-check only: `npm run typecheck`
-- Tests: `npm test` (Vitest, `tests/`)
-- Preview build: `npm run preview`
+- Install: `pnpm install` (repo pins `packageManager`; [Corepack](https://nodejs.org/api/corepack.html) is recommended)
+- Dev server: `pnpm run dev`
+- Build (also type-checks): `pnpm run build`
+- Type-check only: `pnpm run typecheck`
+- Tests: `pnpm test` (Vitest, `tests/`)
+- Preview build: `pnpm run preview`
 
 Notes:
 - There is no lint script in `package.json`.
@@ -79,7 +79,7 @@ Treat as **temporary** (non-exhaustive; grep `generate-`, `capture`, `devCapture
 |------|----------|-------------------|
 | Level / dev capture | (removed from `src/game/`) | Runtime levels + `src/main.ts` only |
 | Per-level image generators | (removed from `src/game/Space Shooter/scripts/`) | `public/…` art already committed |
-| Shared asset tooling | `scripts/pixel/`, `scripts/generate-beast2d-ui.ts` (`npx tsx`; not in `package.json`) | `public/ui/` + committed art |
+| Shared asset tooling | `scripts/pixel/`, `scripts/generate-beast2d-ui.ts` (`pnpm dlx tsx`; not in `package.json`) | `public/ui/` + committed art |
 
 When removing generators, update docs that reference them (`docs/space-shooter-art.md`, `scripts/README.md`) so agents do not resurrect deleted workflows.
 
@@ -87,10 +87,10 @@ When removing generators, update docs that reference them (`docs/space-shooter-a
 
 1. Start from an existing nearby prefab/component/level and mirror its style.
 2. Make minimal changes in the relevant domain folder (`core/components`, `core/prefabs`, or `game/...`).
-3. Run `npm test` and `npm run build` before finishing.
+3. Run `pnpm test` and `pnpm run build` before finishing.
 4. If you introduce new behavior, ensure it is wired through level setup (`init`) and that teardown uses `destroy()` patterns already in use.
 
 ## Documentation Status
 
 - `README.md` documents the engine concepts; this file is the quick-start guide for agents.
-- Human-facing API/syntax docs: `docs/` (VitePress — `npm run docs:dev`). Machine nav: `docs/meta/manifest.json`.
+- Human-facing API/syntax docs: `docs/` (VitePress — `pnpm run docs:dev`). Machine nav: `docs/meta/manifest.json`.

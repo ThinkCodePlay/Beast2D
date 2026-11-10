@@ -40,6 +40,30 @@ await game.loadLevel("helloCart");
 
 The hello cart in `src/game/carts/HelloCart.ts` is loaded by default from `src/main.ts`.
 
+## In-browser editor
+
+`pnpm run dev` loads the cart script from `src/game/carts/hello.script.ts`. **Esc** toggles run and code. **Run** (or Ctrl+Enter) compiles the buffer and restarts the cart. **Save** (Ctrl+S) overwrites `hello.script.ts` through the dev server only; production builds disable Save and keep drafts in `localStorage`.
+
+The script shape has no imports. Declare `init`, `update(dt)`, and `draw`, and use `cls`, `rect`, `rectfill`, `print`, `btn`, and `btnp` in scope. `dt` is seconds. The playfield is 320×240; use those literals or your own constants.
+
+```js
+let x = 112;
+
+function init() {
+  x = 112;
+}
+
+function update(dt) {
+  if (btn("right")) x += 60 * dt;
+}
+
+function draw() {
+  cls(0);
+  rectfill(Math.round(x), 104, 8, 8, 10);
+  print("HELLO", 8, 8, 4);
+}
+```
+
 ## Helpers
 
 Colors are palette indexes `0` through `15` (`Beast2D16`). `0` is plum, `4` is cream, `10` is orange.
