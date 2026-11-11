@@ -1,61 +1,124 @@
-/* Shell chrome hex values mirror Beast2D16 in src/core/ui/palette.ts */
+/*
+  Beast2D editor chrome — CSS custom properties are derived from Beast2D16
+  (see src/core/ui/palette.ts and applyChromePalette in src/editor/chromeColors.ts).
+*/
+
+@font-face {
+  font-family: "Pixeloid Mono";
+  src: url("/ui/pixeloid-mono.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/ui/jetbrains-mono.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --beast-plum: #1f1424;
+  --beast-shadow: #3b2e3f;
+  --beast-stone: #746678;
+  --beast-cream: #f4ead2;
+  --beast-hot-pink: #e86c9a;
+  --beast-leaf: #93be64;
+  --beast-deep-rose: #75273c;
+  --beast-red: #cb4a50;
+  --beast-yellow: #f1c766;
+  --beast-orange: #e28649;
+  --beast-light-pink: #f7abcc;
+  --beast-sky: #7ab2d5;
+  --beast-code-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --beast-radius: 12px;
+  --beast-shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --beast-space-1: 4px;
+  --beast-space-2: 8px;
+  --beast-motion: 200ms ease;
+}
+
 html,
 body,
 #app {
   height: 100%;
   width: 100%;
   margin: 0;
-  background: #ffcbdd;
-  color: #f4ead2;
-  font-family: Inter, system-ui, sans-serif;
+  background: var(--beast-plum);
+  color: var(--beast-cream);
+  font-family: system-ui, Inter, sans-serif;
 }
 
 #app {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .beast2d-app {
-  position: relative;
-}
-
-.beast2d-console {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
-  background: #1f1424;
+  min-height: 0;
 }
 
-.beast2d-stage {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.beast2d-code {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
+.beast2d-shell {
   display: flex;
   flex-direction: column;
-  background: #1f1424;
+  flex: 1;
+  min-height: 0;
+  background: var(--beast-plum);
 }
 
-/* Author `display` wins over the `hidden` attribute unless we override it. */
-.beast2d-code[hidden] {
-  display: none !important;
-}
-
-.beast2d-code-bar {
+.beast2d-topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  padding: 0 12px;
-  background: #3b2e3f;
+  gap: var(--beast-space-2);
+  padding: var(--beast-space-2) var(--beast-space-2) var(--beast-space-1);
   flex-shrink: 0;
+}
+
+.beast2d-logo {
+  flex-shrink: 0;
+}
+
+.beast2d-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--beast-space-2);
+  flex: 1;
+  padding-left: var(--beast-space-2);
+}
+
+.beast2d-tab {
+  font: inherit;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: var(--beast-space-1) var(--beast-space-2);
+  border-radius: var(--beast-radius) var(--beast-radius) 0 0;
+  position: relative;
+  color: var(--beast-cream);
+}
+
+.beast2d-tab-active::after {
+  content: "";
+  position: absolute;
+  left: var(--beast-space-2);
+  right: var(--beast-space-2);
+  bottom: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--beast-hot-pink);
+}
+
+.beast2d-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--beast-space-2);
+  margin-left: auto;
 }
 
 .beast2d-bitmap {
@@ -64,87 +127,290 @@ body,
   image-rendering: crisp-edges;
 }
 
-.beast2d-code-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .beast2d-btn {
   font: inherit;
   border: none;
   cursor: pointer;
-  padding: 0 8px;
-  border-radius: 2px;
-  background: transparent;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: var(--beast-space-1);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--beast-cream);
+  transition: opacity var(--beast-motion), transform var(--beast-motion),
+    background-color var(--beast-motion);
 }
 
-.beast2d-btn-save {
-  background: transparent;
+@media (prefers-reduced-motion: reduce) {
+  .beast2d-btn {
+    transition: none;
+  }
+}
+
+.beast2d-btn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.beast2d-btn-ghost {
+  padding: var(--beast-space-1) var(--beast-space-2);
+}
+
+.beast2d-btn-compact {
+  padding: 2px var(--beast-space-1);
+}
+
+.beast2d-btn-run {
+  padding: var(--beast-space-1) var(--beast-space-2);
+  background: var(--beast-hot-pink);
+  color: var(--beast-plum);
+  box-shadow: var(--beast-shadow-soft);
+}
+
+.beast2d-btn-run:active {
+  animation: beast2d-run-pulse 180ms ease;
+}
+
+@keyframes beast2d-run-pulse {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.beast2d-btn-save:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .beast2d-btn[hidden] {
   display: none !important;
 }
 
-.beast2d-btn-save:disabled {
-  color: #746678;
-  cursor: not-allowed;
-}
-
-.beast2d-btn-run {
-  color: #1f1424;
-  background: #e86c9a;
-}
-
-.beast2d-code-error {
+.beast2d-run-icon {
   flex-shrink: 0;
-  padding: 6px 8px;
-  font-size: 12px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  color: #f4ead2;
-  background: #75273c;
-  box-shadow: inset 3px 0 0 #cb4a50;
 }
 
-.beast2d-code-error[hidden] {
-  display: none !important;
+.beast2d-main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: var(--beast-space-2);
+  padding: 0 var(--beast-space-2) var(--beast-space-2);
+  transition: gap var(--beast-motion);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beast2d-main {
+    transition: none;
+  }
+}
+
+.beast2d-tool-panel {
+  flex: 1 1 55%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  transition: flex var(--beast-motion), opacity var(--beast-motion), max-width var(--beast-motion);
+}
+
+.beast2d-game-panel {
+  flex: 1 1 45%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--beast-space-1);
+}
+
+.beast2d-view-expanded .beast2d-tool-panel {
+  flex: 0 0 0;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.beast2d-view-expanded .beast2d-game-panel {
+  flex: 1 1 100%;
+}
+
+.beast2d-code-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--beast-shadow);
+  border-radius: var(--beast-radius);
+  box-shadow: var(--beast-shadow-soft);
+  overflow: hidden;
+}
+
+.beast2d-error-flash .beast2d-code-editor .cm-activeLine {
+  animation: beast2d-line-glow 900ms ease;
+}
+
+@keyframes beast2d-line-glow {
+  0%,
+  100% {
+    background-color: color-mix(in srgb, var(--beast-cream) 6%, transparent);
+  }
+  35% {
+    background-color: color-mix(in srgb, var(--beast-hot-pink) 22%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beast2d-error-flash .beast2d-code-editor .cm-activeLine {
+    animation: none;
+  }
 }
 
 .beast2d-code-editor {
   flex: 1;
   min-height: 0;
+  background: var(--beast-plum);
 }
 
 .beast2d-code-editor .cm-editor {
   height: 100%;
 }
 
+.beast2d-code-editor .cm-scroller {
+  padding: 0 var(--beast-space-2);
+}
+
+.beast2d-game-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--beast-space-2);
+  flex-shrink: 0;
+  padding: 0 var(--beast-space-1);
+}
+
+.beast2d-scanline-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--beast-space-1);
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.beast2d-scanline-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.beast2d-game-frame {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--beast-space-2);
+  border-radius: calc(var(--beast-radius) + 4px);
+  background: var(--beast-plum);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--beast-hot-pink) 55%, transparent),
+    var(--beast-shadow-soft);
+  outline: 1px solid color-mix(in srgb, var(--beast-hot-pink) 25%, transparent);
+  position: relative;
+}
+
+.beast2d-game-frame.beast2d-scanlines::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: var(--beast-space-2);
+  border-radius: var(--beast-radius);
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(0, 0, 0, 0.12) 2px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  mix-blend-mode: multiply;
+}
+
+.beast2d-game-footer {
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--beast-stone);
+  font-family: var(--beast-code-font);
+  padding-bottom: var(--beast-space-1);
+}
+
+.beast2d-error-strip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--beast-space-2);
+  margin: 0 var(--beast-space-2) var(--beast-space-2);
+  padding: var(--beast-space-2);
+  background: var(--beast-shadow);
+  border-radius: var(--beast-radius);
+  box-shadow: var(--beast-shadow-soft);
+  border-left: 3px solid var(--beast-hot-pink);
+  transform: translateY(12px);
+  opacity: 0;
+  transition: transform var(--beast-motion), opacity var(--beast-motion);
+}
+
+.beast2d-error-strip-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.beast2d-error-strip[hidden] {
+  display: none !important;
+}
+
+.beast2d-error-icon {
+  flex-shrink: 0;
+}
+
+.beast2d-error-text {
+  font-family: var(--beast-code-font);
+  font-size: 12px;
+  color: var(--beast-cream);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beast2d-error-strip {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+}
+
 .beast2d-signature {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--beast-code-font);
   font-size: 13px;
   line-height: 1.4;
-  color: #f4ead2;
-  background: #3b2e3f;
-  border: 1px solid #746678;
-  padding: 2px 8px;
+  color: var(--beast-cream);
+  background: var(--beast-shadow);
+  border: 1px solid var(--beast-stone);
+  border-radius: 8px;
+  padding: var(--beast-space-1) var(--beast-space-2);
 }
 
 .beast2d-signature-active {
-  color: #1f1424;
-  background: #f1c766;
+  color: var(--beast-plum);
+  background: var(--beast-yellow);
 }
-/* Virtual resolution 320×240; outer size set by displayScale.ts (integer CSS scale). */
+
 .game-container {
   position: relative;
   z-index: 1;
-  width: 100%;
-  height: 100%;
   flex-shrink: 0;
   overflow: hidden;
-  background: #000;
+  border-radius: var(--beast-radius);
+  background: var(--beast-plum);
 }
 
 .game-container canvas {
@@ -152,4 +418,21 @@ body,
   height: 100%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  display: block;
+}
+
+/* Standalone play surface (?play=cart) — game only, centered. */
+.beast2d-standalone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  background: var(--beast-plum);
+  padding: var(--beast-space-2);
+}
+
+.beast2d-standalone .game-container {
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--beast-hot-pink) 55%, transparent),
+    var(--beast-shadow-soft);
 }

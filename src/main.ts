@@ -13,8 +13,10 @@ import { BreakoutPaddle } from "./game/BreakoutPaddle/BreakoutPaddle";
 import { helloCart } from "./game/carts/HelloCart";
 import helloScript from "./game/carts/hello.script.ts?raw";
 import { CartLevel } from "./core/cart/CartLevel";
-import { guardCart } from "./core/cart/compile";
+import { compileCart, guardCart } from "./core/cart/compile";
+import { attachDisplayScaleFit } from "./core/displayScale";
 import { mountCartEditor } from "./editor/shell";
+import { parsePlaySurface } from "./editor/viewMode";
 import "./style.css";
 
 const CART_SCRIPT_STORAGE_KEY = "beast2d-cart-script";
@@ -52,6 +54,28 @@ engine
       return;
     }
 
+    const loadCartLevel = async (cart: typeof helloCart) => {
+      const guarded = guardCart(cart, () => {
+        game.pause();
+      });
+      game.registerLevel("helloCart", new CartLevel(engine, guarded));
+      await game.loadLevel("helloCart");
+    };
+
+    if (parsePlaySurface(window.location.search) === "standalone") {
+      appRoot.classList.add("beast2d-standalone");
+      const stored = localStorage.getItem(CART_SCRIPT_STORAGE_KEY);
+      const source = stored ?? helloScript;
+      const compiled = compileCart(source);
+      if (compiled.ok) {
+        await loadCartLevel(compiled.cart);
+      } else {
+        await loadCartLevel(helloCart);
+      }
+      attachDisplayScaleFit(container);
+      return;
+    }
+
     let shell!: ReturnType<typeof mountCartEditor>;
 
     const loadCart = async (cart: typeof helloCart) => {
@@ -68,6 +92,7 @@ engine
       appRoot,
       gameContainer: container,
       game,
+      engine,
       initialSource: helloScript,
       loadCart,
       fallbackCart: helloCart,
