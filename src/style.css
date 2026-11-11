@@ -7,6 +7,15 @@
   font-display: block;
 }
 
+/* Monogram — datagoblin, CC0 (see public/ui/monogram.LICENSE.txt) */
+@font-face {
+  font-family: "Monogram";
+  src: url("/ui/monogram.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
 html,
 body,
 #app {
@@ -15,7 +24,7 @@ body,
   margin: 0;
   background: #ffcbdd;
   color: #f4ead2;
-  font-family: Inter, system-ui, sans-serif;
+  font-family: "Monogram", ui-monospace, monospace;
   --beast-scale: 2;
 }
 
@@ -30,102 +39,324 @@ body,
 }
 
 .beast2d-console {
+  position: relative;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   border-radius: 0;
   overflow: hidden;
-  background: #3b2e3f;
+  background: #1f1424;
   outline: calc(2px * var(--beast-scale)) solid #524658;
-  box-shadow: calc(4px * var(--beast-scale)) calc(4px * var(--beast-scale)) 0 #1f1424;
+  box-shadow: calc(4px * var(--beast-scale)) calc(4px * var(--beast-scale)) 0 #3b2e3f;
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
-.beast2d-stage {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.beast2d-code {
+.beast2d-boot {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  box-sizing: border-box;
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  padding: calc(6px * var(--beast-scale));
-  background: #3b2e3f;
-  box-shadow:
-    inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #524658,
-    inset calc(-2px * var(--beast-scale)) calc(-2px * var(--beast-scale)) 0 #120c16;
+  align-items: center;
+  justify-content: center;
+  gap: calc(8px * var(--beast-scale));
+  background: #1f1424;
 }
 
-/* Author `display` wins over the `hidden` attribute unless we override it. */
-.beast2d-code[hidden] {
+.beast2d-boot[hidden] {
   display: none !important;
 }
 
-.beast2d-code-bar {
+.beast2d-boot-title {
+  color: #e86c9a;
+  font-size: calc(32px * var(--beast-scale));
+  line-height: calc(32px * var(--beast-scale));
+  letter-spacing: calc(2px * var(--beast-scale));
+}
+
+.beast2d-boot-version {
+  color: #f4ead2;
+  font-size: calc(16px * var(--beast-scale));
+}
+
+.beast2d-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
-  padding: 0 calc(6px * var(--beast-scale));
-  background: #3b2e3f;
   flex-shrink: 0;
+  padding: 0 calc(8px * var(--beast-scale));
+  background: #3b2e3f;
   box-shadow: inset 0 calc(-2px * var(--beast-scale)) 0 #1f1424;
 }
 
-.beast2d-clock[hidden] {
+.beast2d-top-bar[hidden] {
   display: none !important;
 }
 
-.beast2d-bitmap {
-  display: block;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+.beast2d-breadcrumb {
+  color: #f4ead2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.beast2d-code-actions {
+.beast2d-top-actions {
   display: flex;
   align-items: center;
-  gap: calc(6px * var(--beast-scale));
+  gap: calc(8px * var(--beast-scale));
+  flex-shrink: 0;
 }
 
-.beast2d-btn {
+.beast2d-clock {
+  color: #93be64;
+}
+
+.beast2d-top-save {
   font: inherit;
   border: none;
   cursor: pointer;
-  padding: 0 calc(4px * var(--beast-scale));
-  border-radius: 0;
+  padding: 0;
   background: transparent;
-  display: flex;
-  align-items: center;
-  outline: none;
+  color: #f4ead2;
 }
 
-.beast2d-btn-save {
-  background: transparent;
-}
-
-.beast2d-btn[hidden] {
-  display: none !important;
-}
-
-.beast2d-btn-save:disabled {
+.beast2d-top-save:disabled {
   color: #746678;
   cursor: not-allowed;
 }
 
-.beast2d-btn-run {
-  color: #1f1424;
+.beast2d-top-save[hidden],
+.beast2d-top-run[hidden] {
+  display: none !important;
+}
+
+.beast2d-top-run {
+  font: inherit;
+  border: none;
+  cursor: pointer;
+  padding: calc(2px * var(--beast-scale)) calc(6px * var(--beast-scale));
   background: #e86c9a;
+  color: #1f1424;
+}
+
+.beast2d-tool-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: calc(4px * var(--beast-scale));
+  flex-shrink: 0;
+  padding: calc(4px * var(--beast-scale)) calc(8px * var(--beast-scale)) 0;
+  background: #1f1424;
+  box-shadow: inset 0 calc(-2px * var(--beast-scale)) 0 #3b2e3f;
+}
+
+.beast2d-tool-row[hidden] {
+  display: none !important;
+}
+
+.beast2d-tool-tab {
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(2px * var(--beast-scale));
+  border: calc(2px * var(--beast-scale)) solid transparent;
+  background: #3b2e3f;
+  color: #746678;
+  cursor: pointer;
+  padding: calc(2px * var(--beast-scale)) calc(4px * var(--beast-scale));
+  margin-bottom: 0;
+  transform: translateY(calc(4px * var(--beast-scale)));
+}
+
+.beast2d-tool-tab:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.beast2d-tool-tab-active:not(:disabled) {
+  color: #f4ead2;
+  border-color: #e86c9a;
+  transform: translateY(0);
+}
+
+.beast2d-tool-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(16px * var(--beast-scale));
+  height: calc(12px * var(--beast-scale));
+  font-size: calc(12px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+  background: #1f1424;
+}
+
+.beast2d-tool-label {
+  font-size: calc(12px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+}
+
+.beast2d-home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(16px * var(--beast-scale));
+  padding: calc(16px * var(--beast-scale));
+  background: #1f1424;
+  min-height: 0;
+}
+
+.beast2d-home[hidden] {
+  display: none !important;
+}
+
+.beast2d-home-logo {
+  color: #e86c9a;
+  font-size: calc(32px * var(--beast-scale));
+  line-height: calc(32px * var(--beast-scale));
+  letter-spacing: calc(2px * var(--beast-scale));
+}
+
+.beast2d-home-shelf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: calc(12px * var(--beast-scale));
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.beast2d-home-disk {
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(6px * var(--beast-scale));
+  border: calc(2px * var(--beast-scale)) solid transparent;
+  background: transparent;
+  color: #f4ead2;
+  cursor: pointer;
+  padding: calc(4px * var(--beast-scale));
+}
+
+.beast2d-home-disk-selected {
+  border-color: #e86c9a;
+  border-radius: calc(4px * var(--beast-scale));
+}
+
+.beast2d-home-disk-art {
+  position: relative;
+  display: block;
+  width: calc(32px * var(--beast-scale));
+  height: calc(32px * var(--beast-scale));
+  background: #3b2e3f;
+  box-shadow:
+    inset 0 calc(4px * var(--beast-scale)) 0 #746678,
+    inset 0 calc(-2px * var(--beast-scale)) 0 #1f1424;
+}
+
+.beast2d-home-disk-art::before {
+  content: "";
+  position: absolute;
+  left: calc(6px * var(--beast-scale));
+  top: calc(6px * var(--beast-scale));
+  width: calc(10px * var(--beast-scale));
+  height: calc(10px * var(--beast-scale));
+  background: #e86c9a;
+}
+
+.beast2d-home-disk-art-new {
+  background: transparent;
+  border: calc(2px * var(--beast-scale)) dashed #746678;
+  box-shadow: none;
+}
+
+.beast2d-home-disk-art-new::before {
+  display: none;
+}
+
+.beast2d-home-disk-title {
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+  text-align: center;
+  max-width: calc(72px * var(--beast-scale));
+}
+
+.beast2d-workspace {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  background: #1f1424;
+  min-height: 0;
+}
+
+.beast2d-workspace[hidden] {
+  display: none !important;
+}
+
+.beast2d-editor-column {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-left: calc(8px * var(--beast-scale));
+  border-right: calc(2px * var(--beast-scale)) solid #3b2e3f;
+}
+
+.beast2d-preview-column {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: calc(8px * var(--beast-scale));
+}
+
+.beast2d-preview-frame {
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #000;
+  box-shadow: inset 0 0 0 calc(2px * var(--beast-scale)) #3b2e3f;
+}
+
+.beast2d-tool-stub {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #746678;
+  background: #3b2e3f;
+  box-shadow: inset 0 0 0 calc(2px * var(--beast-scale)) #120c16;
+}
+
+.beast2d-tool-stub[hidden] {
+  display: none !important;
+}
+
+.beast2d-code {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--beast-scale));
+}
+
+.beast2d-code[hidden] {
+  display: none !important;
 }
 
 .beast2d-code-error {
   flex-shrink: 0;
   padding: calc(2px * var(--beast-scale)) calc(4px * var(--beast-scale));
-  font-family: "Pixeloid Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: calc(9px * var(--beast-scale));
-  line-height: calc(12px * var(--beast-scale));
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
   -webkit-font-smoothing: none;
   font-smooth: never;
   color: #f4ead2;
@@ -158,7 +389,7 @@ body,
 .beast2d-code-editor .cm-dropCursor {
   border-left-width: calc(6px * var(--beast-scale)) !important;
   border-left-style: solid !important;
-  border-left-color: #f4ead2 !important;
+  border-left-color: #e86c9a !important;
   width: 0;
   margin-left: 0;
   background: transparent;
@@ -171,8 +402,8 @@ body,
 }
 
 .beast2d-code-editor .cm-scroller::-webkit-scrollbar {
-  width: calc(8px * var(--beast-scale));
-  height: calc(8px * var(--beast-scale));
+  width: calc(16px * var(--beast-scale));
+  height: calc(16px * var(--beast-scale));
 }
 
 .beast2d-code-editor .cm-scroller::-webkit-scrollbar-track {
@@ -191,18 +422,28 @@ body,
   border: calc(2px * var(--beast-scale)) solid #1f1424;
 }
 
-.beast2d-code-editor .cm-scroller::-webkit-scrollbar-button:vertical:start:decrement,
-.beast2d-code-editor .cm-scroller::-webkit-scrollbar-button:vertical:end:increment {
-  display: block;
-  height: calc(8px * var(--beast-scale));
-  background: #f1c766;
-  border: calc(2px * var(--beast-scale)) solid #1f1424;
+.beast2d-footer-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #746678;
+  background: #3b2e3f;
+  box-shadow: inset 0 calc(2px * var(--beast-scale)) 0 #1f1424;
+}
+
+.beast2d-footer-hint[hidden] {
+  display: none !important;
+}
+
+.beast2d-hint-key {
+  color: #e28649;
 }
 
 .beast2d-signature {
-  font-family: "Pixeloid Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: calc(9px * var(--beast-scale));
-  line-height: calc(12px * var(--beast-scale));
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
   -webkit-font-smoothing: none;
   font-smooth: never;
   color: #f4ead2;
@@ -216,7 +457,8 @@ body,
   color: #1f1424;
   background: #f1c766;
 }
-/* Virtual resolution 320×240; outer size set by displayScale.ts (integer CSS scale). */
+
+/* Virtual resolution 320×240; preview frame sets integer CSS scale. */
 .game-container {
   position: relative;
   z-index: 1;
@@ -230,6 +472,13 @@ body,
 .game-container canvas {
   width: 100%;
   height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Legacy bitmap chrome (unused by console DOM; kept for bitmapLabel tests). */
+.beast2d-bitmap {
+  display: block;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }

@@ -46,6 +46,7 @@ engine
     game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
 
     const levelQuery = bootstrapParams.get("level");
+    const playOnly = bootstrapParams.get("play") === "1" || bootstrapParams.get("standalone") === "1";
 
     if (levelQuery) {
       await game.loadLevel(levelQuery);
@@ -64,13 +65,20 @@ engine
       await game.loadLevel("helloCart");
     };
 
+    const loadLevel = async (levelId: string) => {
+      game.resume();
+      await game.loadLevel(levelId);
+    };
+
     shell = mountCartEditor({
       appRoot,
       gameContainer: container,
       game,
       initialSource: helloScript,
       loadCart,
+      loadLevel,
       fallbackCart: helloCart,
+      playOnly,
     });
 
     await shell.boot();
