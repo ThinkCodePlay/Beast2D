@@ -6,6 +6,8 @@ Beast2D targets a fixed **320×240** virtual resolution (4∶3), scaled in CSS f
 
 `src/core/displayScale.ts` computes the largest **integer** uniform scale that fits the window (minus padding). `main.ts` calls `attachDisplayScaleFit()` on the `.game-container` and `configurePixelArtRendering()` before the engine boots.
 
+The cart console shell (`src/editor/shell.ts`) uses the same integer scaling for the **playfield plus a 16 px bar**: `computeIntegerDisplayScale` sizes the stage from `DISPLAY_WIDTH`×(`DISPLAY_HEIGHT`+16) with 16 px padding so the editor chrome stays pixel-crisp when the window is resized.
+
 | Viewport vs native | Behavior |
 | --- | --- |
 | Larger | 2×, 3×, … up to what fits; centered on the page |

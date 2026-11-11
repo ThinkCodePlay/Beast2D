@@ -6,6 +6,7 @@ import { defineConfig } from "vitest/config";
 
 const repoRoot = fileURLToPath(new URL(".", import.meta.url));
 const cartScriptPath = resolve(repoRoot, "src/game/carts/hello.script.ts");
+const MAX_CART_SAVE_BYTES = 256 * 1024;
 
 function beast2dCartSavePlugin(): Plugin {
   return {
@@ -21,10 +22,19 @@ function beast2dCartSavePlugin(): Plugin {
         }
         if (url === "/__beast2d/save-cart" && req.method === "POST") {
           let body = "";
-          req.on("data", (chunk) => {
+          let tooLarge = false;
+          req.on("data", (chunk: string | Buffer) => {
+            if (tooLarge) return;
             body += chunk;
+            if (Buffer.byteLength(body, "utf8") > MAX_CART_SAVE_BYTES) {
+              tooLarge = true;
+              res.statusCode = 413;
+              res.end("payload too large");
+              req.destroy();
+            }
           });
           req.on("end", () => {
+            if (tooLarge) return;
             try {
               const parsed = JSON.parse(body) as { source?: string };
               if (typeof parsed.source !== "string") {

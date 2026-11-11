@@ -1,14 +1,19 @@
 import { EditorView } from "@codemirror/view";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags } from "@lezer/highlight";
+import { Beast2D16 } from "../core/ui/palette";
 
-const plum = "#1f1424";
-const shadow = "#3b2e3f";
-const stone = "#746678";
-const cream = "#f4ead2";
-const magenta = "#c1386e";
-const yellow = "#f1c766";
-const orange = "#e28649";
+function paletteCss(rgb: number): string {
+  return `#${(rgb & 0xffffff).toString(16).padStart(6, "0")}`;
+}
+
+const plum = paletteCss(Beast2D16.PlumOutline);
+const shadow = paletteCss(Beast2D16.Shadow);
+const stone = paletteCss(Beast2D16.StoneGray);
+const cream = paletteCss(Beast2D16.Cream);
+const magenta = paletteCss(Beast2D16.Magenta);
+const yellow = paletteCss(Beast2D16.Yellow);
+const orange = paletteCss(Beast2D16.Orange);
 export const beast2dEditorTheme = EditorView.theme(
   {
     "&": {

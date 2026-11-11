@@ -9,8 +9,9 @@ import type { Cart } from "../core/cart/Cart";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 import { computeIntegerDisplayScale, displayCssSize } from "../core/displayScale";
 import type { GameManager } from "../core/GameManager";
+import { Beast2D16 } from "../core/ui/palette";
 import { paintBitmapLabel } from "./bitmapLabel";
-import { checkCartSyntax, compileCart } from "./compileCart";
+import { checkCartSyntax, compileCart } from "../core/cart/compile";
 import { cartHelperCompletion } from "./helpers";
 import { cartSignatureHints } from "./signature";
 import { beast2dEditorTheme, beast2dSyntax } from "./theme";
@@ -146,11 +147,18 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     consoleFrame.style.width = `${stageSize.width}px`;
     bar.style.height = `${16 * scale}px`;
     bar.style.width = "100%";
-    const cream = "#f4ead2";
-    const plum = "#1f1424";
+    const cream = `#${(Beast2D16.Cream & 0xffffff).toString(16).padStart(6, "0")}`;
+    const plum = `#${(Beast2D16.PlumOutline & 0xffffff).toString(16).padStart(6, "0")}`;
     if (mode === "code") {
       void paintBitmapLabel(title, "CODE", scale, cream);
-      void paintBitmapLabel(saveLabel, "SAVE", scale, saveButton.disabled ? "#746678" : cream);
+      void paintBitmapLabel(
+        saveLabel,
+        "SAVE",
+        scale,
+        saveButton.disabled
+          ? `#${(Beast2D16.StoneGray & 0xffffff).toString(16).padStart(6, "0")}`
+          : cream,
+      );
       void paintBitmapLabel(runLabel, "RUN", scale, plum);
       editButton.hidden = true;
       saveButton.hidden = false;

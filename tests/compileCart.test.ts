@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compileCart, checkCartSyntax } from "../src/editor/compileCart";
+import { compileCart, checkCartSyntax, guardCart, runtimeErrorLine } from "../src/core/cart/compile";
 
 const validCart = `
 let x = 0;
@@ -40,5 +40,72 @@ function draw() { cls(0); }
     if (!result.ok) {
       expect(result.message).toMatch(/update/);
     }
+  });
+
+  it("maps runtime stack lines with a stable offset", () => {
+    const source = `
+function init() {}
+function update(dt: number) {}
+function draw() {
+  throw new Error("boom");
+}
+`;
+    const compiled = compileCart(source);
+    expect(compiled.ok).toBe(true);
+    if (!compiled.ok) return;
+    let caught: unknown;
+    try {
+      compiled.cart.draw();
+    } catch (error) {
+      caught = error;
+    }
+    expect(caught).toBeDefined();
+    const line = runtimeErrorLine(caught);
+    const throwLine =
+      source.split("\n").findIndex((row) => row.includes("throw new Error")) + 1;
+    expect(line).toBe(throwLine);
+  });
+
+  it("dedupes identical runtime reports per phase but reports across phases", () => {
+    let reports = 0;
+    const cart = {
+      init() {},
+      update() {
+        throw new Error("same");
+      },
+      draw() {
+        throw new Error("same");
+      },
+    };
+    const guarded = guardCart(cart, () => {
+      reports += 1;
+    });
+    expect(() => guarded.update(1 / 60)).toThrow();
+    expect(() => guarded.update(1 / 60)).toThrow();
+    expect(reports).toBe(1);
+    expect(() => guarded.draw()).toThrow();
+    expect(reports).toBe(2);
+  });
+
+  it("reports a new message on the same phase", () => {
+    let last = "";
+    let n = 0;
+    let flip = false;
+    const cart = {
+      init() {},
+      update() {
+        throw new Error(flip ? "b" : "a");
+      },
+      draw() {},
+    };
+    const guarded = guardCart(cart, (message) => {
+      last = message;
+      n += 1;
+    });
+    expect(() => guarded.update(1)).toThrow();
+    flip = true;
+    expect(() => guarded.update(1)).toThrow();
+    expect(n).toBe(2);
+    expect(last).toBe("b");
   });
 });

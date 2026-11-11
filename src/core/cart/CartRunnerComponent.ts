@@ -28,11 +28,16 @@ export class CartRunnerComponent extends Component {
   override update(_deltaTime: number): void {
     const context = this.requireContext();
     this.drawList.clear();
-    withCartContext({ drawList: this.drawList, input: context.input }, () => {
-      this.cart.update(context.time.deltaSeconds);
-      this.cart.draw();
-    });
-    paintDrawList(this.layer, this.drawList, context.width, context.height);
+    try {
+      withCartContext({ drawList: this.drawList, input: context.input }, () => {
+        this.cart.update(context.time.deltaSeconds);
+        this.cart.draw();
+      });
+      paintDrawList(this.layer, this.drawList, context.width, context.height);
+    } catch {
+      this.drawList.clear();
+      this.layer.removeChildren();
+    }
   }
 
   override onDestroy(): void {
