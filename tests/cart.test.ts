@@ -107,7 +107,7 @@ describe("CartLevel", () => {
     context.time.advance(1);
     level.tick(context.time.delta);
 
-    expect(calls).toEqual(["init", "update", "draw", "update", "draw"]);
+    expect(calls).toEqual(["init", "draw", "update", "draw", "update", "draw"]);
     expect(dts[0]).toBeCloseTo(1 / 60);
     expect(dts[1]).toBeCloseTo(1 / 60);
     level.destroy();

@@ -19,9 +19,16 @@ export class CartRunnerComponent extends Component {
   override onInit(): void {
     const context = this.requireContext();
     this.gameObject?.container.addChild(this.layer);
-    withCartContext({ drawList: this.drawList, input: context.input }, () => {
-      this.cart.init();
-    });
+    try {
+      withCartContext({ drawList: this.drawList, input: context.input }, () => {
+        this.cart.init();
+        this.cart.draw();
+      });
+      paintDrawList(this.layer, this.drawList, context.width, context.height);
+    } catch {
+      this.drawList.clear();
+      this.layer.removeChildren();
+    }
     this.drawList.clear();
   }
 

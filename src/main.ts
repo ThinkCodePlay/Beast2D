@@ -1,5 +1,6 @@
 import { Engine } from "./core/Engine";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "./core/display";
+import { Beast2D16 } from "./core/ui/palette";
 import { configurePixelArtRendering } from "./core/displayScale";
 
 // Pixi global default: nearest-neighbor texture sampling (no blur when scaling).
@@ -29,6 +30,7 @@ appRoot.appendChild(container);
 const engine = new Engine({
   width: DISPLAY_WIDTH,
   height: DISPLAY_HEIGHT,
+  backgroundColor: Beast2D16.PlumOutline,
   antialias: false,
   debug: false,
 });

@@ -79,23 +79,32 @@ export async function paintBitmapLabel(
   const advance = font.glyphW + BITMAP_GAP;
   const displayScale = Math.max(1, Math.round(scale));
 
-  canvas.width = width;
-  canvas.height = height;
-  canvas.style.width = `${width * displayScale}px`;
-  canvas.style.height = `${height * displayScale}px`;
-
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  ctx.clearRect(0, 0, width, height);
-  ctx.imageSmoothingEnabled = false;
+  const stamp = document.createElement("canvas");
+  stamp.width = width;
+  stamp.height = height;
+  const stampCtx = stamp.getContext("2d");
+  if (!stampCtx) return;
+  stampCtx.imageSmoothingEnabled = false;
 
   const slots = resolveBitmapLabelGlyphs(text, font);
   for (let i = 0; i < slots.length; i += 1) {
     const { x, y } = slots[i]!;
-    ctx.drawImage(image, x, y, font.glyphW, font.glyphH, i * advance, 0, font.glyphW, font.glyphH);
+    stampCtx.drawImage(image, x, y, font.glyphW, font.glyphH, i * advance, 0, font.glyphW, font.glyphH);
   }
-  ctx.globalCompositeOperation = "source-in";
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, width, height);
-  ctx.globalCompositeOperation = "source-over";
+  stampCtx.globalCompositeOperation = "source-in";
+  stampCtx.fillStyle = color;
+  stampCtx.fillRect(0, 0, width, height);
+
+  const outW = width * displayScale;
+  const outH = height * displayScale;
+  canvas.width = outW;
+  canvas.height = outH;
+  canvas.style.width = `${outW}px`;
+  canvas.style.height = `${outH}px`;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, outW, outH);
+  ctx.drawImage(stamp, 0, 0, width, height, 0, 0, outW, outH);
 }
