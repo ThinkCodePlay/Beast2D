@@ -113,18 +113,6 @@ export const DISK_ART: Record<string, PixelGrid> = {
   ],
 };
 
-/** Pink beast sitting beside the home logo. Do not restyle in the disk pass. */
-export const BEAST_MASCOT: PixelGrid = [
-  "..pppppp..",
-  ".pppppppp.",
-  "ppwwppwwpp",
-  "pppppppppp",
-  ".ppmmmmmp.",
-  "pppppppppp",
-  "p..pppp..p",
-  ".p.p..p.p.",
-];
-
 /** True when every inked row is two side clusters with an empty middle. */
 export function iconIsSplitPair(rows: PixelGrid): boolean {
   const inked = rows.filter((row) => row.split("").some((ch) => ch !== "."));
@@ -138,32 +126,7 @@ export function iconIsSplitPair(rows: PixelGrid): boolean {
   });
 }
 
-export function paintPixelGrid(canvas: HTMLCanvasElement, rows: PixelGrid, scale = 1): void {
-  const height = rows.length;
-  const width = rows.reduce((max, row) => Math.max(max, row.length), 0);
-  const pixel = Math.max(1, Math.round(scale));
-  canvas.width = width * pixel;
-  canvas.height = height * pixel;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  blitGrid(ctx, rows, 0, 0, pixel);
-}
-
 type Ctx = CanvasRenderingContext2D;
-
-function blitGrid(ctx: Ctx, rows: PixelGrid, originX: number, originY: number, scale: number): void {
-  for (let y = 0; y < rows.length; y += 1) {
-    const row = rows[y] ?? "";
-    for (let x = 0; x < row.length; x += 1) {
-      const color = PIXEL_COLORS[row[x] ?? ""];
-      if (!color) continue;
-      ctx.fillStyle = color;
-      ctx.fillRect((originX + x) * scale, (originY + y) * scale, scale, scale);
-    }
-  }
-}
 
 function fill(ctx: Ctx, x: number, y: number, w: number, h: number, color: string, scale: number): void {
   if (w <= 0 || h <= 0) return;

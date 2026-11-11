@@ -247,8 +247,11 @@ body,
 }
 
 .beast2d-mascot {
-  width: calc(32px * var(--beast-scale));
-  height: auto;
+  height: calc(32px * var(--beast-scale));
+  width: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
 }
 
 .beast2d-home-shelf {

@@ -6,6 +6,7 @@ import { btn, btnp, cls, print, rect, rectfill } from "../src/core/cart/api";
 import type { Cart } from "../src/core/cart/Cart";
 import { withCartContext } from "../src/core/cart/context";
 import { measureBitmapText } from "../src/core/ui/BitmapText";
+import { BEAST_EMOJI } from "../src/core/ui/beastEmoji";
 import { useBitmapFont } from "../src/core/ui/bitmapFontRegistry";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../src/core/ui/defaultBitmapFont";
 import { Input } from "../src/core/Input";
@@ -45,6 +46,8 @@ describe("cart draw API", () => {
     ]);
     expect(measureBitmapText("HELLO")).toBe(29);
     expect(measureBitmapText("HI", { scale: 2 })).toBe(22);
+    expect(measureBitmapText(BEAST_EMOJI)).toBe(8);
+    expect(measureBitmapText(`A${BEAST_EMOJI}`)).toBe(14);
   });
 
   it("throws outside a cart and on a bad palette index or scale", () => {

@@ -30,6 +30,18 @@ describe("compileCart", () => {
     expect(compiled.ok).toBe(false);
   });
 
+  it("injects the beast glyph into cart scripts", () => {
+    const source = `
+function init() {}
+function update() {}
+function draw() { print("x" + beast, 0, 0, 4); }
+`;
+    const result = compileCart(source);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(() => result.cart.draw()).toThrow(/cart is running/);
+  });
+
   it("requires update", () => {
     const missing = `
 function init() {}

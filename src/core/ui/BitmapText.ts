@@ -1,4 +1,5 @@
 import { Assets, Container, Rectangle, Sprite, Texture } from "pixi.js";
+import { BEAST_EMOJI, BEAST_EMOJI_PATH, BEAST_EMOJI_SIZE } from "./beastEmoji";
 import { getBitmapFont, tryGetBitmapFont } from "./bitmapFontRegistry";
 import { pixelTexture } from "./pixelTexture";
 
@@ -39,13 +40,19 @@ export function measureBitmapText(
   text: string,
   options: BitmapTextOptions = {},
 ): number {
-  if (text.length === 0) return 0;
+  const chars = [...text];
+  if (chars.length === 0) return 0;
   const font = tryGetBitmapFont();
   const glyphW = font?.glyphW ?? 5;
   const scale = options.scale ?? 1;
   const gap = options.letterSpacing ?? 1;
-  const advance = (glyphW + gap) * scale;
-  return (text.length - 1) * advance + glyphW * scale;
+  let width = 0;
+  chars.forEach((ch, index) => {
+    const cell = ch === BEAST_EMOJI ? BEAST_EMOJI_SIZE : glyphW;
+    width += cell * scale;
+    if (index < chars.length - 1) width += gap * scale;
+  });
+  return width;
 }
 
 function glyphFrame(sheet: Texture, ch: string): Texture {
@@ -79,7 +86,18 @@ export function buildBitmapTextFromSheet(
   const tint = options.tint ?? 0xffffff;
   const container = new Container();
   let x = 0;
+  const glyphH = font.glyphH;
   for (const ch of text.toUpperCase()) {
+    if (ch === BEAST_EMOJI) {
+      // Native 8×8 PNG, nearest-neighbor only. Not a cell of the 5×7 font.
+      const emoji = emojiSprite(scale, glyphH);
+      if (emoji) {
+        emoji.x = Math.round(x);
+        container.addChild(emoji);
+      }
+      x += Math.round((BEAST_EMOJI_SIZE + gap) * scale);
+      continue;
+    }
     const frame = glyphFrame(sheet, ch);
     const sprite = new Sprite(frame);
     sprite.roundPixels = true;
@@ -92,6 +110,22 @@ export function buildBitmapTextFromSheet(
     x += advance;
   }
   return container;
+}
+
+function emojiSprite(scale: number, glyphH: number): Sprite | null {
+  let texture: Texture;
+  try {
+    texture = Assets.get<Texture>(BEAST_EMOJI_PATH);
+  } catch {
+    return null;
+  }
+  if (!texture) return null;
+  pixelTexture(texture);
+  const sprite = new Sprite(texture);
+  sprite.roundPixels = true;
+  sprite.scale.set(scale);
+  sprite.y = Math.round((glyphH - BEAST_EMOJI_SIZE) * scale);
+  return sprite;
 }
 
 /** Async helper; prefer after `preloadBitmapFont()`. */
@@ -130,7 +164,7 @@ export function missingGlyphs(text: string): string[] {
   if (!font) return [...text.toUpperCase()].filter((c) => c !== " ");
   const need = new Set<string>();
   for (const ch of text.toUpperCase()) {
-    if (ch === " ") continue;
+    if (ch === " " || ch === BEAST_EMOJI) continue;
     if (!font.glyphs[ch]) need.add(ch);
   }
   return [...need].sort();

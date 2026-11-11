@@ -1,4 +1,5 @@
 import { transform } from "sucrase";
+import { BEAST_EMOJI } from "../ui/beastEmoji";
 import { btn, btnp, cls, print, rect, rectfill } from "./api";
 import type { Cart } from "./Cart";
 
@@ -6,7 +7,8 @@ export type CompileFailure = { ok: false; message: string; line?: number };
 export type CompileSuccess = { ok: true; cart: Cart };
 export type CompileResult = CompileSuccess | CompileFailure;
 
-const helperNames = ["cls", "rect", "rectfill", "print", "btn", "btnp"] as const;
+// `beast` is the approved 8×8 mascot glyph (public/ui/mascot-emoji-8.png), one character.
+const helperNames = ["cls", "rect", "rectfill", "print", "btn", "btnp", "beast"] as const;
 
 /** V8 reports `new Function(body)` stack lines ahead of the matching `body` line. */
 function measureRuntimeLineOffset(): number {
@@ -85,9 +87,10 @@ export function compileCart(source: string): CompileResult {
       printFn: typeof print,
       btnFn: typeof btn,
       btnpFn: typeof btnp,
+      beastGlyph: string,
     ) => { init: unknown; update: unknown; draw: unknown };
 
-    const phases = runner(cls, rect, rectfill, print, btn, btnp);
+    const phases = runner(cls, rect, rectfill, print, btn, btnp, BEAST_EMOJI);
     const initFn = requireCartPhase(phases.init, "init");
     if (isCompileFailure(initFn)) return initFn;
     const updateFn = requireCartPhase(phases.update, "update");

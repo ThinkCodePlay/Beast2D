@@ -36,7 +36,7 @@ import { cartHelperCompletion } from "./helpers";
 import { cartSignatureHints } from "./signature";
 import { beast2dEditorTheme, beast2dSyntax } from "./theme";
 import { clockText } from "./clock";
-import { BEAST_MASCOT, paintEmptySlot, paintHomeFloppy, paintPixelGrid, paintToolFloppy } from "./pixelArt";
+import { paintEmptySlot, paintHomeFloppy, paintToolFloppy } from "./pixelArt";
 
 const STORAGE_KEY = "beast2d-cart-script";
 const DEV_PING = "/__beast2d/dev";
@@ -189,9 +189,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const homeLogo = document.createElement("div");
   homeLogo.className = "beast2d-home-logo";
   homeLogo.textContent = "BEAST2D";
-  const mascot = document.createElement("canvas");
-  mascot.className = "beast2d-mascot beast2d-pixel";
-  paintPixelGrid(mascot, BEAST_MASCOT, 1);
+  const mascot = document.createElement("img");
+  mascot.className = "beast2d-mascot";
+  mascot.alt = "";
+  mascot.src = "/ui/mascot.png";
   homeBrand.append(homeLogo, mascot);
   const homeShelf = document.createElement("div");
   homeShelf.className = "beast2d-home-shelf";

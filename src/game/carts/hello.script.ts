@@ -23,5 +23,5 @@ function update(dt: number) {
 function draw() {
   cls(0);
   rectfill(Math.round(x), Math.round(y), SIZE, SIZE, 10);
-  print("HELLO", 8, 8, 4);
+  print("HELLO " + beast, 8, 8, 4);
 }
