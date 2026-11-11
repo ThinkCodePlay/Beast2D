@@ -34,6 +34,10 @@ new Box(0, 0, 32, 32)
   .with(new SquareColliderComponent({ mode: ColliderModes.Active }));
 ```
 
+### Cart mode
+
+A cart can also be one module with `init`, `update(dt)`, and `draw`, using `cls`, `rectfill`, `print`, and `btn`. See [Cart mode](./cart.md). Component levels stay available when a game needs objects.
+
 ### Subclass GameObject
 
 Game-specific types (see `BunnyPlayer`, `Player`) call `addComponent` in the constructor and may override `onDestroy()`.

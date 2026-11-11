@@ -18,6 +18,7 @@ Beast2D is a component-based 2D engine (TypeScript, Vite, PixiJS). These pages d
 - [Display spec (320×240)](./guide/display-spec.md)
 - [Level lifecycle](./syntax/levels-and-lifecycle.md)
 - [GameObject & components](./syntax/game-objects-and-components.md)
+- [Cart mode](./syntax/cart.md)
 - [Engine](./api/core/engine.md)
 - [Component index](./api/components/index.md)
 
@@ -30,13 +31,13 @@ Beast2D is a component-based 2D engine (TypeScript, Vite, PixiJS). These pages d
 Run the documentation site locally:
 
 ```bash
-npm run docs:dev
+pnpm run docs:dev
 ```
 
 Build static HTML (for hosting or embedding):
 
 ```bash
-npm run docs:build
+pnpm run docs:build
 ```
 
 Output directory: `docs/.vitepress/dist`.

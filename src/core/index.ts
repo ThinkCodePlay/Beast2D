@@ -66,6 +66,11 @@ export {
 } from "./components/Render/SpriteAnimationComponent";
 export { ScrollingBackgroundComponent } from "./components/Render/ScrollingBackgroundComponent";
 
+export { btn, btnp, cls, print, rect, rectfill } from "./cart/api";
+export type { Cart } from "./cart/Cart";
+export { CartLevel } from "./cart/CartLevel";
+export { CartRunnerComponent } from "./cart/CartRunnerComponent";
+
 export { Box } from "./prefabs/Box";
 export { Circle } from "./prefabs/Circle";
 export { Spawner } from "./prefabs/Spawner";

@@ -20,7 +20,7 @@ See [display spec](./display.md) and [HUD header](./hud-header.md) (geometry in 
 From **repository root**:
 
 ```bash
-npx tsx scripts/generate-beast2d-ui.ts
+pnpm dlx tsx scripts/generate-beast2d-ui.ts
 ```
 
 Writes `public/ui/` and `src/core/ui/defaultBitmapFont.ts`.

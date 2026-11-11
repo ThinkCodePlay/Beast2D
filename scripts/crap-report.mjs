@@ -8,7 +8,7 @@
  * A score above 30 is the usual "refactor or cover this" line.
  * At 100% statement coverage, CRAP equals complexity.
  *
- * Run: npm run crap
+ * Run: pnpm run crap
  * Reads: coverage/coverage-final.json (written by vitest --coverage)
  */
 import { createRequire } from "node:module";
@@ -178,7 +178,7 @@ function loadCoverage() {
   try {
     raw = JSON.parse(readFileSync(coveragePath, "utf8"));
   } catch {
-    console.error(`Missing ${coveragePath}. Run: npm run test:coverage`);
+    console.error(`Missing ${coveragePath}. Run: pnpm run test:coverage`);
     process.exit(1);
   }
   const byFile = new Map();

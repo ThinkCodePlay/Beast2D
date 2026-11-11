@@ -22,6 +22,8 @@ export abstract class Level {
   protected levelRoot!: GameObject;
   /** Lives and score band. Created after {@link init} so it draws above the playfield. */
   protected hud!: HudHeaderUI;
+  /** When false, {@link start} does not add the lives/score band. */
+  protected showHud = true;
   private started = false;
 
   /** Asset paths that LevelManager preloads before `start()`. */
@@ -49,8 +51,10 @@ export abstract class Level {
     this.started = true;
     this.init();
 
-    this.hud = new HudHeaderUI(0, HUD_LAYOUT.defaultLives, DEFAULT_BEAST2D_HUD_THEME);
-    this.levelRoot.addChild(this.hud);
+    if (this.showHud) {
+      this.hud = new HudHeaderUI(0, HUD_LAYOUT.defaultLives, DEFAULT_BEAST2D_HUD_THEME);
+      this.levelRoot.addChild(this.hud);
+    }
   }
 
   // Clean up the level when switching

@@ -3,15 +3,15 @@
 A small component-based 2D engine on top of PixiJS (TypeScript + Vite).
 
 ```bash
-npm install
-npm run dev        # dev server
-npm run build      # type-check + production build
-npm run typecheck  # tsc only
-npm test           # Vitest
-npm run docs:dev   # engine documentation (VitePress)
+pnpm install
+pnpm run dev        # dev server
+pnpm run build      # type-check + production build
+pnpm run typecheck  # tsc only
+pnpm test           # Vitest
+pnpm run docs:dev   # engine documentation (VitePress)
 ```
 
-Full **API and syntax documentation** lives in [`docs/`](./docs/index.md) (build static HTML with `npm run docs:build`). The [Beast2D 16 color palette](./docs/palette.md) and [display spec](./docs/display.md) live there too.
+Full **API and syntax documentation** lives in [`docs/`](./docs/index.md) (build static HTML with `pnpm run docs:build`). The [Beast2D 16 color palette](./docs/palette.md) and [display spec](./docs/display.md) live there too.
 
 ## Quick start
 

@@ -20,6 +20,7 @@ constructor(engine: Engine)
 | --- | --- |
 | `engine` | Owning engine |
 | `levelRoot` | Root `GameObject` (created in `start()`) |
+| `showHud` | When `false`, `start()` skips the lives/score band. Default `true`. |
 | `context` | `engine.context` |
 | `init()` | **abstract** — build scene |
 | `update(dt)` | Default forwards to `levelRoot.update`; call `super.update(dt)` first when overriding |
