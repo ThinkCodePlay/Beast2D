@@ -18,6 +18,8 @@ export class CartLevel extends Level {
   protected init(): void {
     const host = new GameObject();
     host.name = "CartHost";
+    // Keep drawing while the console shell pauses game time (home / boot).
+    host.runWhenPaused = true;
     host.addComponent(new CartRunnerComponent(this.cart));
     this.levelRoot.addChild(host);
   }

@@ -15,22 +15,11 @@ import {
   type ViewUpdate,
 } from "@codemirror/view";
 import type { Cart } from "../core/cart/Cart";
-import { computeIntegerDisplayScale, displayCssSize } from "../core/displayScale";
+import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 import type { GameManager } from "../core/GameManager";
 import { checkCartSyntax, compileCart } from "../core/cart/compile";
 import { DEFAULT_CONSOLE_DISKS } from "./disks";
-import {
-  BOOT_DURATION_MS,
-  CONSOLE_DIVIDER,
-  CONSOLE_EDITOR_W,
-  CONSOLE_FOOTER,
-  CONSOLE_HEIGHT,
-  CONSOLE_PAD,
-  CONSOLE_PREVIEW_W,
-  CONSOLE_TOP_BAR,
-  CONSOLE_WIDTH,
-  CONSOLE_WORK_H,
-} from "./consoleLayout";
+import { BOOT_DURATION_MS, chromeFontScale, fitPreviewScale } from "./consoleLayout";
 import { CONSOLE_TOOLS, type ConsoleTool, type ConsoleViewState, type EditorMode } from "./consoleTypes";
 import {
   cycleTool,
@@ -47,18 +36,11 @@ import { cartHelperCompletion } from "./helpers";
 import { cartSignatureHints } from "./signature";
 import { beast2dEditorTheme, beast2dSyntax } from "./theme";
 import { clockText } from "./clock";
+import { BEAST_MASCOT, createFloppy, DISK_ART, paintPixelGrid, TOOL_ICONS } from "./pixelArt";
 
 const STORAGE_KEY = "beast2d-cart-script";
 const DEV_PING = "/__beast2d/dev";
 const SAVE_URL = "/__beast2d/save-cart";
-
-const TOOL_ICONS: Record<ConsoleTool, string> = {
-  CODE: "<>",
-  SPRITE: "✎",
-  MAP: "▦",
-  SFX: "♪",
-  MUSIC: "♫",
-};
 
 export type CartEditorOptions = {
   appRoot: HTMLElement;
@@ -186,13 +168,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     tab.className = "beast2d-tool-tab";
     tab.dataset.tool = tool;
     tab.disabled = !isToolFunctional(tool);
-    const icon = document.createElement("span");
-    icon.className = "beast2d-tool-icon";
-    icon.textContent = TOOL_ICONS[tool];
-    const label = document.createElement("span");
-    label.className = "beast2d-tool-label";
-    label.textContent = tool;
-    tab.append(icon, label);
+    tab.appendChild(createFloppy(TOOL_ICONS[tool] ?? TOOL_ICONS.CODE!, tool));
     tab.addEventListener("click", () => {
       if (!isToolFunctional(tool)) return;
       viewState = { ...viewState, activeTool: tool };
@@ -204,28 +180,34 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   const homePanel = document.createElement("div");
   homePanel.className = "beast2d-home";
+  const homeBrand = document.createElement("div");
+  homeBrand.className = "beast2d-home-brand";
   const homeLogo = document.createElement("div");
   homeLogo.className = "beast2d-home-logo";
   homeLogo.textContent = "BEAST2D";
+  const mascot = document.createElement("canvas");
+  mascot.className = "beast2d-mascot beast2d-pixel";
+  paintPixelGrid(mascot, BEAST_MASCOT, 1);
+  homeBrand.append(homeLogo, mascot);
   const homeShelf = document.createElement("div");
   homeShelf.className = "beast2d-home-shelf";
   const newDiskSlot = document.createElement("button");
   newDiskSlot.type = "button";
   newDiskSlot.className = "beast2d-home-disk beast2d-home-disk-new";
   newDiskSlot.title = "Coming soon";
-  newDiskSlot.innerHTML = '<span class="beast2d-home-disk-art beast2d-home-disk-art-new"></span><span class="beast2d-home-disk-title">+ New disk</span>';
+  newDiskSlot.innerHTML =
+    '<span class="beast2d-floppy beast2d-floppy-new"></span><span class="beast2d-home-disk-title">+ New disk</span>';
 
   const diskButtons = disks.map((disk, index) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "beast2d-home-disk";
     btn.dataset.diskIndex = String(index);
-    const art = document.createElement("span");
-    art.className = "beast2d-home-disk-art";
+    const art = DISK_ART[disk.id] ?? DISK_ART.hello!;
     const titleEl = document.createElement("span");
     titleEl.className = "beast2d-home-disk-title";
     titleEl.textContent = disk.title;
-    btn.append(art, titleEl);
+    btn.append(createFloppy(art, ""), titleEl);
     btn.addEventListener("click", () => {
       viewState = moveDiskSelection(viewState, index - viewState.selectedDiskIndex, disks.length);
       applyViewState();
@@ -234,7 +216,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     return btn;
   });
   homeShelf.appendChild(newDiskSlot);
-  homePanel.append(homeLogo, homeShelf);
+  homePanel.append(homeBrand, homeShelf);
 
   const workspace = document.createElement("div");
   workspace.className = "beast2d-workspace";
@@ -274,28 +256,36 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const footer = document.createElement("footer");
   footer.className = "beast2d-footer-hint";
 
-  consoleFrame.append(bootOverlay, bar, diskRow, homePanel, workspace, footer);
+  const stageBody = document.createElement("div");
+  stageBody.className = "beast2d-stage-body";
+  stageBody.append(workspace, homePanel);
+  consoleFrame.append(bootOverlay, bar, diskRow, stageBody, footer);
   appRoot.classList.add("beast2d-app");
 
-  const displayScale = () =>
-    computeIntegerDisplayScale(window.innerWidth, window.innerHeight, CONSOLE_WIDTH, CONSOLE_HEIGHT, 16);
-
-  const paintScale = () => {
-    const scale = displayScale();
-    document.documentElement.style.setProperty("--beast-scale", String(scale));
-    const size = displayCssSize(scale, CONSOLE_WIDTH, CONSOLE_HEIGHT);
-    consoleFrame.style.width = `${size.width}px`;
-    consoleFrame.style.height = `${size.height}px`;
-    bar.style.height = `${CONSOLE_TOP_BAR * scale}px`;
-    footer.style.height = `${CONSOLE_FOOTER * scale}px`;
-    workspace.style.height = `${CONSOLE_WORK_H * scale}px`;
-    previewFrame.style.width = `${CONSOLE_PREVIEW_W * scale}px`;
-    previewFrame.style.height = `${240 * scale}px`;
-    editorColumn.style.width = `${(CONSOLE_EDITOR_W + CONSOLE_PAD + CONSOLE_DIVIDER / 2) * scale}px`;
-    previewColumn.style.width = `${(CONSOLE_PREVIEW_W + CONSOLE_PAD + CONSOLE_DIVIDER / 2) * scale}px`;
+  let layoutKey = "";
+  const layoutPreview = () => {
+    const fontScale = chromeFontScale(window.innerHeight);
+    document.documentElement.style.setProperty("--beast-scale", String(fontScale));
+    const pad = 8 * fontScale;
+    const consoleW = consoleFrame.clientWidth;
+    const workH = workspace.clientHeight;
+    const minEditor = Math.floor(consoleW * 0.45);
+    const maxPreview = Math.max(DISPLAY_WIDTH, consoleW - minEditor);
+    const scale = fitPreviewScale(maxPreview - pad * 2, Math.max(0, workH - pad * 2));
+    const frameW = DISPLAY_WIDTH * scale;
+    const frameH = DISPLAY_HEIGHT * scale;
+    const columnW = Math.min(maxPreview, frameW + pad * 2);
+    const key = `${fontScale}:${frameW}:${frameH}:${columnW}`;
+    if (key === layoutKey) return;
+    layoutKey = key;
+    previewFrame.style.width = `${frameW}px`;
+    previewFrame.style.height = `${frameH}px`;
+    previewColumn.style.flex = `0 0 ${columnW}px`;
   };
-  paintScale();
-  window.addEventListener("resize", paintScale);
+  layoutPreview();
+  window.addEventListener("resize", layoutPreview);
+  const previewObserver = new ResizeObserver(() => layoutPreview());
+  previewObserver.observe(workspace);
   window.setInterval(() => {
     clockEl.textContent = clockText();
   }, 1000);
@@ -375,12 +365,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   const syncEditorPanes = () => {
     const onEditorScreen = viewState.screen === "editor";
-    const codeTool = viewState.activeTool === "CODE" && isToolFunctional(viewState.activeTool);
-    const showCode = onEditorScreen && codeTool && viewState.editorMode === "code";
+    const showCode = onEditorScreen && viewState.activeTool === "CODE";
     const showStub = onEditorScreen && viewState.activeTool !== "CODE";
     codePanel.hidden = !showCode;
     stubPanel.hidden = !showStub;
-    if (showCode) {
+    if (showCode && viewState.editorMode === "code") {
       requestAnimationFrame(() => view.focus());
     }
   };
@@ -394,18 +383,33 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       return;
     }
     breadcrumb.textContent = `BEAST2D OS > ${disk.title}`;
-    saveButton.hidden = viewState.editorMode !== "code" || viewState.activeTool !== "CODE";
-    runButton.hidden = viewState.editorMode !== "code" || viewState.activeTool !== "CODE";
+    const showCartActions = viewState.activeTool === "CODE";
+    saveButton.hidden = !showCartActions;
+    runButton.hidden = !showCartActions;
   };
+
+  const hint = (pairs: [string, string][]) =>
+    `<span class="beast2d-hints">${pairs
+      .map(
+        ([key, word]) =>
+          `<span class="beast2d-hint"><span class="beast2d-hint-key">${key}</span><span class="beast2d-hint-word">${word}</span></span>`,
+      )
+      .join("")}</span>`;
 
   const syncFooter = () => {
     if (viewState.screen === "home") {
-      footer.innerHTML =
-        '<span class="beast2d-hint-key">ENTER</span> run   <span class="beast2d-hint-key">E</span> edit   <span class="beast2d-hint-key">N</span> new';
+      footer.innerHTML = hint([
+        ["ENTER", "run"],
+        ["E", "edit"],
+        ["N", "new"],
+      ]);
       return;
     }
     if (viewState.screen === "editor") {
-      footer.textContent = "TAB next disk   ESC home";
+      footer.innerHTML = hint([
+        ["TAB", "next disk"],
+        ["ESC", "home"],
+      ]);
       return;
     }
     footer.textContent = "";
@@ -414,7 +418,6 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const syncVisibility = () => {
     bootOverlay.hidden = viewState.screen !== "boot";
     homePanel.hidden = viewState.screen !== "home";
-    workspace.hidden = viewState.screen !== "editor";
     bar.hidden = viewState.screen === "boot";
     diskRow.hidden = viewState.screen !== "editor";
     footer.hidden = viewState.screen === "boot";
@@ -427,7 +430,19 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     syncToolTabs();
     syncHomeSelection();
     syncEditorPanes();
-    paintScale();
+    layoutPreview();
+    if (viewState.screen === "editor") pokePlayfield();
+  };
+
+  const pokePlayfield = () => {
+    const canvas = gameContainer.querySelector("canvas");
+    if (canvas instanceof HTMLCanvasElement) {
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+    }
+    const app = globalThis.__PIXI_APP__;
+    app?.renderer?.resize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    app?.render();
   };
 
   const enterHome = () => {
@@ -439,12 +454,8 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const enterEditor = (mode: EditorMode) => {
     viewState = openEditor(viewState, mode);
     applyViewState();
-    if (mode === "code") {
-      game.pause();
-      view.focus();
-    } else {
-      game.resume();
-    }
+    game.resume();
+    if (mode === "code") view.focus();
   };
 
   const playSelected = async (): Promise<void> => {
@@ -505,7 +516,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
         viewState = setEditorMode(viewState, "code");
         viewState = { ...viewState, activeTool: "CODE" };
         applyViewState();
-        game.pause();
+        game.resume();
         view.focus();
       }
     },
