@@ -1,24 +1,69 @@
-type GlyphFont = {
-  glyphW: number;
-  glyphH: number;
-  glyphs: Record<string, { x: number; y: number }>;
-};
+import { DEFAULT_BEAST2D_BITMAP_FONT } from "../core/ui/defaultBitmapFont";
+import type { BitmapFontDefinition } from "../core/ui/bitmapFontRegistry";
 
-let ready: Promise<{ font: GlyphFont; image: HTMLImageElement }> | null = null;
+const BITMAP_GAP = 1;
 
-function loadFont(): Promise<{ font: GlyphFont; image: HTMLImageElement }> {
-  if (!ready) {
-    ready = Promise.all([
-      fetch("/ui/font-glyphs.json").then((response) => response.json() as Promise<GlyphFont>),
-      new Promise<HTMLImageElement>((resolve, reject) => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.onerror = () => reject(new Error("bitmap font atlas failed to load"));
-        image.src = "/ui/font-atlas.5x7.png";
-      }),
-    ]).then(([font, image]) => ({ font, image }));
+let atlasReady: Promise<HTMLImageElement> | null = null;
+
+function loadAtlasImage(): Promise<HTMLImageElement> {
+  if (atlasReady) return atlasReady;
+  atlasReady = new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      resolve(image);
+    };
+    image.onerror = () => reject(new Error("bitmap font atlas failed to load"));
+    image.src = `/${DEFAULT_BEAST2D_BITMAP_FONT.atlasPath}`;
+  });
+  return atlasReady;
+}
+
+export function bitmapFontDefinition(): BitmapFontDefinition {
+  return DEFAULT_BEAST2D_BITMAP_FONT;
+}
+
+export function bitmapLabelLetterSpacing(): number {
+  return BITMAP_GAP;
+}
+
+/** Logical (1×) label width before CSS scale — matches cart `print` advance rules. */
+export function bitmapLabelLogicalSize(text: string, font = DEFAULT_BEAST2D_BITMAP_FONT): { width: number; height: number } {
+  const advance = font.glyphW + BITMAP_GAP;
+  const width = Math.max(font.glyphW, text.length * advance - BITMAP_GAP);
+  return { width, height: font.glyphH };
+}
+
+export function resolveBitmapLabelGlyphs(
+  text: string,
+  font = DEFAULT_BEAST2D_BITMAP_FONT,
+): { char: string; x: number; y: number }[] {
+  const upper = text.toUpperCase();
+  const glyphs = font.glyphs;
+  return [...upper].map((char) => {
+    const pos = glyphs[char] ?? glyphs[" "];
+    return { char, x: pos?.x ?? 0, y: pos?.y ?? 0 };
+  });
+}
+
+/** Sample 5×7 atlas ink for tests (matches cart bitmap charset). */
+export function atlasGlyphMask(
+  ch: string,
+  font = DEFAULT_BEAST2D_BITMAP_FONT,
+  atlasRows: Uint8Array,
+  atlasWidth: number,
+): string {
+  const pos = font.glyphs[ch] ?? font.glyphs[" "];
+  if (!pos) return "";
+  let rows = "";
+  for (let y = 0; y < font.glyphH; y += 1) {
+    let line = "";
+    for (let x = 0; x < font.glyphW; x += 1) {
+      const idx = (pos.y + y) * atlasWidth + (pos.x + x);
+      line += atlasRows[idx]! > 0 ? "#" : ".";
+    }
+    rows += `${line}\n`;
   }
-  return ready;
+  return rows.trimEnd();
 }
 
 /** Draws one line with the same 5×7 atlas the cart `print` helper uses. */
@@ -28,35 +73,38 @@ export async function paintBitmapLabel(
   scale: number,
   color: string,
 ): Promise<void> {
-  const { font, image } = await loadFont();
-  const gap = 1;
-  const advance = font.glyphW + gap;
-  const width = Math.max(font.glyphW, text.length * advance - gap) * scale;
-  const height = font.glyphH * scale;
-  canvas.width = width;
-  canvas.height = height;
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
+  const font = DEFAULT_BEAST2D_BITMAP_FONT;
+  const image = await loadAtlasImage();
+  const { width, height } = bitmapLabelLogicalSize(text, font);
+  const advance = font.glyphW + BITMAP_GAP;
+  const displayScale = Math.max(1, Math.round(scale));
+
+  const stamp = document.createElement("canvas");
+  stamp.width = width;
+  stamp.height = height;
+  const stampCtx = stamp.getContext("2d");
+  if (!stampCtx) return;
+  stampCtx.imageSmoothingEnabled = false;
+
+  const slots = resolveBitmapLabelGlyphs(text, font);
+  for (let i = 0; i < slots.length; i += 1) {
+    const { x, y } = slots[i]!;
+    stampCtx.drawImage(image, x, y, font.glyphW, font.glyphH, i * advance, 0, font.glyphW, font.glyphH);
+  }
+  stampCtx.globalCompositeOperation = "source-in";
+  stampCtx.fillStyle = color;
+  stampCtx.fillRect(0, 0, width, height);
+
+  const outW = width * displayScale;
+  const outH = height * displayScale;
+  canvas.width = outW;
+  canvas.height = outH;
+  canvas.style.width = `${outW}px`;
+  canvas.style.height = `${outH}px`;
+
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
-  const upper = text.toUpperCase();
-  for (let i = 0; i < upper.length; i++) {
-    const pos = font.glyphs[upper[i]] ?? font.glyphs[" "];
-    if (!pos) continue;
-    ctx.drawImage(
-      image,
-      pos.x,
-      pos.y,
-      font.glyphW,
-      font.glyphH,
-      i * advance * scale,
-      0,
-      font.glyphW * scale,
-      font.glyphH * scale,
-    );
-  }
-  ctx.globalCompositeOperation = "source-in";
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, width, height);
+  ctx.clearRect(0, 0, outW, outH);
+  ctx.drawImage(stamp, 0, 0, width, height, 0, 0, outW, outH);
 }

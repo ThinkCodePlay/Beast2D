@@ -235,7 +235,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
         if (!line || view.state.doc.lines < 1) return;
         const lineObj = view.state.doc.line(Math.min(line, view.state.doc.lines));
         view.dispatch({
-          selection: { anchor: lineObj.from },
+          selection: { anchor: lineObj.from, head: lineObj.to },
           effects: EditorView.scrollIntoView(lineObj.from, { y: "center" }),
         });
       };
@@ -305,7 +305,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
         await loadCart(compiled.cart);
         return;
       }
-      shell.setError(compiled.message);
+      shell.setError(compiled.message, compiled.line);
       shell.showCode();
       if (fallbackCart) await loadCart(fallbackCart);
     },
