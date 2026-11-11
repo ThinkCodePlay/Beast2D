@@ -33,10 +33,13 @@
   --beast-light-pink: #f7abcc;
   --beast-sky: #7ab2d5;
   --beast-code-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --beast-ui-font: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   --beast-radius: 12px;
   --beast-shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --beast-glow-pink: 0 0 28px color-mix(in srgb, var(--beast-hot-pink) 45%, transparent);
   --beast-space-1: 4px;
   --beast-space-2: 8px;
+  --beast-space-3: 16px;
   --beast-motion: 200ms ease;
 }
 
@@ -48,7 +51,7 @@ body,
   margin: 0;
   background: var(--beast-plum);
   color: var(--beast-cream);
-  font-family: system-ui, Inter, sans-serif;
+  font-family: var(--beast-ui-font);
 }
 
 #app {
@@ -73,50 +76,65 @@ body,
 }
 
 .beast2d-topbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: var(--beast-space-2);
-  padding: var(--beast-space-1) var(--beast-space-2);
-  min-height: 36px;
+  gap: var(--beast-space-3);
+  padding: 0 var(--beast-space-3);
+  min-height: 56px;
   flex-shrink: 0;
 }
 
 .beast2d-logo {
   flex-shrink: 0;
+  justify-self: start;
 }
 
-.beast2d-tabs {
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-  flex: 0 0 auto;
-  margin-left: var(--beast-space-2);
-  padding: 2px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--beast-shadow) 90%, transparent);
+.beast2d-topbar-center {
+  justify-self: center;
+  width: min(420px, 44vw);
 }
 
-.beast2d-tab {
-  font: inherit;
+.beast2d-mode-switch {
+  display: flex;
+  width: 100%;
+  padding: 3px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--beast-shadow) 92%, black);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--beast-cream) 6%, transparent);
+  gap: 2px;
+}
+
+.beast2d-mode-btn {
+  flex: 1;
+  font: 600 13px/1 var(--beast-ui-font);
+  letter-spacing: 0.06em;
   border: none;
-  background: transparent;
   cursor: pointer;
-  padding: 2px var(--beast-space-2);
-  border-radius: 999px;
+  padding: 10px var(--beast-space-3);
+  border-radius: 8px;
   position: relative;
+  color: var(--beast-stone);
+  background: transparent;
+  transition: color var(--beast-motion), background-color var(--beast-motion);
+}
+
+.beast2d-mode-btn:hover {
   color: var(--beast-cream);
 }
 
-.beast2d-tab-active {
-  background: color-mix(in srgb, var(--beast-plum) 65%, transparent);
+.beast2d-mode-active {
+  color: var(--beast-cream);
+  background: color-mix(in srgb, var(--beast-plum) 80%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--beast-cream) 8%, transparent);
 }
 
-.beast2d-tab-active::after {
+.beast2d-mode-active::after {
   content: "";
   position: absolute;
-  left: var(--beast-space-2);
-  right: var(--beast-space-2);
-  bottom: 1px;
+  left: 20%;
+  right: 20%;
+  bottom: 5px;
   height: 2px;
   border-radius: 2px;
   background: var(--beast-hot-pink);
@@ -125,8 +143,8 @@ body,
 .beast2d-topbar-actions {
   display: flex;
   align-items: center;
-  gap: var(--beast-space-2);
-  margin-left: auto;
+  gap: var(--beast-space-3);
+  justify-self: end;
 }
 
 .beast2d-bitmap {
@@ -141,7 +159,7 @@ body,
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: var(--beast-space-1);
+  gap: var(--beast-space-2);
   border-radius: 999px;
   background: transparent;
   color: var(--beast-cream);
@@ -156,23 +174,39 @@ body,
 }
 
 .beast2d-btn:hover:not(:disabled) {
-  opacity: 0.88;
+  opacity: 0.9;
 }
 
-.beast2d-btn-ghost {
-  padding: 4px var(--beast-space-2);
-  background: color-mix(in srgb, var(--beast-shadow) 72%, transparent);
-  border: 1px solid color-mix(in srgb, var(--beast-stone) 32%, transparent);
+.beast2d-btn-text {
+  font: 600 13px/1 var(--beast-ui-font);
+  letter-spacing: 0.08em;
+  padding: 8px 4px;
+  color: var(--beast-cream);
+  opacity: 0.85;
 }
 
-.beast2d-btn-compact {
-  padding: 4px var(--beast-space-2);
-  background: color-mix(in srgb, var(--beast-shadow) 72%, transparent);
-  border: 1px solid color-mix(in srgb, var(--beast-stone) 32%, transparent);
+.beast2d-btn-text:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.beast2d-btn-quiet {
+  font: 500 11px/1 var(--beast-ui-font);
+  letter-spacing: 0.06em;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--beast-stone);
+}
+
+.beast2d-btn-quiet:hover {
+  color: var(--beast-cream);
+  background: color-mix(in srgb, var(--beast-plum) 50%, transparent);
 }
 
 .beast2d-btn-run {
-  padding: var(--beast-space-1) var(--beast-space-2);
+  padding: 10px 20px;
+  font: 700 13px/1 var(--beast-ui-font);
+  letter-spacing: 0.08em;
   background: var(--beast-hot-pink);
   color: var(--beast-plum);
   box-shadow: var(--beast-shadow-soft);
@@ -182,15 +216,14 @@ body,
   animation: beast2d-run-pulse 180ms ease;
 }
 
-@keyframes beast2d-run-pulse {
-  50% {
-    transform: scale(1.04);
-  }
+.beast2d-run-label {
+  display: inline-block;
 }
 
-.beast2d-btn-save:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
+@keyframes beast2d-run-pulse {
+  50% {
+    transform: scale(1.03);
+  }
 }
 
 .beast2d-btn[hidden] {
@@ -205,8 +238,8 @@ body,
   display: flex;
   flex: 1;
   min-height: 0;
-  gap: var(--beast-space-2);
-  padding: 0 var(--beast-space-2) var(--beast-space-2);
+  gap: var(--beast-space-3);
+  padding: 0 var(--beast-space-3) var(--beast-space-3);
   transition: gap var(--beast-motion);
 }
 
@@ -216,8 +249,17 @@ body,
   }
 }
 
+.beast2d-card {
+  background: var(--beast-shadow);
+  border-radius: var(--beast-radius);
+  box-shadow: var(--beast-shadow-soft);
+  padding: var(--beast-space-3);
+  min-height: 0;
+  box-sizing: border-box;
+}
+
 .beast2d-tool-panel {
-  flex: 1 1 55%;
+  flex: 1 1 58%;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -225,11 +267,11 @@ body,
 }
 
 .beast2d-game-panel {
-  flex: 1 1 45%;
+  flex: 1 1 42%;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--beast-space-1);
+  gap: var(--beast-space-2);
 }
 
 .beast2d-view-expanded .beast2d-tool-panel {
@@ -238,6 +280,9 @@ body,
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
+  padding: 0;
+  margin: 0;
+  border: none;
 }
 
 .beast2d-view-expanded .beast2d-game-panel {
@@ -249,9 +294,8 @@ body,
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--beast-shadow);
-  border-radius: var(--beast-radius);
-  box-shadow: var(--beast-shadow-soft);
+  background: var(--beast-plum);
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -286,15 +330,46 @@ body,
 }
 
 .beast2d-code-editor .cm-scroller {
-  padding: 0 var(--beast-space-2);
+  padding: 4px 0;
 }
 
-.beast2d-game-controls {
+.beast2d-preview-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: var(--beast-space-2);
   flex-shrink: 0;
-  padding: 0 var(--beast-space-1);
+}
+
+.beast2d-preview-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px var(--beast-space-2);
+}
+
+.beast2d-preview-title {
+  font: 600 12px/1 var(--beast-ui-font);
+  letter-spacing: 0.12em;
+  color: var(--beast-cream);
+}
+
+.beast2d-preview-heart {
+  color: var(--beast-hot-pink);
+  font-size: 11px;
+}
+
+.beast2d-preview-res {
+  font: 500 11px/1 var(--beast-ui-font);
+  color: var(--beast-stone);
+  width: 100%;
+}
+
+.beast2d-preview-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--beast-space-1);
+  flex-shrink: 0;
 }
 
 .beast2d-scanline-toggle {
@@ -302,7 +377,6 @@ body,
   align-items: center;
   gap: var(--beast-space-1);
   cursor: pointer;
-  margin-left: auto;
 }
 
 .beast2d-scanline-input {
@@ -312,13 +386,23 @@ body,
   height: 0;
 }
 
+.beast2d-scanline-label {
+  font: 500 11px/1 var(--beast-ui-font);
+  letter-spacing: 0.06em;
+  color: var(--beast-stone);
+}
+
+.beast2d-scanline-label-on {
+  color: var(--beast-hot-pink);
+}
+
 .beast2d-game-frame {
   flex: 1;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: var(--beast-space-1) 0;
   position: relative;
 }
 
@@ -329,12 +413,11 @@ body,
   align-items: center;
   justify-content: center;
   padding: 12px;
-  border-radius: calc(var(--beast-radius) + 2px);
+  border-radius: 10px;
   background: var(--beast-plum);
   box-shadow:
-    inset 0 0 0 2px color-mix(in srgb, var(--beast-hot-pink) 55%, transparent),
-    var(--beast-shadow-soft);
-  outline: 1px solid color-mix(in srgb, var(--beast-hot-pink) 22%, transparent);
+    var(--beast-glow-pink),
+    inset 0 0 0 2px color-mix(in srgb, var(--beast-hot-pink) 35%, transparent);
   position: relative;
 }
 
@@ -343,7 +426,7 @@ body,
   pointer-events: none;
   position: absolute;
   inset: 12px;
-  border-radius: var(--beast-radius);
+  border-radius: 8px;
   background: repeating-linear-gradient(
     to bottom,
     transparent 0,
@@ -357,24 +440,23 @@ body,
 .beast2d-game-footer {
   flex-shrink: 0;
   text-align: center;
-  font-size: 11px;
+  font: 500 11px/1.4 var(--beast-ui-font);
   letter-spacing: 0.02em;
   color: var(--beast-stone);
-  font-family: var(--beast-code-font);
-  padding-bottom: var(--beast-space-1);
+  padding-top: var(--beast-space-1);
 }
 
 .beast2d-error-strip {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: var(--beast-space-2);
-  margin: 0 var(--beast-space-2) var(--beast-space-2);
-  padding: var(--beast-space-2);
+  gap: var(--beast-space-3);
+  margin: 0 var(--beast-space-3) var(--beast-space-3);
+  padding: 14px var(--beast-space-3);
   background: var(--beast-shadow);
   border-radius: var(--beast-radius);
   box-shadow: var(--beast-shadow-soft);
-  border-left: 3px solid var(--beast-hot-pink);
+  border-left: 4px solid var(--beast-hot-pink);
   transform: translateY(12px);
   opacity: 0;
   transition: transform var(--beast-motion), opacity var(--beast-motion);
@@ -389,17 +471,30 @@ body,
   display: none !important;
 }
 
-.beast2d-error-icon {
+.beast2d-error-icon-wrap {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--beast-hot-pink);
 }
 
-.beast2d-error-text {
-  font-family: var(--beast-code-font);
-  font-size: 12px;
+.beast2d-error-body {
+  flex: 1;
+  min-width: 0;
+  font: 500 13px/1.45 var(--beast-ui-font);
+}
+
+.beast2d-error-line {
+  color: var(--beast-hot-pink);
+  font-weight: 600;
+}
+
+.beast2d-error-message {
   color: var(--beast-cream);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -431,7 +526,7 @@ body,
   z-index: 1;
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: var(--beast-radius);
+  border-radius: 8px;
   background: var(--beast-plum);
 }
 
@@ -443,7 +538,6 @@ body,
   display: block;
 }
 
-/* Standalone play surface (?play=cart) — game only, centered. */
 .beast2d-standalone {
   display: flex;
   align-items: center;
@@ -454,7 +548,5 @@ body,
 }
 
 .beast2d-standalone .game-container {
-  box-shadow:
-    inset 0 0 0 2px color-mix(in srgb, var(--beast-hot-pink) 55%, transparent),
-    var(--beast-shadow-soft);
+  box-shadow: var(--beast-glow-pink), var(--beast-shadow-soft);
 }

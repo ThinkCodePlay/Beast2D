@@ -37,9 +37,10 @@ import {
 const STORAGE_KEY = "beast2d-cart-script";
 const DEV_PING = "/__beast2d/dev";
 const SAVE_URL = "/__beast2d/save-cart";
-
-const RUN_PLAY_ICON = `<svg class="beast2d-run-icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path fill="currentColor" d="M2 1.5 8.5 5 2 8.5Z"/></svg>`;
+const CARD_PADDING_PX = 16;
 const GAME_BEZEL_PADDING = 12;
+
+const RUN_PLAY_ICON = `<svg class="beast2d-run-icon" width="12" height="12" viewBox="0 0 10 10" aria-hidden="true"><path fill="currentColor" d="M2 1.5 8.5 5 2 8.5Z"/></svg>`;
 
 export type CartEditorOptions = {
   appRoot: HTMLElement;
@@ -109,50 +110,52 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const logo = document.createElement("canvas");
   logo.className = "beast2d-bitmap beast2d-logo";
 
-  const tabBar = document.createElement("nav");
-  tabBar.className = "beast2d-tabs";
-  tabBar.setAttribute("aria-label", "Tools");
+  const topBarCenter = document.createElement("div");
+  topBarCenter.className = "beast2d-topbar-center";
 
-  const codeTab = document.createElement("button");
-  codeTab.type = "button";
-  codeTab.className = "beast2d-tab beast2d-tab-active";
-  codeTab.setAttribute("aria-selected", "true");
-  const codeTabLabel = document.createElement("canvas");
-  codeTabLabel.className = "beast2d-bitmap";
-  codeTab.appendChild(codeTabLabel);
-  tabBar.appendChild(codeTab);
+  const modeSwitch = document.createElement("nav");
+  modeSwitch.className = "beast2d-mode-switch";
+  modeSwitch.setAttribute("aria-label", "Workspace mode");
+
+  const codeModeBtn = document.createElement("button");
+  codeModeBtn.type = "button";
+  codeModeBtn.className = "beast2d-mode-btn beast2d-mode-active";
+  codeModeBtn.textContent = "CODE";
+
+  const playModeBtn = document.createElement("button");
+  playModeBtn.type = "button";
+  playModeBtn.className = "beast2d-mode-btn";
+  playModeBtn.textContent = "PLAY";
+
+  modeSwitch.append(codeModeBtn, playModeBtn);
+  topBarCenter.appendChild(modeSwitch);
 
   const topActions = document.createElement("div");
   topActions.className = "beast2d-topbar-actions";
 
   const saveButton = document.createElement("button");
   saveButton.type = "button";
-  saveButton.className = "beast2d-btn beast2d-btn-ghost";
+  saveButton.className = "beast2d-btn beast2d-btn-text";
+  saveButton.textContent = "SAVE";
   saveButton.disabled = true;
   saveButton.hidden = true;
-  const saveLabel = document.createElement("canvas");
-  saveLabel.className = "beast2d-bitmap";
-  saveButton.appendChild(saveLabel);
 
   const runButton = document.createElement("button");
   runButton.type = "button";
   runButton.className = "beast2d-btn beast2d-btn-run";
-  runButton.innerHTML = RUN_PLAY_ICON;
-  const runLabel = document.createElement("canvas");
-  runLabel.className = "beast2d-bitmap";
-  runButton.appendChild(runLabel);
+  runButton.innerHTML = `${RUN_PLAY_ICON}<span class="beast2d-run-label">RUN</span>`;
 
   const clock = document.createElement("canvas");
   clock.className = "beast2d-bitmap beast2d-clock";
 
   topActions.append(saveButton, runButton, clock);
-  topBar.append(logo, tabBar, topActions);
+  topBar.append(logo, topBarCenter, topActions);
 
   const main = document.createElement("div");
   main.className = "beast2d-main";
 
   const toolPanel = document.createElement("section");
-  toolPanel.className = "beast2d-tool-panel";
+  toolPanel.className = "beast2d-tool-panel beast2d-card";
 
   const editorMount = document.createElement("div");
   editorMount.className = "beast2d-code-editor";
@@ -163,37 +166,52 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   toolPanel.appendChild(codePanel);
 
   const gamePanel = document.createElement("section");
-  gamePanel.className = "beast2d-game-panel";
+  gamePanel.className = "beast2d-game-panel beast2d-card beast2d-preview-card";
 
-  const gameControls = document.createElement("div");
-  gameControls.className = "beast2d-game-controls";
+  const previewHeader = document.createElement("div");
+  previewHeader.className = "beast2d-preview-header";
+
+  const previewHeading = document.createElement("div");
+  previewHeading.className = "beast2d-preview-heading";
+  const previewTitle = document.createElement("span");
+  previewTitle.className = "beast2d-preview-title";
+  previewTitle.textContent = "PREVIEW";
+  const previewHeart = document.createElement("span");
+  previewHeart.className = "beast2d-preview-heart";
+  previewHeart.textContent = "♥";
+  previewHeart.setAttribute("aria-hidden", "true");
+  const previewRes = document.createElement("span");
+  previewRes.className = "beast2d-preview-res";
+  previewRes.textContent = `${DISPLAY_WIDTH}×${DISPLAY_HEIGHT}`;
+  previewHeading.append(previewTitle, previewHeart, previewRes);
+
+  const previewActions = document.createElement("div");
+  previewActions.className = "beast2d-preview-actions";
 
   const expandButton = document.createElement("button");
   expandButton.type = "button";
-  expandButton.className = "beast2d-btn beast2d-btn-ghost beast2d-btn-compact";
-  expandButton.title = "Expand game (Esc to return)";
-  const expandLabel = document.createElement("canvas");
-  expandLabel.className = "beast2d-bitmap";
-  expandButton.appendChild(expandLabel);
+  expandButton.className = "beast2d-btn beast2d-btn-quiet";
+  expandButton.textContent = "EXPAND";
+  expandButton.title = "Expand preview (Esc to return)";
 
   const standaloneButton = document.createElement("button");
   standaloneButton.type = "button";
-  standaloneButton.className = "beast2d-btn beast2d-btn-ghost beast2d-btn-compact";
+  standaloneButton.className = "beast2d-btn beast2d-btn-quiet";
+  standaloneButton.textContent = "POP OUT";
   standaloneButton.title = "Open game in standalone window";
-  const standaloneLabel = document.createElement("canvas");
-  standaloneLabel.className = "beast2d-bitmap";
-  standaloneButton.appendChild(standaloneLabel);
 
   const scanlineToggle = document.createElement("label");
   scanlineToggle.className = "beast2d-scanline-toggle";
   const scanlineInput = document.createElement("input");
   scanlineInput.type = "checkbox";
   scanlineInput.className = "beast2d-scanline-input";
-  const scanlineText = document.createElement("canvas");
-  scanlineText.className = "beast2d-bitmap";
+  const scanlineText = document.createElement("span");
+  scanlineText.className = "beast2d-scanline-label";
+  scanlineText.textContent = "SCAN";
   scanlineToggle.append(scanlineInput, scanlineText);
 
-  gameControls.append(expandButton, standaloneButton, scanlineToggle);
+  previewActions.append(expandButton, standaloneButton, scanlineToggle);
+  previewHeader.append(previewHeading, previewActions);
 
   const gameFrame = document.createElement("div");
   gameFrame.className = "beast2d-game-frame";
@@ -208,33 +226,40 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   gameFooter.className = "beast2d-game-footer";
   gameFooter.textContent = `FPS -- | ${DISPLAY_WIDTH}×${DISPLAY_HEIGHT} | x${gameScale}`;
 
-  gamePanel.append(gameControls, gameFrame, gameFooter);
+  gamePanel.append(previewHeader, gameFrame, gameFooter);
   main.append(toolPanel, gamePanel);
 
   const errorStrip = document.createElement("div");
   errorStrip.className = "beast2d-error-strip";
   errorStrip.hidden = true;
+
+  const errorIconWrap = document.createElement("div");
+  errorIconWrap.className = "beast2d-error-icon-wrap";
   const errorIcon = document.createElement("canvas");
   errorIcon.className = "beast2d-bitmap beast2d-error-icon";
-  const errorText = document.createElement("span");
-  errorText.className = "beast2d-error-text";
-  errorStrip.append(errorIcon, errorText);
+
+  const errorBody = document.createElement("div");
+  errorBody.className = "beast2d-error-body";
+  const errorLinePrefix = document.createElement("span");
+  errorLinePrefix.className = "beast2d-error-line";
+  errorLinePrefix.hidden = true;
+  const errorMessage = document.createElement("span");
+  errorMessage.className = "beast2d-error-message";
+
+  errorIconWrap.appendChild(errorIcon);
+  errorBody.append(errorLinePrefix, errorMessage);
+  errorStrip.append(errorIconWrap, errorBody);
 
   shellRoot.append(topBar, main, errorStrip);
   appRoot.appendChild(shellRoot);
 
   let clockKey = "";
-  let chromeKey = "";
 
   const clockText = (now = new Date()) => {
-    const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-    let hour = now.getHours();
-    const suffix = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12;
-    if (hour === 0) hour = 12;
-    const minute = String(now.getMinutes()).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    return `${days[now.getDay()]} ${day} ${hour}:${minute}${suffix}`;
+    const h = String(now.getHours()).padStart(2, "0");
+    const m = String(now.getMinutes()).padStart(2, "0");
+    const s = String(now.getSeconds()).padStart(2, "0");
+    return `${h}:${m}:${s}`;
   };
 
   const paintClock = () => {
@@ -244,27 +269,44 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     void paintBitmapLabel(clock, nextClock, EDITOR_CHROME_SCALE_TOP, beastColorHex(Beast2D16.LeafGreen));
   };
 
-  const applyViewMode = () => {
+  const paintLogo = () => {
+    void paintBitmapLabel(logo, "BEAST2D", EDITOR_CHROME_SCALE_TOP, beastColorHex(Beast2D16.Cream));
+  };
+
+  const syncModeButtons = () => {
+    const split = viewMode === "split";
+    codeModeBtn.classList.toggle("beast2d-mode-active", split);
+    playModeBtn.classList.toggle("beast2d-mode-active", !split);
+    codeModeBtn.setAttribute("aria-selected", String(split));
+    playModeBtn.setAttribute("aria-selected", String(!split));
+    expandButton.textContent = split ? "EXPAND" : "SPLIT";
+  };
+
+  const setViewMode = (mode: ShellViewMode) => {
+    viewMode = mode;
     shellRoot.classList.remove("beast2d-view-split", "beast2d-view-expanded");
     shellRoot.classList.add(shellClassForViewMode(viewMode));
+    syncModeButtons();
+    layoutGameFrame();
   };
 
   const layoutGameFrame = () => {
     const expanded = viewMode === "expanded";
-    const panelGap = 8;
+    const gap = 8;
     let availW: number;
     let availH: number;
     if (expanded) {
       const mainRect = main.getBoundingClientRect();
-      availW = mainRect.width;
-      availH = mainRect.height;
+      availW = mainRect.width - CARD_PADDING_PX * 2;
+      availH = mainRect.height - CARD_PADDING_PX * 2;
     } else {
-      availW = gamePanel.clientWidth;
+      availW = gamePanel.clientWidth - CARD_PADDING_PX * 2;
       availH =
         gamePanel.clientHeight -
-        gameControls.offsetHeight -
+        previewHeader.offsetHeight -
         gameFooter.offsetHeight -
-        panelGap * 2;
+        CARD_PADDING_PX * 2 -
+        gap;
     }
     const innerW = Math.max(0, availW - GAME_BEZEL_PADDING * 2);
     const innerH = Math.max(0, availH - GAME_BEZEL_PADDING * 2);
@@ -279,44 +321,18 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     gameFooter.textContent = `FPS ${Math.round(engine.app.ticker.FPS)} | ${DISPLAY_WIDTH}×${DISPLAY_HEIGHT} | x${scale}`;
   };
 
-  const paintChrome = () => {
-    const cream = beastColorHex(Beast2D16.Cream);
-    const hotPink = beastColorHex(Beast2D16.HotPink);
-    const stone = beastColorHex(Beast2D16.StoneGray);
-    const topScale = EDITOR_CHROME_SCALE_TOP;
-    const compactScale = EDITOR_CHROME_SCALE_COMPACT;
-    const nextKey = `${topScale}:${saveEnabled}:${saveButton.disabled}:${viewMode}:${scanlinesEnabled}`;
-    if (nextKey === chromeKey) {
-      paintClock();
-      layoutGameFrame();
-      return;
-    }
-    chromeKey = nextKey;
+  paintLogo();
+  paintClock();
+  syncModeButtons();
+  layoutGameFrame();
 
-    void paintBitmapLabel(logo, "BEAST2D", topScale, cream);
-    void paintBitmapLabel(codeTabLabel, "CODE", topScale, hotPink);
-    void paintBitmapLabel(
-      saveLabel,
-      "SAVE",
-      topScale,
-      saveButton.disabled ? stone : cream,
-    );
-    void paintBitmapLabel(runLabel, "RUN", topScale, beastColorHex(Beast2D16.PlumOutline));
-    void paintBitmapLabel(
-      expandLabel,
-      viewMode === "expanded" ? "SPLIT" : "EXPAND",
-      compactScale,
-      cream,
-    );
-    void paintBitmapLabel(standaloneLabel, "POP OUT", compactScale, cream);
-    void paintBitmapLabel(scanlineText, "SCAN", compactScale, scanlinesEnabled ? hotPink : stone);
-    paintClock();
+  const onResize = () => {
+    paintLogo();
     layoutGameFrame();
   };
-
-  paintChrome();
-  window.addEventListener("resize", paintChrome);
+  window.addEventListener("resize", onResize);
   window.setInterval(() => paintClock(), 1000);
+
   requestAnimationFrame(function tickFooter() {
     if (!document.hidden) {
       const fps = Math.round(engine.app.ticker.FPS);
@@ -391,10 +407,18 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     getSource: () => view.state.doc.toString(),
     setError(message, line, runtime = false) {
       runError = runtime ? { message, line } : null;
-      errorText.textContent = line ? `Line ${line}: ${message}` : message;
+      if (line) {
+        errorLinePrefix.hidden = false;
+        errorLinePrefix.textContent = `Line ${line}: `;
+        errorMessage.textContent = message;
+      } else {
+        errorLinePrefix.hidden = true;
+        errorLinePrefix.textContent = "";
+        errorMessage.textContent = message;
+      }
       errorStrip.hidden = false;
       errorStrip.classList.add("beast2d-error-strip-visible");
-      void paintBitmapLabel(errorIcon, "!", EDITOR_CHROME_SCALE_COMPACT, beastColorHex(Beast2D16.HotPink));
+      void paintBitmapLabel(errorIcon, "!", EDITOR_CHROME_SCALE_COMPACT, beastColorHex(Beast2D16.PlumOutline));
       const mark = () => {
         view.dispatch(setDiagnostics(view.state, cartDiagnostics(view, runError)));
         if (!line || view.state.doc.lines < 1) return;
@@ -412,19 +436,19 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       runError = null;
       errorStrip.hidden = true;
       errorStrip.classList.remove("beast2d-error-strip-visible");
-      errorText.textContent = "";
+      errorLinePrefix.hidden = true;
+      errorLinePrefix.textContent = "";
+      errorMessage.textContent = "";
       view.dispatch(setDiagnostics(view.state, cartDiagnostics(view, null)));
     },
     showCode() {
       game.pause();
-      viewMode = "split";
-      applyViewMode();
-      paintChrome();
+      setViewMode("split");
       view.focus();
     },
     showRun() {
       game.resume();
-      paintChrome();
+      layoutGameFrame();
     },
     async runCart() {
       shell.clearError();
@@ -463,7 +487,6 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       saveEnabled = ping?.ok === true;
       saveButton.disabled = !saveEnabled;
       saveButton.hidden = !saveEnabled;
-      paintChrome();
 
       const compiled = compileCart(startSource);
       if (compiled.ok) {
@@ -483,12 +506,28 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     void shell.runCart();
   });
 
+  codeModeBtn.addEventListener("click", () => {
+    setViewMode("split");
+    game.pause();
+    view.focus();
+  });
+
+  playModeBtn.addEventListener("click", () => {
+    setViewMode("expanded");
+    game.resume();
+    gameFrame.focus();
+  });
+
   expandButton.addEventListener("click", () => {
-    viewMode = viewMode === "expanded" ? "split" : "expanded";
-    applyViewMode();
-    paintChrome();
-    if (viewMode === "expanded") gameFrame.focus();
-    else view.focus();
+    const next = viewMode === "expanded" ? "split" : "expanded";
+    setViewMode(next);
+    if (next === "expanded") {
+      game.resume();
+      gameFrame.focus();
+    } else {
+      game.pause();
+      view.focus();
+    }
   });
 
   standaloneButton.addEventListener("click", () => {
@@ -498,7 +537,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   scanlineInput.addEventListener("change", () => {
     scanlinesEnabled = scanlineInput.checked;
     gameBezel.classList.toggle("beast2d-scanlines", scanlinesEnabled);
-    paintChrome();
+    scanlineText.classList.toggle("beast2d-scanline-label-on", scanlinesEnabled);
   });
 
   window.addEventListener(
@@ -508,14 +547,13 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       if (viewMode !== "expanded") return;
       if (event.target instanceof Element && view.dom.contains(event.target)) return;
       viewMode = viewModeAfterEscape(viewMode);
-      applyViewMode();
-      paintChrome();
+      setViewMode(viewMode);
+      game.pause();
       view.focus();
       event.preventDefault();
     },
     true,
   );
 
-  applyViewMode();
   return shell;
 }
