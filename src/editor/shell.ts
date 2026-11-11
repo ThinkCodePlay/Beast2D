@@ -36,7 +36,7 @@ import { cartHelperCompletion } from "./helpers";
 import { cartSignatureHints } from "./signature";
 import { beast2dEditorTheme, beast2dSyntax } from "./theme";
 import { clockText } from "./clock";
-import { BEAST_MASCOT, createFloppy, DISK_ART, paintPixelGrid, TOOL_ICONS } from "./pixelArt";
+import { BEAST_MASCOT, paintEmptySlot, paintHomeFloppy, paintPixelGrid, paintToolFloppy } from "./pixelArt";
 
 const STORAGE_KEY = "beast2d-cart-script";
 const DEV_PING = "/__beast2d/dev";
@@ -168,7 +168,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     tab.className = "beast2d-tool-tab";
     tab.dataset.tool = tool;
     tab.disabled = !isToolFunctional(tool);
-    tab.appendChild(createFloppy(TOOL_ICONS[tool] ?? TOOL_ICONS.CODE!, tool));
+    const glyph = document.createElement("canvas");
+    glyph.className = "beast2d-floppy-canvas";
+    glyph.dataset.floppy = "tool";
+    glyph.dataset.tool = tool;
+    tab.appendChild(glyph);
     tab.addEventListener("click", () => {
       if (!isToolFunctional(tool)) return;
       viewState = { ...viewState, activeTool: tool };
@@ -195,19 +199,27 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   newDiskSlot.type = "button";
   newDiskSlot.className = "beast2d-home-disk beast2d-home-disk-new";
   newDiskSlot.title = "Coming soon";
-  newDiskSlot.innerHTML =
-    '<span class="beast2d-floppy beast2d-floppy-new"></span><span class="beast2d-home-disk-title">+ New disk</span>';
+  const emptySlot = document.createElement("canvas");
+  emptySlot.className = "beast2d-floppy-canvas";
+  emptySlot.dataset.floppy = "empty";
+  const newTitle = document.createElement("span");
+  newTitle.className = "beast2d-home-disk-title";
+  newTitle.textContent = "+ New disk";
+  newDiskSlot.append(emptySlot, newTitle);
 
   const diskButtons = disks.map((disk, index) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "beast2d-home-disk";
     btn.dataset.diskIndex = String(index);
-    const art = DISK_ART[disk.id] ?? DISK_ART.hello!;
+    const face = document.createElement("canvas");
+    face.className = "beast2d-floppy-canvas";
+    face.dataset.floppy = "home";
+    face.dataset.disk = disk.id;
     const titleEl = document.createElement("span");
     titleEl.className = "beast2d-home-disk-title";
     titleEl.textContent = disk.title;
-    btn.append(createFloppy(art, ""), titleEl);
+    btn.append(face, titleEl);
     btn.addEventListener("click", () => {
       viewState = moveDiskSelection(viewState, index - viewState.selectedDiskIndex, disks.length);
       applyViewState();
@@ -281,6 +293,25 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     previewFrame.style.width = `${frameW}px`;
     previewFrame.style.height = `${frameH}px`;
     previewColumn.style.flex = `0 0 ${columnW}px`;
+    repaintFloppies();
+  };
+  const repaintFloppies = () => {
+    const pixel = chromeFontScale(window.innerHeight);
+    consoleFrame.querySelectorAll<HTMLCanvasElement>(".beast2d-floppy-canvas").forEach((canvas) => {
+      const kind = canvas.dataset.floppy;
+      if (kind === "tool") {
+        const tool = canvas.dataset.tool ?? "CODE";
+        paintToolFloppy(canvas, tool, tool === viewState.activeTool, pixel);
+        return;
+      }
+      if (kind === "home") {
+        const diskId = canvas.dataset.disk ?? "hello";
+        const index = disks.findIndex((disk) => disk.id === diskId);
+        paintHomeFloppy(canvas, diskId, index === viewState.selectedDiskIndex, pixel);
+        return;
+      }
+      paintEmptySlot(canvas, pixel);
+    });
   };
   layoutPreview();
   window.addEventListener("resize", layoutPreview);
@@ -344,7 +375,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     state: EditorState.create({ doc: startSource, extensions }),
     parent: editorMount,
   });
-  void document.fonts.load('16px "Monogram"').then(() => view.requestMeasure());
+  void document.fonts.load('16px "Monogram"').then(() => {
+    view.requestMeasure();
+    repaintFloppies();
+  });
 
   const selectedDisk = () => disks[viewState.selectedDiskIndex] ?? disks[0]!;
 
@@ -355,12 +389,14 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       tab.classList.toggle("beast2d-tool-tab-active", active);
       tab.setAttribute("aria-selected", active ? "true" : "false");
     }
+    repaintFloppies();
   };
 
   const syncHomeSelection = () => {
     diskButtons.forEach((btn, i) => {
       btn.classList.toggle("beast2d-home-disk-selected", i === viewState.selectedDiskIndex);
     });
+    repaintFloppies();
   };
 
   const syncEditorPanes = () => {

@@ -14,58 +14,106 @@ const PIXEL_COLORS: Record<string, string> = {
   r: "#cb4a50",
 };
 
+const PLUM = "#1f1424";
+const SHADOW = "#3b2e3f";
+const STONE = "#746678";
+const CREAM = "#f4ead2";
+const PINK = "#e86c9a";
+const METAL = "#f4ead2";
+
 export type PixelGrid = readonly string[];
 
+/** Angle brackets with a wide empty center so they cannot read as ∞. */
 export const TOOL_ICONS: Record<string, PixelGrid> = {
-  CODE: ["........", ".pp..pp.", "p..pp..p", "p..pp..p", ".pp..pp.", "........"],
-  SPRITE: ["......oo", ".....oo.", "....oo..", "...oo...", "..oo....", ".oo.yy..", "oo..yy..", "....yy.."],
-  MAP: ["nnnnnnnn", "n..n..n.", "n..n..n.", "nnnnnnnn", "n..n..n.", "n..n..n.", "nnnnnnnn"],
-  SFX: ["..cc....", ".ccc.pp.", "cccc.pp.", "cccc.pp.", ".ccc.pp.", "..cc...."],
-  MUSIC: ["....pp..", "....pp..", "....pp..", ".cc.pp..", "ccc.pp..", "ccc.....", ".cc....."],
+  CODE: [
+    "...........",
+    ".cc.....cc.",
+    "c.........c",
+    "c.........c",
+    ".cc.....cc.",
+    "...........",
+  ],
+  SPRITE: [
+    "......po...",
+    ".....poy...",
+    "....oyy....",
+    "...oyy.....",
+    "..oyy......",
+    ".oyy.......",
+    "oy.........",
+    "y..........",
+  ],
+  MAP: [
+    "ccccccccc",
+    "c..c..c.c",
+    "c..c..c.c",
+    "ccccccccc",
+    "c..c..c.c",
+    "c..c..c.c",
+    "ccccccccc",
+  ],
+  SFX: [
+    "..cc.......",
+    ".ccc..cc...",
+    "ccccc.cc.cc",
+    "ccccc.cc.cc",
+    ".ccc..cc...",
+    "..cc.......",
+  ],
+  MUSIC: [
+    "..c....c...",
+    "..c....c...",
+    "..c....c...",
+    "..cccccc...",
+    ".cc....cc..",
+    ".cc....cc..",
+  ],
 };
 
-/** Simple label motifs for the home shelf (16×16 or smaller). */
+/** Label stickers for the home shelf. */
 export const DISK_ART: Record<string, PixelGrid> = {
   hello: [
-    "....pppppp....",
+    "...pp....pp...",
+    "..pppp..pppp..",
+    ".pppppppppppp.",
+    ".ppwwppppwwpp.",
+    ".pppppppppppp.",
+    "..pppmmmmmpp..",
     "...pppppppp...",
-    "..ppwwppwwpp..",
-    "..pppppppppp..",
-    "...pppppppp...",
-    "..pppppppppp..",
-    ".pp.pppppp.pp.",
+    "..pp......pp..",
   ],
   "space-run": [
-    "......ww......",
-    ".....wwww.....",
-    "......bb......",
-    "...bbbbbbbb...",
-    "..bbbbbbbbbb..",
-    "...bbyyybb....",
-    ".....oooo.....",
-    "......oo......",
+    "c................c",
+    "......bbbb........",
+    ".....bbwwbb.......",
+    "....bbbbbbbb......",
+    "...bbbbbbbbbb.....",
+    "....bbboooobb.....",
+    "......ooooo.......",
+    ".......ooo........",
+    "c..............c..",
   ],
   paddle: [
-    "..............",
-    "......yy......",
-    "..............",
-    "..............",
-    "..............",
-    "..oooooooooo..",
-    "..............",
+    "mm..mm..mm..mm..",
+    "................",
+    "......yy........",
+    "................",
+    "................",
+    "..oooooooooooo..",
   ],
   "bunny-hop": [
+    "pp........pp",
+    "pp........pp",
     ".cc......cc.",
-    ".cc......cc.",
+    ".cccccccccc.",
+    ".ccwwccwwcc.",
+    ".cccccccccc.",
     "..cccccccc..",
-    "..ccwwccww..",
-    "..cccccccc..",
-    "...cccccc...",
-    "....c..c....",
+    "...cc..cc...",
   ],
 };
 
-/** Pink beast sitting beside the home logo. */
+/** Pink beast sitting beside the home logo. Do not restyle in the disk pass. */
 export const BEAST_MASCOT: PixelGrid = [
   "..pppppp..",
   ".pppppppp.",
@@ -77,6 +125,19 @@ export const BEAST_MASCOT: PixelGrid = [
   ".p.p..p.p.",
 ];
 
+/** True when every inked row is two side clusters with an empty middle. */
+export function iconIsSplitPair(rows: PixelGrid): boolean {
+  const inked = rows.filter((row) => row.split("").some((ch) => ch !== "."));
+  if (inked.length === 0) return false;
+  return inked.every((row) => {
+    const width = row.length;
+    const mid = row.slice(Math.floor(width / 2) - 1, Math.ceil(width / 2) + 1);
+    if ([...mid].some((ch) => ch !== ".")) return false;
+    const clusters = row.split(".").filter((part) => part.length > 0);
+    return clusters.length === 2;
+  });
+}
+
 export function paintPixelGrid(canvas: HTMLCanvasElement, rows: PixelGrid, scale = 1): void {
   const height = rows.length;
   const width = rows.reduce((max, row) => Math.max(max, row.length), 0);
@@ -87,34 +148,211 @@ export function paintPixelGrid(canvas: HTMLCanvasElement, rows: PixelGrid, scale
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let y = 0; y < height; y += 1) {
+  blitGrid(ctx, rows, 0, 0, pixel);
+}
+
+type Ctx = CanvasRenderingContext2D;
+
+function blitGrid(ctx: Ctx, rows: PixelGrid, originX: number, originY: number, scale: number): void {
+  for (let y = 0; y < rows.length; y += 1) {
     const row = rows[y] ?? "";
     for (let x = 0; x < row.length; x += 1) {
       const color = PIXEL_COLORS[row[x] ?? ""];
       if (!color) continue;
       ctx.fillStyle = color;
-      ctx.fillRect(x * pixel, y * pixel, pixel, pixel);
+      ctx.fillRect((originX + x) * scale, (originY + y) * scale, scale, scale);
     }
   }
 }
 
-export function createFloppy(icon: PixelGrid, name: string): HTMLElement {
-  const floppy = document.createElement("span");
-  floppy.className = "beast2d-floppy";
-  const shutter = document.createElement("span");
-  shutter.className = "beast2d-floppy-shutter";
-  const label = document.createElement("span");
-  label.className = "beast2d-floppy-label";
-  const canvas = document.createElement("canvas");
-  canvas.className = "beast2d-pixel";
-  paintPixelGrid(canvas, icon, 1);
-  label.appendChild(canvas);
-  if (name) {
-    const caption = document.createElement("span");
-    caption.className = "beast2d-floppy-name";
-    caption.textContent = name;
-    label.appendChild(caption);
+function fill(ctx: Ctx, x: number, y: number, w: number, h: number, color: string, scale: number): void {
+  if (w <= 0 || h <= 0) return;
+  ctx.fillStyle = color;
+  ctx.fillRect(x * scale, y * scale, w * scale, h * scale);
+}
+
+function inRound(x: number, y: number, w: number, h: number, radius: number): boolean {
+  const r = Math.max(0, Math.min(radius, Math.floor(Math.min(w, h) / 2)));
+  if (r <= 0) return x >= 0 && y >= 0 && x < w && y < h;
+  let dx = 0;
+  let dy = 0;
+  if (x < r) dx = r - x;
+  else if (x >= w - r) dx = x - (w - 1 - r);
+  if (y < r) dy = r - y;
+  else if (y >= h - r) dy = y - (h - 1 - r);
+  return dx * dx + dy * dy <= r * r;
+}
+
+/** Hard-edged rounded rect. Radius is in art pixels. */
+function fillRound(ctx: Ctx, x: number, y: number, w: number, h: number, radius: number, color: string, scale: number): void {
+  for (let yy = 0; yy < h; yy += 1) {
+    for (let xx = 0; xx < w; xx += 1) {
+      if (!inRound(xx, yy, w, h, radius)) continue;
+      fill(ctx, x + xx, y + yy, 1, 1, color, scale);
+    }
   }
-  floppy.append(shutter, label);
-  return floppy;
+}
+
+function strokeRound(ctx: Ctx, x: number, y: number, w: number, h: number, radius: number, color: string, scale: number): void {
+  const r = Math.max(1, radius);
+  for (let yy = 0; yy < h; yy += 1) {
+    for (let xx = 0; xx < w; xx += 1) {
+      if (!inRound(xx, yy, w, h, r)) continue;
+      const inner = inRound(xx - 1, yy - 1, w - 2, h - 2, Math.max(0, r - 1));
+      if (inner) continue;
+      fill(ctx, x + xx, y + yy, 1, 1, color, scale);
+    }
+  }
+}
+
+function fillDisk(ctx: Ctx, cx: number, cy: number, radius: number, color: string, scale: number): void {
+  for (let y = -radius; y <= radius; y += 1) {
+    for (let x = -radius; x <= radius; x += 1) {
+      if (x * x + y * y <= radius * radius) fill(ctx, cx + x, cy + y, 1, 1, color, scale);
+    }
+  }
+}
+
+function paintShutter(ctx: Ctx, x: number, y: number, w: number, h: number, scale: number): void {
+  fill(ctx, x, y, w, h, METAL, scale);
+  fill(ctx, x, y, w, 1, STONE, scale);
+  fill(ctx, x, y + h - 1, w, 1, STONE, scale);
+  fill(ctx, x, y, 1, h, STONE, scale);
+  fill(ctx, x + w - 1, y, 1, h, STONE, scale);
+  const doorW = Math.max(8, Math.floor(w * 0.42));
+  const doorH = h - 4;
+  const doorX = x + 3;
+  const doorY = y + 2;
+  fill(ctx, doorX, doorY, doorW, doorH, STONE, scale);
+  fill(ctx, doorX + 1, doorY + 1, doorW - 2, doorH - 2, PLUM, scale);
+  const hole = Math.max(2, Math.floor(h / 4));
+  fill(ctx, x + w - hole - 3, y + Math.floor((h - hole) / 2), hole, hole, PLUM, scale);
+}
+
+function paintHub(ctx: Ctx, cx: number, cy: number, scale: number): void {
+  fillDisk(ctx, cx, cy, 4, STONE, scale);
+  fillDisk(ctx, cx, cy, 2, PLUM, scale);
+  fill(ctx, cx, cy, 1, 1, CREAM, scale);
+}
+
+const HOME = { w: 64, h: 72, pad: 3 };
+const TOOL = { w: 52, h: 56, pad: 2 };
+
+function paintBody(
+  ctx: Ctx,
+  box: { w: number; h: number; pad: number },
+  scale: number,
+  selected: boolean,
+): { x: number; y: number; w: number; h: number } {
+  const { w, h, pad } = box;
+  if (selected) strokeRound(ctx, 0, 0, w, h, 8, PINK, scale);
+  const x = pad;
+  const y = pad;
+  const bw = w - pad * 2;
+  const bh = h - pad * 2;
+  fillRound(ctx, x, y, bw, bh, 7, PLUM, scale);
+  fillRound(ctx, x + 1, y + 1, bw - 2, bh - 2, 6, SHADOW, scale);
+  return { x, y, w: bw, h: bh };
+}
+
+function centerBlit(
+  ctx: Ctx,
+  grid: PixelGrid,
+  areaX: number,
+  areaY: number,
+  areaW: number,
+  areaH: number,
+  scale: number,
+  dot = 1,
+): void {
+  const gh = grid.length * dot;
+  const gw = grid.reduce((max, row) => Math.max(max, row.length), 0) * dot;
+  const ox = areaX + Math.max(0, Math.floor((areaW - gw) / 2));
+  const oy = areaY + Math.max(0, Math.floor((areaH - gh) / 2));
+  for (let y = 0; y < grid.length; y += 1) {
+    const row = grid[y] ?? "";
+    for (let x = 0; x < row.length; x += 1) {
+      const color = PIXEL_COLORS[row[x] ?? ""];
+      if (!color) continue;
+      fill(ctx, ox + x * dot, oy + y * dot, dot, dot, color, scale);
+    }
+  }
+}
+
+export function paintHomeFloppy(canvas: HTMLCanvasElement, diskId: string, selected: boolean, scale: number): void {
+  const pixel = Math.max(1, Math.round(scale));
+  canvas.width = HOME.w * pixel;
+  canvas.height = HOME.h * pixel;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const body = paintBody(ctx, HOME, pixel, selected);
+  const shutterW = body.w - 16;
+  paintShutter(ctx, body.x + 8, body.y + 4, shutterW, 14, pixel);
+  const labelX = body.x + 8;
+  const labelY = body.y + 21;
+  const labelW = body.w - 16;
+  const labelH = body.h - 36;
+  const border = selected ? PINK : STONE;
+  fill(ctx, labelX, labelY, labelW, labelH, border, pixel);
+  fill(ctx, labelX + 1, labelY + 1, labelW - 2, labelH - 2, PLUM, pixel);
+  const motif = DISK_ART[diskId] ?? DISK_ART.hello!;
+  centerBlit(ctx, motif, labelX + 2, labelY + 2, labelW - 4, labelH - 4, pixel, 2);
+  paintHub(ctx, body.x + Math.floor(body.w / 2), body.y + body.h - 8, pixel);
+}
+
+export function paintEmptySlot(canvas: HTMLCanvasElement, scale: number): void {
+  const pixel = Math.max(1, Math.round(scale));
+  canvas.width = HOME.w * pixel;
+  canvas.height = HOME.h * pixel;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const x = HOME.pad;
+  const y = HOME.pad;
+  const w = HOME.w - HOME.pad * 2;
+  const h = HOME.h - HOME.pad * 2;
+  const radius = 7;
+  for (let yy = 0; yy < h; yy += 1) {
+    for (let xx = 0; xx < w; xx += 1) {
+      if (!inRound(xx, yy, w, h, radius)) continue;
+      const inner = inRound(xx - 1, yy - 1, w - 2, h - 2, radius - 1);
+      if (inner) continue;
+      if ((xx + yy) % 2 !== 0) continue;
+      fill(ctx, x + xx, y + yy, 1, 1, STONE, pixel);
+    }
+  }
+}
+
+export function paintToolFloppy(
+  canvas: HTMLCanvasElement,
+  tool: string,
+  selected: boolean,
+  scale: number,
+): void {
+  const pixel = Math.max(1, Math.round(scale));
+  canvas.width = TOOL.w * pixel;
+  canvas.height = TOOL.h * pixel;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const body = paintBody(ctx, TOOL, pixel, selected);
+  paintShutter(ctx, body.x + 5, body.y + 2, body.w - 10, 8, pixel);
+  const labelX = body.x + 5;
+  const labelY = body.y + 12;
+  const labelW = body.w - 10;
+  const labelH = 18;
+  fill(ctx, labelX, labelY, labelW, labelH, selected ? PINK : STONE, pixel);
+  fill(ctx, labelX + 1, labelY + 1, labelW - 2, labelH - 2, PLUM, pixel);
+  const icon = TOOL_ICONS[tool] ?? TOOL_ICONS.CODE!;
+  centerBlit(ctx, icon, labelX + 1, labelY + 1, labelW - 2, labelH - 2, pixel);
+  paintHub(ctx, body.x + Math.floor(body.w / 2), body.y + body.h - 5, pixel);
+  ctx.font = "16px Monogram, monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillStyle = selected ? CREAM : STONE;
+  ctx.fillText(tool, (body.x + body.w / 2) * pixel, (body.y + body.h - 14) * pixel);
 }

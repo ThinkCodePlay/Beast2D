@@ -84,11 +84,11 @@ export const beast2dEditorTheme = EditorView.theme(
 );
 
 export const beast2dHighlight = HighlightStyle.define([
-  { tag: tags.keyword, color: orange },
+  { tag: tags.keyword, color: hotPink },
   { tag: tags.string, color: leaf },
-  { tag: tags.number, color: yellow },
-  { tag: tags.bool, color: yellow },
-  { tag: tags.null, color: yellow },
+  { tag: tags.number, color: orange },
+  { tag: tags.bool, color: orange },
+  { tag: tags.null, color: orange },
   { tag: tags.comment, color: stone },
   { tag: tags.function(tags.variableName), color: hotPink },
   { tag: tags.definition(tags.function(tags.variableName)), color: hotPink },
