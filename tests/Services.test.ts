@@ -36,6 +36,17 @@ describe("Input", () => {
     expect(input.isDown("left")).toBe(true);
   });
 
+  it("does not steal bound keys from a text field", () => {
+    const editor = new EventTarget();
+    Object.assign(editor, { isContentEditable: true });
+    const input = new Input();
+    input.attach(editor);
+    const space = key("keydown", "Space");
+    editor.dispatchEvent(space);
+    expect(space.defaultPrevented).toBe(false);
+    expect(input.isDown("shoot")).toBe(false);
+  });
+
   it("prevents default only for bound keys", () => {
     const target = new EventTarget();
     const input = new Input();
