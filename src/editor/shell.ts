@@ -22,6 +22,7 @@ import type { GameManager } from "../core/GameManager";
 import { Beast2D16 } from "../core/ui/palette";
 import { applyChromePalette, beastColorHex } from "./chromeColors";
 import { paintBitmapLabel } from "./bitmapLabel";
+import { EDITOR_CHROME_SCALE_COMPACT, EDITOR_CHROME_SCALE_TOP } from "./chromeScale";
 import { checkCartSyntax, compileCart } from "../core/cart/compile";
 import { cartHelperCompletion } from "./helpers";
 import { cartSignatureHints } from "./signature";
@@ -38,6 +39,7 @@ const DEV_PING = "/__beast2d/dev";
 const SAVE_URL = "/__beast2d/save-cart";
 
 const RUN_PLAY_ICON = `<svg class="beast2d-run-icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path fill="currentColor" d="M2 1.5 8.5 5 2 8.5Z"/></svg>`;
+const GAME_BEZEL_PADDING = 12;
 
 export type CartEditorOptions = {
   appRoot: HTMLElement;
@@ -81,10 +83,6 @@ function cartDiagnostics(
     if (mark) diagnostics.push(mark);
   }
   return diagnostics;
-}
-
-function chromeBitmapScale(): number {
-  return Math.max(2, Math.min(4, Math.round(window.innerHeight / 280)));
 }
 
 export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
@@ -200,7 +198,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const gameFrame = document.createElement("div");
   gameFrame.className = "beast2d-game-frame";
   gameFrame.tabIndex = -1;
-  gameFrame.appendChild(gameContainer);
+
+  const gameBezel = document.createElement("div");
+  gameBezel.className = "beast2d-game-bezel";
+  gameBezel.appendChild(gameContainer);
+  gameFrame.appendChild(gameBezel);
 
   const gameFooter = document.createElement("div");
   gameFooter.className = "beast2d-game-footer";
@@ -235,11 +237,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     return `${days[now.getDay()]} ${day} ${hour}:${minute}${suffix}`;
   };
 
-  const paintClock = (scale: number) => {
-    const nextClock = `${scale}:${clockText()}`;
+  const paintClock = () => {
+    const nextClock = clockText();
     if (nextClock === clockKey) return;
     clockKey = nextClock;
-    void paintBitmapLabel(clock, clockText(), scale, beastColorHex(Beast2D16.LeafGreen));
+    void paintBitmapLabel(clock, nextClock, EDITOR_CHROME_SCALE_TOP, beastColorHex(Beast2D16.LeafGreen));
   };
 
   const applyViewMode = () => {
@@ -248,65 +250,73 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   };
 
   const layoutGameFrame = () => {
-    const padding = 24;
-    const footerLine = 24;
-    const controlsLine = 28;
-    const rect = gameFrame.getBoundingClientRect();
     const expanded = viewMode === "expanded";
-    const availW = expanded
-      ? Math.max(0, window.innerWidth - padding * 2)
-      : rect.width > 0
-        ? rect.width - padding
-        : gamePanel.clientWidth - padding;
-    const availH = expanded
-      ? Math.max(0, window.innerHeight - topBar.offsetHeight - footerLine - controlsLine - padding * 2)
-      : rect.height > 0
-        ? rect.height - padding
-        : Math.max(
-            120,
-            window.innerHeight - topBar.offsetHeight - footerLine - controlsLine - 80,
-          );
-    const scale = computeIntegerDisplayScale(availW, availH, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
+    const panelGap = 8;
+    let availW: number;
+    let availH: number;
+    if (expanded) {
+      const mainRect = main.getBoundingClientRect();
+      availW = mainRect.width;
+      availH = mainRect.height;
+    } else {
+      availW = gamePanel.clientWidth;
+      availH =
+        gamePanel.clientHeight -
+        gameControls.offsetHeight -
+        gameFooter.offsetHeight -
+        panelGap * 2;
+    }
+    const innerW = Math.max(0, availW - GAME_BEZEL_PADDING * 2);
+    const innerH = Math.max(0, availH - GAME_BEZEL_PADDING * 2);
+    const scale = computeIntegerDisplayScale(innerW, innerH, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
     gameScale = scale;
     const size = displayCssSize(scale, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     gameContainer.style.width = `${size.width}px`;
     gameContainer.style.height = `${size.height}px`;
-    gameFrame.dataset.displayScale = String(scale);
+    gameBezel.style.width = `${size.width + GAME_BEZEL_PADDING * 2}px`;
+    gameBezel.style.height = `${size.height + GAME_BEZEL_PADDING * 2}px`;
+    gameBezel.dataset.displayScale = String(scale);
     gameFooter.textContent = `FPS ${Math.round(engine.app.ticker.FPS)} | ${DISPLAY_WIDTH}×${DISPLAY_HEIGHT} | x${scale}`;
   };
 
   const paintChrome = () => {
-    const scale = chromeBitmapScale();
     const cream = beastColorHex(Beast2D16.Cream);
     const hotPink = beastColorHex(Beast2D16.HotPink);
     const stone = beastColorHex(Beast2D16.StoneGray);
-    const nextKey = `${scale}:${saveEnabled}:${saveButton.disabled}:${viewMode}`;
+    const topScale = EDITOR_CHROME_SCALE_TOP;
+    const compactScale = EDITOR_CHROME_SCALE_COMPACT;
+    const nextKey = `${topScale}:${saveEnabled}:${saveButton.disabled}:${viewMode}:${scanlinesEnabled}`;
     if (nextKey === chromeKey) {
-      paintClock(scale);
+      paintClock();
       layoutGameFrame();
       return;
     }
     chromeKey = nextKey;
 
-    void paintBitmapLabel(logo, "BEAST2D", scale, cream);
-    void paintBitmapLabel(codeTabLabel, "CODE", scale, hotPink);
+    void paintBitmapLabel(logo, "BEAST2D", topScale, cream);
+    void paintBitmapLabel(codeTabLabel, "CODE", topScale, hotPink);
     void paintBitmapLabel(
       saveLabel,
       "SAVE",
-      scale,
+      topScale,
       saveButton.disabled ? stone : cream,
     );
-    void paintBitmapLabel(runLabel, "RUN", scale, beastColorHex(Beast2D16.PlumOutline));
-    void paintBitmapLabel(expandLabel, viewMode === "expanded" ? "SPLIT" : "EXPAND", scale, cream);
-    void paintBitmapLabel(standaloneLabel, "POP OUT", scale, cream);
-    void paintBitmapLabel(scanlineText, "SCAN", scale, scanlinesEnabled ? hotPink : stone);
-    paintClock(scale);
+    void paintBitmapLabel(runLabel, "RUN", topScale, beastColorHex(Beast2D16.PlumOutline));
+    void paintBitmapLabel(
+      expandLabel,
+      viewMode === "expanded" ? "SPLIT" : "EXPAND",
+      compactScale,
+      cream,
+    );
+    void paintBitmapLabel(standaloneLabel, "POP OUT", compactScale, cream);
+    void paintBitmapLabel(scanlineText, "SCAN", compactScale, scanlinesEnabled ? hotPink : stone);
+    paintClock();
     layoutGameFrame();
   };
 
   paintChrome();
   window.addEventListener("resize", paintChrome);
-  window.setInterval(() => paintClock(chromeBitmapScale()), 1000);
+  window.setInterval(() => paintClock(), 1000);
   requestAnimationFrame(function tickFooter() {
     if (!document.hidden) {
       const fps = Math.round(engine.app.ticker.FPS);
@@ -315,8 +325,9 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     requestAnimationFrame(tickFooter);
   });
 
-  const gameFrameObserver = new ResizeObserver(() => layoutGameFrame());
-  gameFrameObserver.observe(gameFrame);
+  const gameLayoutObserver = new ResizeObserver(() => layoutGameFrame());
+  gameLayoutObserver.observe(gamePanel);
+  gameLayoutObserver.observe(main);
 
   const stored = localStorage.getItem(STORAGE_KEY);
   const startSource = stored ?? initialSource;
@@ -383,7 +394,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       errorText.textContent = line ? `Line ${line}: ${message}` : message;
       errorStrip.hidden = false;
       errorStrip.classList.add("beast2d-error-strip-visible");
-      void paintBitmapLabel(errorIcon, "!", chromeBitmapScale(), beastColorHex(Beast2D16.HotPink));
+      void paintBitmapLabel(errorIcon, "!", EDITOR_CHROME_SCALE_COMPACT, beastColorHex(Beast2D16.HotPink));
       const mark = () => {
         view.dispatch(setDiagnostics(view.state, cartDiagnostics(view, runError)));
         if (!line || view.state.doc.lines < 1) return;
@@ -486,7 +497,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   scanlineInput.addEventListener("change", () => {
     scanlinesEnabled = scanlineInput.checked;
-    gameFrame.classList.toggle("beast2d-scanlines", scanlinesEnabled);
+    gameBezel.classList.toggle("beast2d-scanlines", scanlinesEnabled);
     paintChrome();
   });
 
