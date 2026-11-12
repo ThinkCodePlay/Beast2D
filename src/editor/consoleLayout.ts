@@ -1,12 +1,5 @@
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 
-/** Pink margin around the compact console. The device itself stays near the mockup frame. */
-export const CONSOLE_MARGIN = 48;
-
-/** Outer size of the plum device at the 1280-wide mockup, before the pink margin. */
-export const CONSOLE_DEVICE_WIDTH = 1170;
-export const CONSOLE_DEVICE_HEIGHT = 640;
-
 export const BOOT_DURATION_MS = 1500;
 
 /**

@@ -613,7 +613,6 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         shell.setError(message);
-        enterEditor("code");
       }
       return;
     }

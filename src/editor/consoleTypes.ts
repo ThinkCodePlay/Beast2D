@@ -12,7 +12,7 @@ export type ConsoleViewState = {
   selectedDiskIndex: number;
 };
 
-export type DiskKind = "cart" | "level" | "placeholder";
+export type DiskKind = "cart" | "level";
 
 export type ConsoleDisk = {
   id: string;

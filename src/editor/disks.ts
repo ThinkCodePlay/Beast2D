@@ -7,7 +7,3 @@ export const DEFAULT_CONSOLE_DISKS: ConsoleDisk[] = [
   { id: "paddle", title: "Paddle", kind: "level", levelId: "breakoutPaddle" },
   { id: "bunny-hop", title: "Bunny Hop", kind: "level", levelId: "bunnyHop" },
 ];
-
-export function diskById(disks: ConsoleDisk[], id: string): ConsoleDisk | undefined {
-  return disks.find((d) => d.id === id);
-}
