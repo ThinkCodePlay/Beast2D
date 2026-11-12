@@ -1,3 +1,13 @@
+/* Shell chrome hex values mirror Beast2D16 in src/core/ui/palette.ts */
+/* Monogram — datagoblin, CC0 (see public/ui/monogram.LICENSE.txt) */
+@font-face {
+  font-family: "Monogram";
+  src: url("/ui/monogram.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
 html,
 body,
 #app {
@@ -6,13 +16,16 @@ body,
   margin: 0;
   background: #ffcbdd;
   color: #f4ead2;
-  font-family: Inter, system-ui, sans-serif;
+  font-family: "Monogram", ui-monospace, monospace;
+  --beast-scale: 2;
 }
 
 #app {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  padding: 48px;
 }
 
 .beast2d-app {
@@ -20,92 +33,381 @@ body,
 }
 
 .beast2d-console {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
+  flex: 0 1 auto;
+  width: min(1170px, 100%);
+  height: min(640px, 100%);
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
   background: #1f1424;
+  outline: calc(3px * var(--beast-scale)) solid #3b2e3f;
+  box-shadow: calc(6px * var(--beast-scale)) calc(6px * var(--beast-scale)) 0 #1f1424;
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
-.beast2d-stage {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.beast2d-code {
+.beast2d-boot {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 10;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(12px * var(--beast-scale));
   background: #1f1424;
 }
 
-/* Author `display` wins over the `hidden` attribute unless we override it. */
-.beast2d-code[hidden] {
+.beast2d-boot[hidden] {
   display: none !important;
 }
 
-.beast2d-code-bar {
+.beast2d-boot-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--beast-scale));
+}
+
+.beast2d-boot-title {
+  color: #e86c9a;
+  font-size: calc(32px * var(--beast-scale));
+  line-height: calc(32px * var(--beast-scale));
+  letter-spacing: calc(2px * var(--beast-scale));
+}
+
+.beast2d-boot-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(6px * var(--beast-scale));
+  color: #f4ead2;
+}
+
+.beast2d-boot-status {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--beast-scale));
+}
+
+.beast2d-boot-block {
+  width: 0.55em;
+  height: 0.55em;
+  background: #e86c9a;
+  flex-shrink: 0;
+}
+
+.beast2d-boot-track {
+  align-self: stretch;
+  height: calc(8px * var(--beast-scale));
+  margin-top: calc(4px * var(--beast-scale));
+  background: #3b2e3f;
+}
+
+.beast2d-boot-fill {
+  width: 8%;
+  height: 100%;
+  background: #e86c9a;
+}
+
+.beast2d-boot.is-loading .beast2d-boot-fill {
+  width: 78%;
+  transition: width 1.35s linear;
+}
+
+.beast2d-boot-prompt {
+  color: #f4ead2;
+}
+
+.beast2d-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
-  padding: 0 12px;
-  background: #3b2e3f;
   flex-shrink: 0;
+  min-height: calc(18px * var(--beast-scale));
+  padding: 0 calc(6px * var(--beast-scale));
+  background: #3b2e3f;
+  box-shadow: inset 0 calc(-2px * var(--beast-scale)) 0 #1f1424;
 }
 
-.beast2d-bitmap {
-  display: block;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-}
-
-.beast2d-code-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.beast2d-btn {
-  font: inherit;
-  border: none;
-  cursor: pointer;
-  padding: 0 8px;
-  border-radius: 2px;
-  background: transparent;
-  display: flex;
-  align-items: center;
-}
-
-.beast2d-btn-save {
-  background: transparent;
-}
-
-.beast2d-btn[hidden] {
+.beast2d-top-bar[hidden] {
   display: none !important;
 }
 
-.beast2d-btn-save:disabled {
+.beast2d-breadcrumb {
+  color: #f4ead2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.beast2d-top-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(6px * var(--beast-scale));
+  flex-shrink: 0;
+}
+
+.beast2d-clock {
+  color: #93be64;
+}
+
+.beast2d-top-save {
+  font: inherit;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  background: transparent;
+  color: #f4ead2;
+}
+
+.beast2d-top-save:disabled {
   color: #746678;
   cursor: not-allowed;
 }
 
-.beast2d-btn-run {
-  color: #1f1424;
+.beast2d-top-save[hidden],
+.beast2d-top-run[hidden] {
+  display: none !important;
+}
+
+.beast2d-top-run {
+  font: inherit;
+  border: none;
+  cursor: pointer;
+  padding: 0 calc(4px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
   background: #e86c9a;
+  color: #1f1424;
+}
+
+.beast2d-tool-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: calc(8px * var(--beast-scale));
+  flex-shrink: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0 calc(8px * var(--beast-scale));
+  background: #1f1424;
+  box-shadow: inset 0 calc(-1px * var(--beast-scale)) 0 #3b2e3f;
+}
+
+.beast2d-tool-row[hidden] {
+  display: none !important;
+}
+
+.beast2d-tool-tab {
+  font: inherit;
+  display: flex;
+  align-items: flex-end;
+  border: none;
+  background: transparent;
+  color: #746678;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.beast2d-tool-tab:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.beast2d-tool-tab-active:not(:disabled) {
+  opacity: 1;
+}
+
+.beast2d-floppy-canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex: 0 0 auto;
+}
+
+.beast2d-stage-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.beast2d-home {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(20px * var(--beast-scale));
+  padding: calc(16px * var(--beast-scale));
+  background: #1f1424;
+}
+
+.beast2d-home[hidden] {
+  display: none !important;
+}
+
+.beast2d-home-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--beast-scale));
+}
+
+.beast2d-home-logo {
+  color: #e86c9a;
+  font-size: calc(32px * var(--beast-scale));
+  line-height: calc(32px * var(--beast-scale));
+  letter-spacing: calc(2px * var(--beast-scale));
+}
+
+.beast2d-mascot {
+  height: calc(32px * var(--beast-scale));
+  width: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+.beast2d-home-shelf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: calc(12px * var(--beast-scale));
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.beast2d-home-disk {
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(4px * var(--beast-scale));
+  border: none;
+  background: transparent;
+  color: #f4ead2;
+  cursor: pointer;
+  padding: 0;
+}
+
+.beast2d-home-disk-title,
+.beast2d-tool-stub {
+  font-family: "Monogram", ui-monospace, monospace;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.beast2d-home-disk-title {
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+  text-align: center;
+  white-space: nowrap;
+}
+
+.beast2d-workspace {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  background: #1f1424;
+}
+
+.beast2d-workspace[hidden] {
+  display: none !important;
+}
+
+.beast2d-editor-column {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  padding: calc(6px * var(--beast-scale));
+  border-right: calc(1px * var(--beast-scale)) solid #3b2e3f;
+}
+
+.beast2d-editor-column[hidden] {
+  display: none !important;
+}
+
+.beast2d-workspace-play .beast2d-preview-frame {
+  outline: none;
+  box-shadow: none;
+}
+
+.beast2d-preview-column {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  background: #1f1424;
+  padding: 8px calc(8px * var(--beast-scale));
+}
+
+.beast2d-preview-frame {
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #1f1424;
+  outline: calc(1px * var(--beast-scale)) solid #746678;
+  outline-offset: calc(2px * var(--beast-scale));
+  box-shadow: 0 0 0 calc(4px * var(--beast-scale)) #3b2e3f;
+}
+
+.beast2d-tool-stub {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+  color: #746678;
+  background: #3b2e3f;
+  box-shadow: inset 0 0 0 calc(2px * var(--beast-scale)) #120c16;
+}
+
+.beast2d-tool-stub[hidden] {
+  display: none !important;
+}
+
+.beast2d-code {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--beast-scale));
+}
+
+.beast2d-code[hidden] {
+  display: none !important;
 }
 
 .beast2d-code-error {
   flex-shrink: 0;
-  padding: 6px 8px;
-  font-size: 12px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  padding: calc(2px * var(--beast-scale)) calc(4px * var(--beast-scale));
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
   color: #f4ead2;
   background: #75273c;
-  box-shadow: inset 3px 0 0 #cb4a50;
+  box-shadow: inset calc(3px * var(--beast-scale)) 0 0 #cb4a50;
 }
 
 .beast2d-code-error[hidden] {
@@ -115,27 +417,111 @@ body,
 .beast2d-code-editor {
   flex: 1;
   min-height: 0;
+  background: #1f1424;
+  box-shadow: inset 0 0 0 calc(2px * var(--beast-scale)) #120c16;
 }
 
 .beast2d-code-editor .cm-editor {
   height: 100%;
 }
 
+.beast2d-code-editor .cm-content,
+.beast2d-code-editor .cm-gutters {
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.beast2d-code-editor .cm-cursor,
+.beast2d-code-editor .cm-dropCursor {
+  border-left-width: calc(6px * var(--beast-scale)) !important;
+  border-left-style: solid !important;
+  border-left-color: #e86c9a !important;
+  width: 0;
+  margin-left: 0;
+  background: transparent;
+  mix-blend-mode: normal;
+}
+
+.beast2d-code-editor .cm-scroller {
+  scrollbar-color: #f1c766 #1f1424;
+  scrollbar-width: auto;
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar {
+  width: calc(16px * var(--beast-scale));
+  height: calc(16px * var(--beast-scale));
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar-track {
+  background-color: #1f1424;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #3b2e3f 0,
+    #3b2e3f calc(2px * var(--beast-scale)),
+    #1f1424 calc(2px * var(--beast-scale)),
+    #1f1424 calc(4px * var(--beast-scale))
+  );
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar-thumb {
+  background: #f1c766;
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+}
+
+.beast2d-footer-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: calc(18px * var(--beast-scale));
+  color: #746678;
+  background: #3b2e3f;
+  box-shadow: inset 0 calc(2px * var(--beast-scale)) 0 #1f1424;
+}
+
+.beast2d-hints {
+  display: flex;
+  align-items: center;
+  gap: calc(20px * var(--beast-scale));
+}
+
+.beast2d-hint {
+  display: inline-flex;
+  align-items: baseline;
+  gap: calc(6px * var(--beast-scale));
+}
+
+.beast2d-footer-hint[hidden] {
+  display: none !important;
+}
+
+.beast2d-hint-key {
+  color: #f1c766;
+}
+
+.beast2d-hint-word {
+  color: #746678;
+}
+
 .beast2d-signature {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 13px;
-  line-height: 1.4;
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
   color: #f4ead2;
   background: #3b2e3f;
-  border: 1px solid #746678;
-  padding: 2px 8px;
+  border: calc(2px * var(--beast-scale)) solid #f1c766;
+  border-radius: 0;
+  padding: calc(2px * var(--beast-scale)) calc(4px * var(--beast-scale));
 }
 
 .beast2d-signature-active {
   color: #1f1424;
   background: #f1c766;
 }
-/* Virtual resolution 320×240; outer size set by displayScale.ts (integer CSS scale). */
+
+/* Virtual resolution 320×240; preview frame sets integer CSS scale. */
 .game-container {
   position: relative;
   z-index: 1;
@@ -143,12 +529,13 @@ body,
   height: 100%;
   flex-shrink: 0;
   overflow: hidden;
-  background: #000;
+  background: #1f1424;
 }
 
 .game-container canvas {
-  width: 100%;
-  height: 100%;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }

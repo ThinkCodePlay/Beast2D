@@ -6,10 +6,13 @@ import { btn, btnp, cls, print, rect, rectfill } from "../src/core/cart/api";
 import type { Cart } from "../src/core/cart/Cart";
 import { withCartContext } from "../src/core/cart/context";
 import { measureBitmapText } from "../src/core/ui/BitmapText";
+import { BEAST_EMOJI } from "../src/core/ui/beastEmoji";
 import { useBitmapFont } from "../src/core/ui/bitmapFontRegistry";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../src/core/ui/defaultBitmapFont";
 import { Input } from "../src/core/Input";
-import { createContext, fakeEngine } from "./helpers";
+import { CartRunnerComponent } from "../src/core/cart/CartRunnerComponent";
+import { Container } from "pixi.js";
+import { createContext, createRoot, fakeEngine, frame } from "./helpers";
 
 function key(type: "keydown" | "keyup", code: string) {
   return Object.assign(new Event(type, { cancelable: true }), { code });
@@ -43,16 +46,27 @@ describe("cart draw API", () => {
     ]);
     expect(measureBitmapText("HELLO")).toBe(29);
     expect(measureBitmapText("HI", { scale: 2 })).toBe(22);
+    expect(measureBitmapText(BEAST_EMOJI)).toBe(8);
+    expect(measureBitmapText(`A${BEAST_EMOJI}`)).toBe(14);
   });
 
   it("throws outside a cart and on a bad palette index or scale", () => {
     expect(() => cls(0)).toThrow(/cart is running/);
-    const frame = cartContext();
-    withCartContext(frame, () => {
+    const ctx = cartContext();
+    withCartContext(ctx, () => {
       expect(() => cls(16)).toThrow(/Palette index/);
       expect(() => print("X", 0, 0, 0, 0)).toThrow(/scale/);
     });
-    expect(frame.drawList.commands).toEqual([]);
+    expect(ctx.drawList.commands).toEqual([]);
+  });
+
+  it("rejects non-finite color arguments", () => {
+    const ctx = cartContext();
+    withCartContext(ctx, () => {
+      expect(() => rectfill(0, 0, 1, 1, Number.NaN)).toThrow(/color must be a finite number/);
+      expect(() => cls(Number.POSITIVE_INFINITY)).toThrow(/color must be a finite number/);
+    });
+    expect(ctx.drawList.commands).toEqual([]);
   });
 
   it("reads held and pressed actions from the cart input", () => {
@@ -96,10 +110,27 @@ describe("CartLevel", () => {
     context.time.advance(1);
     level.tick(context.time.delta);
 
-    expect(calls).toEqual(["init", "update", "draw", "update", "draw"]);
+    expect(calls).toEqual(["init", "draw", "update", "draw", "update", "draw"]);
     expect(dts[0]).toBeCloseTo(1 / 60);
     expect(dts[1]).toBeCloseTo(1 / 60);
     level.destroy();
+  });
+
+  it("does not paint a partial draw list when draw() throws", () => {
+    const cart: Cart = {
+      init() {},
+      update() {},
+      draw() {
+        cls(0);
+        throw new Error("stop draw");
+      },
+    };
+    const context = createContext();
+    const host = createRoot(context);
+    host.addComponent(new CartRunnerComponent(cart));
+    frame(host, 1);
+    const layer = host.container.children[0] as Container;
+    expect(layer.children.length).toBe(0);
   });
 
   it("does not add the lives and score band", () => {

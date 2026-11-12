@@ -1,4 +1,5 @@
 import { btn, cls, print, rectfill } from "../../core/cart/api";
+import { BEAST_EMOJI } from "../../core/ui/beastEmoji";
 import type { Cart } from "../../core/cart/Cart";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../../core/display";
 
@@ -25,6 +26,6 @@ export const helloCart: Cart = {
   draw() {
     cls(0);
     rectfill(Math.round(x), Math.round(y), SIZE, SIZE, 10);
-    print("HELLO", 8, 8, 4);
+    print("HELLO " + BEAST_EMOJI, 8, 8, 4);
   },
 };

@@ -1,12 +1,33 @@
 import { transform } from "sucrase";
-import { btn, btnp, cls, print, rect, rectfill } from "../core/cart/api";
-import type { Cart } from "../core/cart/Cart";
+import { BEAST_EMOJI } from "../ui/beastEmoji";
+import { btn, btnp, cls, print, rect, rectfill } from "./api";
+import type { Cart } from "./Cart";
 
 export type CompileFailure = { ok: false; message: string; line?: number };
 export type CompileSuccess = { ok: true; cart: Cart };
 export type CompileResult = CompileSuccess | CompileFailure;
 
-const helperNames = ["cls", "rect", "rectfill", "print", "btn", "btnp"] as const;
+// `beast` is the approved 8×8 mascot glyph (public/ui/mascot-emoji-8.png), one character.
+const helperNames = ["cls", "rect", "rectfill", "print", "btn", "btnp", "beast"] as const;
+
+/** V8 reports `new Function(body)` stack lines ahead of the matching `body` line. */
+function measureRuntimeLineOffset(): number {
+  try {
+    const probe = new Function("throw new Error('beast2d-cart-line-probe');");
+    probe();
+  } catch (error) {
+    if (error instanceof Error && error.stack) {
+      const match = /<anonymous>:(\d+):\d+/.exec(error.stack);
+      if (match) {
+        const reported = Number(match[1]);
+        if (reported >= 1) return reported - 1;
+      }
+    }
+  }
+  return 2;
+}
+
+export const CART_RUNTIME_LINE_OFFSET = measureRuntimeLineOffset();
 
 function errorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -48,13 +69,17 @@ function isCompileFailure(value: unknown): value is CompileFailure {
   );
 }
 
+function cartFunctionBody(js: string): string {
+  return `${js}\nreturn { init, update, draw };`;
+}
+
 export function compileCart(source: string): CompileResult {
   const syntax = checkCartSyntax(source);
   if (!syntax.ok) return syntax;
 
   try {
     const js = transform(source, { transforms: ["typescript"] }).code;
-    const body = `${js}\nreturn { init, update, draw };`;
+    const body = cartFunctionBody(js);
     const runner = new Function(...helperNames, body) as (
       clsFn: typeof cls,
       rectFn: typeof rect,
@@ -62,9 +87,10 @@ export function compileCart(source: string): CompileResult {
       printFn: typeof print,
       btnFn: typeof btn,
       btnpFn: typeof btnp,
+      beastGlyph: string,
     ) => { init: unknown; update: unknown; draw: unknown };
 
-    const phases = runner(cls, rect, rectfill, print, btn, btnp);
+    const phases = runner(cls, rect, rectfill, print, btn, btnp, BEAST_EMOJI);
     const initFn = requireCartPhase(phases.init, "init");
     if (isCompileFailure(initFn)) return initFn;
     const updateFn = requireCartPhase(phases.update, "update");
@@ -84,15 +110,12 @@ export function compileCart(source: string): CompileResult {
   }
 }
 
-/**
- * 1-based line in the script. V8 numbers `new Function` bodies two lines
- * below the start of the source we pass in.
- */
+/** Maps a V8 `<anonymous>:line:col` stack frame to a 1-based script line. */
 export function runtimeErrorLine(error: unknown): number | undefined {
   if (!(error instanceof Error) || !error.stack) return undefined;
   const match = /<anonymous>:(\d+):\d+/.exec(error.stack);
   if (!match) return undefined;
-  const line = Number(match[1]) - 2;
+  const line = Number(match[1]) - CART_RUNTIME_LINE_OFFSET;
   return line >= 1 ? line : undefined;
 }
 
@@ -100,29 +123,36 @@ export function guardCart(
   cart: Cart,
   onRuntimeError: (message: string, line?: number) => void,
 ): Cart {
-  let reported = false;
+  let lastReportKey: string | null = null;
 
-  const run = (fn: () => void) => {
+  const report = (phase: string, error: unknown) => {
+    const message = errorMessage(error);
+    const line = runtimeErrorLine(error);
+    const key = `${phase}\0${line ?? 0}\0${message}`;
+    if (key === lastReportKey) return;
+    lastReportKey = key;
+    onRuntimeError(message, line);
+  };
+
+  const run = (phase: string, fn: () => void) => {
     try {
       fn();
     } catch (error) {
-      if (!reported) {
-        reported = true;
-        onRuntimeError(errorMessage(error), runtimeErrorLine(error));
-      }
+      report(phase, error);
+      throw error;
     }
   };
 
   return {
     init() {
-      reported = false;
-      run(() => cart.init());
+      lastReportKey = null;
+      run("init", () => cart.init());
     },
     update(dt) {
-      run(() => cart.update(dt));
+      run("update", () => cart.update(dt));
     },
     draw() {
-      run(() => cart.draw());
+      run("draw", () => cart.draw());
     },
   };
 }

@@ -44,6 +44,16 @@ The hello cart in `src/game/carts/HelloCart.ts` is loaded by default from `src/m
 
 `pnpm run dev` loads the cart script from `src/game/carts/hello.script.ts`. **Esc** toggles run and code. **Run** (or Ctrl+Enter) compiles the buffer and restarts the cart. **Save** (Ctrl+S) overwrites `hello.script.ts` through the dev server only; production builds disable Save and keep drafts in `localStorage`.
 
+### Draft script in the browser
+
+On every edit, the editor stores the buffer in `localStorage` under the key `beast2d-cart-script`. On the next visit, that saved text **replaces** the committed `hello.script.ts` until you clear it. To reset to the repo file, open the app with `?resetCart=1` (for example `http://localhost:5173/?resetCart=1`), which removes the stored draft before boot.
+
+The dev-only `POST /__beast2d/save-cart` endpoint (see `vite.config.ts`) writes the current buffer to `src/game/carts/hello.script.ts` when Save succeeds. `GET /__beast2d/dev` must return `ok` for Save to be enabled; production builds do not expose these routes.
+
+### Component demos without the editor
+
+Register levels in `src/main.ts` as usual. With no cart editor, pass `?level=<registeredName>` in the URL (for example `?level=spaceShooter`) to load that level directly. Omit the query to get the default cart console.
+
 The script shape has no imports. Declare `init`, `update(dt)`, and `draw`, and use `cls`, `rect`, `rectfill`, `print`, `btn`, and `btnp` in scope. `dt` is seconds. The playfield is 320×240; use those literals or your own constants.
 
 ```js

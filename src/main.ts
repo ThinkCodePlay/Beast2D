@@ -13,22 +13,28 @@ import { BreakoutPaddle } from "./game/BreakoutPaddle/BreakoutPaddle";
 import { helloCart } from "./game/carts/HelloCart";
 import helloScript from "./game/carts/hello.script.ts?raw";
 import { CartLevel } from "./core/cart/CartLevel";
-import { guardCart } from "./editor/compileCart";
+import { guardCart } from "./core/cart/compile";
 import { mountCartEditor } from "./editor/shell";
 import "./style.css";
+
+const CART_SCRIPT_STORAGE_KEY = "beast2d-cart-script";
 
 const appRoot = document.getElementById("app")!;
 const container = document.createElement("div");
 container.className = "game-container";
-container.style.position = "relative";
 appRoot.appendChild(container);
 
 const engine = new Engine({
   width: DISPLAY_WIDTH,
   height: DISPLAY_HEIGHT,
   antialias: false,
-  debug: true,
+  debug: false,
 });
+
+const bootstrapParams = new URLSearchParams(window.location.search);
+if (bootstrapParams.get("resetCart") === "1") {
+  localStorage.removeItem(CART_SCRIPT_STORAGE_KEY);
+}
 
 engine
   .bootstrap(container)
@@ -38,6 +44,14 @@ engine
     game.registerLevel("spaceShooter", new SpaceShooter(engine));
     game.registerLevel("bunnyHop", new BunnyHop(engine));
     game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
+
+    const levelQuery = bootstrapParams.get("level");
+    const playOnly = bootstrapParams.get("play") === "1" || bootstrapParams.get("standalone") === "1";
+
+    if (levelQuery) {
+      await game.loadLevel(levelQuery);
+      return;
+    }
 
     let shell!: ReturnType<typeof mountCartEditor>;
 
@@ -51,13 +65,20 @@ engine
       await game.loadLevel("helloCart");
     };
 
+    const loadLevel = async (levelId: string) => {
+      game.resume();
+      await game.loadLevel(levelId);
+    };
+
     shell = mountCartEditor({
       appRoot,
       gameContainer: container,
       game,
       initialSource: helloScript,
       loadCart,
+      loadLevel,
       fallbackCart: helloCart,
+      playOnly,
     });
 
     await shell.boot();
