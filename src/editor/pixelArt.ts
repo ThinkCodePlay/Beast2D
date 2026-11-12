@@ -199,7 +199,30 @@ function paintHub(ctx: Ctx, cx: number, cy: number, scale: number): void {
 }
 
 const HOME = { w: 64, h: 72, pad: 3 };
-const TOOL = { w: 52, h: 56, pad: 2 };
+
+/** Native 64×72 tool disks. Drawn nearest-neighbor; the pink frame stays separate. */
+export const TOOL_FLOPPY_SRC: Record<string, string> = {
+  CODE: "/ui/floppy-code.png",
+  SPRITE: "/ui/floppy-sprite.png",
+  MAP: "/ui/floppy-map.png",
+  SFX: "/ui/floppy-sfx.png",
+  MUSIC: "/ui/floppy-music.png",
+};
+
+const TOOL_FLOPPY_W = 64;
+const TOOL_FLOPPY_H = 72;
+const toolFloppyImages = new Map<string, HTMLImageElement>();
+
+function toolFloppyImage(tool: string): HTMLImageElement {
+  const src = TOOL_FLOPPY_SRC[tool] ?? TOOL_FLOPPY_SRC.CODE!;
+  let image = toolFloppyImages.get(src);
+  if (!image) {
+    image = new Image();
+    image.src = src;
+    toolFloppyImages.set(src, image);
+  }
+  return image;
+}
 
 function paintBody(
   ctx: Ctx,
@@ -296,26 +319,17 @@ export function paintToolFloppy(
   scale: number,
 ): void {
   const pixel = Math.max(1, Math.round(scale));
-  canvas.width = TOOL.w * pixel;
-  canvas.height = TOOL.h * pixel;
+  canvas.width = TOOL_FLOPPY_W * pixel;
+  canvas.height = TOOL_FLOPPY_H * pixel;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const body = paintBody(ctx, TOOL, pixel, selected);
-  paintShutter(ctx, body.x + 5, body.y + 2, body.w - 10, 8, pixel);
-  const labelX = body.x + 5;
-  const labelY = body.y + 12;
-  const labelW = body.w - 10;
-  const labelH = 18;
-  fill(ctx, labelX, labelY, labelW, labelH, selected ? PINK : STONE, pixel);
-  fill(ctx, labelX + 1, labelY + 1, labelW - 2, labelH - 2, PLUM, pixel);
-  const icon = TOOL_ICONS[tool] ?? TOOL_ICONS.CODE!;
-  centerBlit(ctx, icon, labelX + 1, labelY + 1, labelW - 2, labelH - 2, pixel);
-  paintHub(ctx, body.x + Math.floor(body.w / 2), body.y + body.h - 5, pixel);
-  ctx.font = "16px Monogram, monospace";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "bottom";
-  ctx.fillStyle = selected ? CREAM : STONE;
-  ctx.fillText(tool, (body.x + body.w / 2) * pixel, (body.y + body.h - 14) * pixel);
+  const image = toolFloppyImage(tool);
+  if (image.complete && image.naturalWidth > 0) {
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  } else {
+    image.addEventListener("load", () => paintToolFloppy(canvas, tool, selected, scale), { once: true });
+  }
+  if (selected) strokeRound(ctx, 0, 0, TOOL_FLOPPY_W, TOOL_FLOPPY_H, 8, PINK, pixel);
 }
