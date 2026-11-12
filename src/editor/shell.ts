@@ -283,15 +283,18 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const layoutPreview = () => {
     const fontScale = chromeFontScale(window.innerHeight);
     document.documentElement.style.setProperty("--beast-scale", String(fontScale));
-    const pad = 8 * fontScale;
+    const padX = 8 * fontScale;
+    const padY = 8;
     const consoleW = consoleFrame.clientWidth;
     const workH = workspace.clientHeight;
-    const minEditor = Math.floor(consoleW * 0.45);
-    const maxPreview = Math.max(DISPLAY_WIDTH, consoleW - minEditor);
-    const scale = fitPreviewScale(maxPreview - pad * 2, Math.max(0, workH - pad * 2));
+    const twoXColumn = DISPLAY_WIDTH * 2 + padX * 2;
+    const editorShare = Math.floor(consoleW * 0.45);
+    const editorFloor = Math.min(editorShare, Math.max(0, consoleW - twoXColumn));
+    const maxPreview = Math.max(DISPLAY_WIDTH, consoleW - editorFloor);
+    const scale = fitPreviewScale(maxPreview - padX * 2, Math.max(0, workH - padY * 2));
     const frameW = DISPLAY_WIDTH * scale;
     const frameH = DISPLAY_HEIGHT * scale;
-    const columnW = Math.min(maxPreview, frameW + pad * 2);
+    const columnW = Math.min(maxPreview, frameW + padX * 2);
     const key = `${fontScale}:${frameW}:${frameH}:${columnW}`;
     if (key === layoutKey) return;
     layoutKey = key;
@@ -307,7 +310,8 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       const kind = canvas.dataset.floppy;
       if (kind === "tool") {
         const tool = canvas.dataset.tool ?? "CODE";
-        paintToolFloppy(canvas, tool, tool === viewState.activeTool, pixel);
+        // Native 64×72. Scaling these with the device ate the height a 2× playfield needs.
+        paintToolFloppy(canvas, tool, tool === viewState.activeTool, 1);
         return;
       }
       if (kind === "home") {
