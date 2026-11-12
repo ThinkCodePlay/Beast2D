@@ -14,12 +14,8 @@ const PIXEL_COLORS: Record<string, string> = {
   r: "#cb4a50",
 };
 
-const PLUM = "#1f1424";
-const SHADOW = "#3b2e3f";
 const STONE = "#746678";
-const CREAM = "#f4ead2";
 const PINK = "#e86c9a";
-const METAL = "#f4ead2";
 
 export type PixelGrid = readonly string[];
 
@@ -146,16 +142,6 @@ function inRound(x: number, y: number, w: number, h: number, radius: number): bo
   return dx * dx + dy * dy <= r * r;
 }
 
-/** Hard-edged rounded rect. Radius is in art pixels. */
-function fillRound(ctx: Ctx, x: number, y: number, w: number, h: number, radius: number, color: string, scale: number): void {
-  for (let yy = 0; yy < h; yy += 1) {
-    for (let xx = 0; xx < w; xx += 1) {
-      if (!inRound(xx, yy, w, h, radius)) continue;
-      fill(ctx, x + xx, y + yy, 1, 1, color, scale);
-    }
-  }
-}
-
 function strokeRound(ctx: Ctx, x: number, y: number, w: number, h: number, radius: number, color: string, scale: number): void {
   const r = Math.max(1, radius);
   for (let yy = 0; yy < h; yy += 1) {
@@ -166,36 +152,6 @@ function strokeRound(ctx: Ctx, x: number, y: number, w: number, h: number, radiu
       fill(ctx, x + xx, y + yy, 1, 1, color, scale);
     }
   }
-}
-
-function fillDisk(ctx: Ctx, cx: number, cy: number, radius: number, color: string, scale: number): void {
-  for (let y = -radius; y <= radius; y += 1) {
-    for (let x = -radius; x <= radius; x += 1) {
-      if (x * x + y * y <= radius * radius) fill(ctx, cx + x, cy + y, 1, 1, color, scale);
-    }
-  }
-}
-
-function paintShutter(ctx: Ctx, x: number, y: number, w: number, h: number, scale: number): void {
-  fill(ctx, x, y, w, h, METAL, scale);
-  fill(ctx, x, y, w, 1, STONE, scale);
-  fill(ctx, x, y + h - 1, w, 1, STONE, scale);
-  fill(ctx, x, y, 1, h, STONE, scale);
-  fill(ctx, x + w - 1, y, 1, h, STONE, scale);
-  const doorW = Math.max(8, Math.floor(w * 0.42));
-  const doorH = h - 4;
-  const doorX = x + 3;
-  const doorY = y + 2;
-  fill(ctx, doorX, doorY, doorW, doorH, STONE, scale);
-  fill(ctx, doorX + 1, doorY + 1, doorW - 2, doorH - 2, PLUM, scale);
-  const hole = Math.max(2, Math.floor(h / 4));
-  fill(ctx, x + w - hole - 3, y + Math.floor((h - hole) / 2), hole, hole, PLUM, scale);
-}
-
-function paintHub(ctx: Ctx, cx: number, cy: number, scale: number): void {
-  fillDisk(ctx, cx, cy, 4, STONE, scale);
-  fillDisk(ctx, cx, cy, 2, PLUM, scale);
-  fill(ctx, cx, cy, 1, 1, CREAM, scale);
 }
 
 const HOME = { w: 64, h: 72, pad: 3 };
@@ -213,6 +169,19 @@ const TOOL_FLOPPY_W = 64;
 const TOOL_FLOPPY_H = 72;
 const toolFloppyImages = new Map<string, HTMLImageElement>();
 
+/** Blank 64×72 shell for the home shelf. Tool PNGs keep their own baked names. */
+export const HOME_SHELL_SRC = "/ui/floppy-home.png";
+
+let homeShellImage: HTMLImageElement | null = null;
+
+function homeShell(): HTMLImageElement {
+  if (!homeShellImage) {
+    homeShellImage = new Image();
+    homeShellImage.src = HOME_SHELL_SRC;
+  }
+  return homeShellImage;
+}
+
 function toolFloppyImage(tool: string): HTMLImageElement {
   const src = TOOL_FLOPPY_SRC[tool] ?? TOOL_FLOPPY_SRC.CODE!;
   let image = toolFloppyImages.get(src);
@@ -222,23 +191,6 @@ function toolFloppyImage(tool: string): HTMLImageElement {
     toolFloppyImages.set(src, image);
   }
   return image;
-}
-
-function paintBody(
-  ctx: Ctx,
-  box: { w: number; h: number; pad: number },
-  scale: number,
-  selected: boolean,
-): { x: number; y: number; w: number; h: number } {
-  const { w, h, pad } = box;
-  if (selected) strokeRound(ctx, 0, 0, w, h, 8, PINK, scale);
-  const x = pad;
-  const y = pad;
-  const bw = w - pad * 2;
-  const bh = h - pad * 2;
-  fillRound(ctx, x, y, bw, bh, 7, PLUM, scale);
-  fillRound(ctx, x + 1, y + 1, bw - 2, bh - 2, 6, SHADOW, scale);
-  return { x, y, w: bw, h: bh };
 }
 
 function centerBlit(
@@ -265,27 +217,63 @@ function centerBlit(
   }
 }
 
-export function paintHomeFloppy(canvas: HTMLCanvasElement, diskId: string, selected: boolean, scale: number): void {
+export function paintHomeFloppy(
+  canvas: HTMLCanvasElement,
+  diskId: string,
+  title: string,
+  selected: boolean,
+  scale: number,
+): void {
   const pixel = Math.max(1, Math.round(scale));
-  canvas.width = HOME.w * pixel;
-  canvas.height = HOME.h * pixel;
+  canvas.width = TOOL_FLOPPY_W * pixel;
+  canvas.height = TOOL_FLOPPY_H * pixel;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const body = paintBody(ctx, HOME, pixel, selected);
-  const shutterW = body.w - 16;
-  paintShutter(ctx, body.x + 8, body.y + 4, shutterW, 14, pixel);
-  const labelX = body.x + 8;
-  const labelY = body.y + 21;
-  const labelW = body.w - 16;
-  const labelH = body.h - 36;
-  const border = selected ? PINK : STONE;
-  fill(ctx, labelX, labelY, labelW, labelH, border, pixel);
-  fill(ctx, labelX + 1, labelY + 1, labelW - 2, labelH - 2, PLUM, pixel);
-  const motif = DISK_ART[diskId] ?? DISK_ART.hello!;
-  centerBlit(ctx, motif, labelX + 2, labelY + 2, labelW - 4, labelH - 4, pixel, 2);
-  paintHub(ctx, body.x + Math.floor(body.w / 2), body.y + body.h - 8, pixel);
+  const image = homeShell();
+  if (image.complete && image.naturalWidth > 0) {
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  } else {
+    image.addEventListener(
+      "load",
+      () => paintHomeFloppy(canvas, diskId, title, selected, scale),
+      { once: true },
+    );
+  }
+  const motif = DISK_ART[diskId];
+  if (motif) {
+    centerBlit(ctx, motif, 8, 22, 48, 20, pixel, 2);
+  }
+  stampMonogram(ctx, title, 53 * pixel, 13 * pixel);
+  if (selected) strokeRound(ctx, 0, 0, TOOL_FLOPPY_W, TOOL_FLOPPY_H, 8, PINK, pixel);
+}
+
+/** Monogram at 16px, then thresholded so the title stays cream-or-nothing. */
+function stampMonogram(ctx: Ctx, title: string, bandY: number, bandH: number): void {
+  if (!title || bandH <= 0) return;
+  const width = ctx.canvas.width;
+  const stamp = document.createElement("canvas");
+  stamp.width = width;
+  stamp.height = bandH;
+  const pen = stamp.getContext("2d");
+  if (!pen) return;
+  pen.imageSmoothingEnabled = false;
+  pen.font = "16px Monogram, monospace";
+  pen.textAlign = "center";
+  pen.textBaseline = "middle";
+  pen.fillStyle = "#ffffff";
+  pen.fillText(title, Math.round(width / 2), Math.round(bandH / 2));
+  const ink = pen.getImageData(0, 0, width, bandH);
+  const plate = ctx.getImageData(0, bandY, width, bandH);
+  for (let i = 0; i < ink.data.length; i += 4) {
+    if ((ink.data[i + 3] ?? 0) < 128) continue;
+    plate.data[i] = 0xf4;
+    plate.data[i + 1] = 0xea;
+    plate.data[i + 2] = 0xd2;
+    plate.data[i + 3] = 255;
+  }
+  ctx.putImageData(plate, 0, bandY);
 }
 
 export function paintEmptySlot(canvas: HTMLCanvasElement, scale: number): void {

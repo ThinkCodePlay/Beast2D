@@ -1,7 +1,11 @@
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 
-/** Even light-pink margin around the console frame. */
-export const CONSOLE_MARGIN = 16;
+/** Pink margin around the compact console. The device itself stays near the mockup frame. */
+export const CONSOLE_MARGIN = 48;
+
+/** Outer size of the plum device at the 1280-wide mockup, before the pink margin. */
+export const CONSOLE_DEVICE_WIDTH = 1170;
+export const CONSOLE_DEVICE_HEIGHT = 640;
 
 export const BOOT_DURATION_MS = 1500;
 
@@ -12,6 +16,11 @@ export const BOOT_DURATION_MS = 1500;
 export function chromeFontScale(viewportHeight: number): number {
   if (viewportHeight >= 640) return 2;
   return 1;
+}
+
+/** Home disks use the same pixels as the tool row, one integer step larger. */
+export function homeFloppyScale(chromeScale: number): number {
+  return Math.max(1, Math.round(chromeScale)) + 1;
 }
 
 /** Largest integer scale of the 320×240 playfield that fits inside a panel. */

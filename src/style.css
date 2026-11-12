@@ -30,10 +30,10 @@ body,
 
 #app {
   display: flex;
-  align-items: stretch;
-  justify-content: stretch;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
-  padding: 16px;
+  padding: 48px;
 }
 
 .beast2d-app {
@@ -44,17 +44,17 @@ body,
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  width: 100%;
-  height: 100%;
+  flex: 0 1 auto;
+  width: min(1170px, 100%);
+  height: min(640px, 100%);
   min-width: 0;
   min-height: 0;
   box-sizing: border-box;
   border-radius: 0;
   overflow: hidden;
   background: #1f1424;
-  outline: calc(2px * var(--beast-scale)) solid #524658;
-  box-shadow: calc(4px * var(--beast-scale)) calc(4px * var(--beast-scale)) 0 #3b2e3f;
+  outline: calc(3px * var(--beast-scale)) solid #3b2e3f;
+  box-shadow: calc(6px * var(--beast-scale)) calc(6px * var(--beast-scale)) 0 #1f1424;
   font-family: "Monogram", ui-monospace, monospace;
   font-size: calc(16px * var(--beast-scale));
   line-height: calc(16px * var(--beast-scale));
@@ -276,9 +276,25 @@ body,
   padding: 0;
 }
 
+.beast2d-home-disk-title,
+.beast2d-home-disk-note,
+.beast2d-tool-stub {
+  font-family: "Monogram", ui-monospace, monospace;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
 .beast2d-home-disk-title {
   font-size: calc(16px * var(--beast-scale));
   line-height: calc(16px * var(--beast-scale));
+  text-align: center;
+  white-space: nowrap;
+}
+
+.beast2d-home-disk-note {
+  font-size: 16px;
+  line-height: 16px;
+  color: #746678;
   text-align: center;
   white-space: nowrap;
 }
@@ -331,6 +347,8 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
   color: #746678;
   background: #3b2e3f;
   box-shadow: inset 0 0 0 calc(2px * var(--beast-scale)) #120c16;

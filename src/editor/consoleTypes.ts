@@ -20,4 +20,6 @@ export type ConsoleDisk = {
   kind: DiskKind;
   /** Registered `GameManager` level id when `kind === "level"`. */
   levelId?: string;
+  /** Example shipped with the console. User disks leave this unset. */
+  builtIn?: boolean;
 };

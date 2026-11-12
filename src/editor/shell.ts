@@ -19,7 +19,7 @@ import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 import type { GameManager } from "../core/GameManager";
 import { checkCartSyntax, compileCart } from "../core/cart/compile";
 import { DEFAULT_CONSOLE_DISKS } from "./disks";
-import { BOOT_DURATION_MS, chromeFontScale, fitPreviewScale } from "./consoleLayout";
+import { BOOT_DURATION_MS, chromeFontScale, fitPreviewScale, homeFloppyScale } from "./consoleLayout";
 import { CONSOLE_TOOLS, type ConsoleTool, type ConsoleViewState, type EditorMode } from "./consoleTypes";
 import {
   cycleTool,
@@ -217,10 +217,14 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     face.className = "beast2d-floppy-canvas";
     face.dataset.floppy = "home";
     face.dataset.disk = disk.id;
-    const titleEl = document.createElement("span");
-    titleEl.className = "beast2d-home-disk-title";
-    titleEl.textContent = disk.title;
-    btn.append(face, titleEl);
+    face.dataset.title = disk.title;
+    btn.append(face);
+    if (disk.builtIn) {
+      const note = document.createElement("span");
+      note.className = "beast2d-home-disk-note";
+      note.textContent = "built-in";
+      btn.append(note);
+    }
     btn.addEventListener("click", () => {
       viewState = moveDiskSelection(viewState, index - viewState.selectedDiskIndex, disks.length);
       applyViewState();
@@ -298,6 +302,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   };
   const repaintFloppies = () => {
     const pixel = chromeFontScale(window.innerHeight);
+    const homePixel = homeFloppyScale(pixel);
     consoleFrame.querySelectorAll<HTMLCanvasElement>(".beast2d-floppy-canvas").forEach((canvas) => {
       const kind = canvas.dataset.floppy;
       if (kind === "tool") {
@@ -308,10 +313,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       if (kind === "home") {
         const diskId = canvas.dataset.disk ?? "hello";
         const index = disks.findIndex((disk) => disk.id === diskId);
-        paintHomeFloppy(canvas, diskId, index === viewState.selectedDiskIndex, pixel);
+        const title = canvas.dataset.title ?? disks[index]?.title ?? "";
+        paintHomeFloppy(canvas, diskId, title, index === viewState.selectedDiskIndex, homePixel);
         return;
       }
-      paintEmptySlot(canvas, pixel);
+      paintEmptySlot(canvas, homePixel);
     });
   };
   layoutPreview();
