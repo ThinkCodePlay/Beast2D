@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DISK_ART } from "../src/editor/pixelArt";
 
-const INK = new Set("pmcygobdsnwrleuk.".split(""));
+const INK = new Set("pmcygobdsnrleuk.".split(""));
 
 describe("home disk stickers", () => {
   it("covers the four shelf disks with even palette rows", () => {

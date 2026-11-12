@@ -1,80 +1,33 @@
+import { Beast2D16 } from "../core/ui/palette";
+
+function paletteCss(rgb: number): string {
+  return `#${(rgb & 0xffffff).toString(16).padStart(6, "0")}`;
+}
+
 /** 1-character palette keys used by console pixel art. `.` is empty. */
 const PIXEL_COLORS: Record<string, string> = {
-  p: "#e86c9a",
-  m: "#c1386e",
-  c: "#f4ead2",
-  y: "#f1c766",
-  g: "#93be64",
-  o: "#e28649",
-  b: "#7ab2d5",
-  d: "#1f1424",
-  s: "#3b2e3f",
-  n: "#746678",
-  w: "#f4ead2",
-  r: "#cb4a50",
-  l: "#f7abcc",
-  u: "#3a5b93",
-  e: "#4a784d",
-  k: "#8a5a44",
+  p: paletteCss(Beast2D16.HotPink),
+  m: paletteCss(Beast2D16.Magenta),
+  c: paletteCss(Beast2D16.Cream),
+  y: paletteCss(Beast2D16.Yellow),
+  g: paletteCss(Beast2D16.LeafGreen),
+  o: paletteCss(Beast2D16.Orange),
+  b: paletteCss(Beast2D16.SkyBlue),
+  d: paletteCss(Beast2D16.PlumOutline),
+  s: paletteCss(Beast2D16.Shadow),
+  n: paletteCss(Beast2D16.StoneGray),
+  r: paletteCss(Beast2D16.Red),
+  l: paletteCss(Beast2D16.LightPink),
+  u: paletteCss(Beast2D16.Blue),
+  e: paletteCss(Beast2D16.MossGreen),
+  k: paletteCss(Beast2D16.DirtBrown),
 };
 
-const STONE = "#746678";
-const PINK = "#e86c9a";
+const STONE = paletteCss(Beast2D16.StoneGray);
+const PINK = paletteCss(Beast2D16.HotPink);
 
 export type PixelGrid = readonly string[];
 
-/** Angle brackets with a wide empty center so they cannot read as ∞. */
-export const TOOL_ICONS: Record<string, PixelGrid> = {
-  CODE: [
-    "...........",
-    ".cc.....cc.",
-    "c.........c",
-    "c.........c",
-    ".cc.....cc.",
-    "...........",
-  ],
-  SPRITE: [
-    "......po...",
-    ".....poy...",
-    "....oyy....",
-    "...oyy.....",
-    "..oyy......",
-    ".oyy.......",
-    "oy.........",
-    "y..........",
-  ],
-  MAP: [
-    "ccccccccc",
-    "c..c..c.c",
-    "c..c..c.c",
-    "ccccccccc",
-    "c..c..c.c",
-    "c..c..c.c",
-    "ccccccccc",
-  ],
-  SFX: [
-    "..cc.......",
-    ".ccc..cc...",
-    "ccccc.cc.cc",
-    "ccccc.cc.cc",
-    ".ccc..cc...",
-    "..cc.......",
-  ],
-  MUSIC: [
-    "..c....c...",
-    "..c....c...",
-    "..c....c...",
-    "..cccccc...",
-    ".cc....cc..",
-    ".cc....cc..",
-  ],
-};
-
-/**
- * Label stickers for the home shelf.
- * One source pixel per shell pixel, drawn into the blank label above the hub.
- * Titles are not baked in — the shell name band stays empty.
- */
 /**
  * Label stickers for the home shelf. Each grid is the full label
  * (51×22, one shell pixel per cell) so the motif fills the face.
@@ -178,19 +131,6 @@ export const DISK_ART: Record<string, PixelGrid> = {
     "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
   ],
 };
-
-/** True when every inked row is two side clusters with an empty middle. */
-export function iconIsSplitPair(rows: PixelGrid): boolean {
-  const inked = rows.filter((row) => row.split("").some((ch) => ch !== "."));
-  if (inked.length === 0) return false;
-  return inked.every((row) => {
-    const width = row.length;
-    const mid = row.slice(Math.floor(width / 2) - 1, Math.ceil(width / 2) + 1);
-    if ([...mid].some((ch) => ch !== ".")) return false;
-    const clusters = row.split(".").filter((part) => part.length > 0);
-    return clusters.length === 2;
-  });
-}
 
 type Ctx = CanvasRenderingContext2D;
 

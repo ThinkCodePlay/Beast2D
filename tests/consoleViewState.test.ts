@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   cycleTool,
-  finishBoot,
   goHome,
   initialViewState,
   isToolFunctional,
@@ -20,10 +19,10 @@ describe("console view state", () => {
     expect(initialViewState({ skipBoot: true, startScreen: "play" }).screen).toBe("play");
   });
 
-  it("transitions boot to home", () => {
+  it("leaves boot for home, and ignores the transition off boot", () => {
     const boot = initialViewState();
-    expect(finishBoot(boot).screen).toBe("home");
     expect(skipBoot(boot).screen).toBe("home");
+    expect(skipBoot(skipBoot(boot)).screen).toBe("home");
   });
 
   it("opens a full playfield without entering the editor split", () => {
@@ -35,7 +34,7 @@ describe("console view state", () => {
   });
 
   it("opens editor and sets mode", () => {
-    const home = finishBoot(initialViewState());
+    const home = skipBoot(initialViewState());
     const editor = openEditor(home, "code");
     expect(editor.screen).toBe("editor");
     expect(editor.editorMode).toBe("code");

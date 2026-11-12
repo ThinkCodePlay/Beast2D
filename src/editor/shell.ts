@@ -23,7 +23,6 @@ import { BOOT_DURATION_MS, chromeFontScale, fitPreviewScale, homeFloppyScale } f
 import { CONSOLE_TOOLS, type ConsoleTool, type ConsoleViewState, type EditorMode } from "./consoleTypes";
 import {
   cycleTool,
-  finishBoot,
   goHome,
   initialViewState,
   isToolFunctional,
@@ -38,6 +37,7 @@ import { cartSignatureHints } from "./signature";
 import { beast2dEditorTheme, beast2dSyntax } from "./theme";
 import { clockText } from "./clock";
 import { paintEmptySlot, paintHomeFloppy, paintToolFloppy } from "./pixelArt";
+import { loadEditorCart } from "./editorCart";
 
 const STORAGE_KEY = "beast2d-cart-script";
 const DEV_PING = "/__beast2d/dev";
@@ -119,7 +119,6 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   let viewState: ConsoleViewState = initialViewState({
     skipBoot: skipBootOption || playOnly,
     startScreen: playOnly ? "play" : "home",
-    editorMode: playOnly ? "run" : "run",
   });
 
   const consoleFrame = document.createElement("div");
@@ -557,6 +556,30 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     if (mode === "code") view.focus();
   };
 
+  /** E on the cart disk: show the editor and replace whatever level was running. */
+  const openCartEditor = async (): Promise<void> => {
+    viewState = openEditor(viewState, "code");
+    applyViewState();
+    try {
+      const loaded = await loadEditorCart(shell.getSource(), loadCart);
+      if (viewState.screen !== "editor") return;
+      if (!loaded.ok) {
+        shell.setError(loaded.message, loaded.line);
+        return;
+      }
+    } catch (error) {
+      if (viewState.screen === "editor") {
+        const message = error instanceof Error ? error.message : String(error);
+        shell.setError(message);
+      }
+      return;
+    }
+    if (viewState.screen !== "editor") return;
+    game.resume();
+    pokePlayfield();
+    view.focus();
+  };
+
   const playSelected = async (): Promise<void> => {
     const disk = selectedDisk();
     viewState = openPlay(viewState);
@@ -686,7 +709,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       if (viewState.screen === "boot") {
         requestAnimationFrame(() => bootOverlay.classList.add("is-loading"));
         const bootTimer = window.setTimeout(() => {
-          viewState = finishBoot(viewState);
+          viewState = skipBoot(viewState);
           applyViewState();
         }, BOOT_DURATION_MS);
         const dismissBoot = () => {
@@ -757,8 +780,8 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
         if (event.key === "e" || event.key === "E") {
           const disk = selectedDisk();
           if (disk.kind === "cart") {
-            enterEditor("code");
             event.preventDefault();
+            void openCartEditor();
           }
           return;
         }

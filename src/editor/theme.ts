@@ -7,6 +7,13 @@ function paletteCss(rgb: number): string {
   return `#${(rgb & 0xffffff).toString(16).padStart(6, "0")}`;
 }
 
+function paletteRgba(rgb: number, alpha: number): string {
+  const r = (rgb >> 16) & 255;
+  const g = (rgb >> 8) & 255;
+  const b = rgb & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 const plum = paletteCss(Beast2D16.PlumOutline);
 const shadow = paletteCss(Beast2D16.Shadow);
 const stone = paletteCss(Beast2D16.StoneGray);
@@ -47,10 +54,10 @@ export const beast2dEditorTheme = EditorView.theme(
       color: yellow,
     },
     ".cm-activeLine": {
-      backgroundColor: "rgba(244, 234, 210, 0.06)",
+      backgroundColor: paletteRgba(Beast2D16.Cream, 0.06),
     },
     "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {
-      backgroundColor: "rgba(241, 199, 102, 0.35)",
+      backgroundColor: paletteRgba(Beast2D16.Yellow, 0.35),
     },
     ".cm-cursor, .cm-dropCursor": {
       borderLeftColor: hotPink,
@@ -68,7 +75,7 @@ export const beast2dEditorTheme = EditorView.theme(
       fontSize,
       backgroundColor: shadow,
       color: cream,
-      border: "calc(2px * var(--beast-scale, 2)) solid #f1c766",
+      border: `calc(2px * var(--beast-scale, 2)) solid ${yellow}`,
       borderRadius: "0",
     },
     ".cm-tooltip-autocomplete ul li[aria-selected]": {

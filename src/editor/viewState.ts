@@ -14,12 +14,8 @@ export function initialViewState(options: {
   };
 }
 
+/** Leave the boot screen for Home. Skip and the timer share this transition. */
 export function skipBoot(state: ConsoleViewState): ConsoleViewState {
-  if (state.screen !== "boot") return state;
-  return { ...state, screen: "home" };
-}
-
-export function finishBoot(state: ConsoleViewState): ConsoleViewState {
   if (state.screen !== "boot") return state;
   return { ...state, screen: "home" };
 }

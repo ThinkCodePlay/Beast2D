@@ -1,12 +1,4 @@
 /* Shell chrome hex values mirror Beast2D16 in src/core/ui/palette.ts */
-@font-face {
-  font-family: "Pixeloid Mono";
-  src: url("/ui/pixeloid-mono.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: block;
-}
-
 /* Monogram — datagoblin, CC0 (see public/ui/monogram.LICENSE.txt) */
 @font-face {
   font-family: "Monogram";
@@ -241,14 +233,6 @@ body,
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   flex: 0 0 auto;
-}
-
-.beast2d-pixel {
-  display: block;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  width: calc(16px * var(--beast-scale));
-  height: auto;
 }
 
 .beast2d-stage-body {
@@ -552,13 +536,6 @@ body,
   display: block;
   width: 100% !important;
   height: 100% !important;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-}
-
-/* Legacy bitmap chrome (unused by console DOM; kept for bitmapLabel tests). */
-.beast2d-bitmap {
-  display: block;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
