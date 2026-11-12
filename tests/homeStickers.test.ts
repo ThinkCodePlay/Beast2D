@@ -9,7 +9,8 @@ describe("home disk stickers", () => {
       const rows = DISK_ART[id];
       expect(rows, id).toBeTruthy();
       const width = rows![0]?.length ?? 0;
-      expect(width).toBeGreaterThan(8);
+      expect(rows!.length).toBeGreaterThanOrEqual(20);
+      expect(width).toBeGreaterThanOrEqual(48);
       for (const row of rows!) {
         expect(row.length).toBe(width);
         for (const ch of row) expect(INK.has(ch)).toBe(true);

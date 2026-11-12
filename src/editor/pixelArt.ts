@@ -75,94 +75,107 @@ export const TOOL_ICONS: Record<string, PixelGrid> = {
  * One source pixel per shell pixel, drawn into the blank label above the hub.
  * Titles are not baked in — the shell name band stays empty.
  */
+/**
+ * Label stickers for the home shelf. Each grid is the full label
+ * (51×22, one shell pixel per cell) so the motif fills the face.
+ * Titles stay off the shell — the name band is left empty.
+ */
 export const DISK_ART: Record<string, PixelGrid> = {
-  hello: [
-    "llllllllllllllllllllllllllllllllllllllllllll",
-    "lllllllllmmmmllllmmmmlllllllllllllllllllllll",
-    "llllllllmllllmllmllllmllllllmmllllllllllllll",
-    "llllllllmllllmllmllllmlllllmllmlllllllllllll",
-    "lllllllllmmmmmmmmmmmmlllllmlllmlllllllllllll",
-    "lllllllmmllllllllllmmllllmlllmllllllllllllll",
-    "llllllmlllddllllddllmllllmmmllllllllllllllll",
-    "llllllmlllccdllcclllmlllllllllllllllllllllll",
-    "llllllmlllddllllddllmlllllllllllllllllllllll",
-    "llllllmlllllllllllllmlllllllllllllllllllllll",
-    "lllllllmmmmmmmmmmmmmmlllllllllllllllllllllll",
-    "lllllllllmmllllllmmlllllllllllllllllllllllll",
-    "llllllllmlllllllllmlllllllllllllllllllllllll",
-    "llllllllmlllllllllmlllllllllllllllllllllllll",
-    "lllllllllmmmmmmmmlllllllllllllllllllllllllll",
-    "llllllllmllmllmllmllllllllllllllllllllllllll",
-    "llllllllmmlmmlmmlmmlllllllllllllllllllllllll",
-    "llllllllllllllllllllllllllllllllllllllllllll",
-    "llllllllllllllllllllllllllllllllllllllllllll",
-    "llllllllllllllllllllllllllllllllllllllllllll",
+  "hello": [
+    "lllllllllllllmmmmmmllllllmmmmmmlllllllllllllllmmlll",
+    "lllllllllllllmmppmmllllllmmppmmllllllllllllllmmmmml",
+    "llllllllllllmmppppmmllllmmppppmmlllllllllllmmmlllml",
+    "llllllllllllmmppppmmllllmmppppmmllllllllllmmmllllml",
+    "llllllllllllmppppppmllllmppppppmllllllllmmmpmmlllml",
+    "llllllllllllmppmmmmmmmmmmmmmmppmlllllllmmppppmmmmml",
+    "llllllllllllmmmmmppppppppppmmmmmlllllmmmppppppmmmll",
+    "llllllllllmmmppppppppppppppppppmmmllmmppppppppmllll",
+    "llllllllmmmppppppppppppppppppppppmmmppppppppmmlllll",
+    "lllllllmmmpppppppppppppppppppppppmmpppppppmmlllllll",
+    "lllllllmmpppppddddppppppppddddpppmpppppppmmllllllll",
+    "llllllmmppppppddccppppppppddccpppmpppppmmllllllllll",
+    "llllllmmpppppddddddppppppddddddppmmppmmmlllllllllll",
+    "llllmmllmmppppddddppppppppddddppppmmmmlllllllllllll",
+    "llllmllllmpppppddppppppppppddpppppppmmlllllllllllll",
+    "llllmllllmppppppppppppppppppppppppppmmlllllllllllll",
+    "llllmmllmmpppppppppmpppppmpppppppppmmllllllllllllll",
+    "llllllmmmmppppppppppmmmmmpppppppppmmlllllllllllllll",
+    "lllllllllmmmmmmmmppppppppmmmmmmpmmmllllllllllllllll",
+    "llllllllllmmppppmmppppppmmppppmmmllllllllllllllllll",
+    "llllllllllmppppppmmmmmmmmppppppmlllllllllllllllllll",
+    "llllllllllmmmppmmmmmmmmmmmmppmmmlllllllllllllllllll",
   ],
   "space-run": [
-    "ddddddddddddcddddddddddydddddddddddddddddddd",
-    "ddcddddddddddddddddddddddddddddddydddddddddd",
-    "dddddddddddddddddddcdddddddddddddddddddddddd",
-    "dddddddydddddddddddddddddddddddddddddddcdddd",
-    "ddddddddddddddddddbbbbbbdddddddddddddddddddd",
-    "ddddddddddddddddbbuwwuubbddddddddddddddddddd",
-    "dddddddddddddddbbbbbbbbbbbdddddddddddddddddd",
-    "ddddcdddddddddbbdddbbbbdddbbdddddddddddddddd",
-    "ddddddddddddddddbbboooobbbdddddddddddddddydd",
-    "ddddddddddddddddddoyyyoddddddddddddddddddddd",
-    "dddddddddddddddddddooodddddddddddddddddddddd",
-    "dddddddddddddddddddddddddddddddddddddddddddd",
-    "dddddddddcdddddddddddddddddddddddddddddddddd",
-    "dddnnndddddddddddddddddddddddddddddddddddddd",
-    "ddnkkkndddddddddddddddddddddddddddddyddddddd",
-    "ddnkkknddddddddddddddddddddddddddddddddddddd",
-    "dddnnndddddddddcddddddddddddddddddddddddddcd",
-    "ddddddddddddddddddddddddddddcddddddddddddddd",
-    "dddddddddddddddddddddddddddddddddddddddddddd",
-    "dddddddddddddddddddddddddddddddddddddddddddd",
+    "dddddddddddddddddddddddccccdddddddddddddddddddddddd",
+    "ddcdddddddddddddddddduccbbccudddddddddddddddddcdddd",
+    "dddddddddddddddddddduucbbbbcuuddddddddddddddddddddd",
+    "ddddddddddddddddddduubcbbbbcbuudddddddddcdddddddddd",
+    "ddddddydddddduuuuuuubbccbbccbbuuuuuuudddddddddddddd",
+    "ddddddddduuuuuuuuuuubbbbccbbbbuuuuuuuuuuudddddddddd",
+    "dddddduuuuubbbbbbuubbbbccccbbbbuubbbbbbuuuuuddddydd",
+    "ddddduuubbbbbbbbbuubbbccuuccbbbuubbbbbbbbbuuudddddd",
+    "dddduubbbbbbbbbbbuubbbcuuuucbbbuubbbbbbbbbbbuuddddd",
+    "ddduubbbbbbbbbbbbuubbbccuuccbbbuubbbbbbbbbbbbuudddd",
+    "ddduubccbbbbbbbbbuubbbbbccbbbbbuubbbbbbbbbbccuudddd",
+    "dddduubbbbbbbbbbbuuubbbbbbbbbbuuubbbbbbbbbbbuuddddd",
+    "ddddduuubbbbbbbbbbuubbbbbbbbbbuubbbbbbbbbbuuudddddd",
+    "dddddduuuuubbbbbbbuuubbbbbbbbuuubbbbbbbuuuuuddddddd",
+    "ddddddddduuuuuuuuubuuuoooooouuubuuuuuuuuuddddddddyd",
+    "ddddddddddddduuuuuuuoooooooooouuuuuuudddddddddddddd",
+    "ddddddddddddddddddddooyyyyyyooddddddddddddddddddddd",
+    "ddddddddddddddddddddooyyccyyooddddddddddddddddddddd",
+    "ddcddddddddddddddddddoyccccyodddddddddddddddddddddd",
+    "ddddddddddddddddddddddddooddddddddddddddddddcdddddd",
+    "ddddddddydddddddddddddddddddddddddddddddddddddddddd",
+    "ddddddddddddddddddddddddddddddddddddddddddddddddddd",
   ],
-  paddle: [
-    "ddddddddddydddddddddddddcdddddddddddddyddddd",
-    "dddcddddddddddddddddmmddddddddcddddddddddddd",
-    "dddddddddddddddddddmllmddddddddddddddddddddd",
-    "dddddddddddddddddddmyymdddddddddddddddddddcd",
-    "dddddddddddddddddddmllmddddddddddddddddddddd",
-    "ddddddddddddddddddmmllmmdddddddddddddddddddd",
-    "ddddddcddddddddddmllllllmddddddddddddddddddd",
-    "dddddddddddddddddmllllllmddddddddddddddddddd",
-    "dddddddddddddddddmllllllmdddddddddddddddyddd",
-    "ddddddddddddddddddmmllmmdddddddddddddddddddd",
-    "ddcddddddddddddddddmoomddddddddddddddddddddd",
-    "ddddddddddddddddddddoodddddddddddddddddddddd",
-    "ddddddddddddddddddddyydddddddddddddddddddddd",
-    "ddddnnnndddddddddddddodddddddddddddddddddddd",
-    "dddncccnnddddddddddddddddddddddddddddddddddd",
-    "dddnccnnndddddddddddddddddddddddddddyddddddd",
-    "ddddnnnndddddddddddddddddddddddddddddddddddd",
-    "ddddddddddddddcddddddddddddddddddddddddddddd",
-    "dddddddddddddddddddddddddddddddddddddddddddd",
-    "dddddddddddddddddddddddddddddddddddddddddddd",
+  "paddle": [
+    "dddddddddddddddddddddddddddddddddddddmmmmmmmmmmmmdd",
+    "ddddddddddddddddddddddddddddddddddmmmmpppmllllmmmdd",
+    "ddcdddddddddddddddddddddddddddddmmmmppppmmllllmmmdd",
+    "ddddddddddddddddddddddddddddddmmmmppppppmmllllmmmdd",
+    "ddddddddddddddddddddddddddddmmmmpppppppppmllllmmmdd",
+    "ddddddddddddddddddddddddddmmmmpppppppppppmmmmmmmmdd",
+    "dddcddddddddddddddddddddmmmppppppppppppppppmmmmmddd",
+    "dddddddddddddddddddddmmmmpppppyyyypppppppppmmmmdddd",
+    "dddddddddddmmmmddddmmmmpppppppyccypppppppmmmmdddddd",
+    "dddddddddddmmmmmdmmmmpppppppppyccypppppmmmmdddddddd",
+    "ddddddnndddmmmmmmmmpppppppppppyyyypppmmmmdddddddddd",
+    "ddddnnnnnndmmmmmmmmppppppppppppppppmmmmdddddddddddd",
+    "dddnkkkkkkndmmmmmmmmpppppppppppppmmmddddddddddddddd",
+    "ddnkccckkkkmmmmoommmmmppppppppmmmmddddddddddddddddd",
+    "ddncccckkkkmmooyyommmmppppppmmmmddddddddddddddddddd",
+    "dnnkccckkkkoooyyyyommmppppmmmmddddddddddddddddddddd",
+    "dnnkkkkkkoooyyyyyyommmmpmmmmddddddddddddddddddddddd",
+    "ddnkkkkooooyyyyyyommmmmmmmddddddddddddddddddddddddd",
+    "ddnkkkooooyyyyyoopmmmmmmmmddddddddddddddddddddddddd",
+    "dddnkooccyyyyyommmmmmmmmmmddddddddddddddddddddddddd",
+    "ddddnoccccyyymmmmmmddmmmmmddddddddddddddddddddddddd",
+    "ddddddoccyydddddddddddmmmmddddddddddddddddddddddddd",
   ],
   "bunny-hop": [
-    "ddddddddddddyddddddddddddddddddddddddddddddd",
-    "dddcddddddddddddddddddddddddddddddcddddddddd",
-    "ddddddddddddddddddddddcddddddddddddddddddddd",
-    "dddddddddddddddmmdmmddddddddddddddddddddyddd",
-    "ddddddddddddddmlllllmddddddddddddddddddddddd",
-    "ddddddddddddddmldldlmddddddddddddddddddddddd",
-    "ddddddddddddddmlccllmdddddddddnnnnnndddddddd",
-    "ddddddddddddddmlllllmdddddddddnsssdndddddddd",
-    "dddeeeeddddddddmmmmmddddddddddnnnnnndddddddd",
-    "ddeggggeddddddmddmddmdddddddddndsssndddddddd",
-    "deggggggeddddddmmddmmdddddddddnnnnnndddddddd",
-    "deggggggedddddddddddddddddddddnsssdndddddddd",
-    "ddeeeeeeddddddddddddddddddddddnnnnnndddddddd",
-    "dddddddddddddddddddddddddddddddddddddddddddd",
-    "dddddddddddddddddddddddddddddddddddddddddddd",
-    "ddddddddddggddddddddddddddegdddddddddddddddd",
-    "gggggggggggggggggggggggggggggggggggggggggggg",
-    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
-    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
-    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "ddddddddddddddddddddmmmmdddmmmmdddddddddddddddddddd",
+    "ddddddddddddddddddddmppmdddmppmdddddddddddddddydddd",
+    "ddcdddddddddddddddddmppmdddmppmdddddnnnnnnnnnnnnddd",
+    "ddddddddddddddddddddmpmmmmmmmpmdddddnssssssssssnddd",
+    "ddddeeeeeeeeddddddddmmmpppppmmmdddddnssssssssssnddd",
+    "ddeeggggggggeeddddddmpppppppppmdddddnnnnnnnnnnnnddd",
+    "deeggggggggggeeddddmmpddpppddpmmddddddnnnnnnnnnnndd",
+    "eeggggggggggggeedddmppdcdpddcppmddddddnsssssssssndd",
+    "eeggggggggggggeedddmppddpppddppmddddddnsssssssssndd",
+    "eeggggggggggggeedddmpppppppppppmddddddnnnnnnnnnnndd",
+    "eeggggggggggggeedddmmpppppppppmmddnnnnnnnnnnnnnnddd",
+    "eeggggggggggggeedddmmmpppppppmmmddnssssssssssssnddd",
+    "eeeggggggggggeeeddmmmmmmmmmmmmmmmdnssssssssssssnddd",
+    "deeeeggggggeeeeddmmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnddd",
+    "ddeeeeeeeeeeeeddddmmmmdddddddmmmmdnnnnnnnnnnnnnnddd",
+    "ggggggggggggggggggggggggggggggggggggggggggggggggggg",
+    "ggggggggggggggggggggggggggggggggggggggggggggggggggg",
+    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
   ],
 };
 
@@ -199,14 +212,40 @@ function inRound(x: number, y: number, w: number, h: number, radius: number): bo
   return dx * dx + dy * dy <= r * r;
 }
 
-function strokeRound(ctx: Ctx, x: number, y: number, w: number, h: number, radius: number, color: string, scale: number): void {
-  const r = Math.max(1, radius);
-  for (let yy = 0; yy < h; yy += 1) {
-    for (let xx = 0; xx < w; xx += 1) {
-      if (!inRound(xx, yy, w, h, r)) continue;
-      const inner = inRound(xx - 1, yy - 1, w - 2, h - 2, Math.max(0, r - 1));
-      if (inner) continue;
-      fill(ctx, x + xx, y + yy, 1, 1, color, scale);
+/**
+ * Opaque body shared by the home shell and the tool floppies.
+ * Top-right is a one-pixel stair; the other three corners are square.
+ */
+function inFloppyBody(x: number, y: number): boolean {
+  if (y < 3 || y > 68 || x < 3) return false;
+  const maxX = y <= 10 ? 53 + (y - 3) : 60;
+  return x <= maxX;
+}
+
+/** Same gap the old frame used: three pixels outside the body, one pixel thick. */
+const FLOPPY_FRAME_OFFSET = 3;
+
+function nearFloppyBody(x: number, y: number, dist: number): boolean {
+  for (let dy = -dist; dy <= dist; dy += 1) {
+    for (let dx = -dist; dx <= dist; dx += 1) {
+      if (inFloppyBody(x + dx, y + dy)) return true;
+    }
+  }
+  return false;
+}
+
+/** Hot-pink selection pixel. Traces the chamfered silhouette, not a rounded rect. */
+export function isFloppySelectionPixel(x: number, y: number): boolean {
+  if (x < 0 || y < 0 || x >= TOOL_FLOPPY_W || y >= TOOL_FLOPPY_H) return false;
+  if (nearFloppyBody(x, y, FLOPPY_FRAME_OFFSET - 1)) return false;
+  return nearFloppyBody(x, y, FLOPPY_FRAME_OFFSET);
+}
+
+function strokeFloppyFrame(ctx: Ctx, color: string, scale: number): void {
+  for (let y = 0; y < TOOL_FLOPPY_H; y += 1) {
+    for (let x = 0; x < TOOL_FLOPPY_W; x += 1) {
+      if (!isFloppySelectionPixel(x, y)) continue;
+      fill(ctx, x, y, 1, 1, color, scale);
     }
   }
 }
@@ -295,9 +334,9 @@ export function paintHomeFloppy(
   }
   const motif = DISK_ART[diskId];
   if (motif) {
-    centerBlit(ctx, motif, 8, 22, 48, 20, pixel, 1);
+    centerBlit(ctx, motif, 8, 21, 51, 22, pixel, 1);
   }
-  if (selected) strokeRound(ctx, 0, 0, TOOL_FLOPPY_W, TOOL_FLOPPY_H, 8, PINK, pixel);
+  if (selected) strokeFloppyFrame(ctx, PINK, pixel);
 }
 
 export function paintEmptySlot(canvas: HTMLCanvasElement, scale: number): void {
@@ -343,5 +382,5 @@ export function paintToolFloppy(
   } else {
     image.addEventListener("load", () => paintToolFloppy(canvas, tool, selected, scale), { once: true });
   }
-  if (selected) strokeRound(ctx, 0, 0, TOOL_FLOPPY_W, TOOL_FLOPPY_H, 8, PINK, pixel);
+  if (selected) strokeFloppyFrame(ctx, PINK, pixel);
 }
