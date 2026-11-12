@@ -12,6 +12,10 @@ const PIXEL_COLORS: Record<string, string> = {
   n: "#746678",
   w: "#f4ead2",
   r: "#cb4a50",
+  l: "#f7abcc",
+  u: "#3a5b93",
+  e: "#4a784d",
+  k: "#8a5a44",
 };
 
 const STONE = "#746678";
@@ -66,46 +70,99 @@ export const TOOL_ICONS: Record<string, PixelGrid> = {
   ],
 };
 
-/** Label stickers for the home shelf. */
+/**
+ * Label stickers for the home shelf.
+ * One source pixel per shell pixel, drawn into the blank label above the hub.
+ * Titles are not baked in — the shell name band stays empty.
+ */
 export const DISK_ART: Record<string, PixelGrid> = {
   hello: [
-    "...pp....pp...",
-    "..pppp..pppp..",
-    ".pppppppppppp.",
-    ".ppwwppppwwpp.",
-    ".pppppppppppp.",
-    "..pppmmmmmpp..",
-    "...pppppppp...",
-    "..pp......pp..",
+    "llllllllllllllllllllllllllllllllllllllllllll",
+    "lllllllllmmmmllllmmmmlllllllllllllllllllllll",
+    "llllllllmllllmllmllllmllllllmmllllllllllllll",
+    "llllllllmllllmllmllllmlllllmllmlllllllllllll",
+    "lllllllllmmmmmmmmmmmmlllllmlllmlllllllllllll",
+    "lllllllmmllllllllllmmllllmlllmllllllllllllll",
+    "llllllmlllddllllddllmllllmmmllllllllllllllll",
+    "llllllmlllccdllcclllmlllllllllllllllllllllll",
+    "llllllmlllddllllddllmlllllllllllllllllllllll",
+    "llllllmlllllllllllllmlllllllllllllllllllllll",
+    "lllllllmmmmmmmmmmmmmmlllllllllllllllllllllll",
+    "lllllllllmmllllllmmlllllllllllllllllllllllll",
+    "llllllllmlllllllllmlllllllllllllllllllllllll",
+    "llllllllmlllllllllmlllllllllllllllllllllllll",
+    "lllllllllmmmmmmmmlllllllllllllllllllllllllll",
+    "llllllllmllmllmllmllllllllllllllllllllllllll",
+    "llllllllmmlmmlmmlmmlllllllllllllllllllllllll",
+    "llllllllllllllllllllllllllllllllllllllllllll",
+    "llllllllllllllllllllllllllllllllllllllllllll",
+    "llllllllllllllllllllllllllllllllllllllllllll",
   ],
   "space-run": [
-    "c................c",
-    "......bbbb........",
-    ".....bbwwbb.......",
-    "....bbbbbbbb......",
-    "...bbbbbbbbbb.....",
-    "....bbboooobb.....",
-    "......ooooo.......",
-    ".......ooo........",
-    "c..............c..",
+    "ddddddddddddcddddddddddydddddddddddddddddddd",
+    "ddcddddddddddddddddddddddddddddddydddddddddd",
+    "dddddddddddddddddddcdddddddddddddddddddddddd",
+    "dddddddydddddddddddddddddddddddddddddddcdddd",
+    "ddddddddddddddddddbbbbbbdddddddddddddddddddd",
+    "ddddddddddddddddbbuwwuubbddddddddddddddddddd",
+    "dddddddddddddddbbbbbbbbbbbdddddddddddddddddd",
+    "ddddcdddddddddbbdddbbbbdddbbdddddddddddddddd",
+    "ddddddddddddddddbbboooobbbdddddddddddddddydd",
+    "ddddddddddddddddddoyyyoddddddddddddddddddddd",
+    "dddddddddddddddddddooodddddddddddddddddddddd",
+    "dddddddddddddddddddddddddddddddddddddddddddd",
+    "dddddddddcdddddddddddddddddddddddddddddddddd",
+    "dddnnndddddddddddddddddddddddddddddddddddddd",
+    "ddnkkkndddddddddddddddddddddddddddddyddddddd",
+    "ddnkkknddddddddddddddddddddddddddddddddddddd",
+    "dddnnndddddddddcddddddddddddddddddddddddddcd",
+    "ddddddddddddddddddddddddddddcddddddddddddddd",
+    "dddddddddddddddddddddddddddddddddddddddddddd",
+    "dddddddddddddddddddddddddddddddddddddddddddd",
   ],
   paddle: [
-    "mm..mm..mm..mm..",
-    "................",
-    "......yy........",
-    "................",
-    "................",
-    "..oooooooooooo..",
+    "ddddddddddydddddddddddddcdddddddddddddyddddd",
+    "dddcddddddddddddddddmmddddddddcddddddddddddd",
+    "dddddddddddddddddddmllmddddddddddddddddddddd",
+    "dddddddddddddddddddmyymdddddddddddddddddddcd",
+    "dddddddddddddddddddmllmddddddddddddddddddddd",
+    "ddddddddddddddddddmmllmmdddddddddddddddddddd",
+    "ddddddcddddddddddmllllllmddddddddddddddddddd",
+    "dddddddddddddddddmllllllmddddddddddddddddddd",
+    "dddddddddddddddddmllllllmdddddddddddddddyddd",
+    "ddddddddddddddddddmmllmmdddddddddddddddddddd",
+    "ddcddddddddddddddddmoomddddddddddddddddddddd",
+    "ddddddddddddddddddddoodddddddddddddddddddddd",
+    "ddddddddddddddddddddyydddddddddddddddddddddd",
+    "ddddnnnndddddddddddddodddddddddddddddddddddd",
+    "dddncccnnddddddddddddddddddddddddddddddddddd",
+    "dddnccnnndddddddddddddddddddddddddddyddddddd",
+    "ddddnnnndddddddddddddddddddddddddddddddddddd",
+    "ddddddddddddddcddddddddddddddddddddddddddddd",
+    "dddddddddddddddddddddddddddddddddddddddddddd",
+    "dddddddddddddddddddddddddddddddddddddddddddd",
   ],
   "bunny-hop": [
-    "pp........pp",
-    "pp........pp",
-    ".cc......cc.",
-    ".cccccccccc.",
-    ".ccwwccwwcc.",
-    ".cccccccccc.",
-    "..cccccccc..",
-    "...cc..cc...",
+    "ddddddddddddyddddddddddddddddddddddddddddddd",
+    "dddcddddddddddddddddddddddddddddddcddddddddd",
+    "ddddddddddddddddddddddcddddddddddddddddddddd",
+    "dddddddddddddddmmdmmddddddddddddddddddddyddd",
+    "ddddddddddddddmlllllmddddddddddddddddddddddd",
+    "ddddddddddddddmldldlmddddddddddddddddddddddd",
+    "ddddddddddddddmlccllmdddddddddnnnnnndddddddd",
+    "ddddddddddddddmlllllmdddddddddnsssdndddddddd",
+    "dddeeeeddddddddmmmmmddddddddddnnnnnndddddddd",
+    "ddeggggeddddddmddmddmdddddddddndsssndddddddd",
+    "deggggggeddddddmmddmmdddddddddnnnnnndddddddd",
+    "deggggggedddddddddddddddddddddnsssdndddddddd",
+    "ddeeeeeeddddddddddddddddddddddnnnnnndddddddd",
+    "dddddddddddddddddddddddddddddddddddddddddddd",
+    "dddddddddddddddddddddddddddddddddddddddddddd",
+    "ddddddddddggddddddddddddddegdddddddddddddddd",
+    "gggggggggggggggggggggggggggggggggggggggggggg",
+    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
   ],
 };
 
@@ -220,7 +277,6 @@ function centerBlit(
 export function paintHomeFloppy(
   canvas: HTMLCanvasElement,
   diskId: string,
-  title: string,
   selected: boolean,
   scale: number,
 ): void {
@@ -235,45 +291,13 @@ export function paintHomeFloppy(
   if (image.complete && image.naturalWidth > 0) {
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
   } else {
-    image.addEventListener(
-      "load",
-      () => paintHomeFloppy(canvas, diskId, title, selected, scale),
-      { once: true },
-    );
+    image.addEventListener("load", () => paintHomeFloppy(canvas, diskId, selected, scale), { once: true });
   }
   const motif = DISK_ART[diskId];
   if (motif) {
-    centerBlit(ctx, motif, 8, 22, 48, 20, pixel, 2);
+    centerBlit(ctx, motif, 8, 22, 48, 20, pixel, 1);
   }
-  stampMonogram(ctx, title, 53 * pixel, 13 * pixel);
   if (selected) strokeRound(ctx, 0, 0, TOOL_FLOPPY_W, TOOL_FLOPPY_H, 8, PINK, pixel);
-}
-
-/** Monogram at 16px, then thresholded so the title stays cream-or-nothing. */
-function stampMonogram(ctx: Ctx, title: string, bandY: number, bandH: number): void {
-  if (!title || bandH <= 0) return;
-  const width = ctx.canvas.width;
-  const stamp = document.createElement("canvas");
-  stamp.width = width;
-  stamp.height = bandH;
-  const pen = stamp.getContext("2d");
-  if (!pen) return;
-  pen.imageSmoothingEnabled = false;
-  pen.font = "16px Monogram, monospace";
-  pen.textAlign = "center";
-  pen.textBaseline = "middle";
-  pen.fillStyle = "#ffffff";
-  pen.fillText(title, Math.round(width / 2), Math.round(bandH / 2));
-  const ink = pen.getImageData(0, 0, width, bandH);
-  const plate = ctx.getImageData(0, bandY, width, bandH);
-  for (let i = 0; i < ink.data.length; i += 4) {
-    if ((ink.data[i + 3] ?? 0) < 128) continue;
-    plate.data[i] = 0xf4;
-    plate.data[i + 1] = 0xea;
-    plate.data[i + 2] = 0xd2;
-    plate.data[i + 3] = 255;
-  }
-  ctx.putImageData(plate, 0, bandY);
 }
 
 export function paintEmptySlot(canvas: HTMLCanvasElement, scale: number): void {

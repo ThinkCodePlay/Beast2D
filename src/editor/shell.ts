@@ -29,6 +29,7 @@ import {
   isToolFunctional,
   moveDiskSelection,
   openEditor,
+  openPlay,
   setEditorMode,
   skipBoot,
 } from "./viewState";
@@ -117,7 +118,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   let runError: { message: string; line?: number } | null = null;
   let viewState: ConsoleViewState = initialViewState({
     skipBoot: skipBootOption || playOnly,
-    startScreen: playOnly ? "editor" : "home",
+    startScreen: playOnly ? "play" : "home",
     editorMode: playOnly ? "run" : "run",
   });
 
@@ -126,13 +127,45 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   const bootOverlay = document.createElement("div");
   bootOverlay.className = "beast2d-boot";
+  const bootBrand = document.createElement("div");
+  bootBrand.className = "beast2d-boot-brand";
   const bootTitle = document.createElement("div");
   bootTitle.className = "beast2d-boot-title";
   bootTitle.textContent = "BEAST2D";
-  const bootVersion = document.createElement("div");
-  bootVersion.className = "beast2d-boot-version";
-  bootVersion.textContent = "BEAST2D OS v0.1";
-  bootOverlay.append(bootTitle, bootVersion);
+  const bootMascot = document.createElement("img");
+  bootMascot.className = "beast2d-mascot";
+  bootMascot.alt = "";
+  bootMascot.src = "/ui/mascot.png";
+  bootBrand.append(bootTitle, bootMascot);
+  const bootCopy = document.createElement("div");
+  bootCopy.className = "beast2d-boot-copy";
+  const bootLine = (text: string) => {
+    const line = document.createElement("div");
+    line.textContent = text;
+    return line;
+  };
+  const bootStatus = document.createElement("div");
+  bootStatus.className = "beast2d-boot-status";
+  bootStatus.append(bootLine(`Loading disks... ${disks.length} found`));
+  const bootBlock = document.createElement("span");
+  bootBlock.className = "beast2d-boot-block";
+  bootStatus.append(bootBlock);
+  const bootTrack = document.createElement("div");
+  bootTrack.className = "beast2d-boot-track";
+  const bootFill = document.createElement("div");
+  bootFill.className = "beast2d-boot-fill";
+  bootTrack.append(bootFill);
+  const bootPrompt = document.createElement("div");
+  bootPrompt.className = "beast2d-boot-prompt";
+  bootPrompt.textContent = "press any key";
+  bootCopy.append(
+    bootLine("BEAST2D OS v0.1"),
+    bootLine("(c) 2026 ThinkCodePlay"),
+    bootLine("320x240 16 colors Monogram"),
+    bootStatus,
+    bootTrack,
+  );
+  bootOverlay.append(bootBrand, bootCopy, bootPrompt);
 
   const bar = document.createElement("header");
   bar.className = "beast2d-top-bar";
@@ -217,14 +250,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     face.className = "beast2d-floppy-canvas";
     face.dataset.floppy = "home";
     face.dataset.disk = disk.id;
-    face.dataset.title = disk.title;
-    btn.append(face);
-    if (disk.builtIn) {
-      const note = document.createElement("span");
-      note.className = "beast2d-home-disk-note";
-      note.textContent = "built-in";
-      btn.append(note);
-    }
+    const title = document.createElement("span");
+    title.className = "beast2d-home-disk-title";
+    title.textContent = disk.title;
+    btn.append(face, title);
     btn.addEventListener("click", () => {
       viewState = moveDiskSelection(viewState, index - viewState.selectedDiskIndex, disks.length);
       applyViewState();
@@ -283,24 +312,38 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const layoutPreview = () => {
     const fontScale = chromeFontScale(window.innerHeight);
     document.documentElement.style.setProperty("--beast-scale", String(fontScale));
+    const playing = viewState.screen === "play";
+    workspace.classList.toggle("beast2d-workspace-play", playing);
+    editorColumn.hidden = playing;
     const padX = 8 * fontScale;
     const padY = 8;
     const consoleW = consoleFrame.clientWidth;
     const workH = workspace.clientHeight;
-    const twoXColumn = DISPLAY_WIDTH * 2 + padX * 2;
-    const editorShare = Math.floor(consoleW * 0.45);
-    const editorFloor = Math.min(editorShare, Math.max(0, consoleW - twoXColumn));
-    const maxPreview = Math.max(DISPLAY_WIDTH, consoleW - editorFloor);
-    const scale = fitPreviewScale(maxPreview - padX * 2, Math.max(0, workH - padY * 2));
-    const frameW = DISPLAY_WIDTH * scale;
-    const frameH = DISPLAY_HEIGHT * scale;
-    const columnW = Math.min(maxPreview, frameW + padX * 2);
-    const key = `${fontScale}:${frameW}:${frameH}:${columnW}`;
+    let frameW: number;
+    let frameH: number;
+    let columnFlex: string;
+    if (playing) {
+      const scale = fitPreviewScale(Math.max(0, consoleW - padX * 2), Math.max(0, workH - padY * 2));
+      frameW = DISPLAY_WIDTH * scale;
+      frameH = DISPLAY_HEIGHT * scale;
+      columnFlex = "1 1 auto";
+    } else {
+      const twoXColumn = DISPLAY_WIDTH * 2 + padX * 2;
+      const editorShare = Math.floor(consoleW * 0.45);
+      const editorFloor = Math.min(editorShare, Math.max(0, consoleW - twoXColumn));
+      const maxPreview = Math.max(DISPLAY_WIDTH, consoleW - editorFloor);
+      const scale = fitPreviewScale(maxPreview - padX * 2, Math.max(0, workH - padY * 2));
+      frameW = DISPLAY_WIDTH * scale;
+      frameH = DISPLAY_HEIGHT * scale;
+      const columnW = Math.min(maxPreview, frameW + padX * 2);
+      columnFlex = `0 0 ${columnW}px`;
+    }
+    const key = `${fontScale}:${frameW}:${frameH}:${columnFlex}:${playing ? 1 : 0}`;
     if (key === layoutKey) return;
     layoutKey = key;
     previewFrame.style.width = `${frameW}px`;
     previewFrame.style.height = `${frameH}px`;
-    previewColumn.style.flex = `0 0 ${columnW}px`;
+    previewColumn.style.flex = columnFlex;
     repaintFloppies();
   };
   const repaintFloppies = () => {
@@ -317,8 +360,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       if (kind === "home") {
         const diskId = canvas.dataset.disk ?? "hello";
         const index = disks.findIndex((disk) => disk.id === diskId);
-        const title = canvas.dataset.title ?? disks[index]?.title ?? "";
-        paintHomeFloppy(canvas, diskId, title, index === viewState.selectedDiskIndex, homePixel);
+        paintHomeFloppy(canvas, diskId, index === viewState.selectedDiskIndex, homePixel);
         return;
       }
       paintEmptySlot(canvas, homePixel);
@@ -429,6 +471,12 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       runButton.hidden = true;
       return;
     }
+    if (viewState.screen === "play") {
+      breadcrumb.textContent = `BEAST2D OS > ${disk.title}`;
+      saveButton.hidden = true;
+      runButton.hidden = true;
+      return;
+    }
     breadcrumb.textContent = `BEAST2D OS > ${disk.title}`;
     const showCartActions = viewState.activeTool === "CODE";
     saveButton.hidden = !showCartActions;
@@ -459,6 +507,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       ]);
       return;
     }
+    if (viewState.screen === "play") {
+      footer.innerHTML = hint([["ESC", "home"]]);
+      return;
+    }
     footer.textContent = "";
   };
 
@@ -478,7 +530,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     syncHomeSelection();
     syncEditorPanes();
     layoutPreview();
-    if (viewState.screen === "editor") pokePlayfield();
+    if (viewState.screen === "editor" || viewState.screen === "play") pokePlayfield();
   };
 
   const pokePlayfield = () => {
@@ -507,17 +559,34 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   const playSelected = async (): Promise<void> => {
     const disk = selectedDisk();
-    viewState = openEditor(viewState, "run");
+    viewState = openPlay(viewState);
     applyViewState();
     shell.clearError();
     if (disk.kind === "cart") {
-      await shell.runCart();
+      const result = compileCart(shell.getSource());
+      if (!result.ok) {
+        shell.setError(result.message, result.line);
+        return;
+      }
+      try {
+        await loadCart(result.cart);
+        if (viewState.screen === "play") {
+          game.resume();
+          pokePlayfield();
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        shell.setError(message);
+      }
       return;
     }
     if (disk.kind === "level" && disk.levelId && loadLevel) {
       try {
         await loadLevel(disk.levelId);
-        game.resume();
+        if (viewState.screen === "play") {
+          game.resume();
+          pokePlayfield();
+        }
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         shell.setError(message);
@@ -615,6 +684,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       applyViewState();
 
       if (viewState.screen === "boot") {
+        requestAnimationFrame(() => bootOverlay.classList.add("is-loading"));
         const bootTimer = window.setTimeout(() => {
           viewState = finishBoot(viewState);
           applyViewState();
@@ -696,6 +766,14 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
           event.preventDefault();
           return;
         }
+      }
+
+      if (viewState.screen === "play") {
+        if (event.key === "Escape") {
+          enterHome();
+          event.preventDefault();
+        }
+        return;
       }
 
       if (viewState.screen === "editor") {

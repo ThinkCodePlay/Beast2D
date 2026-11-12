@@ -7,6 +7,7 @@ import {
   isToolFunctional,
   moveDiskSelection,
   openEditor,
+  openPlay,
   setEditorMode,
   skipBoot,
 } from "../src/editor/viewState";
@@ -16,12 +17,21 @@ describe("console view state", () => {
     expect(initialViewState().screen).toBe("boot");
     expect(initialViewState({ skipBoot: true }).screen).toBe("home");
     expect(initialViewState({ skipBoot: true, startScreen: "editor" }).screen).toBe("editor");
+    expect(initialViewState({ skipBoot: true, startScreen: "play" }).screen).toBe("play");
   });
 
   it("transitions boot to home", () => {
     const boot = initialViewState();
     expect(finishBoot(boot).screen).toBe("home");
     expect(skipBoot(boot).screen).toBe("home");
+  });
+
+  it("opens a full playfield without entering the editor split", () => {
+    const home = initialViewState({ skipBoot: true });
+    const play = openPlay(home);
+    expect(play.screen).toBe("play");
+    expect(play.editorMode).toBe("run");
+    expect(goHome(play).screen).toBe("home");
   });
 
   it("opens editor and sets mode", () => {

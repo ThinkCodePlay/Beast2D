@@ -70,12 +70,18 @@ body,
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: calc(8px * var(--beast-scale));
+  gap: calc(12px * var(--beast-scale));
   background: #1f1424;
 }
 
 .beast2d-boot[hidden] {
   display: none !important;
+}
+
+.beast2d-boot-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--beast-scale));
 }
 
 .beast2d-boot-title {
@@ -85,9 +91,47 @@ body,
   letter-spacing: calc(2px * var(--beast-scale));
 }
 
-.beast2d-boot-version {
+.beast2d-boot-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(6px * var(--beast-scale));
   color: #f4ead2;
-  font-size: calc(16px * var(--beast-scale));
+}
+
+.beast2d-boot-status {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--beast-scale));
+}
+
+.beast2d-boot-block {
+  width: 0.55em;
+  height: 0.55em;
+  background: #e86c9a;
+  flex-shrink: 0;
+}
+
+.beast2d-boot-track {
+  align-self: stretch;
+  height: calc(8px * var(--beast-scale));
+  margin-top: calc(4px * var(--beast-scale));
+  background: #3b2e3f;
+}
+
+.beast2d-boot-fill {
+  width: 8%;
+  height: 100%;
+  background: #e86c9a;
+}
+
+.beast2d-boot.is-loading .beast2d-boot-fill {
+  width: 78%;
+  transition: width 1.35s linear;
+}
+
+.beast2d-boot-prompt {
+  color: #746678;
 }
 
 .beast2d-top-bar {
@@ -276,7 +320,6 @@ body,
 }
 
 .beast2d-home-disk-title,
-.beast2d-home-disk-note,
 .beast2d-tool-stub {
   font-family: "Monogram", ui-monospace, monospace;
   -webkit-font-smoothing: none;
@@ -286,14 +329,6 @@ body,
 .beast2d-home-disk-title {
   font-size: calc(16px * var(--beast-scale));
   line-height: calc(16px * var(--beast-scale));
-  text-align: center;
-  white-space: nowrap;
-}
-
-.beast2d-home-disk-note {
-  font-size: 16px;
-  line-height: 16px;
-  color: #746678;
   text-align: center;
   white-space: nowrap;
 }
@@ -319,6 +354,15 @@ body,
   min-height: 0;
   padding: calc(6px * var(--beast-scale));
   border-right: calc(1px * var(--beast-scale)) solid #3b2e3f;
+}
+
+.beast2d-editor-column[hidden] {
+  display: none !important;
+}
+
+.beast2d-workspace-play .beast2d-preview-frame {
+  outline: none;
+  box-shadow: none;
 }
 
 .beast2d-preview-column {

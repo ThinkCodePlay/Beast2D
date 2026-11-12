@@ -2,7 +2,7 @@ import { CONSOLE_TOOLS, type ConsoleTool, type ConsoleViewState, type EditorMode
 
 export function initialViewState(options: {
   skipBoot?: boolean;
-  startScreen?: "home" | "editor";
+  startScreen?: "home" | "editor" | "play";
   editorMode?: EditorMode;
 } = {}): ConsoleViewState {
   const screen = options.skipBoot ? (options.startScreen ?? "home") : "boot";
@@ -30,6 +30,11 @@ export function goHome(state: ConsoleViewState): ConsoleViewState {
 
 export function openEditor(state: ConsoleViewState, mode: EditorMode = "code"): ConsoleViewState {
   return { ...state, screen: "editor", editorMode: mode, activeTool: "CODE" };
+}
+
+/** Full playfield inside the console. The editor split stays on `openEditor`. */
+export function openPlay(state: ConsoleViewState): ConsoleViewState {
+  return { ...state, screen: "play" };
 }
 
 export function setEditorMode(state: ConsoleViewState, mode: EditorMode): ConsoleViewState {
