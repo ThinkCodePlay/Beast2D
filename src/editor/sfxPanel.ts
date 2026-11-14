@@ -119,12 +119,27 @@ export function mountSfxDisk(): SfxDisk {
     const chip = live ? el("button", `beast2d-sfx-chip beast2d-sfx-chip-${id}`, CHIP_LABELS[id]) : el("span", `beast2d-sfx-chip beast2d-sfx-chip-${id} is-dim`, CHIP_LABELS[id]);
     if (chip instanceof HTMLButtonElement) {
       chip.type = "button";
-      chip.addEventListener("click", () => setChip(id as LiveChipId));
+      chip.addEventListener("click", (event) => {
+        event.stopPropagation();
+        setChip(id as LiveChipId);
+      });
     }
     chipButtons.set(id, chip);
     rotor.append(chip);
   }
   rotor.append(dial);
+  rotor.addEventListener("click", (event) => {
+    const rect = rotor.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const live =
+      x < rect.width / 2 && y < rect.height / 2 ? "pico"
+      : x < rect.width / 2 && y >= rect.height / 2 ? "gb"
+      : x >= rect.width / 2 && y < rect.height / 2 ? "snes"
+      : "gen";
+    if (!CHIPS[live].live) return;
+    setChip(live);
+  });
   top.append(transport, nameLcd, rotor);
 
   const presets = el("div", "beast2d-sfx-presets");
