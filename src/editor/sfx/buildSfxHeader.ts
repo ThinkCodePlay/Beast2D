@@ -65,6 +65,12 @@ export function buildSfxHeader(onRotorPick: (chip: LiveChipId) => void): SfxHead
   rotor.append(rotorCanvas);
   const chipButtons = new Map<string, HTMLElement>();
   for (const id of CHIP_IDS) {
+    const label = el("span", `beast2d-sfx-rotor-label beast2d-sfx-rotor-label-${id}`, CHIP_LABELS[id]);
+    label.dataset.chip = id;
+    label.setAttribute("aria-hidden", "true");
+    rotor.append(label);
+  }
+  for (const id of CHIP_IDS) {
     const live = CHIPS[id].live;
     const chip = live
       ? (el("button", `beast2d-sfx-chip beast2d-sfx-chip-${id}`) as HTMLButtonElement)

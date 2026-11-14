@@ -23,6 +23,7 @@ import { buildSfxHeader } from "./sfx/buildSfxHeader";
 import { buildSfxKnobs } from "./sfx/buildSfxKnobs";
 import { buildSfxPresets } from "./sfx/buildSfxPresets";
 import { syncPresetStripLayout } from "./sfx/syncPresetStrip";
+import { syncSfxBoardMetrics } from "./sfx/syncSfxBoardMetrics";
 
 export type SfxDisk = {
   machine: HTMLElement;
@@ -137,18 +138,28 @@ export function mountSfxDisk(): SfxDisk {
       nameSlot = selected;
     }
     header.loopButton.classList.toggle("is-selected", sound.loop);
+    syncSfxBoardMetrics(machine);
+    syncPresetStripLayout(presetsUi.presets);
     const chromeScale =
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue("--beast-scale"), 10) || 1;
-    paintSfxRotor(header.rotorCanvas, cartChip, chromeScale);
+      Number.parseInt(getComputedStyle(machine).getPropertyValue("--beast-scale"), 10) ||
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue("--beast-scale"), 10) ||
+      1;
+    const rotorPx =
+      header.rotor.clientWidth > 0 ? Math.max(1, Math.round(header.rotor.clientWidth / 64)) : chromeScale;
+    paintSfxRotor(header.rotorCanvas, cartChip, rotorPx);
     for (const [id, node] of header.chipButtons) {
       node.classList.toggle("is-on", id === cartChip);
     }
+    header.rotor.querySelectorAll(".beast2d-sfx-rotor-label").forEach((node) => {
+      const id = (node as HTMLElement).dataset.chip;
+      node.classList.toggle("is-on", id === cartChip);
+      node.classList.toggle("is-dim", id === "snes" || id === "gen");
+    });
     for (const preset of PRESET_IDS) {
       const button = presetsUi.presetButtons.get(preset);
       button?.classList.toggle("is-selected", armed === preset);
     }
     presetsUi.diceButton.classList.toggle("is-selected", armed === "dice");
-    syncPresetStripLayout(presetsUi.presets);
     for (const id of WAVE_IDS) {
       const button = gridUi.waveButtons.get(id);
       if (!button) continue;
@@ -257,9 +268,13 @@ export function mountSfxDisk(): SfxDisk {
   }
 
   subscribeSfxBank(paint);
-  const presetStripObserver = new ResizeObserver(() => syncPresetStripLayout(presetsUi.presets));
-  presetStripObserver.observe(presetsUi.presets);
-  if (machine.parentElement) presetStripObserver.observe(machine.parentElement);
+  const layoutObserver = new ResizeObserver(() => {
+    syncSfxBoardMetrics(machine);
+    syncPresetStripLayout(presetsUi.presets);
+    paint();
+  });
+  layoutObserver.observe(machine);
+  if (machine.parentElement) layoutObserver.observe(machine.parentElement);
   paint();
 
   return {

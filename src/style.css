@@ -570,7 +570,12 @@ body,
   --sfx-pad: calc(8px * var(--beast-scale));
   --sfx-key-w: calc(64px * var(--beast-scale));
   --sfx-key-h: calc(56px * var(--beast-scale));
-  --sfx-wave-w: calc(84px * var(--beast-scale));
+  --sfx-knob-w: calc(32px * var(--beast-scale));
+  --sfx-knob-h: calc(34px * var(--beast-scale));
+  --sfx-transport-w: calc(48px * var(--beast-scale));
+  --sfx-transport-h: calc(42px * var(--beast-scale));
+  --sfx-wave-sprite-w: calc(72px * var(--beast-scale));
+  --sfx-wave-sprite-h: calc(48px * var(--beast-scale));
   flex: 1 1 auto;
   min-height: 0;
   max-height: 100%;
@@ -655,12 +660,6 @@ body,
   transform: translateY(calc(1px * var(--beast-scale)));
 }
 
-.beast2d-sfx.beast2d-sfx-keys-use-1x {
-  --sfx-key-w: calc(32px * var(--beast-scale));
-  --sfx-key-h: calc(28px * var(--beast-scale));
-  --sfx-wave-w: calc(42px * var(--beast-scale));
-}
-
 .beast2d-sfx-top {
   display: flex;
   align-items: center;
@@ -689,16 +688,11 @@ body,
 
 .beast2d-sfx-transport-sprite {
   display: block;
-  width: calc(48px * var(--beast-scale));
-  height: calc(42px * var(--beast-scale));
+  width: var(--sfx-transport-w);
+  height: var(--sfx-transport-h);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
-}
-
-.beast2d-sfx.beast2d-sfx-keys-use-1x .beast2d-sfx-transport-sprite {
-  width: calc(24px * var(--beast-scale));
-  height: calc(21px * var(--beast-scale));
 }
 
 .beast2d-sfx-transport-btn.is-down .beast2d-sfx-transport-sprite {
@@ -786,6 +780,45 @@ body,
 }
 
 .beast2d-sfx-chip-gen {
+  right: 0;
+  bottom: 0;
+}
+
+.beast2d-sfx-rotor-label {
+  position: absolute;
+  font-size: calc(8px * var(--beast-scale));
+  line-height: calc(8px * var(--beast-scale));
+  color: #f4ead2;
+  pointer-events: none;
+  z-index: 1;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.beast2d-sfx-rotor-label.is-dim {
+  color: #746678;
+}
+
+.beast2d-sfx-rotor-label.is-on {
+  color: #f1c766;
+}
+
+.beast2d-sfx-rotor-label-pico {
+  top: 0;
+  left: 0;
+}
+
+.beast2d-sfx-rotor-label-snes {
+  top: 0;
+  right: 0;
+}
+
+.beast2d-sfx-rotor-label-gb {
+  left: 0;
+  bottom: 0;
+}
+
+.beast2d-sfx-rotor-label-gen {
   right: 0;
   bottom: 0;
 }
@@ -913,8 +946,8 @@ body,
 }
 
 .beast2d-sfx-pitch {
-  flex: 1 1 auto;
-  min-height: calc(32px * var(--beast-scale));
+  flex: 3 1 0;
+  min-height: 0;
 }
 
 .beast2d-sfx-pitch .beast2d-sfx-cell:nth-child(12n + 1) {
@@ -922,8 +955,7 @@ body,
 }
 
 .beast2d-sfx-volume {
-  flex: 0 0 calc(16px * var(--beast-scale));
-  height: calc(16px * var(--beast-scale));
+  flex: 1 1 0;
   min-height: calc(16px * var(--beast-scale));
 }
 
@@ -985,19 +1017,17 @@ body,
 }
 
 .beast2d-sfx-waves {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: var(--sfx-gap);
   flex: 0 0 auto;
   width: 100%;
 }
 
 .beast2d-sfx-wave.beast2d-sfx-btn {
-  width: var(--sfx-wave-w);
+  width: 100%;
   height: var(--sfx-key-h);
-  min-width: var(--sfx-wave-w);
+  min-width: 0;
   min-height: var(--sfx-key-h);
 }
 
@@ -1023,15 +1053,10 @@ body,
 .beast2d-sfx-wave-icon {
   display: block;
   flex: 0 0 auto;
-  width: calc(72px * var(--beast-scale));
-  height: calc(48px * var(--beast-scale));
+  width: var(--sfx-key-w);
+  height: var(--sfx-key-h);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-}
-
-.beast2d-sfx.beast2d-sfx-keys-use-1x .beast2d-sfx-wave-icon {
-  width: calc(36px * var(--beast-scale));
-  height: calc(24px * var(--beast-scale));
 }
 
 /* PV8-style effects strip: 8 × 32px modules (24px knob + 4px pad each side). */
@@ -1039,15 +1064,18 @@ body,
   display: flex;
   flex: 0 0 auto;
   flex-shrink: 0;
+  flex-wrap: nowrap;
   align-items: flex-end;
   gap: var(--sfx-gap);
-  width: max-content;
+  width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
 }
 
 .beast2d-sfx-fx-mod {
-  flex: 0 0 calc(48px * var(--beast-scale));
-  width: calc(48px * var(--beast-scale));
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
   box-sizing: border-box;
   padding: calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(1px * var(--beast-scale));
   display: flex;
@@ -1111,10 +1139,10 @@ body,
 }
 
 .beast2d-sfx-knob {
-  width: calc(32px * var(--beast-scale));
-  height: calc(34px * var(--beast-scale));
-  min-width: calc(32px * var(--beast-scale));
-  min-height: calc(34px * var(--beast-scale));
+  width: var(--sfx-knob-w);
+  height: var(--sfx-knob-h);
+  min-width: 0;
+  min-height: 0;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -1130,8 +1158,8 @@ body,
 .beast2d-sfx-knob-stack {
   position: relative;
   display: block;
-  width: calc(32px * var(--beast-scale));
-  height: calc(34px * var(--beast-scale));
+  width: var(--sfx-knob-w);
+  height: var(--sfx-knob-h);
   flex: 0 0 auto;
   pointer-events: none;
 }
@@ -1142,8 +1170,8 @@ body,
   position: absolute;
   left: 0;
   top: 0;
-  width: calc(32px * var(--beast-scale));
-  height: calc(34px * var(--beast-scale));
+  width: var(--sfx-knob-w);
+  height: var(--sfx-knob-h);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
@@ -1315,18 +1343,6 @@ body,
   min-height: calc(48px * var(--beast-scale));
 }
 
-.beast2d-workspace-sfx .beast2d-sfx-pitch {
-  flex: 1 1 auto;
-  height: auto;
-  min-height: calc(32px * var(--beast-scale));
-}
-
-.beast2d-workspace-sfx .beast2d-sfx-volume {
-  flex: 0 0 calc(16px * var(--beast-scale));
-  height: calc(16px * var(--beast-scale));
-  min-height: calc(16px * var(--beast-scale));
-}
-
 .beast2d-sfx-spare {
   flex: 1 1 auto;
   min-height: 0;
@@ -1360,43 +1376,6 @@ body,
   min-height: 0;
   height: 100%;
   width: 100%;
-}
-
-.beast2d-workspace-sfx .beast2d-sfx-pitch {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.beast2d-workspace-sfx-run .beast2d-sfx {
-  --sfx-key-w: calc(32px * var(--beast-scale));
-  --sfx-key-h: calc(28px * var(--beast-scale));
-  --sfx-wave-w: calc(42px * var(--beast-scale));
-}
-
-.beast2d-workspace-sfx-run .beast2d-sfx-effects {
-  flex-wrap: nowrap;
-  gap: calc(1px * var(--beast-scale));
-  max-width: 100%;
-}
-
-.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod {
-  flex: 0 0 calc(28px * var(--beast-scale));
-  width: calc(28px * var(--beast-scale));
-  padding: calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(1px * var(--beast-scale));
-}
-
-.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod .beast2d-sfx-knob {
-  width: calc(20px * var(--beast-scale));
-  height: calc(20px * var(--beast-scale));
-  min-width: calc(20px * var(--beast-scale));
-  min-height: calc(20px * var(--beast-scale));
-}
-
-.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod .beast2d-sfx-knob-stack,
-.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod .beast2d-sfx-knob-sprite,
-.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod .beast2d-sfx-knob-pointer {
-  width: calc(16px * var(--beast-scale));
-  height: calc(17px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx-run .beast2d-sfx-fx-mod-tag {

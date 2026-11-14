@@ -3,30 +3,18 @@ import { Beast2D16 } from "../core/ui/palette";
 import { hex } from "./sfxPixelArt";
 import { KNOB_SPRITE_H, KNOB_SPRITE_W, knobSpriteUrl } from "./sfx/knobSprites";
 
-/** Logical pixels (64×56), matches preset key size. */
+/** Logical pixels (64×56), matches `--sfx-key-w` / `--sfx-key-h`. */
 const W = 64;
 const H = 56;
 const CX = 32;
 const CY = 30;
 const KNOB_SCALE = 3;
 
-const MICRO: Record<string, readonly string[]> = {
-  P: ["111", "101", "111", "100", "100"],
-  I: ["111", "010", "010", "010", "111"],
-  C: ["111", "100", "100", "100", "111"],
-  O: ["111", "101", "101", "101", "111"],
-  G: ["111", "100", "110", "101", "111"],
-  B: ["111", "101", "111", "101", "111"],
-  S: ["111", "100", "111", "001", "111"],
-  N: ["101", "111", "111", "111", "101"],
-  E: ["111", "100", "110", "100", "111"],
-};
-
-const LABEL_ANCHOR: Record<ChipId, { x: number; y: number; text: string }> = {
-  pico: { x: 3, y: 2, text: "PICO" },
-  snes: { x: 40, y: 2, text: "SNES" },
-  gb: { x: 6, y: 44, text: "GB" },
-  gen: { x: 42, y: 44, text: "GEN" },
+const LABEL_CENTER: Record<ChipId, { x: number; y: number }> = {
+  pico: { x: 11, y: 8 },
+  snes: { x: 53, y: 8 },
+  gb: { x: 11, y: 48 },
+  gen: { x: 53, y: 48 },
 };
 
 let stoneKnob: HTMLImageElement | null = null;
@@ -42,45 +30,8 @@ function loadStoneKnob(): HTMLImageElement {
 
 void loadStoneKnob().decode?.();
 
-function drawMicro(ctx: CanvasRenderingContext2D, text: string, ox: number, oy: number, rgb: number): void {
-  const chars = text.toUpperCase().split("");
-  let x = Math.round(ox);
-  const y = Math.round(oy);
-  for (const ch of chars) {
-    const g = MICRO[ch];
-    if (!g) continue;
-    for (let row = 0; row < g.length; row += 1) {
-      const line = g[row] ?? "";
-      for (let col = 0; col < line.length; col += 1) {
-        if (line[col] === "1") {
-          ctx.fillStyle = hex(rgb);
-          ctx.fillRect(x + col, y + row, 1, 1);
-        }
-      }
-    }
-    x += 4;
-  }
-}
-
-function microWidth(text: string): number {
-  return text.length * 4 - 1;
-}
-
 function labelCenter(chip: ChipId): { x: number; y: number } {
-  const { x, y, text } = LABEL_ANCHOR[chip];
-  return { x: x + microWidth(text) / 2, y: y + 2 };
-}
-
-function labelColor(id: ChipId): number {
-  if (id === "snes" || id === "gen") return Beast2D16.Shadow;
-  return Beast2D16.Cream;
-}
-
-function drawFixedLabels(ctx: CanvasRenderingContext2D): void {
-  for (const id of ["pico", "gb", "snes", "gen"] as const) {
-    const anchor = LABEL_ANCHOR[id];
-    drawMicro(ctx, anchor.text, anchor.x, anchor.y, labelColor(id));
-  }
+  return LABEL_CENTER[chip];
 }
 
 function drawStoneKnob(ctx: CanvasRenderingContext2D): void {
@@ -111,7 +62,7 @@ function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
   for (let i = 0; i <= steps; i += 1) {
     const t = steps === 0 ? 0 : i / steps;
     const x = Math.round(sx + (tipX - sx) * t);
-    const y = Math.round(sy + (tipY - sy) * t);
+    const y = Math.round(sy + (ty - sy) * t);
     ctx.fillRect(x, y, 1, 1);
     ctx.fillRect(x + 1, y, 1, 1);
     ctx.fillRect(x, y + 1, 1, 1);
@@ -128,6 +79,5 @@ export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1
   ctx.setTransform(pixel, 0, 0, pixel, 0, 0);
   ctx.clearRect(0, 0, W, H);
   drawStoneKnob(ctx);
-  drawFixedLabels(ctx);
   drawPointerTo(ctx, chip);
 }
