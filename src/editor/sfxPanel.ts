@@ -132,7 +132,7 @@ export function mountSfxDisk(): SfxDisk {
     button.type = "button";
     const badge = el("span", "beast2d-sfx-preset-badge", "GB");
     const label = el("span", "beast2d-sfx-preset-name", preset.toUpperCase());
-    button.append(label, badge);
+    button.append(badge, label);
     pressable(button);
     button.addEventListener("click", () => applyPreset(preset));
     presetButtons.set(preset, button);
@@ -374,7 +374,7 @@ export function mountSfxDisk(): SfxDisk {
     for (const preset of PRESET_IDS) {
       presetButtons.get(preset)?.classList.toggle("is-selected", armed === preset);
       const badge = presetBadges.get(preset);
-      if (badge) badge.textContent = spec.label;
+      if (badge) badge.textContent = CHIPS[cartChip].label;
     }
     for (const id of WAVE_IDS) {
       const button = waveButtons.get(id);

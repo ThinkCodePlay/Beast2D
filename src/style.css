@@ -555,12 +555,12 @@ body,
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: calc(2px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-sfx {
-  zoom: 0.84;
+  zoom: 0.88;
 }
 
 .beast2d-sfx {
@@ -700,6 +700,7 @@ body,
   cursor: pointer;
   z-index: 2;
   white-space: nowrap;
+  outline: none;
 }
 
 button.beast2d-sfx-chip {
@@ -707,7 +708,7 @@ button.beast2d-sfx-chip {
 }
 
 .beast2d-sfx-chip.is-dim {
-  color: #746678;
+  color: #4a3f52;
   cursor: default;
   pointer-events: none;
 }
@@ -766,35 +767,34 @@ button.beast2d-sfx-chip {
 }
 
 .beast2d-sfx-preset {
+  position: relative;
   flex: 1 1 0;
   min-width: 0;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto;
-  align-items: end;
-  min-height: calc(32px * var(--beast-scale));
-  padding: calc(2px * var(--beast-scale));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: calc(34px * var(--beast-scale));
+  padding: calc(10px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-preset-name {
-  grid-column: 1 / -1;
-  grid-row: 2;
   text-align: center;
   font-size: calc(11px * var(--beast-scale));
   line-height: calc(12px * var(--beast-scale));
-  padding: calc(1px * var(--beast-scale)) 0 0;
 }
 
 .beast2d-sfx-preset-badge {
-  grid-column: 2;
-  grid-row: 1;
-  justify-self: end;
+  position: absolute;
+  top: calc(2px * var(--beast-scale));
+  right: calc(2px * var(--beast-scale));
   font-size: calc(8px * var(--beast-scale));
   line-height: calc(9px * var(--beast-scale));
   color: #93be64;
   background: #4a784d;
   padding: 0 calc(2px * var(--beast-scale));
   border: calc(1px * var(--beast-scale)) solid #1f1424;
+  pointer-events: none;
 }
 
 .beast2d-sfx-mid {
@@ -808,12 +808,13 @@ button.beast2d-sfx-chip {
   position: relative;
   flex: 1;
   min-width: 0;
-  height: calc(56px * var(--beast-scale));
+  flex-shrink: 0;
+  height: calc(64px * var(--beast-scale));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: calc(2px * var(--beast-scale));
-  padding: calc(4px * var(--beast-scale));
+  gap: calc(1px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
   background: #4a784d;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
   box-shadow: inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #3b2e3f;
@@ -827,14 +828,13 @@ button.beast2d-sfx-chip {
 }
 
 .beast2d-sfx-pitch {
-  flex: 1 1 auto;
-  height: calc(42px * var(--beast-scale));
-  min-height: calc(42px * var(--beast-scale));
+  flex: 1 1 0;
+  min-height: 0;
 }
 
 .beast2d-sfx-volume {
-  flex: 0 0 calc(10px * var(--beast-scale));
-  height: calc(10px * var(--beast-scale));
+  flex: 0 0 calc(5px * var(--beast-scale));
+  height: calc(5px * var(--beast-scale));
 }
 
 .beast2d-sfx-cell {
@@ -883,8 +883,9 @@ button.beast2d-sfx-chip {
   gap: calc(2px * var(--beast-scale));
   flex: 0 0 calc(72px * var(--beast-scale));
   width: calc(72px * var(--beast-scale));
-  height: calc(56px * var(--beast-scale));
-  align-self: stretch;
+  min-height: calc(56px * var(--beast-scale));
+  height: calc(64px * var(--beast-scale));
+  align-self: flex-start;
 }
 
 .beast2d-sfx-wave {
