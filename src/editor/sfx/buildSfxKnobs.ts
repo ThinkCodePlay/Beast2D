@@ -2,11 +2,13 @@ import { KNOB_IDS, type KnobId } from "../../core/sfx/chips";
 import { clampKnob } from "../../core/sfx/grid";
 import { updateSfxSlot } from "../../core/sfx/bank";
 import { knobLabel } from "../sfxKnobLabels";
+import { knobSpriteUrl, knobSpriteVariant } from "./knobSprites";
 import { el, knobStepFromPointer } from "./buildDom";
 
 export type KnobUi = {
   button: HTMLButtonElement;
-  canvas: HTMLCanvasElement;
+  sprite: HTMLImageElement;
+  pointer: HTMLCanvasElement;
   label: HTMLElement;
   module: HTMLElement;
   tag: HTMLElement | null;
@@ -29,12 +31,20 @@ export function buildSfxKnobs(): SfxKnobsUi {
     const button = el("button", "beast2d-sfx-knob") as HTMLButtonElement;
     button.type = "button";
     button.setAttribute("aria-label", knobLabel(id));
-    const knobCanvas = el("canvas", "beast2d-sfx-knob-icon") as HTMLCanvasElement;
+    const stack = el("span", "beast2d-sfx-knob-stack");
+    const sprite = el("img", "beast2d-sfx-knob-sprite") as HTMLImageElement;
+    sprite.src = knobSpriteUrl(knobSpriteVariant(id, false));
+    sprite.width = 16;
+    sprite.height = 17;
+    sprite.alt = "";
+    sprite.draggable = false;
+    const pointer = el("canvas", "beast2d-sfx-knob-pointer") as HTMLCanvasElement;
+    stack.append(sprite, pointer);
+    button.append(stack);
     const label = el("span", "beast2d-sfx-knob-label", knobLabel(id));
-    button.append(knobCanvas);
     if (tag) box.append(tag);
     box.append(button, label);
-    knobUi.set(id, { button, canvas: knobCanvas, label, module: box, tag });
+    knobUi.set(id, { button, sprite, pointer, label, module: box, tag });
     effects.append(box);
   }
 
@@ -56,6 +66,7 @@ export function buildSfxKnobs(): SfxKnobsUi {
         event.preventDefault();
         button.setPointerCapture(event.pointerId);
         button.classList.add("is-down");
+        ui.sprite.src = knobSpriteUrl(knobSpriteVariant(id, true));
         apply(event.clientX, event.clientY);
       });
       button.addEventListener("pointermove", (event) => {
@@ -66,6 +77,7 @@ export function buildSfxKnobs(): SfxKnobsUi {
         if (!button.hasPointerCapture(event.pointerId)) return;
         button.releasePointerCapture(event.pointerId);
         button.classList.remove("is-down");
+        ui.sprite.src = knobSpriteUrl(knobSpriteVariant(id, false));
       };
       button.addEventListener("pointerup", release);
       button.addEventListener("pointercancel", release);

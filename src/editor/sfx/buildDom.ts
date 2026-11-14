@@ -19,7 +19,7 @@ export function pressable(button: HTMLButtonElement): void {
   button.addEventListener("pointerleave", clear);
 }
 
-/** Matches `paintSfxKnob`: `rotate(-140 + value * 280deg)` with 12 o'clock = 0.5. */
+/** Matches `paintSfxKnobPointer`: `rotate(-140 + value * 280deg)` with 12 o'clock = 0.5. */
 const KNOB_ANGLE_MIN = -140;
 const KNOB_ANGLE_MAX = 140;
 const KNOB_ANGLE_SPAN = KNOB_ANGLE_MAX - KNOB_ANGLE_MIN;

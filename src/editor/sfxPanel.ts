@@ -12,8 +12,8 @@ import { getSfxBank, subscribeSfxBank, updateSfxCartChip, updateSfxSlot } from "
 import { PITCH_MAX, knobTo01 } from "../core/sfx/grid";
 import { PRESET_IDS, generateDice, generatePreset, type PresetId } from "../core/sfx/generate";
 import { playSfx, sfxPlayhead, stopSfx } from "../core/sfx/synth";
-import { paintSfxButton } from "./sfxButtonArt";
-import { paintSfxKnob } from "./sfxKnobArt";
+import { knobSpriteUrl, knobSpriteVariant } from "./sfx/knobSprites";
+import { paintSfxKnobPointer } from "./sfx/knobPointer";
 import { knobLabel } from "./sfxKnobLabels";
 import { paintSfxRotor } from "./sfxRotorArt";
 import { paintSfxWaveIcon } from "./sfxWaves";
@@ -149,13 +149,6 @@ export function mountSfxDisk(): SfxDisk {
     }
     presetsUi.diceButton.classList.toggle("is-selected", armed === "dice");
     syncPresetStripLayout(presetsUi.presets);
-    paintSfxButton(header.playIcon, { face: "cream", icon: "play", pressed: header.playButton.classList.contains("is-down") });
-    paintSfxButton(header.stopIcon, { face: "cream", icon: "stop", pressed: header.stopButton.classList.contains("is-down") });
-    paintSfxButton(header.loopIcon, {
-      face: sound.loop ? "selected" : "cream",
-      icon: "loop",
-      pressed: header.loopButton.classList.contains("is-down"),
-    });
     for (const id of WAVE_IDS) {
       const button = gridUi.waveButtons.get(id);
       if (!button) continue;
@@ -191,7 +184,9 @@ export function mountSfxDisk(): SfxDisk {
       ui.module.classList.toggle("is-dim", !enabled);
       const applied = applyChip(sound, bankState.chip);
       const shown = id === "duty" ? applied.duty : knobTo01(sound.knobs[id]);
-      paintSfxKnob(ui.canvas, shown);
+      const dragging = ui.button.classList.contains("is-down");
+      ui.sprite.src = knobSpriteUrl(knobSpriteVariant(id, dragging));
+      paintSfxKnobPointer(ui.pointer, shown);
       ui.label.textContent = knobLabel(id);
       if (id === "cutoff") {
         ui.button.setAttribute("aria-label", enabled ? "CUT" : "NO GB");

@@ -1,15 +1,26 @@
 import { CHIP_IDS, CHIP_LABELS, CHIPS, type LiveChipId } from "../../core/sfx/chips";
+import { transportSpriteUrl } from "./transportSprites";
 import { el, pressable } from "./buildDom";
+
+function transportSpriteImg(id: "play" | "stop" | "loop"): HTMLImageElement {
+  const img = el("img", "beast2d-sfx-transport-sprite") as HTMLImageElement;
+  img.src = transportSpriteUrl(id);
+  img.width = 24;
+  img.height = 21;
+  img.alt = "";
+  img.draggable = false;
+  return img;
+}
 
 export type SfxHeaderUi = {
   top: HTMLElement;
   transport: HTMLElement;
   playButton: HTMLButtonElement;
-  playIcon: HTMLCanvasElement;
+  playSprite: HTMLImageElement;
   stopButton: HTMLButtonElement;
-  stopIcon: HTMLCanvasElement;
+  stopSprite: HTMLImageElement;
   loopButton: HTMLButtonElement;
-  loopIcon: HTMLCanvasElement;
+  loopSprite: HTMLImageElement;
   nameInput: HTMLInputElement;
   rotor: HTMLElement;
   rotorCanvas: HTMLCanvasElement;
@@ -20,21 +31,21 @@ export type SfxHeaderUi = {
 export function buildSfxHeader(onRotorPick: (chip: LiveChipId) => void): SfxHeaderUi {
   const top = el("div", "beast2d-sfx-top");
   const transport = el("div", "beast2d-sfx-transport");
-  const playButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn") as HTMLButtonElement;
+  const playButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn") as HTMLButtonElement;
   playButton.type = "button";
   playButton.title = "Play";
-  const playIcon = el("canvas", "beast2d-sfx-btn-icon") as HTMLCanvasElement;
-  playButton.append(playIcon);
-  const stopButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn") as HTMLButtonElement;
+  const playSprite = transportSpriteImg("play");
+  playButton.append(playSprite);
+  const stopButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn") as HTMLButtonElement;
   stopButton.type = "button";
   stopButton.title = "Stop";
-  const stopIcon = el("canvas", "beast2d-sfx-btn-icon") as HTMLCanvasElement;
-  stopButton.append(stopIcon);
-  const loopButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn") as HTMLButtonElement;
+  const stopSprite = transportSpriteImg("stop");
+  stopButton.append(stopSprite);
+  const loopButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn") as HTMLButtonElement;
   loopButton.type = "button";
   loopButton.title = "Loop";
-  const loopIcon = el("canvas", "beast2d-sfx-btn-icon") as HTMLCanvasElement;
-  loopButton.append(loopIcon);
+  const loopSprite = transportSpriteImg("loop");
+  loopButton.append(loopSprite);
   pressable(playButton);
   pressable(stopButton);
   pressable(loopButton);
@@ -87,11 +98,11 @@ export function buildSfxHeader(onRotorPick: (chip: LiveChipId) => void): SfxHead
     top,
     transport,
     playButton,
-    playIcon,
+    playSprite,
     stopButton,
-    stopIcon,
+    stopSprite,
     loopButton,
-    loopIcon,
+    loopSprite,
     nameInput,
     rotor,
     rotorCanvas,
