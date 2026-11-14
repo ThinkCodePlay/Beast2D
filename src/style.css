@@ -781,12 +781,6 @@ body,
   background: #1f1424;
 }
 
-.beast2d-sfx-preset-strip-chip {
-  flex: 0 0 auto;
-  align-self: center;
-  margin-right: calc(2px * var(--beast-scale));
-}
-
 .beast2d-sfx-preset.beast2d-sfx-btn {
   position: relative;
   flex-direction: column;
@@ -826,20 +820,19 @@ body,
   transform: translateY(calc(1px * var(--beast-scale)));
 }
 
-.beast2d-console-narrow .beast2d-sfx-preset-sprite {
+.beast2d-sfx-presets-use-1x .beast2d-sfx-preset-sprite {
   width: calc(32px * var(--beast-scale));
   height: calc(28px * var(--beast-scale));
 }
 
-.beast2d-sfx-preset-strip-chip {
-  color: #93be64 !important;
-  background: #4a784d;
-  font-size: calc(9px * var(--beast-scale));
-  line-height: calc(10px * var(--beast-scale));
-  padding: 0 calc(2px * var(--beast-scale));
-  border: calc(1px * var(--beast-scale)) solid #1f1424;
-  -webkit-font-smoothing: none;
-  font-smooth: never;
+.beast2d-sfx-presets-tight {
+  gap: 0;
+  padding: 0;
+}
+
+.beast2d-sfx-presets-tight .beast2d-sfx-preset.beast2d-sfx-btn {
+  padding: 0;
+  min-width: 0;
 }
 
 .beast2d-sfx-sequencer {
@@ -1001,7 +994,12 @@ body,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #4a784d;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.beast2d-sfx-wave.is-selected {
+  box-shadow: inset 0 0 0 calc(2px * var(--beast-scale)) #f1c766;
 }
 
 .beast2d-sfx-wave-icon {
@@ -1334,14 +1332,14 @@ body,
 .beast2d-workspace-sfx .beast2d-sfx-mid {
   flex: 1 1 auto;
   min-height: 0;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 @media (max-width: 1279px) {
   .beast2d-workspace-sfx .beast2d-sfx-mid {
     flex: 2 1 0;
     min-height: calc(88px * var(--beast-scale));
-    align-items: stretch;
+    align-items: flex-start;
   }
 
   .beast2d-workspace-sfx .beast2d-sfx-grid {
@@ -1359,11 +1357,6 @@ body,
     height: auto;
     min-height: calc(42px * var(--beast-scale));
     max-height: none;
-  }
-
-  .beast2d-workspace-sfx .beast2d-sfx-waves {
-    height: calc(88px * var(--beast-scale));
-    align-self: flex-start;
   }
 
   .beast2d-sfx-spare {
@@ -1400,11 +1393,12 @@ body,
 .beast2d-workspace-sfx-run .beast2d-sfx-presets {
   flex-wrap: nowrap;
   overflow: hidden;
-  gap: calc(1px * var(--beast-scale));
+  gap: 0;
+  padding: 0;
 }
 
 .beast2d-workspace-sfx-run .beast2d-sfx-preset.beast2d-sfx-btn {
-  min-width: calc(24px * var(--beast-scale));
+  min-width: 0;
   padding: 0;
 }
 
@@ -1417,13 +1411,6 @@ body,
   font-size: calc(6px * var(--beast-scale));
   line-height: calc(6px * var(--beast-scale));
 }
-
-.beast2d-workspace-sfx-run .beast2d-sfx-preset-strip-chip {
-  font-size: calc(8px * var(--beast-scale));
-  line-height: calc(8px * var(--beast-scale));
-  margin-right: calc(1px * var(--beast-scale));
-}
-
 
 .beast2d-workspace-sfx .beast2d-sfx-bank-head {
   flex-direction: column;

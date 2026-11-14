@@ -4,7 +4,6 @@ import { el, pressable } from "./buildDom";
 
 export type SfxPresetsUi = {
   presets: HTMLElement;
-  presetChipBadge: HTMLElement;
   presetButtons: Map<string, HTMLButtonElement>;
   presetSprites: Map<string, HTMLImageElement>;
   diceButton: HTMLButtonElement;
@@ -24,10 +23,8 @@ function spriteImg(id: PresetSpriteId): HTMLImageElement {
 
 export function buildSfxPresets(onPreset: (preset: PresetId) => void, onDice: () => void): SfxPresetsUi {
   const presets = el("div", "beast2d-sfx-presets");
-  const presetChipBadge = el("span", "beast2d-sfx-row-badge beast2d-sfx-preset-strip-chip", "GB");
   const presetButtons = new Map<string, HTMLButtonElement>();
   const presetSprites = new Map<string, HTMLImageElement>();
-  presets.append(presetChipBadge);
   for (const preset of PRESET_IDS) {
     const button = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset") as HTMLButtonElement;
     button.type = "button";
@@ -53,7 +50,6 @@ export function buildSfxPresets(onPreset: (preset: PresetId) => void, onDice: ()
 
   return {
     presets,
-    presetChipBadge,
     presetButtons,
     presetSprites,
     diceButton,

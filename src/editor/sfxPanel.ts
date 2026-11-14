@@ -1,5 +1,4 @@
 import {
-  CHIP_LABELS,
   CHIPS,
   KNOB_IDS,
   SFX_SLOTS,
@@ -23,6 +22,7 @@ import { buildSfxGrid } from "./sfx/buildSfxGrid";
 import { buildSfxHeader } from "./sfx/buildSfxHeader";
 import { buildSfxKnobs } from "./sfx/buildSfxKnobs";
 import { buildSfxPresets } from "./sfx/buildSfxPresets";
+import { syncPresetStripLayout } from "./sfx/syncPresetStrip";
 
 export type SfxDisk = {
   machine: HTMLElement;
@@ -148,7 +148,7 @@ export function mountSfxDisk(): SfxDisk {
       button?.classList.toggle("is-selected", armed === preset);
     }
     presetsUi.diceButton.classList.toggle("is-selected", armed === "dice");
-    presetsUi.presetChipBadge.textContent = CHIP_LABELS[cartChip];
+    syncPresetStripLayout(presetsUi.presets);
     paintSfxButton(header.playIcon, { face: "cream", icon: "play", pressed: header.playButton.classList.contains("is-down") });
     paintSfxButton(header.stopIcon, { face: "cream", icon: "stop", pressed: header.stopButton.classList.contains("is-down") });
     paintSfxButton(header.loopIcon, {
@@ -257,6 +257,9 @@ export function mountSfxDisk(): SfxDisk {
   }
 
   subscribeSfxBank(paint);
+  const presetStripObserver = new ResizeObserver(() => syncPresetStripLayout(presetsUi.presets));
+  presetStripObserver.observe(presetsUi.presets);
+  if (machine.parentElement) presetStripObserver.observe(machine.parentElement);
   paint();
 
   return {
@@ -264,6 +267,7 @@ export function mountSfxDisk(): SfxDisk {
     bank: bankUi.bank,
     repaintChrome() {
       paint();
+      syncPresetStripLayout(presetsUi.presets);
     },
     setLive(on) {
       if (on && frame === 0) frame = requestAnimationFrame(loop);

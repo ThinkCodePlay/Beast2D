@@ -4,7 +4,7 @@ import { hex, plumFrame } from "./sfxPixelArt";
 
 const S = 16;
 
-/** 16×16 wave key: plum outline, leaf waveform (stone when dimmed). */
+/** 16×16 wave key: plum outline, plum waveform on cream (stone when dimmed). */
 export function paintSfxWaveIcon(canvas: HTMLCanvasElement, wave: WaveId, dim: boolean): void {
   canvas.width = S;
   canvas.height = S;
@@ -15,7 +15,7 @@ export function paintSfxWaveIcon(canvas: HTMLCanvasElement, wave: WaveId, dim: b
   ctx.fillStyle = hex(Beast2D16.Cream);
   ctx.fillRect(1, 1, S - 2, S - 2);
 
-  const ink = dim ? Beast2D16.StoneGray : Beast2D16.LeafGreen;
+  const ink = dim ? Beast2D16.StoneGray : Beast2D16.PlumOutline;
   ctx.fillStyle = hex(ink);
 
   const mid = 8;
