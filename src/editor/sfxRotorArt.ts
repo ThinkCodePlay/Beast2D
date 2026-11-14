@@ -1,5 +1,4 @@
 import type { ChipId } from "../core/sfx/chips";
-import { CHIPS } from "../core/sfx/chips";
 import { Beast2D16 } from "../core/ui/palette";
 import { hex } from "./sfxPixelArt";
 
@@ -81,17 +80,21 @@ function drawKnobBody(ctx: CanvasRenderingContext2D): void {
   }
 }
 
+/** Short yellow tick inside the knob, aimed at the active label. */
 function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
   const { x: tx, y: ty } = labelCenter(chip);
+  const dx = tx - CX;
+  const dy = ty - CY;
+  const len = Math.hypot(dx, dy) || 1;
+  const tipX = Math.round(CX + (dx / len) * (KNOB_R - 2));
+  const tipY = Math.round(CY + (dy / len) * (KNOB_R - 2));
   const sx = CX;
   const sy = CY;
-  const px = Math.round(tx);
-  const py = Math.round(ty);
-  const steps = Math.max(Math.abs(px - sx), Math.abs(py - sy));
+  const steps = Math.max(Math.abs(tipX - sx), Math.abs(tipY - sy));
   for (let i = 0; i <= steps; i += 1) {
     const t = steps === 0 ? 0 : i / steps;
-    const x = Math.round(sx + (px - sx) * t);
-    const y = Math.round(sy + (py - sy) * t);
+    const x = Math.round(sx + (tipX - sx) * t);
+    const y = Math.round(sy + (tipY - sy) * t);
     ctx.fillStyle = hex(Beast2D16.Yellow);
     ctx.fillRect(x, y, 2, 1);
     ctx.fillRect(x, y + 1, 2, 1);
@@ -99,7 +102,7 @@ function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
 }
 
 function labelColor(id: ChipId): number {
-  if (!CHIPS[id].live) return Beast2D16.StoneGray;
+  if (id === "snes" || id === "gen") return Beast2D16.StoneGray;
   return Beast2D16.Cream;
 }
 
@@ -119,7 +122,7 @@ export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1
   ctx.imageSmoothingEnabled = false;
   ctx.setTransform(pixel, 0, 0, pixel, 0, 0);
   ctx.clearRect(0, 0, W, H);
-  drawFixedLabels(ctx);
   drawKnobBody(ctx);
+  drawFixedLabels(ctx);
   drawPointerTo(ctx, chip);
 }
