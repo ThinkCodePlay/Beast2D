@@ -497,6 +497,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     previewFrame.hidden = showSfx && !sfxPreviewGame;
     previewColumn.classList.toggle("beast2d-preview-column-bank", showSfx && !sfxPreviewGame);
     workspace.classList.toggle("beast2d-workspace-sfx", showSfx);
+    workspace.classList.toggle("beast2d-workspace-sfx-run", sfxPreviewGame);
     editorColumn.classList.toggle("beast2d-editor-column-sfx", showSfx);
     sfxDisk.setLive(showSfx);
     if (showCode && viewState.editorMode === "code") {

@@ -534,6 +534,16 @@ body,
   padding: calc(2px * var(--beast-scale));
   border-right: calc(1px * var(--beast-scale)) solid #3b2e3f;
   overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 1040px) {
+  .beast2d-tool-row .beast2d-floppy-canvas[data-floppy="tool"] {
+    width: calc(28px * var(--beast-scale));
+    height: calc(32px * var(--beast-scale));
+  }
 }
 
 .beast2d-preview-column-bank {
@@ -704,8 +714,8 @@ body,
 
 .beast2d-sfx-rotor {
   position: relative;
-  width: calc(92px * var(--beast-scale));
-  height: calc(92px * var(--beast-scale));
+  width: calc(72px * var(--beast-scale));
+  height: calc(72px * var(--beast-scale));
   flex-shrink: 0;
   cursor: pointer;
 }
@@ -765,12 +775,18 @@ body,
 
 .beast2d-sfx-presets {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: calc(1px * var(--beast-scale));
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: calc(2px * var(--beast-scale));
   flex-shrink: 0;
   padding: calc(1px * var(--beast-scale));
   background: #1f1424;
+}
+
+.beast2d-sfx-preset-strip-chip {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-right: calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-preset.beast2d-sfx-btn {
@@ -800,19 +816,11 @@ body,
 
 .beast2d-sfx-preset .beast2d-sfx-btn-icon {
   flex: 0 0 auto;
-  width: calc(16px * var(--beast-scale));
-  height: calc(16px * var(--beast-scale));
+  width: calc(32px * var(--beast-scale));
+  height: calc(32px * var(--beast-scale));
 }
 
-.beast2d-sfx-preset-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.beast2d-sfx-preset .beast2d-sfx-row-badge {
+.beast2d-sfx-preset-strip-chip {
   color: #93be64 !important;
   background: #4a784d;
   font-size: calc(9px * var(--beast-scale));
@@ -823,10 +831,19 @@ body,
   font-smooth: never;
 }
 
+.beast2d-sfx-sequencer {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(2px * var(--beast-scale));
+}
+
 .beast2d-sfx-mid {
   display: flex;
   gap: calc(4px * var(--beast-scale));
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
   align-items: stretch;
   justify-content: flex-start;
   width: 100%;
@@ -1239,16 +1256,23 @@ body,
   height: calc(16px * var(--beast-scale));
 }
 
+.beast2d-workspace-sfx .beast2d-editor-column-sfx {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .beast2d-workspace-sfx .beast2d-sfx-grid {
   flex: 1 1 auto;
-  min-width: calc(120px * var(--beast-scale));
-  height: calc(56px * var(--beast-scale));
-  min-height: calc(56px * var(--beast-scale));
+  min-width: calc(80px * var(--beast-scale));
+  height: auto;
+  min-height: calc(48px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-pitch {
-  height: calc(42px * var(--beast-scale));
-  min-height: calc(42px * var(--beast-scale));
+  flex: 1 1 auto;
+  height: auto;
+  min-height: calc(32px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-volume {
@@ -1257,19 +1281,40 @@ body,
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-waves {
-  height: calc(56px * var(--beast-scale));
+  align-self: stretch;
+  height: auto;
+  min-height: calc(48px * var(--beast-scale));
 }
-
-.beast2d-workspace-sfx .beast2d-sfx-rotor {
-  width: calc(64px * var(--beast-scale));
-  height: calc(64px * var(--beast-scale));
-}
-
 
 .beast2d-workspace-sfx .beast2d-sfx-mid {
   flex: 1 1 auto;
   min-height: 0;
-  align-items: center;
+  align-items: stretch;
+}
+
+.beast2d-workspace-sfx-run .beast2d-sfx-effects {
+  flex-wrap: nowrap;
+  gap: calc(1px * var(--beast-scale));
+  max-width: 100%;
+}
+
+.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod {
+  flex: 0 0 calc(28px * var(--beast-scale));
+  width: calc(28px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(1px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod .beast2d-sfx-knob,
+.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod .beast2d-sfx-knob-icon {
+  width: calc(20px * var(--beast-scale));
+  height: calc(20px * var(--beast-scale));
+  min-width: calc(20px * var(--beast-scale));
+  min-height: calc(20px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx-run .beast2d-sfx-fx-mod-tag {
+  font-size: calc(5px * var(--beast-scale));
+  line-height: calc(5px * var(--beast-scale));
 }
 
 

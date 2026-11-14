@@ -3,24 +3,21 @@ import { CHIPS } from "../core/sfx/chips";
 import { Beast2D16 } from "../core/ui/palette";
 import { frameToAngleDeg, hex } from "./sfxPixelArt";
 
-const W = 48;
-const H = 48;
+/** Logical sprite pixels (72×72). */
+const W = 72;
+const H = 72;
+const CX = 36;
+const CY = 38;
+const KNOB_R = 15;
 
-const ROTOR_CSS: Record<ChipId, number> = {
+const CHIP_DEG: Record<ChipId, number> = {
   pico: 315,
   gb: 225,
   snes: 45,
   gen: 135,
 };
 
-function cssAngleToFrame(deg: number): number {
-  let a = deg;
-  while (a > 180) a -= 360;
-  const math = -a;
-  return Math.min(15, Math.max(0, Math.round(((math + 140) / 280) * 15)));
-}
-
-const MICRO: Record<string, Pixel3x5> = {
+const MICRO: Record<string, readonly string[]> = {
   P: ["111", "101", "111", "100", "100"],
   I: ["111", "010", "010", "010", "111"],
   C: ["111", "100", "100", "100", "111"],
@@ -32,17 +29,10 @@ const MICRO: Record<string, Pixel3x5> = {
   E: ["111", "100", "110", "100", "111"],
 };
 
-type Pixel3x5 = readonly string[];
-
-function drawMicro(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  ox: number,
-  oy: number,
-  rgb: number,
-): void {
+function drawMicro(ctx: CanvasRenderingContext2D, text: string, ox: number, oy: number, rgb: number): void {
   const chars = text.toUpperCase().split("");
-  let x = ox;
+  let x = Math.round(ox);
+  const y = Math.round(oy);
   for (const ch of chars) {
     const g = MICRO[ch];
     if (!g) continue;
@@ -51,11 +41,81 @@ function drawMicro(
       for (let col = 0; col < line.length; col += 1) {
         if (line[col] === "1") {
           ctx.fillStyle = hex(rgb);
-          ctx.fillRect(x + col, oy + row, 1, 1);
+          ctx.fillRect(x + col, y + row, 1, 1);
         }
       }
     }
     x += 4;
+  }
+}
+
+function microWidth(text: string): number {
+  return text.length * 4 - 1;
+}
+
+function drawKnobBody(ctx: CanvasRenderingContext2D): void {
+  for (let y = 0; y < H; y += 1) {
+    for (let x = 0; x < W; x += 1) {
+      const dx = x - CX;
+      const dy = y - CY;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > (KNOB_R + 1) * (KNOB_R + 1)) continue;
+      if (d2 > KNOB_R * KNOB_R) {
+        ctx.fillStyle = hex(Beast2D16.Shadow);
+        ctx.fillRect(x, y, 1, 1);
+        continue;
+      }
+      if (x <= CX && y <= CY && d2 > (KNOB_R - 3) * (KNOB_R - 3)) {
+        ctx.fillStyle = hex(Beast2D16.Cream);
+      } else {
+        ctx.fillStyle = hex(Beast2D16.StoneGray);
+      }
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+}
+
+function drawPointer(ctx: CanvasRenderingContext2D, chip: ChipId): void {
+  let a = CHIP_DEG[chip];
+  while (a > 180) a -= 360;
+  const math = -a;
+  const frame = Math.min(15, Math.max(0, Math.round(((math + 140) / 280) * 15)));
+  const deg = (frameToAngleDeg(frame) * Math.PI) / 180;
+  const tipX = CX + Math.sin(deg) * (KNOB_R - 2);
+  const tipY = CY - Math.cos(deg) * (KNOB_R - 2);
+  const sx = CX;
+  const sy = CY;
+  const px = Math.round(tipX);
+  const py = Math.round(tipY);
+  const steps = Math.max(Math.abs(px - sx), Math.abs(py - sy));
+  for (let i = 0; i <= steps; i += 1) {
+    const t = steps === 0 ? 0 : i / steps;
+    const x = Math.round(sx + (px - sx) * t);
+    const y = Math.round(sy + (py - sy) * t);
+    ctx.fillStyle = hex(Beast2D16.Yellow);
+    ctx.fillRect(x, y, 2, 1);
+    ctx.fillRect(x, y + 1, 2, 1);
+  }
+}
+
+function labelColor(id: ChipId): number {
+  if (!CHIPS[id].live) return Beast2D16.StoneGray;
+  return Beast2D16.Cream;
+}
+
+function drawOutsideLabels(ctx: CanvasRenderingContext2D): void {
+  const entries: { id: ChipId; text: string; deg: number }[] = [
+    { id: "pico", text: "PICO", deg: 315 },
+    { id: "gb", text: "GB", deg: 225 },
+    { id: "snes", text: "SNES", deg: 45 },
+    { id: "gen", text: "GEN", deg: 135 },
+  ];
+  const labelR = KNOB_R + 10;
+  for (const { id, text, deg } of entries) {
+    const rad = (deg * Math.PI) / 180;
+    const lx = CX + Math.sin(rad) * labelR;
+    const ly = CY - Math.cos(rad) * labelR;
+    drawMicro(ctx, text, lx - microWidth(text) / 2, ly - 2, labelColor(id));
   }
 }
 
@@ -68,57 +128,7 @@ export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1
   ctx.imageSmoothingEnabled = false;
   ctx.setTransform(pixel, 0, 0, pixel, 0, 0);
   ctx.clearRect(0, 0, W, H);
-
-  const cx = 24;
-  const cy = 24;
-  const r = 18;
-
-  for (let y = 0; y < H; y += 1) {
-    for (let x = 0; x < W; x += 1) {
-      const dx = x - cx;
-      const dy = y - cy;
-      const d2 = dx * dx + dy * dy;
-      if (d2 > (r + 1) * (r + 1)) continue;
-      if (d2 > r * r) {
-        ctx.fillStyle = hex(Beast2D16.Shadow);
-        ctx.fillRect(x, y, 1, 1);
-        continue;
-      }
-      const left = x <= cx;
-      ctx.fillStyle = hex(left ? Beast2D16.Cream : Beast2D16.Shadow);
-      ctx.fillRect(x, y, 1, 1);
-    }
-  }
-
-  const labelColor = (id: ChipId): number =>
-    CHIPS[id].live ? Beast2D16.LeafGreen : id === "snes" || id === "gen" ? Beast2D16.StoneGray : Beast2D16.LeafGreen;
-  drawMicro(ctx, "PICO", 4, 3, labelColor("pico"));
-  drawMicro(ctx, "SNES", 25, 3, labelColor("snes"));
-  drawMicro(ctx, "GB", 4, 38, labelColor("gb"));
-  drawMicro(ctx, "GEN", 28, 38, labelColor("gen"));
-
-  for (const angle of [315, 225, 45, 135]) {
-    const rad = (angle * Math.PI) / 180;
-    const tx = cx + Math.sin(rad) * (r - 4);
-    const ty = cy - Math.cos(rad) * (r - 4);
-    ctx.fillStyle = hex(Beast2D16.PlumOutline);
-    ctx.fillRect(Math.round(tx), Math.round(ty), 2, 2);
-  }
-
-  const frame = cssAngleToFrame(ROTOR_CSS[chip]);
-  const deg = (frameToAngleDeg(frame) * Math.PI) / 180;
-  const tipX = cx + Math.sin(deg) * (r - 3);
-  const tipY = cy - Math.cos(deg) * (r - 3);
-  const sx = cx;
-  const sy = cy;
-  const px = Math.round(tipX);
-  const py = Math.round(tipY);
-  const steps = Math.max(Math.abs(px - sx), Math.abs(py - sy));
-  for (let i = 0; i <= steps; i += 1) {
-    const t = steps === 0 ? 0 : i / steps;
-    const x = Math.round(sx + (px - sx) * t);
-    const y = Math.round(sy + (py - sy) * t);
-    ctx.fillStyle = hex(Beast2D16.Yellow);
-    ctx.fillRect(x, y, 2, 2);
-  }
+  drawOutsideLabels(ctx);
+  drawKnobBody(ctx);
+  drawPointer(ctx, chip);
 }

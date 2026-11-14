@@ -237,11 +237,63 @@ export function paintSfxButton(
     return;
   }
   if (options.preset) {
-    const ink = dim
-      ? Beast2D16.StoneGray
-      : options.preset === "dice"
-        ? Beast2D16.PlumOutline
-        : Beast2D16.LeafGreen;
+    if (options.preset === "dice" && options.face === "pink") {
+      drawDiceFace(ctx, dim);
+      return;
+    }
+    const ink = dim ? Beast2D16.StoneGray : Beast2D16.LeafGreen;
     blitGrid(ctx, PRESET_GRIDS[options.preset], 0, 0, ink);
+  }
+}
+
+/** Preset keys: 16×16 art scaled 2× on a 32×32 canvas (icon only; frame stays 16px logical). */
+export function paintSfxPresetIcon(
+  canvas: HTMLCanvasElement,
+  preset: SfxPresetIcon,
+  options: { face: SfxButtonFace; dim?: boolean; pressed?: boolean },
+): void {
+  canvas.width = W * 2;
+  canvas.height = H * 2;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+  ctx.scale(2, 2);
+  const dim = options.dim ?? false;
+  const selected = options.face === "selected";
+  const pressed = options.pressed ?? false;
+  fillFace(ctx, options.face, selected, pressed);
+
+  if (preset === "dice" && options.face === "pink") {
+    drawDiceFace(ctx, dim);
+    return;
+  }
+  const ink = dim ? Beast2D16.StoneGray : Beast2D16.LeafGreen;
+  blitGrid(ctx, PRESET_GRIDS[preset], 0, 0, ink);
+}
+
+function drawDiceFace(ctx: CanvasRenderingContext2D, dim: boolean): void {
+  const pip = dim ? Beast2D16.StoneGray : Beast2D16.PlumOutline;
+  const face = dim ? Beast2D16.StoneGray : Beast2D16.Cream;
+  for (let y = 4; y <= 11; y += 1) {
+    for (let x = 4; x <= 11; x += 1) {
+      const onEdge = x === 4 || x === 11 || y === 4 || y === 11;
+      const corner = (x === 4 || x === 11) && (y === 4 || y === 11);
+      if (onEdge && !corner) {
+        ctx.fillStyle = hex(face);
+        ctx.fillRect(x, y, 1, 1);
+      } else if (!onEdge) {
+        ctx.fillStyle = hex(face);
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+  }
+  for (let y = 0; y < DICE.length; y += 1) {
+    const row = DICE[y] ?? "";
+    for (let x = 0; x < row.length; x += 1) {
+      if (row[x] === "p") {
+        ctx.fillStyle = hex(pip);
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
   }
 }

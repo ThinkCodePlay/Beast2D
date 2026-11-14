@@ -16,7 +16,7 @@ import { getSfxBank, subscribeSfxBank, updateSfxCartChip, updateSfxSlot } from "
 import { knobLabel } from "../core/sfx/format";
 import { PRESET_IDS, generateDice, generatePreset, type PresetId } from "../core/sfx/generate";
 import { playSfx, sfxPlayhead, stopSfx } from "../core/sfx/synth";
-import { paintSfxButton } from "./sfxButtonArt";
+import { paintSfxButton, paintSfxPresetIcon } from "./sfxButtonArt";
 import { paintSfxKnob } from "./sfxKnobArt";
 import { paintSfxRotor } from "./sfxRotorArt";
 import { paintSfxWaveIcon } from "./sfxWaves";
@@ -137,19 +137,18 @@ export function mountSfxDisk(): SfxDisk {
   top.append(transport, nameLcd, rotor);
 
   const presets = el("div", "beast2d-sfx-presets");
+  const presetChipBadge = el("span", "beast2d-sfx-row-badge beast2d-sfx-preset-strip-chip", "GB");
   const presetButtons = new Map<string, HTMLButtonElement>();
   const presetIcons = new Map<string, HTMLCanvasElement>();
-  const presetBadges = new Map<string, HTMLElement>();
+  presets.append(presetChipBadge);
   for (const preset of PRESET_IDS) {
     const button = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset");
     button.type = "button";
     button.title = preset.toUpperCase();
     const icon = el("canvas", "beast2d-sfx-btn-icon");
-    const badge = el("span", "beast2d-sfx-row-badge beast2d-sfx-preset-badge", "GB");
     const label = el("span", "beast2d-sfx-preset-name", preset.toUpperCase());
-    button.append(icon, badge, label);
+    button.append(icon, label);
     presetIcons.set(preset, icon);
-    presetBadges.set(preset, badge);
     pressable(button);
     button.addEventListener("click", () => applyPreset(preset));
     presetButtons.set(preset, button);
@@ -228,8 +227,10 @@ export function mountSfxDisk(): SfxDisk {
     effects.append(box);
   }
   mid.append(gridWrap, waves);
+  const sequencer = el("div", "beast2d-sfx-sequencer");
+  sequencer.append(mid, effects);
 
-  machine.append(top, presets, mid, effects);
+  machine.append(top, presets, sequencer);
 
   const bank = el("section", "beast2d-sfx-bank");
   bank.setAttribute("aria-label", "Sound bank");
@@ -402,15 +403,13 @@ export function mountSfxDisk(): SfxDisk {
       const on = armed === preset;
       button?.classList.toggle("is-selected", on);
       if (icon) {
-        paintSfxButton(icon, {
+        paintSfxPresetIcon(icon, preset, {
           face: on ? "selected" : "cream",
-          preset,
           pressed: button?.classList.contains("is-down"),
         });
       }
-      const badge = presetBadges.get(preset);
-      if (badge) badge.textContent = CHIP_LABELS[cartChip];
     }
+    presetChipBadge.textContent = CHIP_LABELS[cartChip];
     paintSfxButton(playIcon, { face: "cream", icon: "play", pressed: playButton.classList.contains("is-down") });
     paintSfxButton(stopIcon, { face: "cream", icon: "stop", pressed: stopButton.classList.contains("is-down") });
     paintSfxButton(loopIcon, {
@@ -418,7 +417,10 @@ export function mountSfxDisk(): SfxDisk {
       icon: "loop",
       pressed: loopButton.classList.contains("is-down"),
     });
-    paintSfxButton(diceIcon, { face: "pink", preset: "dice", pressed: diceButton.classList.contains("is-down") });
+    paintSfxPresetIcon(diceIcon, "dice", {
+      face: "pink",
+      pressed: diceButton.classList.contains("is-down"),
+    });
     for (const id of WAVE_IDS) {
       const button = waveButtons.get(id);
       if (!button) continue;
