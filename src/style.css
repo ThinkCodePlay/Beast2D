@@ -521,6 +521,515 @@ body,
   background: #f1c766;
 }
 
+.beast2d-workspace-sfx .beast2d-editor-column-sfx {
+  flex: 1.2 1 0;
+  padding: calc(4px * var(--beast-scale));
+  border-right: calc(1px * var(--beast-scale)) solid #3b2e3f;
+}
+
+.beast2d-preview-column-bank {
+  flex: 0 0 min(300px, 38%);
+  align-items: stretch;
+  justify-content: stretch;
+  padding: calc(4px * var(--beast-scale));
+}
+
+.beast2d-sfx-bank-mount {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.beast2d-sfx-bank-mount[hidden] {
+  display: none !important;
+}
+
+.beast2d-sfx[hidden] {
+  display: none !important;
+}
+
+.beast2d-sfx {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(6px * var(--beast-scale));
+  box-sizing: border-box;
+  padding: calc(8px * var(--beast-scale));
+  color: #f4ead2;
+  background: #746678;
+  border: calc(3px * var(--beast-scale)) solid #1f1424;
+  box-shadow:
+    inset calc(3px * var(--beast-scale)) calc(3px * var(--beast-scale)) 0 #746678,
+    inset calc(-3px * var(--beast-scale)) calc(-3px * var(--beast-scale)) 0 #3b2e3f;
+}
+
+.beast2d-sfx-btn {
+  font: inherit;
+  position: relative;
+  color: #1f1424;
+  background: #f4ead2;
+  border: calc(3px * var(--beast-scale)) solid #1f1424;
+  box-shadow: inset calc(-2px * var(--beast-scale)) calc(-2px * var(--beast-scale)) 0 #746678;
+  padding: calc(2px * var(--beast-scale)) calc(6px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+  cursor: pointer;
+}
+
+.beast2d-sfx-btn:disabled,
+.beast2d-sfx-btn.is-dim {
+  color: #746678;
+  background: #3b2e3f;
+  cursor: default;
+  box-shadow: none;
+}
+
+.beast2d-sfx-btn-pink {
+  color: #f4ead2;
+  background: #e86c9a;
+  box-shadow: calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #c1386e;
+}
+
+.beast2d-sfx-btn.is-selected,
+.beast2d-sfx-btn.is-down:not(:disabled) {
+  background: #f1c766;
+  box-shadow: calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #e28649;
+  transform: translateY(calc(2px * var(--beast-scale)));
+}
+
+.beast2d-sfx-top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--beast-scale));
+}
+
+.beast2d-sfx-transport {
+  display: flex;
+  gap: calc(4px * var(--beast-scale));
+  flex-shrink: 0;
+}
+
+.beast2d-sfx-icon-btn {
+  width: calc(36px * var(--beast-scale));
+  height: calc(28px * var(--beast-scale));
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.beast2d-sfx-play-icon {
+  width: 0;
+  height: 0;
+  border-top: calc(6px * var(--beast-scale)) solid transparent;
+  border-bottom: calc(6px * var(--beast-scale)) solid transparent;
+  border-left: calc(10px * var(--beast-scale)) solid currentColor;
+  margin-left: calc(2px * var(--beast-scale));
+}
+
+.beast2d-sfx-stop-icon {
+  width: calc(10px * var(--beast-scale));
+  height: calc(10px * var(--beast-scale));
+  background: currentColor;
+}
+
+.beast2d-sfx-name {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: #93be64;
+  background: #4a784d;
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+  box-shadow: inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #3b2e3f;
+  padding: calc(4px * var(--beast-scale));
+  line-height: calc(16px * var(--beast-scale));
+}
+
+.beast2d-sfx-rotor {
+  position: relative;
+  width: calc(84px * var(--beast-scale));
+  height: calc(84px * var(--beast-scale));
+  flex-shrink: 0;
+}
+
+.beast2d-sfx-chip {
+  position: absolute;
+  font: inherit;
+  font-size: calc(12px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+  color: #f4ead2;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.beast2d-sfx-chip.is-dim {
+  color: #746678;
+  cursor: default;
+}
+
+.beast2d-sfx-chip.is-on {
+  color: #f1c766;
+}
+
+.beast2d-sfx-chip-pico {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.beast2d-sfx-chip-gb {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.beast2d-sfx-chip-snes {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.beast2d-sfx-chip-gen {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.beast2d-sfx-dial {
+  position: absolute;
+  inset: calc(18px * var(--beast-scale));
+  border-radius: 50%;
+  background: #f4ead2;
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+  box-shadow: inset calc(-2px * var(--beast-scale)) calc(-2px * var(--beast-scale)) 0 #746678;
+}
+
+.beast2d-sfx-needle {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  width: calc(3px * var(--beast-scale));
+  height: 34%;
+  margin-left: calc(-1.5px * var(--beast-scale));
+  background: #1f1424;
+  transform-origin: 50% 100%;
+}
+
+.beast2d-sfx-chip-note {
+  position: absolute;
+  right: calc(96px * var(--beast-scale));
+  top: 0;
+  color: #f1c766;
+  font-size: calc(12px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+}
+
+.beast2d-sfx-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(4px * var(--beast-scale));
+}
+
+.beast2d-sfx-preset {
+  position: relative;
+  min-width: calc(52px * var(--beast-scale));
+}
+
+.beast2d-sfx-badge {
+  position: absolute;
+  top: calc(1px * var(--beast-scale));
+  right: calc(2px * var(--beast-scale));
+  font-size: calc(10px * var(--beast-scale));
+  line-height: calc(10px * var(--beast-scale));
+  color: #93be64;
+}
+
+.beast2d-sfx-mid {
+  display: flex;
+  gap: calc(6px * var(--beast-scale));
+  min-height: calc(120px * var(--beast-scale));
+}
+
+.beast2d-sfx-grid {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(2px * var(--beast-scale));
+  padding: calc(4px * var(--beast-scale));
+  background: #4a784d;
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+  box-shadow: inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #3b2e3f;
+}
+
+.beast2d-sfx-pitch,
+.beast2d-sfx-volume {
+  display: grid;
+  grid-template-columns: repeat(32, minmax(0, 1fr));
+  gap: calc(1px * var(--beast-scale));
+}
+
+.beast2d-sfx-pitch {
+  flex: 1;
+  min-height: calc(78px * var(--beast-scale));
+}
+
+.beast2d-sfx-volume {
+  height: calc(14px * var(--beast-scale));
+}
+
+.beast2d-sfx-cell {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 100%;
+  background: #3b2e3f;
+}
+
+.beast2d-sfx-bar {
+  width: 100%;
+  height: 0;
+  max-height: 100%;
+  background: #93be64;
+}
+
+.beast2d-sfx-bar-vol {
+  min-height: calc(4px * var(--beast-scale));
+}
+
+.beast2d-sfx-playhead {
+  position: absolute;
+  top: calc(4px * var(--beast-scale));
+  bottom: calc(4px * var(--beast-scale));
+  width: calc(8px * var(--beast-scale));
+  margin-left: calc(-4px * var(--beast-scale));
+  border: calc(2px * var(--beast-scale)) solid #f4ead2;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.beast2d-sfx-playhead.is-on {
+  opacity: 1;
+}
+
+.beast2d-sfx-waves {
+  display: flex;
+  flex-direction: column;
+  gap: calc(3px * var(--beast-scale));
+  flex-shrink: 0;
+}
+
+.beast2d-sfx-wave {
+  width: calc(42px * var(--beast-scale));
+  padding-left: 0;
+  padding-right: 0;
+  text-align: center;
+}
+
+.beast2d-sfx-knobs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(4px * var(--beast-scale));
+}
+
+.beast2d-sfx-mod {
+  display: flex;
+  flex-direction: column;
+  gap: calc(2px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+}
+
+.beast2d-sfx-mod-yellow {
+  background: #f1c766;
+}
+
+.beast2d-sfx-mod-orange {
+  background: #e28649;
+}
+
+.beast2d-sfx-mod.is-dim {
+  background: #3b2e3f;
+}
+
+.beast2d-sfx-mod-title {
+  text-align: center;
+  color: #1f1424;
+  background: #3b2e3f;
+  font-size: calc(12px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+  padding: calc(1px * var(--beast-scale));
+}
+
+.beast2d-sfx-mod.is-dim .beast2d-sfx-mod-title {
+  color: #746678;
+}
+
+.beast2d-sfx-mod-note {
+  text-align: center;
+  color: #f4ead2;
+  font-size: calc(10px * var(--beast-scale));
+  line-height: calc(10px * var(--beast-scale));
+}
+
+.beast2d-sfx-mod-knobs {
+  display: flex;
+  justify-content: center;
+  gap: calc(4px * var(--beast-scale));
+}
+
+.beast2d-sfx-knob-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(2px * var(--beast-scale));
+}
+
+.beast2d-sfx-knob {
+  width: calc(32px * var(--beast-scale));
+  height: calc(32px * var(--beast-scale));
+  border-radius: 50%;
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+  background: #f4ead2;
+  box-shadow: inset calc(-2px * var(--beast-scale)) calc(-2px * var(--beast-scale)) 0 #746678;
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+}
+
+.beast2d-sfx-mod.is-dim .beast2d-sfx-knob {
+  background: #746678;
+  cursor: default;
+}
+
+.beast2d-sfx-knob:disabled {
+  cursor: default;
+}
+
+.beast2d-sfx-knob-needle {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  width: calc(2px * var(--beast-scale));
+  height: 32%;
+  margin-left: calc(-1px * var(--beast-scale));
+  background: #1f1424;
+  transform-origin: 50% 100%;
+}
+
+.beast2d-sfx-knob-label {
+  font-size: calc(10px * var(--beast-scale));
+  line-height: calc(10px * var(--beast-scale));
+  color: #1f1424;
+  text-align: center;
+}
+
+.beast2d-sfx-mod.is-dim .beast2d-sfx-knob-label {
+  color: #746678;
+}
+
+.beast2d-sfx-bank {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #1f1424;
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+  box-shadow: inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #746678;
+}
+
+.beast2d-sfx-bank-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(4px * var(--beast-scale));
+  padding: calc(4px * var(--beast-scale));
+  color: #f4ead2;
+  background: #3b2e3f;
+}
+
+.beast2d-sfx-bank-run {
+  color: #746678;
+  font-size: calc(12px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+}
+
+.beast2d-sfx-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(2px * var(--beast-scale));
+  padding: calc(4px * var(--beast-scale));
+}
+
+.beast2d-sfx-row {
+  display: flex;
+  gap: calc(4px * var(--beast-scale));
+  background: #1f1424;
+}
+
+.beast2d-sfx-row.is-selected .beast2d-sfx-row-main {
+  outline: calc(2px * var(--beast-scale)) solid #f1c766;
+  outline-offset: calc(-2px * var(--beast-scale));
+}
+
+.beast2d-sfx-row.is-playing .beast2d-sfx-row-main {
+  background: #e28649;
+}
+
+.beast2d-sfx-row.is-empty .beast2d-sfx-row-name {
+  color: #746678;
+}
+
+.beast2d-sfx-row-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: calc(6px * var(--beast-scale));
+  font: inherit;
+  color: #f4ead2;
+  background: #1f1424;
+  border: calc(2px * var(--beast-scale)) solid #3b2e3f;
+  padding: calc(2px * var(--beast-scale));
+  cursor: pointer;
+  text-align: left;
+}
+
+.beast2d-sfx-slot {
+  flex-shrink: 0;
+  min-width: calc(24px * var(--beast-scale));
+  text-align: center;
+  color: #93be64;
+  background: #4a784d;
+  padding: calc(1px * var(--beast-scale)) calc(2px * var(--beast-scale));
+  border: calc(1px * var(--beast-scale)) solid #1f1424;
+}
+
+.beast2d-sfx-row-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.beast2d-sfx-row-play {
+  flex-shrink: 0;
+  width: calc(28px * var(--beast-scale));
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Virtual resolution 320×240; preview frame sets integer CSS scale. */
 .game-container {
   position: relative;

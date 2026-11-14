@@ -63,8 +63,9 @@ describe("console view state", () => {
     expect(moveDiskSelection(moved, -99, 4).selectedDiskIndex).toBe(0);
   });
 
-  it("marks only CODE as functional", () => {
+  it("marks CODE and SFX as functional", () => {
     expect(isToolFunctional("CODE")).toBe(true);
+    expect(isToolFunctional("SFX")).toBe(true);
     expect(isToolFunctional("MAP")).toBe(false);
   });
 });

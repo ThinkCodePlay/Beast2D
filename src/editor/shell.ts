@@ -38,6 +38,9 @@ import { beast2dEditorTheme, beast2dSyntax } from "./theme";
 import { clockText } from "./clock";
 import { paintEmptySlot, paintHomeFloppy, paintToolFloppy } from "./pixelArt";
 import { loadEditorCart } from "./editorCart";
+import { mountSfxDisk } from "./sfxPanel";
+import { getSfxBank } from "../core/sfx/bank";
+import { serializeSfxBank } from "../core/sfx/format";
 
 const STORAGE_KEY = "beast2d-cart-script";
 const DEV_PING = "/__beast2d/dev";
@@ -287,14 +290,22 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   codePanel.append(errorStrip, editorMount);
   editorColumn.append(stubPanel, codePanel);
 
+  const sfxDisk = mountSfxDisk();
+  editorColumn.append(sfxDisk.machine);
+  sfxDisk.machine.hidden = true;
+
   const previewColumn = document.createElement("div");
   previewColumn.className = "beast2d-preview-column";
+  const sfxBankMount = document.createElement("div");
+  sfxBankMount.className = "beast2d-sfx-bank-mount";
+  sfxBankMount.hidden = true;
+  sfxBankMount.append(sfxDisk.bank);
   const previewFrame = document.createElement("div");
   previewFrame.className = "beast2d-preview-frame";
 
   gameContainer.parentElement?.insertBefore(consoleFrame, gameContainer);
   previewFrame.appendChild(gameContainer);
-  previewColumn.appendChild(previewFrame);
+  previewColumn.append(sfxBankMount, previewFrame);
 
   workspace.append(editorColumn, previewColumn);
 
@@ -453,10 +464,19 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   const syncEditorPanes = () => {
     const onEditorScreen = viewState.screen === "editor";
+    const showSfx = onEditorScreen && viewState.activeTool === "SFX";
     const showCode = onEditorScreen && viewState.activeTool === "CODE";
-    const showStub = onEditorScreen && viewState.activeTool !== "CODE";
+    const showStub = onEditorScreen && !showCode && !showSfx;
     codePanel.hidden = !showCode;
     stubPanel.hidden = !showStub;
+    sfxDisk.machine.hidden = !showSfx;
+    const sfxPreviewGame = showSfx && viewState.editorMode === "run";
+    sfxBankMount.hidden = !showSfx || sfxPreviewGame;
+    previewFrame.hidden = showSfx && !sfxPreviewGame;
+    previewColumn.classList.toggle("beast2d-preview-column-bank", showSfx && !sfxPreviewGame);
+    workspace.classList.toggle("beast2d-workspace-sfx", showSfx);
+    editorColumn.classList.toggle("beast2d-editor-column-sfx", showSfx);
+    sfxDisk.setLive(showSfx);
     if (showCode && viewState.editorMode === "code") {
       requestAnimationFrame(() => view.focus());
     }
@@ -477,9 +497,9 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       return;
     }
     breadcrumb.textContent = `BEAST2D OS > ${disk.title}`;
-    const showCartActions = viewState.activeTool === "CODE";
-    saveButton.hidden = !showCartActions;
-    runButton.hidden = !showCartActions;
+    const editorTool = viewState.activeTool;
+    saveButton.hidden = editorTool !== "CODE" && editorTool !== "SFX";
+    runButton.hidden = editorTool !== "CODE" && editorTool !== "SFX";
   };
 
   const hint = (pairs: [string, string][]) =>
@@ -500,6 +520,16 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       return;
     }
     if (viewState.screen === "editor") {
+      if (viewState.activeTool === "SFX") {
+        footer.innerHTML = hint([
+          ["SPACE", "play"],
+          ["↑↓", "slot"],
+          ["C", "chip"],
+          ["D", "dice"],
+          ["TAB", "next disk"],
+        ]);
+        return;
+      }
       footer.innerHTML = hint([
         ["TAB", "next disk"],
         ["ESC", "home"],
@@ -691,7 +721,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       const response = await fetch(SAVE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ source: shell.getSource() }),
+        body: JSON.stringify({ source: shell.getSource(), sfx: serializeSfxBank(getSfxBank()) }),
       });
       if (!response.ok) {
         shell.setError("Save failed");
@@ -799,6 +829,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       }
 
       if (viewState.screen === "editor") {
+        if (viewState.activeTool === "SFX" && sfxDisk.handleKey(event)) {
+          event.preventDefault();
+          return;
+        }
         if (event.key === "Escape") {
           enterHome();
           event.preventDefault();

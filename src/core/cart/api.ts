@@ -1,3 +1,5 @@
+import { SFX_SLOTS } from "../sfx/chips";
+import { playSfx } from "../sfx/synth";
 import { paletteIndex } from "./paletteIndex";
 import { requireCartContext } from "./context";
 
@@ -76,4 +78,12 @@ export function btn(action: string): boolean {
 /** True on the frame the named action was pressed. */
 export function btnp(action: string): boolean {
   return requireCartContext("btnp").input.wasPressed(action);
+}
+
+/** Plays sound slot n from the live cart bank. Out-of-range slots are ignored. */
+export function sfx(n: number): void {
+  requireCartContext("sfx");
+  if (!Number.isInteger(n)) throw new Error("sfx slot must be an integer");
+  if (n < 0 || n >= SFX_SLOTS) return;
+  playSfx(n);
 }
