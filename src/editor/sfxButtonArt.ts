@@ -237,7 +237,7 @@ export function paintSfxButton(
     return;
   }
   if (options.preset) {
-    const ink = dim ? Beast2D16.StoneGray : options.preset === "dice" ? Beast2D16.PlumOutline : Beast2D16.LeafGreen;
+    const ink = dim ? Beast2D16.StoneGray : options.preset === "dice" ? Beast2D16.Cream : Beast2D16.LeafGreen;
     blitGrid(ctx, PRESET_GRIDS[options.preset], 0, 0, ink);
   }
 }

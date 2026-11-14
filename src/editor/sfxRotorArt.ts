@@ -59,12 +59,14 @@ function drawMicro(
   }
 }
 
-export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId): void {
-  canvas.width = W;
-  canvas.height = H;
+export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1): void {
+  const pixel = Math.max(1, Math.round(scale));
+  canvas.width = W * pixel;
+  canvas.height = H * pixel;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
+  ctx.setTransform(pixel, 0, 0, pixel, 0, 0);
   ctx.clearRect(0, 0, W, H);
 
   const cx = 24;

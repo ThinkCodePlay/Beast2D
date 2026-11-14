@@ -205,24 +205,31 @@ export function mountSfxDisk(): SfxDisk {
     waves.append(button);
   }
   const effects = el("div", "beast2d-sfx-effects");
-  const knobUi = new Map<KnobId, { button: HTMLButtonElement; canvas: HTMLCanvasElement; label: HTMLElement; module: HTMLElement }>();
+  const knobUi = new Map<
+    KnobId,
+  { button: HTMLButtonElement; canvas: HTMLCanvasElement; label: HTMLElement; module: HTMLElement; tag: HTMLElement | null }
+  >();
   for (const id of KNOB_IDS) {
     const box = el("section", "beast2d-sfx-fx-mod");
     box.dataset.knob = id;
+    const tag =
+      id === "cutoff" ? el("span", "beast2d-sfx-fx-mod-tag", "") : null;
+    if (tag) tag.hidden = true;
     const button = el("button", "beast2d-sfx-knob");
     button.type = "button";
     button.setAttribute("aria-label", knobLabel(id));
     const knobCanvas = el("canvas", "beast2d-sfx-knob-icon");
     const label = el("span", "beast2d-sfx-knob-label", knobLabel(id));
     button.append(knobCanvas);
+    if (tag) box.append(tag);
     box.append(button, label);
-    knobUi.set(id, { button, canvas: knobCanvas, label, module: box });
+    knobUi.set(id, { button, canvas: knobCanvas, label, module: box, tag });
     bindKnob(id, button);
     effects.append(box);
   }
-  mid.append(effects, gridWrap, waves);
+  mid.append(gridWrap, waves);
 
-  machine.append(top, presets, mid);
+  machine.append(top, presets, mid, effects);
 
   const bank = el("section", "beast2d-sfx-bank");
   bank.setAttribute("aria-label", "Sound bank");
@@ -274,11 +281,13 @@ export function mountSfxDisk(): SfxDisk {
   }
 
   function setChip(chip: LiveChipId): void {
+    updateSfxCartChip(chip);
     const sound = current();
-    if (sound.chip === null) updateSfxCartChip(chip);
-    else updateSfxSlot(selected, (slot) => {
-      slot.chip = chip;
-    });
+    if (sound.chip !== null) {
+      updateSfxSlot(selected, (slot) => {
+        slot.chip = null;
+      });
+    }
   }
 
   function cycleChip(): void {
@@ -380,7 +389,9 @@ export function mountSfxDisk(): SfxDisk {
       nameSlot = selected;
     }
     loopButton.classList.toggle("is-selected", sound.loop);
-    paintSfxRotor(rotorCanvas, cartChip);
+    const chromeScale =
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue("--beast-scale"), 10) || 1;
+    paintSfxRotor(rotorCanvas, cartChip, chromeScale);
     for (const id of CHIP_IDS) {
       const node = chipButtons.get(id);
       node?.classList.toggle("is-on", id === cartChip);
@@ -437,6 +448,10 @@ export function mountSfxDisk(): SfxDisk {
       ui.label.textContent = knobLabel(id);
       if (id === "cutoff") {
         ui.button.setAttribute("aria-label", enabled ? "CUT" : "NO GB");
+        if (ui.tag) {
+          ui.tag.textContent = "NO GB";
+          ui.tag.hidden = enabled;
+        }
       }
     }
     bankState.slots.forEach((slot, index) => {
