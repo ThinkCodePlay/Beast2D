@@ -164,7 +164,12 @@ export function mountSfxDisk(): SfxDisk {
       button.classList.toggle("is-dim", !allowed);
       button.classList.toggle("is-selected", allowed && sound.wave === id);
       const icon = button.querySelector("canvas.beast2d-sfx-wave-icon");
-      if (icon instanceof HTMLCanvasElement) paintSfxWaveIcon(icon, id, !allowed);
+      if (icon instanceof HTMLCanvasElement) {
+        paintSfxWaveIcon(icon, id, {
+          dim: !allowed,
+          selected: allowed && sound.wave === id,
+        });
+      }
     }
     sound.pitch.forEach((value, index) => {
       const bar = gridUi.pitchBars[index];

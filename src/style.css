@@ -778,7 +778,7 @@ body,
   gap: calc(2px * var(--beast-scale));
   flex-shrink: 0;
   padding: calc(1px * var(--beast-scale));
-  background: #1f1424;
+  background: #746678;
 }
 
 .beast2d-sfx-preset.beast2d-sfx-btn {
@@ -992,20 +992,25 @@ body,
 .beast2d-sfx-wave {
   padding: 0;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
   background: transparent;
   box-sizing: border-box;
 }
 
-.beast2d-sfx-wave.is-selected {
-  box-shadow: inset 0 0 0 calc(2px * var(--beast-scale)) #f1c766;
+.beast2d-sfx-wave.beast2d-sfx-btn.is-dim,
+.beast2d-sfx-wave.beast2d-sfx-btn.is-selected,
+.beast2d-sfx-wave.beast2d-sfx-pixel-btn.is-selected,
+.beast2d-sfx-wave.beast2d-sfx-pixel-btn.is-down:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+  transform: none;
 }
 
 .beast2d-sfx-wave-icon {
   display: block;
-  width: calc(16px * var(--beast-scale));
-  height: calc(16px * var(--beast-scale));
+  width: 100%;
+  height: 100%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
@@ -1281,11 +1286,6 @@ body,
   grid-template-columns: repeat(2, calc(28px * var(--beast-scale)));
   flex: 0 0 calc(58px * var(--beast-scale));
   width: calc(58px * var(--beast-scale));
-}
-
-.beast2d-workspace-sfx .beast2d-sfx-wave-icon {
-  width: calc(16px * var(--beast-scale));
-  height: calc(16px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-editor-column-sfx {
