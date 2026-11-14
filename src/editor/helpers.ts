@@ -39,6 +39,7 @@ export const CART_FUNCTIONS: CartFunction[] = [
   },
   { name: "btn", params: [{ name: "action", quoted: true }] },
   { name: "btnp", params: [{ name: "action", quoted: true }] },
+  { name: "sfx", params: [{ name: "n" }] },
 ];
 
 const byName = new Map(CART_FUNCTIONS.map((fn) => [fn.name, fn]));

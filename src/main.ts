@@ -15,6 +15,8 @@ import helloScript from "./game/carts/hello.script.ts?raw";
 import { CartLevel } from "./core/cart/CartLevel";
 import { guardCart } from "./core/cart/compile";
 import { mountCartEditor } from "./editor/shell";
+import { CART_SFX_STORAGE_KEY, initSfxBank } from "./core/sfx/bank";
+import helloSfx from "./game/carts/hello.sfx.json";
 import "./style.css";
 
 const CART_SCRIPT_STORAGE_KEY = "beast2d-cart-script";
@@ -34,7 +36,10 @@ const engine = new Engine({
 const bootstrapParams = new URLSearchParams(window.location.search);
 if (bootstrapParams.get("resetCart") === "1") {
   localStorage.removeItem(CART_SCRIPT_STORAGE_KEY);
+  localStorage.removeItem(CART_SFX_STORAGE_KEY);
 }
+
+initSfxBank(helloSfx);
 
 engine
   .bootstrap(container)

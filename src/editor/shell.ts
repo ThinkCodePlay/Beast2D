@@ -19,7 +19,13 @@ import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 import type { GameManager } from "../core/GameManager";
 import { checkCartSyntax, compileCart } from "../core/cart/compile";
 import { DEFAULT_CONSOLE_DISKS } from "./disks";
-import { BOOT_DURATION_MS, chromeFontScale, fitPreviewScale, homeFloppyScale } from "./consoleLayout";
+import {
+  BOOT_DURATION_MS,
+  BOOT_SCREEN_ENABLED,
+  chromeFontScale,
+  fitPreviewScale,
+  homeFloppyScale,
+} from "./consoleLayout";
 import { CONSOLE_TOOLS, type ConsoleTool, type ConsoleViewState, type EditorMode } from "./consoleTypes";
 import {
   cycleTool,
@@ -28,6 +34,7 @@ import {
   isToolFunctional,
   moveDiskSelection,
   openEditor,
+  selectDisk,
   openPlay,
   setEditorMode,
   skipBoot,
@@ -38,6 +45,9 @@ import { beast2dEditorTheme, beast2dSyntax } from "./theme";
 import { clockText } from "./clock";
 import { paintEmptySlot, paintHomeFloppy, paintToolFloppy } from "./pixelArt";
 import { loadEditorCart } from "./editorCart";
+import { mountSfxDisk } from "./sfxPanel";
+import { getSfxBank } from "../core/sfx/bank";
+import { serializeSfxBank } from "../core/sfx/format";
 
 const STORAGE_KEY = "beast2d-cart-script";
 const DEV_PING = "/__beast2d/dev";
@@ -117,7 +127,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   let saveEnabled = false;
   let runError: { message: string; line?: number } | null = null;
   let viewState: ConsoleViewState = initialViewState({
-    skipBoot: skipBootOption || playOnly,
+    skipBoot: skipBootOption || playOnly || !BOOT_SCREEN_ENABLED,
     startScreen: playOnly ? "play" : "home",
   });
 
@@ -254,8 +264,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     title.textContent = disk.title;
     btn.append(face, title);
     btn.addEventListener("click", () => {
-      viewState = moveDiskSelection(viewState, index - viewState.selectedDiskIndex, disks.length);
+      viewState = selectDisk(viewState, index, disks.length);
       applyViewState();
+      if (disk.kind === "cart") {
+        void openCartEditor();
+      }
     });
     homeShelf.appendChild(btn);
     return btn;
@@ -287,14 +300,22 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   codePanel.append(errorStrip, editorMount);
   editorColumn.append(stubPanel, codePanel);
 
+  const sfxDisk = mountSfxDisk();
+  editorColumn.append(sfxDisk.machine);
+  sfxDisk.machine.hidden = true;
+
   const previewColumn = document.createElement("div");
   previewColumn.className = "beast2d-preview-column";
+  const sfxBankMount = document.createElement("div");
+  sfxBankMount.className = "beast2d-sfx-bank-mount";
+  sfxBankMount.hidden = true;
+  sfxBankMount.append(sfxDisk.bank);
   const previewFrame = document.createElement("div");
   previewFrame.className = "beast2d-preview-frame";
 
   gameContainer.parentElement?.insertBefore(consoleFrame, gameContainer);
   previewFrame.appendChild(gameContainer);
-  previewColumn.appendChild(previewFrame);
+  previewColumn.append(sfxBankMount, previewFrame);
 
   workspace.append(editorColumn, previewColumn);
 
@@ -308,9 +329,18 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   appRoot.classList.add("beast2d-app");
 
   let layoutKey = "";
+  const maybeRepaintSfxChrome = () => {
+    if (viewState.screen === "editor" && viewState.activeTool === "SFX") {
+      sfxDisk.repaintChrome();
+    }
+  };
   const layoutPreview = () => {
-    const fontScale = chromeFontScale(window.innerHeight);
-    document.documentElement.style.setProperty("--beast-scale", String(fontScale));
+    const fontScale = chromeFontScale(window.innerHeight, window.innerWidth);
+    const scaleText = String(fontScale);
+    document.documentElement.style.setProperty("--beast-scale", scaleText);
+    document.body.style.setProperty("--beast-scale", scaleText);
+    consoleFrame.style.setProperty("--beast-scale", scaleText);
+    consoleFrame.classList.toggle("beast2d-console-narrow", window.innerWidth < 1280);
     const playing = viewState.screen === "play";
     workspace.classList.toggle("beast2d-workspace-play", playing);
     editorColumn.hidden = playing;
@@ -337,23 +367,37 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       const columnW = Math.min(maxPreview, frameW + padX * 2);
       columnFlex = `0 0 ${columnW}px`;
     }
-    const key = `${fontScale}:${frameW}:${frameH}:${columnFlex}:${playing ? 1 : 0}`;
-    if (key === layoutKey) return;
+    const sfxEdit =
+      viewState.screen === "editor" &&
+      viewState.activeTool === "SFX" &&
+      viewState.editorMode !== "run";
+    const key = `${fontScale}:${frameW}:${frameH}:${columnFlex}:${playing ? 1 : 0}:${sfxEdit ? 1 : 0}`;
+    if (key === layoutKey) {
+      maybeRepaintSfxChrome();
+      return;
+    }
     layoutKey = key;
     previewFrame.style.width = `${frameW}px`;
     previewFrame.style.height = `${frameH}px`;
-    previewColumn.style.flex = columnFlex;
+    if (sfxEdit) {
+      editorColumn.style.flex = "0 0 62%";
+      previewColumn.style.flex = "0 0 36%";
+    } else {
+      editorColumn.style.flex = "";
+      previewColumn.style.flex = columnFlex;
+    }
+    maybeRepaintSfxChrome();
     repaintFloppies();
   };
   const repaintFloppies = () => {
-    const pixel = chromeFontScale(window.innerHeight);
+    const pixel = chromeFontScale(window.innerHeight, window.innerWidth);
     const homePixel = homeFloppyScale(pixel);
+    const iconsOnly = window.innerWidth < 1280;
     consoleFrame.querySelectorAll<HTMLCanvasElement>(".beast2d-floppy-canvas").forEach((canvas) => {
       const kind = canvas.dataset.floppy;
       if (kind === "tool") {
         const tool = canvas.dataset.tool ?? "CODE";
-        // Native 64×72. Scaling these with the device ate the height a 2× playfield needs.
-        paintToolFloppy(canvas, tool, tool === viewState.activeTool, 1);
+        paintToolFloppy(canvas, tool, tool === viewState.activeTool, pixel, iconsOnly);
         return;
       }
       if (kind === "home") {
@@ -453,10 +497,20 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   const syncEditorPanes = () => {
     const onEditorScreen = viewState.screen === "editor";
+    const showSfx = onEditorScreen && viewState.activeTool === "SFX";
     const showCode = onEditorScreen && viewState.activeTool === "CODE";
-    const showStub = onEditorScreen && viewState.activeTool !== "CODE";
+    const showStub = onEditorScreen && !showCode && !showSfx;
     codePanel.hidden = !showCode;
     stubPanel.hidden = !showStub;
+    sfxDisk.machine.hidden = !showSfx;
+    const sfxPreviewGame = showSfx && viewState.editorMode === "run";
+    sfxBankMount.hidden = !showSfx || sfxPreviewGame;
+    previewFrame.hidden = showSfx && !sfxPreviewGame;
+    previewColumn.classList.toggle("beast2d-preview-column-bank", showSfx && !sfxPreviewGame);
+    workspace.classList.toggle("beast2d-workspace-sfx", showSfx);
+    workspace.classList.toggle("beast2d-workspace-sfx-run", sfxPreviewGame);
+    editorColumn.classList.toggle("beast2d-editor-column-sfx", showSfx);
+    sfxDisk.setLive(showSfx);
     if (showCode && viewState.editorMode === "code") {
       requestAnimationFrame(() => view.focus());
     }
@@ -477,9 +531,9 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       return;
     }
     breadcrumb.textContent = `BEAST2D OS > ${disk.title}`;
-    const showCartActions = viewState.activeTool === "CODE";
-    saveButton.hidden = !showCartActions;
-    runButton.hidden = !showCartActions;
+    const editorTool = viewState.activeTool;
+    saveButton.hidden = editorTool !== "CODE" && editorTool !== "SFX";
+    runButton.hidden = editorTool !== "CODE" && editorTool !== "SFX";
   };
 
   const hint = (pairs: [string, string][]) =>
@@ -500,6 +554,16 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       return;
     }
     if (viewState.screen === "editor") {
+      if (viewState.activeTool === "SFX") {
+        footer.innerHTML = hint([
+          ["SPACE", "play"],
+          ["↑↓", "slot"],
+          ["C", "chip"],
+          ["D", "dice"],
+          ["TAB", "next disk"],
+        ]);
+        return;
+      }
       footer.innerHTML = hint([
         ["TAB", "next disk"],
         ["ESC", "home"],
@@ -529,6 +593,8 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     syncHomeSelection();
     syncEditorPanes();
     layoutPreview();
+    maybeRepaintSfxChrome();
+    repaintFloppies();
     if (viewState.screen === "editor" || viewState.screen === "play") pokePlayfield();
   };
 
@@ -691,7 +757,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       const response = await fetch(SAVE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ source: shell.getSource() }),
+        body: JSON.stringify({ source: shell.getSource(), sfx: serializeSfxBank(getSfxBank()) }),
       });
       if (!response.ok) {
         shell.setError("Save failed");
@@ -799,6 +865,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       }
 
       if (viewState.screen === "editor") {
+        if (viewState.activeTool === "SFX" && sfxDisk.handleKey(event)) {
+          event.preventDefault();
+          return;
+        }
         if (event.key === "Escape") {
           enterHome();
           event.preventDefault();

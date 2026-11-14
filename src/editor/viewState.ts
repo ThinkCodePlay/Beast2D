@@ -56,5 +56,5 @@ export function moveDiskSelection(state: ConsoleViewState, delta: number, diskCo
 }
 
 export function isToolFunctional(tool: ConsoleTool): boolean {
-  return tool === "CODE";
+  return tool === "CODE" || tool === "SFX";
 }
