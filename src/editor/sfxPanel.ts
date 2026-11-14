@@ -27,14 +27,20 @@ const ROTOR_ANGLE: Record<(typeof CHIP_IDS)[number], number> = {
 
 type ModuleTone = "yellow" | "orange";
 
-const MODULES: { title: string; knobs: readonly KnobId[]; tone: ModuleTone; note: boolean }[] = [
-  { title: "OUTPUT", knobs: ["vol"], tone: "yellow", note: false },
-  { title: "ENVELOPE", knobs: ["attack", "decay"], tone: "orange", note: false },
-  { title: "SPEED", knobs: ["rate"], tone: "yellow", note: false },
-  { title: "SLIDE", knobs: ["slide"], tone: "yellow", note: false },
-  { title: "VIBRATO", knobs: ["vibrato"], tone: "yellow", note: false },
-  { title: "DUTY", knobs: ["duty"], tone: "yellow", note: false },
-  { title: "FILTER", knobs: ["cutoff"], tone: "yellow", note: true },
+type SfxModule = { title: string; knobs: readonly KnobId[]; tone: ModuleTone; note: boolean };
+
+const KNOB_ROWS: SfxModule[][] = [
+  [
+    { title: "OUTPUT", knobs: ["vol"], tone: "yellow", note: false },
+    { title: "ENVELOPE", knobs: ["attack", "decay"], tone: "orange", note: false },
+    { title: "SPEED", knobs: ["rate"], tone: "yellow", note: false },
+  ],
+  [
+    { title: "SLIDE", knobs: ["slide"], tone: "yellow", note: false },
+    { title: "VIBRATO", knobs: ["vibrato"], tone: "yellow", note: false },
+    { title: "DUTY", knobs: ["duty"], tone: "yellow", note: false },
+    { title: "FILTER", knobs: ["cutoff"], tone: "yellow", note: true },
+  ],
 ];
 
 export type SfxDisk = {
@@ -185,28 +191,32 @@ export function mountSfxDisk(): SfxDisk {
 
   const knobs = el("div", "beast2d-sfx-knobs");
   const knobUi = new Map<KnobId, { button: HTMLButtonElement; needle: HTMLElement; label: HTMLElement; module: HTMLElement; note: HTMLElement | null }>();
-  for (const module of MODULES) {
-    const box = el("section", `beast2d-sfx-mod beast2d-sfx-mod-${module.tone} beast2d-sfx-mod-${module.title.toLowerCase()}`);
-    box.append(el("div", "beast2d-sfx-mod-title", module.title));
-    const note = module.note ? el("div", "beast2d-sfx-mod-note", "") : null;
-    if (note) box.append(note);
-    const row = el("div", "beast2d-sfx-mod-knobs");
-    for (const id of module.knobs) {
-      const button = el("button", "beast2d-sfx-knob");
-      button.type = "button";
-      button.setAttribute("aria-label", knobLabel(id));
-      const needle = el("i", "beast2d-sfx-knob-needle");
-      const label = el("span", "beast2d-sfx-knob-label", knobLabel(id));
-      button.append(needle);
-      const wrap = el("div", "beast2d-sfx-knob-wrap");
-      wrap.append(button, label);
-      row.append(wrap);
-      knobUi.set(id, { button, needle, label, module: box, note });
-      bindKnob(id, button);
+  KNOB_ROWS.forEach((modules, rowIndex) => {
+    const knobRow = el("div", `beast2d-sfx-knob-row beast2d-sfx-knob-row-${rowIndex + 1}`);
+    for (const module of modules) {
+      const box = el("section", `beast2d-sfx-mod beast2d-sfx-mod-${module.tone} beast2d-sfx-mod-${module.title.toLowerCase()}`);
+      box.append(el("div", "beast2d-sfx-mod-title", module.title));
+      const note = module.note ? el("div", "beast2d-sfx-mod-note", "") : null;
+      if (note) box.append(note);
+      const row = el("div", "beast2d-sfx-mod-knobs");
+      for (const id of module.knobs) {
+        const button = el("button", "beast2d-sfx-knob");
+        button.type = "button";
+        button.setAttribute("aria-label", knobLabel(id));
+        const needle = el("i", "beast2d-sfx-knob-needle");
+        const label = el("span", "beast2d-sfx-knob-label", knobLabel(id));
+        button.append(needle);
+        const wrap = el("div", "beast2d-sfx-knob-wrap");
+        wrap.append(button, label);
+        row.append(wrap);
+        knobUi.set(id, { button, needle, label, module: box, note });
+        bindKnob(id, button);
+      }
+      box.append(row);
+      knobRow.append(box);
     }
-    box.append(row);
-    knobs.append(box);
-  }
+    knobs.append(knobRow);
+  });
 
   machine.append(top, presets, mid, knobs);
 

@@ -664,21 +664,24 @@ body,
 
 .beast2d-sfx-rotor {
   position: relative;
-  width: calc(78px * var(--beast-scale));
-  height: calc(78px * var(--beast-scale));
+  width: calc(92px * var(--beast-scale));
+  height: calc(92px * var(--beast-scale));
   flex-shrink: 0;
 }
 
 .beast2d-sfx-chip {
   position: absolute;
   font: inherit;
-  font-size: calc(12px * var(--beast-scale));
-  line-height: calc(12px * var(--beast-scale));
+  font-size: calc(11px * var(--beast-scale));
+  line-height: calc(11px * var(--beast-scale));
   color: #f4ead2;
   background: transparent;
   border: none;
   padding: 0;
+  margin: 0;
   cursor: pointer;
+  z-index: 2;
+  white-space: nowrap;
 }
 
 .beast2d-sfx-chip.is-dim {
@@ -691,28 +694,30 @@ body,
 }
 
 .beast2d-sfx-chip-pico {
-  top: 0;
-  left: 0;
+  top: calc(2px * var(--beast-scale));
+  left: calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-chip-gb {
-  left: 0;
-  bottom: 0;
+  left: calc(2px * var(--beast-scale));
+  bottom: calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-chip-snes {
-  top: 0;
-  right: 0;
+  top: calc(2px * var(--beast-scale));
+  right: calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-chip-gen {
-  right: 0;
-  bottom: 0;
+  right: calc(2px * var(--beast-scale));
+  bottom: calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-dial {
   position: absolute;
-  inset: calc(18px * var(--beast-scale));
+  inset: calc(20px * var(--beast-scale));
+  z-index: 1;
+  pointer-events: none;
   border-radius: 50%;
   background: #f4ead2;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
@@ -741,15 +746,21 @@ body,
   position: relative;
   flex: 1 1 0;
   min-width: 0;
-  padding: calc(6px * var(--beast-scale)) calc(4px * var(--beast-scale)) calc(2px * var(--beast-scale));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: calc(30px * var(--beast-scale));
+  padding: calc(9px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-preset-name {
   display: block;
+  width: 100%;
   text-align: center;
   font-size: calc(12px * var(--beast-scale));
   line-height: calc(12px * var(--beast-scale));
-  padding-right: calc(14px * var(--beast-scale));
+  padding: 0;
 }
 
 .beast2d-sfx-preset-badge {
@@ -767,14 +778,16 @@ body,
 .beast2d-sfx-mid {
   display: flex;
   gap: calc(4px * var(--beast-scale));
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  align-items: stretch;
 }
 
 .beast2d-sfx-grid {
   position: relative;
   flex: 1;
   min-width: 0;
+  height: calc(56px * var(--beast-scale));
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: calc(2px * var(--beast-scale));
@@ -792,13 +805,14 @@ body,
 }
 
 .beast2d-sfx-pitch {
-  flex: 1;
-  min-height: 0;
+  flex: 1 1 auto;
+  height: calc(42px * var(--beast-scale));
+  min-height: calc(42px * var(--beast-scale));
 }
 
 .beast2d-sfx-volume {
-  flex-shrink: 0;
-  height: calc(12px * var(--beast-scale));
+  flex: 0 0 calc(10px * var(--beast-scale));
+  height: calc(10px * var(--beast-scale));
 }
 
 .beast2d-sfx-cell {
@@ -815,6 +829,10 @@ body,
   height: 0;
   max-height: 100%;
   background: #93be64;
+}
+
+.beast2d-sfx-volume .beast2d-sfx-bar {
+  background: #f1c766;
 }
 
 .beast2d-sfx-bar-vol {
@@ -838,16 +856,19 @@ body,
 
 .beast2d-sfx-waves {
   display: grid;
-  grid-template-columns: repeat(2, calc(36px * var(--beast-scale)));
-  grid-template-rows: repeat(3, calc(28px * var(--beast-scale)));
+  grid-template-columns: repeat(2, calc(34px * var(--beast-scale)));
+  grid-template-rows: repeat(3, 1fr);
   gap: calc(2px * var(--beast-scale));
-  flex-shrink: 0;
-  align-content: start;
+  flex: 0 0 calc(72px * var(--beast-scale));
+  width: calc(72px * var(--beast-scale));
+  height: calc(56px * var(--beast-scale));
+  align-self: stretch;
 }
 
 .beast2d-sfx-wave {
-  width: calc(36px * var(--beast-scale));
-  height: calc(28px * var(--beast-scale));
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -863,10 +884,23 @@ body,
 }
 
 .beast2d-sfx-knobs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: calc(2px * var(--beast-scale));
-  flex-shrink: 0;
+  flex: 0 0 auto;
+}
+
+.beast2d-sfx-knob-row {
+  display: grid;
+  gap: calc(2px * var(--beast-scale));
+}
+
+.beast2d-sfx-knob-row-1 {
+  grid-template-columns: 0.85fr 1.3fr 0.85fr;
+}
+
+.beast2d-sfx-knob-row-2 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .beast2d-sfx-mod {
