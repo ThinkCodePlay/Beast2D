@@ -54,6 +54,10 @@ body,
   font-smooth: never;
 }
 
+.beast2d-console:has(.beast2d-workspace-sfx) {
+  height: min(672px, 100%);
+}
+
 .beast2d-boot {
   position: absolute;
   inset: 0;
@@ -776,13 +780,46 @@ body,
   background: #1f1424;
 }
 
+.beast2d-sfx-preset.beast2d-sfx-btn {
+  position: relative;
+  flex-direction: column;
+  width: auto;
+  min-width: calc(32px * var(--beast-scale));
+  height: auto;
+  min-height: calc(28px * var(--beast-scale));
+  overflow: visible;
+  gap: calc(1px * var(--beast-scale));
+}
+
 .beast2d-sfx-preset-name {
   display: block;
   text-align: center;
-  font-size: calc(16px * var(--beast-scale));
-  line-height: 1;
+  font-size: calc(9px * var(--beast-scale));
+  line-height: calc(10px * var(--beast-scale));
+  color: #1f1424 !important;
   padding: 0;
   pointer-events: none;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.beast2d-sfx-preset-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.beast2d-sfx-preset .beast2d-sfx-row-badge {
+  color: #93be64 !important;
+  background: #4a784d;
+  font-size: calc(9px * var(--beast-scale));
+  line-height: calc(10px * var(--beast-scale));
+  padding: 0 calc(2px * var(--beast-scale));
+  border: calc(1px * var(--beast-scale)) solid #1f1424;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }
 
 .beast2d-sfx-mid {

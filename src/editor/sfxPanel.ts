@@ -157,13 +157,17 @@ export function mountSfxDisk(): SfxDisk {
   const presets = el("div", "beast2d-sfx-presets");
   const presetButtons = new Map<string, HTMLButtonElement>();
   const presetIcons = new Map<string, HTMLCanvasElement>();
+  const presetBadges = new Map<string, HTMLElement>();
   for (const preset of PRESET_IDS) {
     const button = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset");
     button.type = "button";
     button.title = preset.toUpperCase();
     const icon = el("canvas", "beast2d-sfx-btn-icon");
-    button.append(icon);
+    const badge = el("span", "beast2d-sfx-row-badge beast2d-sfx-preset-badge", "GB");
+    const label = el("span", "beast2d-sfx-preset-name", preset.toUpperCase());
+    button.append(icon, badge, label);
     presetIcons.set(preset, icon);
+    presetBadges.set(preset, badge);
     pressable(button);
     button.addEventListener("click", () => applyPreset(preset));
     presetButtons.set(preset, button);
@@ -400,17 +404,18 @@ export function mountSfxDisk(): SfxDisk {
   function paint(): void {
     const bankState = getSfxBank();
     const sound = current();
-    const chipId = effectiveChip(sound.chip, bankState.chip);
+    const cartChip = bankState.chip;
+    const chipId = effectiveChip(sound.chip, cartChip);
     const spec = CHIPS[chipId];
     if (nameSlot !== selected || document.activeElement !== nameInput) {
       nameInput.value = sound.name;
       nameSlot = selected;
     }
     loopButton.classList.toggle("is-selected", sound.loop);
-    needle.style.transform = `rotate(${ROTOR_ANGLE[chipId]}deg)`;
+    needle.style.transform = `rotate(${ROTOR_ANGLE[cartChip]}deg)`;
     for (const id of CHIP_IDS) {
       const node = chipButtons.get(id);
-      node?.classList.toggle("is-on", id === chipId);
+      node?.classList.toggle("is-on", id === cartChip);
     }
     for (const preset of PRESET_IDS) {
       const button = presetButtons.get(preset);
@@ -424,6 +429,8 @@ export function mountSfxDisk(): SfxDisk {
           pressed: button?.classList.contains("is-down"),
         });
       }
+      const badge = presetBadges.get(preset);
+      if (badge) badge.textContent = CHIP_LABELS[cartChip];
     }
     paintSfxButton(playIcon, { face: "cream", icon: "play", pressed: playButton.classList.contains("is-down") });
     paintSfxButton(stopIcon, { face: "cream", icon: "stop", pressed: stopButton.classList.contains("is-down") });
@@ -460,7 +467,13 @@ export function mountSfxDisk(): SfxDisk {
       const shown = id === "duty" ? applyChip(sound, bankState.chip).duty : sound.knobs[id];
       ui.needle.style.transform = `rotate(${-140 + shown * 280}deg)`;
       ui.label.textContent = id === "duty" ? dutyText(sound, bankState.chip) : knobLabel(id);
-      if (ui.note) ui.note.textContent = enabled ? "" : "NO GB";
+      if (id === "cutoff") {
+        const title = ui.module.querySelector(".beast2d-sfx-mod-title");
+        if (title) title.textContent = enabled ? "FILTER" : "NO GB";
+        if (ui.note) ui.note.textContent = "";
+      } else if (ui.note) {
+        ui.note.textContent = "";
+      }
     }
     bankState.slots.forEach((slot, index) => {
       const row = rows[index];
