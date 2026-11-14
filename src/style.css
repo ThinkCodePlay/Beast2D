@@ -588,7 +588,7 @@ body,
 
 .beast2d-workspace-sfx .beast2d-sfx-preset {
   min-height: calc(26px * var(--beast-scale));
-  padding: calc(5px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(1px * var(--beast-scale));
+  padding: calc(1px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-grid {
@@ -635,7 +635,6 @@ body,
 .beast2d-workspace-sfx .beast2d-sfx-mod-note {
   font-size: calc(8px * var(--beast-scale));
   line-height: calc(8px * var(--beast-scale));
-  min-height: calc(8px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-knob-label {
@@ -847,31 +846,43 @@ button.beast2d-sfx-chip {
 }
 
 .beast2d-sfx-preset {
-  position: relative;
   flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0;
+  min-height: calc(30px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+}
+
+.beast2d-sfx-preset-head {
+  display: flex;
   justify-content: flex-end;
-  min-height: calc(34px * var(--beast-scale));
-  padding: calc(10px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale));
+  align-items: flex-start;
+  min-height: calc(10px * var(--beast-scale));
+  flex: 0 0 auto;
 }
 
 .beast2d-sfx-preset-name {
+  flex: 0 0 auto;
   text-align: center;
   font-size: calc(11px * var(--beast-scale));
   line-height: calc(12px * var(--beast-scale));
 }
 
 .beast2d-sfx-preset-badge {
-  position: absolute;
-  top: calc(1px * var(--beast-scale));
-  right: calc(1px * var(--beast-scale));
-  z-index: 1;
+  flex-shrink: 0;
   pointer-events: none;
   -webkit-font-smoothing: none;
   font-smooth: never;
+}
+
+.beast2d-sfx-preset .beast2d-sfx-row-badge {
+  color: #93be64;
+  background: #4a784d;
 }
 
 .beast2d-sfx-mid {
@@ -1044,6 +1055,10 @@ button.beast2d-sfx-chip {
   color: #f4ead2;
   font-size: calc(10px * var(--beast-scale));
   line-height: calc(10px * var(--beast-scale));
+}
+
+.beast2d-sfx-mod-note:empty {
+  display: none;
 }
 
 .beast2d-sfx-mod-knobs {

@@ -130,9 +130,11 @@ export function mountSfxDisk(): SfxDisk {
   for (const preset of PRESET_IDS) {
     const button = el("button", "beast2d-sfx-btn beast2d-sfx-preset");
     button.type = "button";
+    const head = el("div", "beast2d-sfx-preset-head");
     const badge = el("span", "beast2d-sfx-row-badge beast2d-sfx-preset-badge", "GB");
     const label = el("span", "beast2d-sfx-preset-name", preset.toUpperCase());
-    button.append(badge, label);
+    head.append(badge);
+    button.append(head, label);
     pressable(button);
     button.addEventListener("click", () => applyPreset(preset));
     presetButtons.set(preset, button);
