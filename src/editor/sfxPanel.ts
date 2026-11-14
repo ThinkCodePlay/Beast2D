@@ -268,21 +268,16 @@ export function mountSfxDisk(): SfxDisk {
     paint();
   }
 
-  function setChip(chip: LiveChipId): void {
-    const sound = current();
-    if (sound.chip === null) updateSfxCartChip(chip);
-    else updateSfxSlot(selected, (slot) => {
-      slot.chip = chip;
+  function setCartChip(chip: LiveChipId): void {
+    updateSfxCartChip(chip);
+    updateSfxSlot(selected, (slot) => {
+      if (slot.chip !== null) slot.chip = null;
     });
   }
 
   function cycleChip(): void {
-    const order: (LiveChipId | null)[] = [null, "pico", "gb"];
-    const index = order.indexOf(current().chip);
-    const next = order[(index + 1) % order.length] ?? null;
-    updateSfxSlot(selected, (slot) => {
-      slot.chip = next;
-    });
+    const cart = getSfxBank().chip;
+    setCartChip(cart === "pico" ? "gb" : "pico");
   }
 
   function applyPreset(preset: PresetId): void {
@@ -363,17 +358,18 @@ export function mountSfxDisk(): SfxDisk {
   function paint(): void {
     const bankState = getSfxBank();
     const sound = current();
-    const chipId = effectiveChip(sound.chip, bankState.chip);
+    const cartChip = bankState.chip;
+    const chipId = effectiveChip(sound.chip, cartChip);
     const spec = CHIPS[chipId];
     if (nameSlot !== selected || document.activeElement !== nameInput) {
       nameInput.value = sound.name;
       nameSlot = selected;
     }
     loopButton.classList.toggle("is-selected", sound.loop);
-    needle.style.transform = `rotate(${ROTOR_ANGLE[chipId]}deg)`;
+    needle.style.transform = `rotate(${ROTOR_ANGLE[cartChip]}deg)`;
     for (const id of CHIP_IDS) {
       const node = chipButtons.get(id);
-      node?.classList.toggle("is-on", id === chipId);
+      node?.classList.toggle("is-on", id === cartChip);
     }
     for (const preset of PRESET_IDS) {
       presetButtons.get(preset)?.classList.toggle("is-selected", armed === preset);
@@ -443,13 +439,13 @@ export function mountSfxDisk(): SfxDisk {
       : x >= rect.width / 2 && y < rect.height / 2 ? "snes"
       : "gen";
     if (!CHIPS[live].live) return;
-    setChip(live);
+    setCartChip(live as LiveChipId);
   });
   chipButtons.forEach((node, id) => {
     if (!(node instanceof HTMLButtonElement)) return;
     node.addEventListener("click", (event) => {
       event.stopPropagation();
-      setChip(id as LiveChipId);
+      setCartChip(id as LiveChipId);
     });
   });
 

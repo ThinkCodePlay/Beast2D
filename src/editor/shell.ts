@@ -487,7 +487,6 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     workspace.classList.toggle("beast2d-workspace-sfx", showSfx);
     editorColumn.classList.toggle("beast2d-editor-column-sfx", showSfx);
     sfxDisk.setLive(showSfx);
-    document.documentElement.style.setProperty("--beast-sfx-shrink", showSfx ? "0.88" : "1");
     if (showCode && viewState.editorMode === "code") {
       requestAnimationFrame(() => view.focus());
     }
