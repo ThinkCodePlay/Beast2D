@@ -1,13 +1,14 @@
 import type { ChipId } from "../core/sfx/chips";
 import { Beast2D16 } from "../core/ui/palette";
 import { hex } from "./sfxPixelArt";
+import { KNOB_SPRITE_H, KNOB_SPRITE_W, knobSpriteUrl } from "./sfx/knobSprites";
 
-/** Logical sprite pixels (72×72). */
-const W = 72;
-const H = 72;
-const CX = 36;
-const CY = 38;
-const KNOB_R = 15;
+/** Logical pixels (64×56), matches preset key size. */
+const W = 64;
+const H = 56;
+const CX = 32;
+const CY = 30;
+const KNOB_SCALE = 3;
 
 const MICRO: Record<string, readonly string[]> = {
   P: ["111", "101", "111", "100", "100"],
@@ -21,13 +22,25 @@ const MICRO: Record<string, readonly string[]> = {
   E: ["111", "100", "110", "100", "111"],
 };
 
-/** Fixed label anchors (top-left of micro string). */
 const LABEL_ANCHOR: Record<ChipId, { x: number; y: number; text: string }> = {
-  pico: { x: 5, y: 3, text: "PICO" },
-  snes: { x: 44, y: 3, text: "SNES" },
-  gb: { x: 8, y: 57, text: "GB" },
-  gen: { x: 46, y: 57, text: "GEN" },
+  pico: { x: 3, y: 2, text: "PICO" },
+  snes: { x: 40, y: 2, text: "SNES" },
+  gb: { x: 6, y: 44, text: "GB" },
+  gen: { x: 42, y: 44, text: "GEN" },
 };
+
+let stoneKnob: HTMLImageElement | null = null;
+
+function loadStoneKnob(): HTMLImageElement {
+  if (!stoneKnob) {
+    stoneKnob = new Image();
+    stoneKnob.src = knobSpriteUrl("stone");
+    stoneKnob.decoding = "sync";
+  }
+  return stoneKnob;
+}
+
+void loadStoneKnob().decode?.();
 
 function drawMicro(ctx: CanvasRenderingContext2D, text: string, ox: number, oy: number, rgb: number): void {
   const chars = text.toUpperCase().split("");
@@ -58,49 +71,6 @@ function labelCenter(chip: ChipId): { x: number; y: number } {
   return { x: x + microWidth(text) / 2, y: y + 2 };
 }
 
-function drawKnobBody(ctx: CanvasRenderingContext2D): void {
-  for (let y = 0; y < H; y += 1) {
-    for (let x = 0; x < W; x += 1) {
-      const dx = x - CX;
-      const dy = y - CY;
-      const d2 = dx * dx + dy * dy;
-      if (d2 > (KNOB_R + 1) * (KNOB_R + 1)) continue;
-      if (d2 > KNOB_R * KNOB_R) {
-        ctx.fillStyle = hex(Beast2D16.Shadow);
-        ctx.fillRect(x, y, 1, 1);
-        continue;
-      }
-      if (x <= CX && y <= CY && d2 > (KNOB_R - 3) * (KNOB_R - 3)) {
-        ctx.fillStyle = hex(Beast2D16.Cream);
-      } else {
-        ctx.fillStyle = hex(Beast2D16.StoneGray);
-      }
-      ctx.fillRect(x, y, 1, 1);
-    }
-  }
-}
-
-/** Short yellow tick inside the knob, aimed at the active label. */
-function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
-  const { x: tx, y: ty } = labelCenter(chip);
-  const dx = tx - CX;
-  const dy = ty - CY;
-  const len = Math.hypot(dx, dy) || 1;
-  const tipX = Math.round(CX + (dx / len) * (KNOB_R - 2));
-  const tipY = Math.round(CY + (dy / len) * (KNOB_R - 2));
-  const sx = CX;
-  const sy = CY;
-  const steps = Math.max(Math.abs(tipX - sx), Math.abs(tipY - sy));
-  for (let i = 0; i <= steps; i += 1) {
-    const t = steps === 0 ? 0 : i / steps;
-    const x = Math.round(sx + (tipX - sx) * t);
-    const y = Math.round(sy + (tipY - sy) * t);
-    ctx.fillStyle = hex(Beast2D16.Yellow);
-    ctx.fillRect(x, y, 2, 1);
-    ctx.fillRect(x, y + 1, 2, 1);
-  }
-}
-
 function labelColor(id: ChipId): number {
   if (id === "snes" || id === "gen") return Beast2D16.Shadow;
   return Beast2D16.Cream;
@@ -113,6 +83,41 @@ function drawFixedLabels(ctx: CanvasRenderingContext2D): void {
   }
 }
 
+function drawStoneKnob(ctx: CanvasRenderingContext2D): void {
+  const img = loadStoneKnob();
+  if (!img.complete || img.naturalWidth === 0) return;
+  const w = KNOB_SPRITE_W * KNOB_SCALE;
+  const h = KNOB_SPRITE_H * KNOB_SCALE;
+  const x = Math.round(CX - w / 2);
+  const y = Math.round(CY - h / 2 + 1);
+  ctx.drawImage(img, 0, 0, KNOB_SPRITE_W, KNOB_SPRITE_H, x, y, w, h);
+}
+
+/** Plum pointer from the cream cap toward the active chip label. */
+function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
+  const capX = CX;
+  const capY = CY - 2;
+  const { x: tx, y: ty } = labelCenter(chip);
+  const dx = tx - capX;
+  const dy = ty - capY;
+  const len = Math.hypot(dx, dy) || 1;
+  const reach = KNOB_SCALE * 4;
+  const tipX = Math.round(capX + (dx / len) * reach);
+  const tipY = Math.round(capY + (dy / len) * reach);
+  const sx = Math.round(capX);
+  const sy = Math.round(capY);
+  const steps = Math.max(Math.abs(tipX - sx), Math.abs(tipY - sy));
+  ctx.fillStyle = hex(Beast2D16.PlumOutline);
+  for (let i = 0; i <= steps; i += 1) {
+    const t = steps === 0 ? 0 : i / steps;
+    const x = Math.round(sx + (tipX - sx) * t);
+    const y = Math.round(sy + (tipY - sy) * t);
+    ctx.fillRect(x, y, 1, 1);
+    ctx.fillRect(x + 1, y, 1, 1);
+    ctx.fillRect(x, y + 1, 1, 1);
+  }
+}
+
 export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1): void {
   const pixel = Math.max(1, Math.round(scale));
   canvas.width = W * pixel;
@@ -122,7 +127,7 @@ export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1
   ctx.imageSmoothingEnabled = false;
   ctx.setTransform(pixel, 0, 0, pixel, 0, 0);
   ctx.clearRect(0, 0, W, H);
-  drawKnobBody(ctx);
+  drawStoneKnob(ctx);
   drawFixedLabels(ctx);
   drawPointerTo(ctx, chip);
 }

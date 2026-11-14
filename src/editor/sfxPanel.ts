@@ -124,7 +124,7 @@ export function mountSfxDisk(): SfxDisk {
     });
   }
 
-  machine.append(header.top, presetsUi.presets, gridUi.sequencer);
+  machine.append(header.top, presetsUi.presets, gridUi.waves, gridUi.sequencer);
 
   function paint(): void {
     const bankState = getSfxBank();

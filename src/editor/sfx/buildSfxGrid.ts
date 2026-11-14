@@ -14,7 +14,6 @@ export type SfxGridUi = {
   mid: HTMLElement;
   waves: HTMLElement;
   sequencer: HTMLElement;
-  sparePad: HTMLElement;
   bindInput: (getSelected: () => number, clearArmed: () => void) => void;
 };
 
@@ -64,11 +63,9 @@ export function buildSfxGrid(
     waves.append(button);
   }
 
-  mid.append(gridWrap, waves);
+  mid.append(gridWrap);
   const sequencer = el("div", "beast2d-sfx-sequencer");
-  const sparePad = el("div", "beast2d-sfx-spare");
-  sparePad.setAttribute("aria-hidden", "true");
-  sequencer.append(mid, effects, sparePad);
+  sequencer.append(mid, effects);
 
   function bindDraw(target: HTMLElement, kind: "pitch" | "volume", getSelected: () => number, clearArmed: () => void): void {
     const draw = (event: PointerEvent) => {
@@ -111,7 +108,6 @@ export function buildSfxGrid(
     mid,
     waves,
     sequencer,
-    sparePad,
     bindInput,
   };
 }
