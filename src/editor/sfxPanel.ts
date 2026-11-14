@@ -17,14 +17,9 @@ import { knobLabel } from "../core/sfx/format";
 import { PRESET_IDS, generateDice, generatePreset, type PresetId } from "../core/sfx/generate";
 import { playSfx, sfxPlayhead, stopSfx } from "../core/sfx/synth";
 import { paintSfxButton } from "./sfxButtonArt";
+import { paintSfxKnob } from "./sfxKnobArt";
+import { paintSfxRotor } from "./sfxRotorArt";
 import { paintSfxWaveIcon } from "./sfxWaves";
-
-const ROTOR_ANGLE: Record<(typeof CHIP_IDS)[number], number> = {
-  pico: 315,
-  gb: 225,
-  snes: 45,
-  gen: 135,
-};
 
 type ModuleTone = "yellow" | "orange" | "grey";
 
@@ -137,21 +132,37 @@ export function mountSfxDisk(): SfxDisk {
   nameLcd.append(nameInput);
 
   const rotor = el("div", "beast2d-sfx-rotor");
-  const dial = el("div", "beast2d-sfx-dial");
-  const needle = el("i", "beast2d-sfx-needle");
-  dial.append(needle);
+  const rotorCanvas = el("canvas", "beast2d-sfx-rotor-canvas");
+  rotor.append(rotorCanvas);
   const chipButtons = new Map<string, HTMLElement>();
   for (const id of CHIP_IDS) {
     const live = CHIPS[id].live;
-    const chip = live ? el("button", `beast2d-sfx-chip beast2d-sfx-chip-${id}`, CHIP_LABELS[id]) : el("span", `beast2d-sfx-chip beast2d-sfx-chip-${id} is-dim`, CHIP_LABELS[id]);
+    const chip = live
+      ? el("button", `beast2d-sfx-chip beast2d-sfx-chip-${id}`)
+      : el("span", `beast2d-sfx-chip beast2d-sfx-chip-${id} is-dim`);
+    chip.setAttribute("aria-label", CHIP_LABELS[id]);
     if (chip instanceof HTMLButtonElement) {
       chip.type = "button";
-      chip.addEventListener("click", () => setChip(id as LiveChipId));
+      chip.addEventListener("click", (event) => {
+        event.stopPropagation();
+        setChip(id as LiveChipId);
+      });
     }
     chipButtons.set(id, chip);
     rotor.append(chip);
   }
-  rotor.append(dial);
+  rotor.addEventListener("click", (event) => {
+    const rect = rotor.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const live =
+      x < rect.width / 2 && y < rect.height / 2 ? "pico"
+      : x < rect.width / 2 && y >= rect.height / 2 ? "gb"
+      : x >= rect.width / 2 && y < rect.height / 2 ? "snes"
+      : "gen";
+    if (!CHIPS[live].live) return;
+    setChip(live as LiveChipId);
+  });
   top.append(transport, nameLcd, rotor);
 
   const presets = el("div", "beast2d-sfx-presets");
@@ -173,11 +184,12 @@ export function mountSfxDisk(): SfxDisk {
     presetButtons.set(preset, button);
     presets.append(button);
   }
-  const diceButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn");
+  const diceButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset");
   diceButton.type = "button";
   diceButton.title = "Dice";
   const diceIcon = el("canvas", "beast2d-sfx-btn-icon");
-  diceButton.append(diceIcon);
+  const diceLabel = el("span", "beast2d-sfx-preset-name", "DICE");
+  diceButton.append(diceIcon, diceLabel);
   pressable(diceButton);
   diceButton.addEventListener("click", () => rollDice());
   presets.append(diceButton);
@@ -224,7 +236,7 @@ export function mountSfxDisk(): SfxDisk {
   mid.append(gridWrap, waves);
 
   const knobs = el("div", "beast2d-sfx-knobs");
-  const knobUi = new Map<KnobId, { button: HTMLButtonElement; needle: HTMLElement; label: HTMLElement; module: HTMLElement; note: HTMLElement | null }>();
+  const knobUi = new Map<KnobId, { button: HTMLButtonElement; canvas: HTMLCanvasElement; label: HTMLElement; module: HTMLElement; note: HTMLElement | null }>();
   KNOB_ROWS.forEach((modules, rowIndex) => {
     const knobRow = el("div", `beast2d-sfx-knob-row beast2d-sfx-knob-row-${rowIndex + 1}`);
     for (const [moduleIndex, module] of modules.entries()) {
@@ -238,13 +250,13 @@ export function mountSfxDisk(): SfxDisk {
         const button = el("button", "beast2d-sfx-knob");
         button.type = "button";
         button.setAttribute("aria-label", knobLabel(id));
-        const needle = el("i", "beast2d-sfx-knob-needle");
+        const knobCanvas = el("canvas", "beast2d-sfx-knob-icon");
         const label = el("span", "beast2d-sfx-knob-label", knobLabel(id));
-        button.append(needle);
+        button.append(knobCanvas);
         const wrap = el("div", "beast2d-sfx-knob-wrap");
         wrap.append(button, label);
         row.append(wrap);
-        knobUi.set(id, { button, needle, label, module: box, note });
+        knobUi.set(id, { button, canvas: knobCanvas, label, module: box, note });
         bindKnob(id, button);
       }
       box.append(row);
@@ -411,7 +423,7 @@ export function mountSfxDisk(): SfxDisk {
       nameSlot = selected;
     }
     loopButton.classList.toggle("is-selected", sound.loop);
-    needle.style.transform = `rotate(${ROTOR_ANGLE[cartChip]}deg)`;
+    paintSfxRotor(rotorCanvas, cartChip);
     for (const id of CHIP_IDS) {
       const node = chipButtons.get(id);
       node?.classList.toggle("is-on", id === cartChip);
@@ -424,7 +436,7 @@ export function mountSfxDisk(): SfxDisk {
       if (icon) {
         paintSfxButton(icon, {
           face: on ? "selected" : "cream",
-          char: preset[0]!.toUpperCase(),
+          preset,
           pressed: button?.classList.contains("is-down"),
         });
       }
@@ -438,7 +450,7 @@ export function mountSfxDisk(): SfxDisk {
       icon: "loop",
       pressed: loopButton.classList.contains("is-down"),
     });
-    paintSfxButton(diceIcon, { face: "cream", char: "D", pressed: diceButton.classList.contains("is-down") });
+    paintSfxButton(diceIcon, { face: "pink", preset: "dice", pressed: diceButton.classList.contains("is-down") });
     for (const id of WAVE_IDS) {
       const button = waveButtons.get(id);
       if (!button) continue;
@@ -464,7 +476,7 @@ export function mountSfxDisk(): SfxDisk {
       ui.button.disabled = !enabled;
       ui.module.classList.toggle("is-dim", !enabled);
       const shown = id === "duty" ? applyChip(sound, bankState.chip).duty : sound.knobs[id];
-      ui.needle.style.transform = `rotate(${-140 + shown * 280}deg)`;
+      paintSfxKnob(ui.canvas, shown);
       ui.label.textContent = id === "duty" ? dutyText(sound, bankState.chip) : knobLabel(id);
       if (id === "cutoff") {
         const title = ui.module.querySelector(".beast2d-sfx-mod-title");

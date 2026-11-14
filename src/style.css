@@ -702,21 +702,31 @@ body,
   width: calc(92px * var(--beast-scale));
   height: calc(92px * var(--beast-scale));
   flex-shrink: 0;
+  cursor: pointer;
+}
+
+.beast2d-sfx-rotor-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
 }
 
 .beast2d-sfx-chip {
   position: absolute;
-  font: inherit;
-  font-size: calc(11px * var(--beast-scale));
-  line-height: calc(11px * var(--beast-scale));
-  color: #f4ead2;
+  width: 38%;
+  height: 38%;
+  font-size: 0;
+  color: transparent;
   background: transparent;
   border: none;
   padding: 0;
   margin: 0;
   cursor: pointer;
   z-index: 2;
-  white-space: nowrap;
+  opacity: 0;
 }
 
 .beast2d-sfx-chip.is-dim {
@@ -729,45 +739,23 @@ body,
 }
 
 .beast2d-sfx-chip-pico {
-  top: calc(2px * var(--beast-scale));
-  left: calc(2px * var(--beast-scale));
+  top: 0;
+  left: 0;
 }
 
 .beast2d-sfx-chip-gb {
-  left: calc(2px * var(--beast-scale));
-  bottom: calc(2px * var(--beast-scale));
+  left: 0;
+  bottom: 0;
 }
 
 .beast2d-sfx-chip-snes {
-  top: calc(2px * var(--beast-scale));
-  right: calc(2px * var(--beast-scale));
+  top: 0;
+  right: 0;
 }
 
 .beast2d-sfx-chip-gen {
-  right: calc(2px * var(--beast-scale));
-  bottom: calc(2px * var(--beast-scale));
-}
-
-.beast2d-sfx-dial {
-  position: absolute;
-  inset: calc(20px * var(--beast-scale));
-  z-index: 1;
-  pointer-events: none;
-  border-radius: 50%;
-  background: #f4ead2;
-  border: calc(2px * var(--beast-scale)) solid #1f1424;
-  box-shadow: inset calc(-2px * var(--beast-scale)) calc(-2px * var(--beast-scale)) 0 #746678;
-}
-
-.beast2d-sfx-needle {
-  position: absolute;
-  left: 50%;
-  top: 18%;
-  width: calc(3px * var(--beast-scale));
-  height: 34%;
-  margin-left: calc(-1.5px * var(--beast-scale));
-  background: #1f1424;
-  transform-origin: 50% 100%;
+  right: 0;
+  bottom: 0;
 }
 
 .beast2d-sfx-presets {
@@ -929,9 +917,10 @@ body,
 
 .beast2d-sfx-wave-icon {
   display: block;
-  width: calc(32px * var(--beast-scale));
-  height: calc(24px * var(--beast-scale));
+  width: calc(16px * var(--beast-scale));
+  height: calc(16px * var(--beast-scale));
   image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 .beast2d-sfx-knobs {
@@ -1016,37 +1005,35 @@ body,
 }
 
 .beast2d-sfx-knob {
-  width: calc(16px * var(--beast-scale));
-  height: calc(16px * var(--beast-scale));
-  min-width: calc(16px * var(--beast-scale));
-  min-height: calc(16px * var(--beast-scale));
-  border-radius: 50%;
-  border: calc(2px * var(--beast-scale)) solid #1f1424;
-  background: #f4ead2;
-  box-shadow: inset calc(-2px * var(--beast-scale)) calc(-2px * var(--beast-scale)) 0 #746678;
+  width: calc(24px * var(--beast-scale));
+  height: calc(24px * var(--beast-scale));
+  min-width: calc(24px * var(--beast-scale));
+  min-height: calc(24px * var(--beast-scale));
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   position: relative;
   padding: 0;
   cursor: pointer;
 }
 
+.beast2d-sfx-knob-icon {
+  display: block;
+  width: calc(24px * var(--beast-scale));
+  height: calc(24px * var(--beast-scale));
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+}
+
 .beast2d-sfx-mod.is-dim .beast2d-sfx-knob {
-  background: #746678;
+  opacity: 0.55;
   cursor: default;
 }
 
 .beast2d-sfx-knob:disabled {
   cursor: default;
-}
-
-.beast2d-sfx-knob-needle {
-  position: absolute;
-  left: 50%;
-  top: 18%;
-  width: calc(2px * var(--beast-scale));
-  height: 32%;
-  margin-left: calc(-1px * var(--beast-scale));
-  background: #1f1424;
-  transform-origin: 50% 100%;
 }
 
 .beast2d-sfx-knob-label {
@@ -1215,9 +1202,6 @@ body,
   line-height: calc(9px * var(--beast-scale));
 }
 
-.beast2d-workspace-sfx .beast2d-sfx-dial {
-  inset: calc(10px * var(--beast-scale));
-}
 
 
 .beast2d-workspace-sfx .beast2d-sfx-waves {
@@ -1228,8 +1212,8 @@ body,
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-wave-icon {
-  width: calc(26px * var(--beast-scale));
-  height: calc(20px * var(--beast-scale));
+  width: calc(16px * var(--beast-scale));
+  height: calc(16px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-grid {

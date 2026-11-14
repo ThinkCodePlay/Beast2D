@@ -1,83 +1,66 @@
 import type { WaveId } from "../core/sfx/chips";
+import { Beast2D16 } from "../core/ui/palette";
+import { hex, plumFrame } from "./sfxPixelArt";
 
-/** Draw a tiny wave glyph for the 2×3 selector (Leaf on Moss when active, Stone when dimmed). */
+const S = 16;
+
+/** 16×16 wave key: plum outline, leaf waveform (stone when dimmed). */
 export function paintSfxWaveIcon(canvas: HTMLCanvasElement, wave: WaveId, dim: boolean): void {
-  const w = 32;
-  const h = 24;
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = S;
+  canvas.height = S;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
-  ctx.clearRect(0, 0, w, h);
-  const stroke = dim ? "#746678" : "#93be64";
-  ctx.strokeStyle = stroke;
-  ctx.fillStyle = stroke;
-  ctx.lineWidth = 2;
-  ctx.lineJoin = "round";
-  const mid = h / 2;
+  ctx.imageSmoothingEnabled = false;
+  plumFrame(ctx, S, S);
+  ctx.fillStyle = hex(Beast2D16.Cream);
+  ctx.fillRect(1, 1, S - 2, S - 2);
+
+  const ink = dim ? Beast2D16.StoneGray : Beast2D16.LeafGreen;
+  ctx.fillStyle = hex(ink);
+
+  const mid = 8;
 
   if (wave === "sqr") {
-    ctx.beginPath();
-    ctx.moveTo(3, mid + 6);
-    ctx.lineTo(3, mid - 6);
-    ctx.lineTo(15, mid - 6);
-    ctx.lineTo(15, mid + 6);
-    ctx.lineTo(27, mid + 6);
-    ctx.lineTo(27, mid - 6);
-    ctx.stroke();
+    for (let x = 2; x <= 13; x += 1) {
+      const top = x < 8 ? mid - 5 : mid + 5;
+      for (let y = top; y <= mid + 5; y += 1) ctx.fillRect(x, y, 1, 1);
+    }
     return;
   }
   if (wave === "pls") {
-    ctx.beginPath();
-    ctx.moveTo(3, mid + 5);
-    ctx.lineTo(3, mid - 2);
-    ctx.lineTo(11, mid - 2);
-    ctx.lineTo(11, mid - 7);
-    ctx.lineTo(21, mid - 7);
-    ctx.lineTo(21, mid - 2);
-    ctx.lineTo(29, mid - 2);
-    ctx.lineTo(29, mid + 5);
-    ctx.stroke();
+    for (let y = mid - 5; y <= mid + 5; y += 1) ctx.fillRect(2, y, 1, 1);
+    for (let y = mid - 7; y <= mid + 5; y += 1) ctx.fillRect(7, y, 1, 1);
+    for (let y = mid - 3; y <= mid + 5; y += 1) ctx.fillRect(12, y, 1, 1);
     return;
   }
   if (wave === "wave") {
-    ctx.beginPath();
-    for (let x = 0; x <= w; x += 1) {
-      const y = mid + Math.sin((x / w) * Math.PI * 2.5) * 7;
-      if (x === 0) ctx.moveTo(x + 2, y);
-      else ctx.lineTo(x + 2, y);
+    for (let x = 2; x <= 13; x += 1) {
+      const y = Math.round(mid + Math.sin((x / 12) * Math.PI * 2) * 4);
+      ctx.fillRect(x, y, 1, 1);
+      ctx.fillRect(x, y + 1, 1, 1);
     }
-    ctx.stroke();
     return;
   }
   if (wave === "noise") {
-    let x = 3;
-    let up = true;
-    ctx.beginPath();
-    ctx.moveTo(x, mid);
-    while (x < w - 3) {
-      const y = up ? mid - 7 : mid + 7;
-      ctx.lineTo(x, y);
-      x += 4;
-      up = !up;
+    const heights = [mid - 4, mid + 3, mid - 2, mid + 5, mid - 3, mid + 2, mid - 5, mid + 4];
+    let x = 2;
+    for (const h of heights) {
+      ctx.fillRect(x, h, 1, 1);
+      x += 1;
     }
-    ctx.stroke();
     return;
   }
   if (wave === "saw") {
-    ctx.beginPath();
-    ctx.moveTo(3, mid + 7);
-    ctx.lineTo(10, mid - 7);
-    ctx.lineTo(17, mid + 7);
-    ctx.lineTo(24, mid - 7);
-    ctx.stroke();
+    for (let x = 2; x <= 13; x += 1) {
+      const t = ((x - 2) % 6) / 6;
+      const y = Math.round(mid + 5 - t * 10);
+      ctx.fillRect(x, y, 1, 1);
+    }
     return;
   }
-  ctx.beginPath();
-  ctx.moveTo(3, mid + 7);
-  ctx.lineTo(8, mid);
-  ctx.lineTo(16, mid - 7);
-  ctx.lineTo(24, mid);
-  ctx.lineTo(29, mid + 7);
-  ctx.stroke();
+  for (let x = 2; x <= 13; x += 1) {
+    const t = ((x - 2) % 12) / 12;
+    const y = Math.round(mid + Math.sin(t * Math.PI) * 6);
+    ctx.fillRect(x, y, 1, 1);
+  }
 }
