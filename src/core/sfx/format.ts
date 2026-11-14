@@ -169,7 +169,7 @@ export function knobLabel(id: KnobId): string {
   if (id === "decay") return "DEC";
   if (id === "rate") return "RATE";
   if (id === "slide") return "SLD";
-  if (id === "vibrato") return "DEPTH";
+  if (id === "vibrato") return "VIB";
   if (id === "duty") return "DUTY";
   return "CUT";
 }
