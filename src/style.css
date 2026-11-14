@@ -55,7 +55,7 @@ body,
 }
 
 .beast2d-console:has(.beast2d-workspace-sfx) {
-  height: min(672px, 100%);
+  height: min(684px, 100%);
 }
 
 .beast2d-boot {
@@ -1264,8 +1264,8 @@ body,
 
 /* SFX edit: compact machine so knobs and presets fit the editor column. */
 .beast2d-workspace-sfx .beast2d-sfx {
-  gap: calc(1px * var(--beast-scale));
-  padding: calc(1px * var(--beast-scale));
+  gap: calc(2px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-top {
@@ -1329,15 +1329,15 @@ body,
   }
 }
 
-.beast2d-workspace-sfx .beast2d-sfx-mid {
+.beast2d-workspace-sfx .beast2d-sfx-sequencer {
   flex: 1 1 auto;
-  min-height: calc(88px * var(--beast-scale));
-  align-items: flex-start;
+  min-height: 0;
   overflow: hidden;
 }
 
-.beast2d-workspace-sfx .beast2d-sfx-sequencer {
-  gap: calc(1px * var(--beast-scale));
+.beast2d-workspace-sfx .beast2d-sfx-mid {
+  flex: 0 0 calc(88px * var(--beast-scale));
+  align-items: flex-start;
 }
 
 @media (max-width: 1279px) {
