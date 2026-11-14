@@ -335,6 +335,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     document.documentElement.style.setProperty("--beast-scale", scaleText);
     document.body.style.setProperty("--beast-scale", scaleText);
     consoleFrame.style.setProperty("--beast-scale", scaleText);
+    consoleFrame.classList.toggle("beast2d-console-narrow", window.innerWidth < 1280);
     const playing = viewState.screen === "play";
     workspace.classList.toggle("beast2d-workspace-play", playing);
     editorColumn.hidden = playing;
@@ -382,11 +383,12 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const repaintFloppies = () => {
     const pixel = chromeFontScale(window.innerHeight, window.innerWidth);
     const homePixel = homeFloppyScale(pixel);
+    const iconsOnly = window.innerWidth < 1280;
     consoleFrame.querySelectorAll<HTMLCanvasElement>(".beast2d-floppy-canvas").forEach((canvas) => {
       const kind = canvas.dataset.floppy;
       if (kind === "tool") {
         const tool = canvas.dataset.tool ?? "CODE";
-        paintToolFloppy(canvas, tool, tool === viewState.activeTool, pixel);
+        paintToolFloppy(canvas, tool, tool === viewState.activeTool, pixel, iconsOnly);
         return;
       }
       if (kind === "home") {

@@ -181,8 +181,8 @@ export function isFloppySelectionPixel(x: number, y: number): boolean {
   return nearFloppyBody(x, y, FLOPPY_FRAME_OFFSET);
 }
 
-function strokeFloppyFrame(ctx: Ctx, color: string, scale: number): void {
-  for (let y = 0; y < TOOL_FLOPPY_H; y += 1) {
+function strokeFloppyFrame(ctx: Ctx, color: string, scale: number, logicalH = TOOL_FLOPPY_H): void {
+  for (let y = 0; y < logicalH; y += 1) {
     for (let x = 0; x < TOOL_FLOPPY_W; x += 1) {
       if (!isFloppySelectionPixel(x, y)) continue;
       fill(ctx, x, y, 1, 1, color, scale);
@@ -203,6 +203,8 @@ export const TOOL_FLOPPY_SRC: Record<string, string> = {
 
 const TOOL_FLOPPY_W = 64;
 const TOOL_FLOPPY_H = 72;
+/** Source pixels when cropping label text off tool floppies. */
+const TOOL_FLOPPY_ICON_H = 46;
 const toolFloppyImages = new Map<string, HTMLImageElement>();
 
 /** Blank 64×72 shell for the home shelf. Tool PNGs keep their own baked names. */
@@ -308,19 +310,28 @@ export function paintToolFloppy(
   tool: string,
   selected: boolean,
   scale: number,
+  iconsOnly = false,
 ): void {
   const pixel = Math.max(1, Math.round(scale));
+  const logicalH = iconsOnly ? TOOL_FLOPPY_ICON_H : TOOL_FLOPPY_H;
   canvas.width = TOOL_FLOPPY_W * pixel;
-  canvas.height = TOOL_FLOPPY_H * pixel;
+  canvas.height = logicalH * pixel;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const image = toolFloppyImage(tool);
-  if (image.complete && image.naturalWidth > 0) {
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-  } else {
-    image.addEventListener("load", () => paintToolFloppy(canvas, tool, selected, scale), { once: true });
-  }
-  if (selected) strokeFloppyFrame(ctx, PINK, pixel);
+  const draw = () => {
+    const nw = image.naturalWidth;
+    const nh = image.naturalHeight;
+    if (iconsOnly && nh > 0) {
+      const srcH = Math.round((TOOL_FLOPPY_ICON_H / TOOL_FLOPPY_H) * nh);
+      ctx.drawImage(image, 0, 0, nw, srcH, 0, 0, canvas.width, canvas.height);
+    } else {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    }
+    if (selected) strokeFloppyFrame(ctx, PINK, pixel, logicalH);
+  };
+  if (image.complete && image.naturalWidth > 0) draw();
+  else image.addEventListener("load", () => paintToolFloppy(canvas, tool, selected, scale, iconsOnly), { once: true });
 }

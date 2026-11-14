@@ -228,7 +228,9 @@ export function mountSfxDisk(): SfxDisk {
   }
   mid.append(gridWrap, waves);
   const sequencer = el("div", "beast2d-sfx-sequencer");
-  sequencer.append(mid, effects);
+  const sparePad = el("div", "beast2d-sfx-spare");
+  sparePad.setAttribute("aria-hidden", "true");
+  sequencer.append(mid, effects, sparePad);
 
   machine.append(top, presets, sequencer);
 

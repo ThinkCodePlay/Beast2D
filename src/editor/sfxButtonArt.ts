@@ -30,12 +30,12 @@ const SHOOT: PixelGrid = [
 
 const COIN: PixelGrid = [
   "................",
-  ".....ooo........",
-  "....ollllo......",
-  "....ollllo......",
-  "....ollllo......",
-  ".....ooo........",
-  "................",
+  ".....yyy........",
+  "....yyoyyy......",
+  "....yyyyyy......",
+  "....yyyyyy......",
+  "....yyyyyy......",
+  ".....yyy........",
   "................",
   "................",
   "................",
@@ -106,12 +106,13 @@ const JUMP: PixelGrid = [
 
 const POWER: PixelGrid = [
   "................",
-  "......l.........",
-  ".....l.l........",
-  "....l..l........",
-  "...lllll........",
-  ".....l.l........",
-  ".....lll........",
+  "......y.........",
+  ".....y.y........",
+  "....y..y........",
+  "...yyy..........",
+  "....y.y.........",
+  ".....yyy........",
+  "......y.........",
   "................",
   "................",
   "................",
@@ -267,7 +268,24 @@ export function paintSfxPresetIcon(
     drawDiceFace(ctx, dim);
     return;
   }
-  const ink = dim ? Beast2D16.StoneGray : Beast2D16.LeafGreen;
+  if (preset === "coin") {
+    blitGrid(ctx, PRESET_GRIDS[preset], 0, 0, dim ? Beast2D16.StoneGray : Beast2D16.PlumOutline);
+    if (!dim) {
+      const g = PRESET_GRIDS[preset];
+      for (let y = 0; y < g.length; y += 1) {
+        const row = g[y] ?? "";
+        for (let x = 0; x < row.length; x += 1) {
+          if (row[x] === "y") {
+            ctx.fillStyle = hex(Beast2D16.Yellow);
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+    }
+    return;
+  }
+  const ink =
+    dim ? Beast2D16.StoneGray : preset === "power" ? Beast2D16.Yellow : Beast2D16.LeafGreen;
   blitGrid(ctx, PRESET_GRIDS[preset], 0, 0, ink);
 }
 

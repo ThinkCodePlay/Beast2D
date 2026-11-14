@@ -1,7 +1,7 @@
 import type { ChipId } from "../core/sfx/chips";
 import { CHIPS } from "../core/sfx/chips";
 import { Beast2D16 } from "../core/ui/palette";
-import { frameToAngleDeg, hex } from "./sfxPixelArt";
+import { hex } from "./sfxPixelArt";
 
 /** Logical sprite pixels (72×72). */
 const W = 72;
@@ -9,13 +9,6 @@ const H = 72;
 const CX = 36;
 const CY = 38;
 const KNOB_R = 15;
-
-const CHIP_DEG: Record<ChipId, number> = {
-  pico: 315,
-  gb: 225,
-  snes: 45,
-  gen: 135,
-};
 
 const MICRO: Record<string, readonly string[]> = {
   P: ["111", "101", "111", "100", "100"],
@@ -27,6 +20,14 @@ const MICRO: Record<string, readonly string[]> = {
   S: ["111", "100", "111", "001", "111"],
   N: ["101", "111", "111", "111", "101"],
   E: ["111", "100", "110", "100", "111"],
+};
+
+/** Fixed label anchors (top-left of micro string). */
+const LABEL_ANCHOR: Record<ChipId, { x: number; y: number; text: string }> = {
+  pico: { x: 5, y: 3, text: "PICO" },
+  snes: { x: 44, y: 3, text: "SNES" },
+  gb: { x: 8, y: 57, text: "GB" },
+  gen: { x: 46, y: 57, text: "GEN" },
 };
 
 function drawMicro(ctx: CanvasRenderingContext2D, text: string, ox: number, oy: number, rgb: number): void {
@@ -53,6 +54,11 @@ function microWidth(text: string): number {
   return text.length * 4 - 1;
 }
 
+function labelCenter(chip: ChipId): { x: number; y: number } {
+  const { x, y, text } = LABEL_ANCHOR[chip];
+  return { x: x + microWidth(text) / 2, y: y + 2 };
+}
+
 function drawKnobBody(ctx: CanvasRenderingContext2D): void {
   for (let y = 0; y < H; y += 1) {
     for (let x = 0; x < W; x += 1) {
@@ -75,18 +81,12 @@ function drawKnobBody(ctx: CanvasRenderingContext2D): void {
   }
 }
 
-function drawPointer(ctx: CanvasRenderingContext2D, chip: ChipId): void {
-  let a = CHIP_DEG[chip];
-  while (a > 180) a -= 360;
-  const math = -a;
-  const frame = Math.min(15, Math.max(0, Math.round(((math + 140) / 280) * 15)));
-  const deg = (frameToAngleDeg(frame) * Math.PI) / 180;
-  const tipX = CX + Math.sin(deg) * (KNOB_R - 2);
-  const tipY = CY - Math.cos(deg) * (KNOB_R - 2);
+function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
+  const { x: tx, y: ty } = labelCenter(chip);
   const sx = CX;
   const sy = CY;
-  const px = Math.round(tipX);
-  const py = Math.round(tipY);
+  const px = Math.round(tx);
+  const py = Math.round(ty);
   const steps = Math.max(Math.abs(px - sx), Math.abs(py - sy));
   for (let i = 0; i <= steps; i += 1) {
     const t = steps === 0 ? 0 : i / steps;
@@ -103,19 +103,10 @@ function labelColor(id: ChipId): number {
   return Beast2D16.Cream;
 }
 
-function drawOutsideLabels(ctx: CanvasRenderingContext2D): void {
-  const entries: { id: ChipId; text: string; deg: number }[] = [
-    { id: "pico", text: "PICO", deg: 315 },
-    { id: "gb", text: "GB", deg: 225 },
-    { id: "snes", text: "SNES", deg: 45 },
-    { id: "gen", text: "GEN", deg: 135 },
-  ];
-  const labelR = KNOB_R + 10;
-  for (const { id, text, deg } of entries) {
-    const rad = (deg * Math.PI) / 180;
-    const lx = CX + Math.sin(rad) * labelR;
-    const ly = CY - Math.cos(rad) * labelR;
-    drawMicro(ctx, text, lx - microWidth(text) / 2, ly - 2, labelColor(id));
+function drawFixedLabels(ctx: CanvasRenderingContext2D): void {
+  for (const id of ["pico", "gb", "snes", "gen"] as const) {
+    const anchor = LABEL_ANCHOR[id];
+    drawMicro(ctx, anchor.text, anchor.x, anchor.y, labelColor(id));
   }
 }
 
@@ -128,7 +119,7 @@ export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1
   ctx.imageSmoothingEnabled = false;
   ctx.setTransform(pixel, 0, 0, pixel, 0, 0);
   ctx.clearRect(0, 0, W, H);
-  drawOutsideLabels(ctx);
+  drawFixedLabels(ctx);
   drawKnobBody(ctx);
-  drawPointer(ctx, chip);
+  drawPointerTo(ctx, chip);
 }
