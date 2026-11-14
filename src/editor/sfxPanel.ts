@@ -313,11 +313,10 @@ export function mountSfxDisk(): SfxDisk {
   }
 
   function cycleChip(): void {
-    const order: (LiveChipId | null)[] = [null, "pico", "gb"];
-    const index = order.indexOf(current().chip);
-    const next = order[(index + 1) % order.length] ?? null;
+    const cart = getSfxBank().chip;
+    updateSfxCartChip(cart === "pico" ? "gb" : "pico");
     updateSfxSlot(selected, (slot) => {
-      slot.chip = next;
+      if (slot.chip !== null) slot.chip = null;
     });
   }
 
