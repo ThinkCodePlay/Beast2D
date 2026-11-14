@@ -84,17 +84,18 @@ export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1
         ctx.fillRect(x, y, 1, 1);
         continue;
       }
-      if (x <= cx && y <= cy) ctx.fillStyle = hex(Beast2D16.Cream);
-      else ctx.fillStyle = hex(Beast2D16.StoneGray);
+      const left = x <= cx;
+      ctx.fillStyle = hex(left ? Beast2D16.Cream : Beast2D16.Shadow);
       ctx.fillRect(x, y, 1, 1);
     }
   }
 
-  const liveColor = (id: ChipId) => (CHIPS[id].live ? Beast2D16.LeafGreen : Beast2D16.StoneGray);
-  drawMicro(ctx, "PICO", 4, 3, liveColor("pico"));
-  drawMicro(ctx, "SNES", 28, 3, liveColor("snes"));
-  drawMicro(ctx, "GB", 4, 38, liveColor("gb"));
-  drawMicro(ctx, "GEN", 30, 38, liveColor("gen"));
+  const labelColor = (id: ChipId): number =>
+    CHIPS[id].live ? Beast2D16.LeafGreen : id === "snes" || id === "gen" ? Beast2D16.StoneGray : Beast2D16.LeafGreen;
+  drawMicro(ctx, "PICO", 4, 3, labelColor("pico"));
+  drawMicro(ctx, "SNES", 25, 3, labelColor("snes"));
+  drawMicro(ctx, "GB", 4, 38, labelColor("gb"));
+  drawMicro(ctx, "GEN", 28, 38, labelColor("gen"));
 
   for (const angle of [315, 225, 45, 135]) {
     const rad = (angle * Math.PI) / 180;
