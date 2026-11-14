@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { KNOB_IDS, SFX_SLOTS, SFX_STEPS } from "../src/core/sfx/chips";
-import {
-  createDefaultSfxBank,
-  isSfxBankJson,
-  parseSfxBank,
-  serializeSfxBank,
-} from "../src/core/sfx/format";
+import { createDefaultSfxBank } from "../src/core/sfx/defaultBank";
+import { isSfxBankJson, parseSfxBank, serializeSfxBank } from "../src/core/sfx/format";
 
 describe("sfx bank format", () => {
   it("ships 16 slots of 32 steps with the cart chip separate from the grid", () => {
@@ -19,11 +15,13 @@ describe("sfx bank format", () => {
       expect(sound.pitch).toHaveLength(SFX_STEPS);
       expect(sound.volume).toHaveLength(SFX_STEPS);
       expect(Object.keys(sound.knobs)).toEqual([...KNOB_IDS]);
+      expect(sound.pitch.every((step) => Number.isInteger(step))).toBe(true);
+      expect(sound.volume.every((step) => Number.isInteger(step))).toBe(true);
     }
     const sound = bank.slots[0]!;
     const pitch = [...sound.pitch];
-    sound.knobs.duty = 0.15;
-    sound.knobs.cutoff = 0.2;
+    sound.knobs.duty = 38;
+    sound.knobs.cutoff = 51;
     expect(sound.pitch).toEqual(pitch);
     expect(sound.volume).toHaveLength(SFX_STEPS);
   });
@@ -31,7 +29,7 @@ describe("sfx bank format", () => {
   it("round-trips and repairs a bad document back to the default bank", () => {
     const bank = createDefaultSfxBank();
     bank.slots[1]!.name = "blip";
-    bank.slots[1]!.knobs.vol = 0.25;
+    bank.slots[1]!.knobs.vol = 64;
     const saved = serializeSfxBank(bank);
     expect(isSfxBankJson(saved)).toBe(true);
     expect(parseSfxBank(saved).slots[1]).toEqual(saved.slots[1]);
@@ -46,7 +44,7 @@ describe("sfx bank format", () => {
     });
     expect(repaired.chip).toBe("gb");
     expect(repaired.slots[0]?.wave).toBe("sqr");
-    expect(repaired.slots[0]?.knobs.duty).toBe(1);
+    expect(repaired.slots[0]?.knobs.duty).toBe(4);
     expect(repaired.slots[0]?.knobs.vol).toBe(0);
     expect(repaired.slots[0]?.pitch).toHaveLength(SFX_STEPS);
     expect(repaired.slots[15]?.name).toBe("empty");

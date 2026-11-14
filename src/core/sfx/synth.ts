@@ -8,9 +8,11 @@ import {
   type ChipSpec,
   type WaveId,
 } from "./chips";
+import { knobTo01, pitchTo01, volumeTo01 } from "./grid";
 import { getSfxBank } from "./bank";
 
 type PlayListener = (slot: number) => void;
+type AppliedListener = (applied: AppliedSfx) => void;
 
 type Transport = {
   slot: number;
@@ -20,7 +22,8 @@ type Transport = {
   clock: AudioContext | null;
 };
 
-const listeners = new Set<PlayListener>();
+const playListeners = new Set<PlayListener>();
+const appliedListeners = new Set<AppliedListener>();
 let audio: AudioContext | null = null;
 let noise: AudioBuffer | null = null;
 const pulseWaves = new Map<number, PeriodicWave>();
@@ -28,16 +31,16 @@ let waveTable: PeriodicWave | null = null;
 let nodes: AudioScheduledSourceNode[] = [];
 let playToken = 0;
 let transport: Transport | null = null;
-let lastApplied: AppliedSfx | null = null;
 
 export function onSfxPlayed(listener: PlayListener): () => void {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
+  playListeners.add(listener);
+  return () => playListeners.delete(listener);
 }
 
-/** Last sound sent to the synth, after chip limits. Tests read this. */
-export function lastAppliedSfx(): AppliedSfx | null {
-  return lastApplied;
+/** Test seam: last `AppliedSfx` passed to the synth for a slot. */
+export function onSfxApplied(listener: AppliedListener): () => void {
+  appliedListeners.add(listener);
+  return () => appliedListeners.delete(listener);
 }
 
 export function sfxPlayhead(): { slot: number; step: number } | null {
@@ -81,7 +84,7 @@ export function stopSfx(): void {
 function pitchHz(applied: AppliedSfx, spec: ChipSpec, index: number): number {
   const pitch = applied.pitch[index] ?? 0;
   const [lo, hi] = spec.pitchHz;
-  const t = Math.min(1, Math.max(0, pitch));
+  const t = pitchTo01(pitch);
   return lo * (hi / lo) ** t;
 }
 
@@ -129,17 +132,21 @@ function noiseBuffer(ctx: AudioContext): AudioBuffer {
   return buffer;
 }
 
+function beginTransport(slot: number, started: number, stepDur: number, loop: boolean, clock: AudioContext | null): void {
+  transport = { slot, started, stepDur, loop, clock };
+}
+
 function schedule(ctx: AudioContext, applied: AppliedSfx, token: number, slot: number): void {
   if (playToken !== token) return;
   const spec = CHIPS[applied.chip];
-  const stepDur = lerpRange(spec.stepSeconds, applied.knobs.rate);
+  const stepDur = lerpRange(spec.stepSeconds, knobTo01(applied.knobs.rate));
   const started = ctx.currentTime + 0.02;
-  transport = { slot, started, stepDur, loop: applied.loop, clock: ctx };
+  beginTransport(slot, started, stepDur, applied.loop, ctx);
   const end = started + stepDur * SFX_STEPS;
-  const attack = lerpRange(spec.attackSeconds, applied.knobs.attack);
-  const decay = lerpRange(spec.decaySeconds, applied.knobs.decay);
+  const attack = lerpRange(spec.attackSeconds, knobTo01(applied.knobs.attack));
+  const decay = lerpRange(spec.decaySeconds, knobTo01(applied.knobs.decay));
   const master = ctx.createGain();
-  master.gain.value = 0.22 * applied.knobs.vol;
+  master.gain.value = 0.22 * knobTo01(applied.knobs.vol);
   let destination: AudioNode = master;
   if (applied.cutoff !== null) {
     const filter = ctx.createBiquadFilter();
@@ -167,11 +174,11 @@ function schedule(ctx: AudioContext, applied: AppliedSfx, token: number, slot: n
   }
   source.connect(voiceGain);
 
-  if (applied.wave !== "noise" && applied.knobs.vibrato > 0.001) {
+  if (applied.wave !== "noise" && knobTo01(applied.knobs.vibrato) > 0.001) {
     const lfo = ctx.createOscillator();
     const depth = ctx.createGain();
     lfo.frequency.value = spec.vibratoHz;
-    depth.gain.value = applied.knobs.vibrato * 24;
+    depth.gain.value = knobTo01(applied.knobs.vibrato) * 24;
     lfo.connect(depth);
     depth.connect((source as OscillatorNode).frequency);
     lfo.start(started);
@@ -182,11 +189,11 @@ function schedule(ctx: AudioContext, applied: AppliedSfx, token: number, slot: n
   for (let index = 0; index < SFX_STEPS; index += 1) {
     const time = started + index * stepDur;
     const elapsed = index * stepDur;
-    const amp = (applied.volume[index] ?? 0) * envelope(elapsed, attack, decay);
+    const amp = volumeTo01(applied.volume[index] ?? 0) * envelope(elapsed, attack, decay);
     voiceGain.gain.setValueAtTime(Math.max(0, amp), time);
     const hz = pitchHz(applied, spec, index);
     const next = pitchHz(applied, spec, Math.min(SFX_STEPS - 1, index + 1));
-    const glide = hz + (next - hz) * applied.knobs.slide;
+    const glide = hz + (next - hz) * knobTo01(applied.knobs.slide);
     if (applied.wave === "noise") {
       const rate = 0.35 + (hz / spec.pitchHz[1]) * 1.4;
       (source as AudioBufferSourceNode).playbackRate.setValueAtTime(rate, time);
@@ -229,27 +236,23 @@ function setOscWave(ctx: AudioContext, osc: OscillatorNode, wave: WaveId, duty: 
   osc.setPeriodicWave(pulseWave(ctx, width));
 }
 
-/** Plays slot n from the live bank. Chip limits apply here and are not written back. */
+/** Plays slot n from the live bank. v1: one sound at a time; channel mixing comes later. */
 export function playSfx(slot: number): void {
   if (!Number.isInteger(slot) || slot < 0 || slot >= SFX_SLOTS) return;
   const bank = getSfxBank();
   const sound = bank.slots[slot];
   if (!sound) return;
   const applied = applyChip(sound, bank.chip);
-  lastApplied = applied;
+  for (const listener of appliedListeners) listener(applied);
   stopSfx();
   const token = playToken;
-  for (const listener of listeners) listener(slot);
+  for (const listener of playListeners) listener(slot);
   const spec = CHIPS[applied.chip];
-  const stepDur = lerpRange(spec.stepSeconds, applied.knobs.rate);
+  const stepDur = lerpRange(spec.stepSeconds, knobTo01(applied.knobs.rate));
   const clock = context();
-  transport = {
-    slot,
-    started: clock ? clock.currentTime + 0.02 : performance.now() / 1000,
-    stepDur,
-    loop: applied.loop,
-    clock,
-  };
-  if (!clock) return;
+  if (!clock) {
+    beginTransport(slot, performance.now() / 1000, stepDur, applied.loop, null);
+    return;
+  }
   schedule(clock, applied, token, slot);
 }

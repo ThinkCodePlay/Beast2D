@@ -21,7 +21,8 @@ describe("sfx generators", () => {
         expect(gb.wave === "saw" || gb.wave === "tri").toBe(false);
         expect(gb.pitch).toHaveLength(32);
         expect(pico.knobs.duty).toBeGreaterThanOrEqual(0);
-        expect(pico.knobs.duty).toBeLessThanOrEqual(1);
+        expect(pico.knobs.duty).toBeLessThanOrEqual(255);
+        expect(Number.isInteger(pico.pitch[0])).toBe(true);
       }
       const dice = generateDice("gb", seed);
       expect(CHIPS.gb.waves).toContain(dice.wave);

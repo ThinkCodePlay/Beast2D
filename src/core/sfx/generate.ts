@@ -1,4 +1,5 @@
-import { CHIPS, clamp01, type KnobValues, type LiveChipId, type SfxSound, type WaveId } from "./chips";
+import { CHIPS, type KnobValues, type LiveChipId, type SfxSound, type WaveId } from "./chips";
+import { clampKnob, clampPitch, clampVolume, KNOB_MAX, PITCH_MAX, VOLUME_MAX } from "./grid";
 
 export const PRESET_IDS = ["shoot", "coin", "boom", "hit", "jump", "power"] as const;
 export type PresetId = (typeof PRESET_IDS)[number];
@@ -32,19 +33,19 @@ function curve(
   const volume: number[] = [];
   for (let index = 0; index < 32; index += 1) {
     const step = shape(index, (rng() - 0.5) * 0.08);
-    pitch.push(clamp01(step.pitch));
-    volume.push(clamp01(step.volume));
+    pitch.push(clampPitch(step.pitch * PITCH_MAX));
+    volume.push(clampVolume(step.volume * VOLUME_MAX));
   }
   return { pitch, volume };
 }
 
 const PRESET_KNOBS: Record<PresetId, KnobValues> = {
-  shoot: { vol: 0.85, attack: 0.02, decay: 0.35, rate: 0.7, slide: 0.45, vibrato: 0.05, duty: 0.5, cutoff: 0.55 },
-  coin: { vol: 0.7, attack: 0.01, decay: 0.2, rate: 0.8, slide: 0.05, vibrato: 0, duty: 0.5, cutoff: 0.8 },
-  boom: { vol: 0.95, attack: 0.01, decay: 0.7, rate: 0.4, slide: 0.2, vibrato: 0.02, duty: 0.5, cutoff: 0.25 },
-  hit: { vol: 0.8, attack: 0, decay: 0.15, rate: 0.85, slide: 0.1, vibrato: 0, duty: 0.25, cutoff: 0.6 },
-  jump: { vol: 0.75, attack: 0.02, decay: 0.3, rate: 0.65, slide: 0.7, vibrato: 0.08, duty: 0.5, cutoff: 0.75 },
-  power: { vol: 0.8, attack: 0.04, decay: 0.45, rate: 0.6, slide: 0.15, vibrato: 0.12, duty: 0.5, cutoff: 0.7 },
+  shoot: { vol: 217, attack: 5, decay: 89, rate: 179, slide: 115, vibrato: 13, duty: 128, cutoff: 140 },
+  coin: { vol: 179, attack: 3, decay: 51, rate: 204, slide: 13, vibrato: 0, duty: 128, cutoff: 204 },
+  boom: { vol: 242, attack: 3, decay: 179, rate: 102, slide: 51, vibrato: 5, duty: 128, cutoff: 64 },
+  hit: { vol: 204, attack: 0, decay: 38, rate: 217, slide: 26, vibrato: 0, duty: 64, cutoff: 153 },
+  jump: { vol: 191, attack: 5, decay: 77, rate: 166, slide: 179, vibrato: 20, duty: 128, cutoff: 191 },
+  power: { vol: 204, attack: 10, decay: 115, rate: 153, slide: 38, vibrato: 31, duty: 128, cutoff: 179 },
 };
 
 function presetShape(preset: PresetId, index: number, jitter: number): { pitch: number; volume: number } {
@@ -96,14 +97,14 @@ export function generateDice(chip: LiveChipId, seed: number): SfxPatch {
   const rng = mulberry32(seed * 10007 + 401 + (chip === "gb" ? 13 : 3));
   const wave = pickWave(rng, chip, CHIPS[chip].waves);
   const values: KnobValues = {
-    vol: rng(),
-    attack: rng() * 0.4,
-    decay: rng(),
-    rate: rng(),
-    slide: rng(),
-    vibrato: rng() * 0.5,
-    duty: rng(),
-    cutoff: rng(),
+    vol: clampKnob(rng() * KNOB_MAX),
+    attack: clampKnob(rng() * 102),
+    decay: clampKnob(rng() * KNOB_MAX),
+    rate: clampKnob(rng() * KNOB_MAX),
+    slide: clampKnob(rng() * KNOB_MAX),
+    vibrato: clampKnob(rng() * 128),
+    duty: clampKnob(rng() * KNOB_MAX),
+    cutoff: clampKnob(rng() * KNOB_MAX),
   };
   const grid = curve(rng, (_index, jitter) => ({
     pitch: rng() * 0.85 + jitter,
@@ -114,14 +115,15 @@ export function generateDice(chip: LiveChipId, seed: number): SfxPatch {
 }
 
 function varyKnobs(rng: () => number, base: KnobValues): KnobValues {
+  const jitter = (center: number, span: number) => clampKnob(center + (rng() - 0.5) * span);
   return {
-    vol: clamp01(base.vol + (rng() - 0.5) * 0.08),
-    attack: clamp01(base.attack + (rng() - 0.5) * 0.06),
-    decay: clamp01(base.decay + (rng() - 0.5) * 0.12),
-    rate: clamp01(base.rate + (rng() - 0.5) * 0.1),
-    slide: clamp01(base.slide + (rng() - 0.5) * 0.1),
-    vibrato: clamp01(base.vibrato + (rng() - 0.5) * 0.08),
-    duty: clamp01(base.duty + (rng() - 0.5) * 0.1),
-    cutoff: clamp01(base.cutoff + (rng() - 0.5) * 0.1),
+    vol: jitter(base.vol, 20),
+    attack: jitter(base.attack, 15),
+    decay: jitter(base.decay, 31),
+    rate: jitter(base.rate, 26),
+    slide: jitter(base.slide, 26),
+    vibrato: jitter(base.vibrato, 20),
+    duty: jitter(base.duty, 26),
+    cutoff: jitter(base.cutoff, 26),
   };
 }

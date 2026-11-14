@@ -99,29 +99,29 @@ export const CHIPS: Record<ChipId, ChipSpec> = {
     id: "snes",
     label: "SNES",
     live: false,
-    waves: ALL_WAVES,
+    waves: ["sqr", "tri", "noise"],
     knobs: knobs(false),
-    dutySnap: null,
-    pitchHz: [80, 2400],
-    stepSeconds: [0.07, 0.012],
-    attackSeconds: [0, 0.4],
-    decaySeconds: [0.05, 0.8],
-    vibratoHz: 6,
-    filterHz: [200, 8000],
+    dutySnap: [0.25, 0.5, 0.75],
+    pitchHz: [110, 3520],
+    stepSeconds: [0.06, 0.01],
+    attackSeconds: [0, 0.25],
+    decaySeconds: [0.04, 0.6],
+    vibratoHz: 5.5,
+    filterHz: [400, 12000],
   },
   gen: {
     id: "gen",
     label: "GEN",
     live: false,
-    waves: ALL_WAVES,
+    waves: ["saw", "noise", "pls"],
     knobs: knobs(false),
-    dutySnap: null,
-    pitchHz: [80, 2400],
-    stepSeconds: [0.07, 0.012],
-    attackSeconds: [0, 0.4],
-    decaySeconds: [0.05, 0.8],
-    vibratoHz: 6,
-    filterHz: [200, 8000],
+    dutySnap: [0.125, 0.375, 0.625],
+    pitchHz: [55, 2800],
+    stepSeconds: [0.08, 0.014],
+    attackSeconds: [0, 0.45],
+    decaySeconds: [0.06, 0.85],
+    vibratoHz: 7,
+    filterHz: [150, 6000],
   },
 };
 
@@ -186,12 +186,13 @@ export type SfxSound = {
 export function applyChip(sound: SfxSound, cartChip: LiveChipId): AppliedSfx {
   const chip = CHIPS[effectiveChip(sound.chip, cartChip)];
   const wave = chip.waves.includes(sound.wave) ? sound.wave : chip.waves[0] ?? "sqr";
-  const duty = chip.dutySnap ? nearest(sound.knobs.duty, chip.dutySnap) : sound.knobs.duty;
+  const dutyT = sound.knobs.duty / 255;
+  const duty = chip.dutySnap ? nearest(dutyT, chip.dutySnap) : dutyT;
   return {
     chip: chip.id as LiveChipId,
     wave,
     duty,
-    cutoff: chip.knobs.cutoff ? sound.knobs.cutoff : null,
+    cutoff: chip.knobs.cutoff ? sound.knobs.cutoff / 255 : null,
     knobs: { ...sound.knobs },
     pitch: sound.pitch.slice(),
     volume: sound.volume.slice(),

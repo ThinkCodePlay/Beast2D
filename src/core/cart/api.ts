@@ -80,10 +80,10 @@ export function btnp(action: string): boolean {
   return requireCartContext("btnp").input.wasPressed(action);
 }
 
-/** Plays sound slot n from the live cart bank. Out-of-range slots are ignored. */
+/** Plays sound slot n from the live cart bank. */
 export function sfx(n: number): void {
   requireCartContext("sfx");
   if (!Number.isInteger(n)) throw new Error("sfx slot must be an integer");
-  if (n < 0 || n >= SFX_SLOTS) return;
+  if (n < 0 || n >= SFX_SLOTS) throw new Error("sfx slot out of range");
   playSfx(n);
 }

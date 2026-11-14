@@ -15,13 +15,11 @@ import helloScript from "./game/carts/hello.script.ts?raw";
 import { CartLevel } from "./core/cart/CartLevel";
 import { guardCart } from "./core/cart/compile";
 import { mountCartEditor } from "./editor/shell";
-import { replaceSfxBank } from "./core/sfx/bank";
-import { createDefaultSfxBank, parseSfxBank } from "./core/sfx/format";
+import { CART_SFX_STORAGE_KEY, initSfxBank } from "./core/sfx/bank";
 import helloSfx from "./game/carts/hello.sfx.json";
 import "./style.css";
 
 const CART_SCRIPT_STORAGE_KEY = "beast2d-cart-script";
-const CART_SFX_STORAGE_KEY = "beast2d-cart-sfx";
 
 const appRoot = document.getElementById("app")!;
 const container = document.createElement("div");
@@ -41,20 +39,7 @@ if (bootstrapParams.get("resetCart") === "1") {
   localStorage.removeItem(CART_SFX_STORAGE_KEY);
 }
 
-function seedCartSfxBank(): void {
-  try {
-    if (localStorage.getItem(CART_SFX_STORAGE_KEY)) return;
-    const fromFile = parseSfxBank(helloSfx);
-    const filled = fromFile.slots.some((slot) => slot.name !== "empty" && slot.name !== "") ?
-      fromFile
-    : createDefaultSfxBank();
-    replaceSfxBank(filled);
-  } catch {
-    replaceSfxBank(createDefaultSfxBank());
-  }
-}
-
-seedCartSfxBank();
+initSfxBank(helloSfx);
 
 engine
   .bootstrap(container)

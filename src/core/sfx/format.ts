@@ -2,16 +2,25 @@ import {
   KNOB_IDS,
   SFX_SLOTS,
   SFX_STEPS,
-  clamp01,
   isLiveChip,
   isWaveId,
-  type KnobId,
   type KnobValues,
   type LiveChipId,
   type SfxSound,
   type WaveId,
 } from "./chips";
-import { generatePreset, type PresetId } from "./generate";
+import { createDefaultSfxBank } from "./defaultBank";
+import {
+  KNOB_MAX,
+  PITCH_MAX,
+  VOLUME_MAX,
+  clampKnob,
+  clampPitch,
+  clampVolume,
+  migrateKnobValue,
+  migratePitchValue,
+  migrateVolumeValue,
+} from "./grid";
 
 export type SfxBank = {
   version: 1;
@@ -20,14 +29,14 @@ export type SfxBank = {
 };
 
 const DEFAULT_KNOBS: KnobValues = {
-  vol: 0.8,
-  attack: 0.02,
-  decay: 0.4,
-  rate: 0.55,
-  slide: 0.1,
+  vol: 204,
+  attack: 5,
+  decay: 102,
+  rate: 140,
+  slide: 26,
   vibrato: 0,
-  duty: 0.5,
-  cutoff: 0.75,
+  duty: 128,
+  cutoff: 191,
 };
 
 export function emptySound(): SfxSound {
@@ -42,11 +51,11 @@ export function emptySound(): SfxSound {
   };
 }
 
-function numberList(value: unknown, fallback: number): number[] {
+function intList(value: unknown, fallback: number, migrate: (n: number) => number): number[] {
   const source = Array.isArray(value) ? value : [];
   return Array.from({ length: SFX_STEPS }, (_, index) => {
     const item = source[index];
-    return typeof item === "number" ? clamp01(item) : fallback;
+    return typeof item === "number" ? migrate(item) : fallback;
   });
 }
 
@@ -55,7 +64,7 @@ function readKnobs(value: unknown): KnobValues {
   const knobs = { ...DEFAULT_KNOBS };
   for (const id of KNOB_IDS) {
     const item = record[id];
-    if (typeof item === "number") knobs[id] = clamp01(item);
+    if (typeof item === "number") knobs[id] = migrateKnobValue(item);
   }
   return knobs;
 }
@@ -72,8 +81,8 @@ function readSound(value: unknown): SfxSound {
     wave,
     loop: record.loop === true,
     knobs: readKnobs(record.knobs),
-    pitch: numberList(record.pitch, 0),
-    volume: numberList(record.volume, 0),
+    pitch: intList(record.pitch, 0, migratePitchValue),
+    volume: intList(record.volume, 0, migrateVolumeValue),
   };
 }
 
@@ -97,15 +106,37 @@ export function serializeSfxBank(bank: SfxBank): SfxBank {
       chip: sound.chip,
       wave: sound.wave,
       loop: sound.loop,
-      knobs: { ...sound.knobs },
-      pitch: sound.pitch.slice(),
-      volume: sound.volume.slice(),
+      knobs: Object.fromEntries(KNOB_IDS.map((id) => [id, clampKnob(sound.knobs[id])])) as KnobValues,
+      pitch: sound.pitch.map((step) => clampPitch(step)),
+      volume: sound.volume.map((step) => clampVolume(step)),
     })),
   };
 }
 
-function isNumberList(value: unknown): boolean {
-  return Array.isArray(value) && value.length === SFX_STEPS && value.every((item) => typeof item === "number" && Number.isFinite(item));
+function isPitchList(value: unknown): boolean {
+  return (
+    Array.isArray(value) &&
+    value.length === SFX_STEPS &&
+    value.every((item) => typeof item === "number" && Number.isInteger(item) && item >= 0 && item <= PITCH_MAX)
+  );
+}
+
+function isVolumeList(value: unknown): boolean {
+  return (
+    Array.isArray(value) &&
+    value.length === SFX_STEPS &&
+    value.every((item) => typeof item === "number" && Number.isInteger(item) && item >= 0 && item <= VOLUME_MAX)
+  );
+}
+
+function isKnobsJson(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const knobs = value as Record<string, unknown>;
+  for (const id of KNOB_IDS) {
+    const item = knobs[id];
+    if (typeof item !== "number" || !Number.isInteger(item) || item < 0 || item > KNOB_MAX) return false;
+  }
+  return true;
 }
 
 function isSoundJson(value: unknown): boolean {
@@ -115,12 +146,8 @@ function isSoundJson(value: unknown): boolean {
   if (record.chip !== null && (typeof record.chip !== "string" || !isLiveChip(record.chip))) return false;
   if (typeof record.wave !== "string" || !isWaveId(record.wave)) return false;
   if (typeof record.loop !== "boolean") return false;
-  if (!record.knobs || typeof record.knobs !== "object") return false;
-  const knobs = record.knobs as Record<string, unknown>;
-  for (const id of KNOB_IDS) {
-    if (typeof knobs[id] !== "number" || !Number.isFinite(knobs[id])) return false;
-  }
-  return isNumberList(record.pitch) && isNumberList(record.volume);
+  if (!isKnobsJson(record.knobs)) return false;
+  return isPitchList(record.pitch) && isVolumeList(record.volume);
 }
 
 /** True when a save payload has the v1 bank shape. */
@@ -131,45 +158,4 @@ export function isSfxBankJson(value: unknown): boolean {
   if (typeof record.chip !== "string" || !isLiveChip(record.chip)) return false;
   if (!Array.isArray(record.slots) || record.slots.length !== SFX_SLOTS) return false;
   return record.slots.every(isSoundJson);
-}
-
-function fill(
-  slots: SfxSound[],
-  index: number,
-  name: string,
-  preset: PresetId,
-  chip: LiveChipId | null,
-  seed: number,
-): void {
-  const patch = generatePreset(preset, chip ?? "gb", seed);
-  slots[index] = {
-    ...patch,
-    name,
-    chip,
-  };
-}
-
-/** Sixteen slots. A few are filled so the disk is not a blank bank. */
-export function createDefaultSfxBank(): SfxBank {
-  const slots = Array.from({ length: SFX_SLOTS }, () => emptySound());
-  fill(slots, 0, "jump", "jump", null, 1);
-  fill(slots, 1, "coin", "coin", null, 2);
-  fill(slots, 2, "hit", "hit", null, 3);
-  fill(slots, 3, "laser_01", "shoot", null, 4);
-  fill(slots, 4, "boom_big", "boom", null, 5);
-  fill(slots, 5, "power_up", "power", null, 6);
-  fill(slots, 6, "enemy_die", "boom", null, 7);
-  fill(slots, 7, "select", "coin", "pico", 8);
-  return { version: 1, chip: "gb", slots };
-}
-
-export function knobLabel(id: KnobId): string {
-  if (id === "vol") return "VOL";
-  if (id === "attack") return "ATK";
-  if (id === "decay") return "DEC";
-  if (id === "rate") return "RATE";
-  if (id === "slide") return "SLD";
-  if (id === "vibrato") return "VIB";
-  if (id === "duty") return "DUTY";
-  return "CUT";
 }

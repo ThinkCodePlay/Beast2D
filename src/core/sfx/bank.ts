@@ -1,15 +1,18 @@
 import type { LiveChipId, SfxSound } from "./chips";
-import { createDefaultSfxBank, parseSfxBank, serializeSfxBank, type SfxBank } from "./format";
+import { createDefaultSfxBank } from "./defaultBank";
+import { parseSfxBank, serializeSfxBank, type SfxBank } from "./format";
 
-const STORAGE_KEY = "beast2d-cart-sfx";
+export const CART_SFX_STORAGE_KEY = "beast2d-cart-sfx";
 
 type Listener = () => void;
 
 const listeners = new Set<Listener>();
 
+let bank: SfxBank | null = null;
+
 function readStored(): SfxBank | null {
   try {
-    const raw = globalThis.localStorage?.getItem(STORAGE_KEY);
+    const raw = globalThis.localStorage?.getItem(CART_SFX_STORAGE_KEY);
     if (!raw) return null;
     return parseSfxBank(JSON.parse(raw) as unknown);
   } catch {
@@ -17,23 +20,45 @@ function readStored(): SfxBank | null {
   }
 }
 
-function persist(bank: SfxBank): void {
+function persist(bankState: SfxBank): void {
   try {
-    globalThis.localStorage?.setItem(STORAGE_KEY, JSON.stringify(serializeSfxBank(bank)));
+    globalThis.localStorage?.setItem(CART_SFX_STORAGE_KEY, JSON.stringify(serializeSfxBank(bankState)));
   } catch {
     /* Private mode and tests without storage keep the in-memory bank. */
   }
 }
-
-let bank: SfxBank = readStored() ?? createDefaultSfxBank();
 
 function publish(): void {
   persist(bank);
   for (const listener of listeners) listener();
 }
 
+function bankHasContent(bankState: SfxBank): boolean {
+  return bankState.slots.some((slot) => slot.name !== "empty" && slot.name !== "");
+}
+
+/**
+ * Seeds the in-memory bank from localStorage, an optional cart file, or the built-in default.
+ * Call once at startup before the editor or cart runs.
+ */
+export function initSfxBank(fileSeed?: unknown): void {
+  const stored = readStored();
+  if (stored) {
+    bank = stored;
+    return;
+  }
+  if (fileSeed !== undefined) {
+    const fromFile = parseSfxBank(fileSeed);
+    bank = bankHasContent(fromFile) ? fromFile : createDefaultSfxBank();
+  } else {
+    bank = createDefaultSfxBank();
+  }
+  persist(bank);
+}
+
 /** The live cart bank. Playback reads this object, so an edit is heard on the next sfx(). */
 export function getSfxBank(): SfxBank {
+  if (!bank) initSfxBank();
   return bank;
 }
 
@@ -62,7 +87,7 @@ export function subscribeSfxBank(listener: Listener): () => void {
 export function resetSfxBank(next = createDefaultSfxBank()): void {
   bank = next;
   try {
-    globalThis.localStorage?.removeItem(STORAGE_KEY);
+    globalThis.localStorage?.removeItem(CART_SFX_STORAGE_KEY);
   } catch {
     /* ignore */
   }
