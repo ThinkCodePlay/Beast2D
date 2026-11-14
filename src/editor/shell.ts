@@ -330,7 +330,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   let layoutKey = "";
   const layoutPreview = () => {
-    const fontScale = chromeFontScale(window.innerHeight);
+    const fontScale = chromeFontScale(window.innerHeight, window.innerWidth);
     document.documentElement.style.setProperty("--beast-scale", String(fontScale));
     const playing = viewState.screen === "play";
     workspace.classList.toggle("beast2d-workspace-play", playing);
@@ -377,14 +377,13 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     repaintFloppies();
   };
   const repaintFloppies = () => {
-    const pixel = chromeFontScale(window.innerHeight);
+    const pixel = chromeFontScale(window.innerHeight, window.innerWidth);
     const homePixel = homeFloppyScale(pixel);
     consoleFrame.querySelectorAll<HTMLCanvasElement>(".beast2d-floppy-canvas").forEach((canvas) => {
       const kind = canvas.dataset.floppy;
       if (kind === "tool") {
         const tool = canvas.dataset.tool ?? "CODE";
-        // Native 64×72. Scaling these with the device ate the height a 2× playfield needs.
-        paintToolFloppy(canvas, tool, tool === viewState.activeTool, 1);
+        paintToolFloppy(canvas, tool, tool === viewState.activeTool, pixel);
         return;
       }
       if (kind === "home") {
@@ -579,6 +578,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     syncHomeSelection();
     syncEditorPanes();
     layoutPreview();
+    repaintFloppies();
     if (viewState.screen === "editor" || viewState.screen === "play") pokePlayfield();
   };
 

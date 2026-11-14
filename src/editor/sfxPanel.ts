@@ -21,30 +21,6 @@ import { paintSfxKnob } from "./sfxKnobArt";
 import { paintSfxRotor } from "./sfxRotorArt";
 import { paintSfxWaveIcon } from "./sfxWaves";
 
-type ModuleTone = "yellow" | "orange" | "grey";
-
-type SfxModule = { title: string; knobs: readonly KnobId[]; tone: ModuleTone; note: boolean };
-
-/** Picotron-style 12-column spans per row (wider modules = more knobs). */
-const MODULE_COL_SPAN: readonly (readonly number[])[] = [
-  [3, 5, 4],
-  [3, 3, 3, 3],
-];
-
-const KNOB_ROWS: SfxModule[][] = [
-  [
-    { title: "OUTPUT", knobs: ["vol"], tone: "grey", note: false },
-    { title: "ENVELOPE", knobs: ["attack", "decay"], tone: "orange", note: false },
-    { title: "SPEED", knobs: ["rate"], tone: "yellow", note: false },
-  ],
-  [
-    { title: "SLIDE", knobs: ["slide"], tone: "yellow", note: false },
-    { title: "VIBRATO", knobs: ["vibrato"], tone: "yellow", note: false },
-    { title: "DUTY", knobs: ["duty"], tone: "yellow", note: false },
-    { title: "FILTER", knobs: ["cutoff"], tone: "yellow", note: true },
-  ],
-];
-
 export type SfxDisk = {
   machine: HTMLElement;
   bank: HTMLElement;
@@ -67,11 +43,6 @@ function pressable(button: HTMLButtonElement): void {
   const clear = () => button.classList.remove("is-down");
   button.addEventListener("pointerup", clear);
   button.addEventListener("pointerleave", clear);
-}
-
-function dutyText(sound: SfxSound, cart: LiveChipId): string {
-  const pct = applyChip(sound, cart).duty * 100;
-  return `${Number.isInteger(pct) ? String(pct) : pct.toFixed(1)}%`;
 }
 
 /** Matches `paint()` needle: `rotate(-140 + value * 280deg)` with 12 o'clock = 0.5. */
@@ -218,7 +189,7 @@ export function mountSfxDisk(): SfxDisk {
   const waves = el("div", "beast2d-sfx-waves");
   const waveButtons = new Map<WaveId, HTMLButtonElement>();
   for (const id of WAVE_IDS) {
-    const button = el("button", "beast2d-sfx-btn beast2d-sfx-wave");
+    const button = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-wave");
     button.type = "button";
     button.title = id.toUpperCase();
     const icon = el("canvas", "beast2d-sfx-wave-icon");
@@ -233,44 +204,30 @@ export function mountSfxDisk(): SfxDisk {
     waveButtons.set(id, button);
     waves.append(button);
   }
-  mid.append(gridWrap, waves);
+  const effects = el("div", "beast2d-sfx-effects");
+  const knobUi = new Map<KnobId, { button: HTMLButtonElement; canvas: HTMLCanvasElement; label: HTMLElement; module: HTMLElement }>();
+  for (const id of KNOB_IDS) {
+    const box = el("section", "beast2d-sfx-fx-mod");
+    box.dataset.knob = id;
+    const button = el("button", "beast2d-sfx-knob");
+    button.type = "button";
+    button.setAttribute("aria-label", knobLabel(id));
+    const knobCanvas = el("canvas", "beast2d-sfx-knob-icon");
+    const label = el("span", "beast2d-sfx-knob-label", knobLabel(id));
+    button.append(knobCanvas);
+    box.append(button, label);
+    knobUi.set(id, { button, canvas: knobCanvas, label, module: box });
+    bindKnob(id, button);
+    effects.append(box);
+  }
+  mid.append(effects, gridWrap, waves);
 
-  const knobs = el("div", "beast2d-sfx-knobs");
-  const knobUi = new Map<KnobId, { button: HTMLButtonElement; canvas: HTMLCanvasElement; label: HTMLElement; module: HTMLElement; note: HTMLElement | null }>();
-  KNOB_ROWS.forEach((modules, rowIndex) => {
-    const knobRow = el("div", `beast2d-sfx-knob-row beast2d-sfx-knob-row-${rowIndex + 1}`);
-    for (const [moduleIndex, module] of modules.entries()) {
-      const box = el("section", `beast2d-sfx-mod beast2d-sfx-mod-${module.tone} beast2d-sfx-mod-${module.title.toLowerCase()}`);
-      box.dataset.colSpan = String(MODULE_COL_SPAN[rowIndex]?.[moduleIndex] ?? 3);
-      box.append(el("div", "beast2d-sfx-mod-title", module.title));
-      const note = module.note ? el("div", "beast2d-sfx-mod-note", "") : null;
-      if (note) box.append(note);
-      const row = el("div", "beast2d-sfx-mod-knobs");
-      for (const id of module.knobs) {
-        const button = el("button", "beast2d-sfx-knob");
-        button.type = "button";
-        button.setAttribute("aria-label", knobLabel(id));
-        const knobCanvas = el("canvas", "beast2d-sfx-knob-icon");
-        const label = el("span", "beast2d-sfx-knob-label", knobLabel(id));
-        button.append(knobCanvas);
-        const wrap = el("div", "beast2d-sfx-knob-wrap");
-        wrap.append(button, label);
-        row.append(wrap);
-        knobUi.set(id, { button, canvas: knobCanvas, label, module: box, note });
-        bindKnob(id, button);
-      }
-      box.append(row);
-      knobRow.append(box);
-    }
-    knobs.append(knobRow);
-  });
-
-  machine.append(top, presets, mid, knobs);
+  machine.append(top, presets, mid);
 
   const bank = el("section", "beast2d-sfx-bank");
   bank.setAttribute("aria-label", "Sound bank");
   const bankHead = el("div", "beast2d-sfx-bank-head");
-  bankHead.append(el("span", "beast2d-sfx-bank-title", "SOUND BANK"), el("span", "beast2d-sfx-bank-run", "RUN = GAME HERE"));
+  bankHead.append(el("span", "beast2d-sfx-bank-title", "SOUND BANK"), el("span", "beast2d-sfx-bank-run", "RUN → GAME"));
   const list = el("div", "beast2d-sfx-list");
   const rows: HTMLElement[] = [];
   const rowNames: HTMLElement[] = [];
@@ -477,13 +434,9 @@ export function mountSfxDisk(): SfxDisk {
       ui.module.classList.toggle("is-dim", !enabled);
       const shown = id === "duty" ? applyChip(sound, bankState.chip).duty : sound.knobs[id];
       paintSfxKnob(ui.canvas, shown);
-      ui.label.textContent = id === "duty" ? dutyText(sound, bankState.chip) : knobLabel(id);
+      ui.label.textContent = knobLabel(id);
       if (id === "cutoff") {
-        const title = ui.module.querySelector(".beast2d-sfx-mod-title");
-        if (title) title.textContent = enabled ? "FILTER" : "NO GB";
-        if (ui.note) ui.note.textContent = "";
-      } else if (ui.note) {
-        ui.note.textContent = "";
+        ui.button.setAttribute("aria-label", enabled ? "CUT" : "NO GB");
       }
     }
     bankState.slots.forEach((slot, index) => {

@@ -165,11 +165,11 @@ export function createDefaultSfxBank(): SfxBank {
 
 export function knobLabel(id: KnobId): string {
   if (id === "vol") return "VOL";
-  if (id === "attack") return "ATTACK";
-  if (id === "decay") return "DECAY";
+  if (id === "attack") return "ATK";
+  if (id === "decay") return "DEC";
   if (id === "rate") return "RATE";
-  if (id === "slide") return "AMOUNT";
+  if (id === "slide") return "SLD";
   if (id === "vibrato") return "DEPTH";
   if (id === "duty") return "DUTY";
-  return "CUTOFF";
+  return "CUT";
 }

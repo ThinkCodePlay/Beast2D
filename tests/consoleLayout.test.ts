@@ -4,7 +4,9 @@ import { chromeFontScale, fitPreviewScale, homeFloppyScale } from "../src/editor
 describe("console layout", () => {
   it("uses 16px chrome below 640px and 32px at mockup height", () => {
     expect(chromeFontScale(480)).toBe(1);
-    expect(chromeFontScale(800)).toBe(2);
+    expect(chromeFontScale(800, 1280)).toBe(2);
+    expect(chromeFontScale(800, 1024)).toBe(1);
+    expect(chromeFontScale(800, 800)).toBe(1);
   });
 
   it("draws home disks one integer step larger than the tool row", () => {
