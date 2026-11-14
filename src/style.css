@@ -1302,28 +1302,36 @@ body,
 
 @media (max-width: 1279px) {
   .beast2d-workspace-sfx .beast2d-sfx-mid {
-    flex: 0 0 auto;
-    min-height: 0;
+    flex: 2 1 0;
+    min-height: calc(88px * var(--beast-scale));
+    align-items: stretch;
   }
 
   .beast2d-workspace-sfx .beast2d-sfx-grid {
     flex: 1 1 auto;
     min-width: 0;
     width: auto;
-    height: calc(56px * var(--beast-scale));
+    align-self: stretch;
+    height: 100%;
     min-height: calc(56px * var(--beast-scale));
-    max-height: calc(56px * var(--beast-scale));
+    max-height: calc(88px * var(--beast-scale));
   }
 
   .beast2d-workspace-sfx .beast2d-sfx-pitch {
-    flex: 0 0 calc(42px * var(--beast-scale));
-    height: calc(42px * var(--beast-scale));
-    max-height: calc(42px * var(--beast-scale));
+    flex: 1 1 auto;
+    height: auto;
+    min-height: calc(42px * var(--beast-scale));
+    max-height: none;
   }
 
   .beast2d-workspace-sfx .beast2d-sfx-waves {
     height: calc(88px * var(--beast-scale));
     align-self: flex-start;
+  }
+
+  .beast2d-sfx-spare {
+    flex: 1 1 0;
+    min-height: calc(4px * var(--beast-scale));
   }
 }
 

@@ -25,6 +25,7 @@ export type SfxDisk = {
   machine: HTMLElement;
   bank: HTMLElement;
   setLive: (on: boolean) => void;
+  repaintChrome: () => void;
   handleKey: (event: KeyboardEvent) => boolean;
 };
 
@@ -516,6 +517,9 @@ export function mountSfxDisk(): SfxDisk {
   return {
     machine,
     bank,
+    repaintChrome() {
+      paint();
+    },
     setLive(on) {
       if (on && frame === 0) frame = requestAnimationFrame(loop);
       if (!on && frame !== 0) {

@@ -102,7 +102,7 @@ function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
 }
 
 function labelColor(id: ChipId): number {
-  if (id === "snes" || id === "gen") return Beast2D16.StoneGray;
+  if (id === "snes" || id === "gen") return Beast2D16.Shadow;
   return Beast2D16.Cream;
 }
 

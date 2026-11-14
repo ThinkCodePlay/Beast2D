@@ -329,6 +329,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   appRoot.classList.add("beast2d-app");
 
   let layoutKey = "";
+  const maybeRepaintSfxChrome = () => {
+    if (viewState.screen === "editor" && viewState.activeTool === "SFX") {
+      sfxDisk.repaintChrome();
+    }
+  };
   const layoutPreview = () => {
     const fontScale = chromeFontScale(window.innerHeight, window.innerWidth);
     const scaleText = String(fontScale);
@@ -367,7 +372,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       viewState.activeTool === "SFX" &&
       viewState.editorMode !== "run";
     const key = `${fontScale}:${frameW}:${frameH}:${columnFlex}:${playing ? 1 : 0}:${sfxEdit ? 1 : 0}`;
-    if (key === layoutKey) return;
+    if (key === layoutKey) {
+      maybeRepaintSfxChrome();
+      return;
+    }
     layoutKey = key;
     previewFrame.style.width = `${frameW}px`;
     previewFrame.style.height = `${frameH}px`;
@@ -378,6 +386,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       editorColumn.style.flex = "";
       previewColumn.style.flex = columnFlex;
     }
+    maybeRepaintSfxChrome();
     repaintFloppies();
   };
   const repaintFloppies = () => {
@@ -584,6 +593,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     syncHomeSelection();
     syncEditorPanes();
     layoutPreview();
+    maybeRepaintSfxChrome();
     repaintFloppies();
     if (viewState.screen === "editor" || viewState.screen === "play") pokePlayfield();
   };
