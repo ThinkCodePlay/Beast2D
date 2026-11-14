@@ -55,7 +55,7 @@ body,
 }
 
 .beast2d-console:has(.beast2d-workspace-sfx) {
-  height: min(684px, 100%);
+  height: min(696px, 100%);
 }
 
 .beast2d-boot {
@@ -566,8 +566,9 @@ body,
 }
 
 .beast2d-sfx {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
+  max-height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -874,8 +875,8 @@ body,
   }
 
   .beast2d-workspace-sfx .beast2d-sfx-waves {
-    flex: 0 0 calc(50px * var(--beast-scale));
-    width: calc(50px * var(--beast-scale));
+    flex: 0 0 calc(74px * var(--beast-scale));
+    width: calc(74px * var(--beast-scale));
   }
 }
 
@@ -976,12 +977,12 @@ body,
 
 .beast2d-sfx-waves {
   display: grid;
-  grid-template-columns: repeat(2, calc(28px * var(--beast-scale)));
-  grid-template-rows: repeat(3, calc(28px * var(--beast-scale)));
+  grid-template-columns: repeat(2, calc(36px * var(--beast-scale)));
+  grid-template-rows: repeat(3, calc(24px * var(--beast-scale)));
   gap: calc(2px * var(--beast-scale));
-  flex: 0 0 calc(58px * var(--beast-scale));
-  width: calc(58px * var(--beast-scale));
-  height: calc(88px * var(--beast-scale));
+  flex: 0 0 calc(74px * var(--beast-scale));
+  width: calc(74px * var(--beast-scale));
+  height: calc(76px * var(--beast-scale));
   align-self: flex-start;
 }
 
@@ -1014,8 +1015,8 @@ body,
 .beast2d-sfx-wave-icon {
   display: block;
   flex: 0 0 auto;
-  width: calc(18px * var(--beast-scale));
-  height: calc(12px * var(--beast-scale));
+  width: calc(36px * var(--beast-scale));
+  height: calc(24px * var(--beast-scale));
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
@@ -1303,15 +1304,18 @@ body,
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-waves {
-  grid-template-columns: repeat(2, calc(28px * var(--beast-scale)));
-  flex: 0 0 calc(58px * var(--beast-scale));
-  width: calc(58px * var(--beast-scale));
+  grid-template-columns: repeat(2, calc(36px * var(--beast-scale)));
+  grid-template-rows: repeat(3, calc(24px * var(--beast-scale)));
+  flex: 0 0 calc(74px * var(--beast-scale));
+  width: calc(74px * var(--beast-scale));
+  height: calc(76px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-editor-column-sfx {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-grid {
