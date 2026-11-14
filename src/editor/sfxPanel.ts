@@ -16,6 +16,7 @@ import { getSfxBank, subscribeSfxBank, updateSfxCartChip, updateSfxSlot } from "
 import { knobLabel } from "../core/sfx/format";
 import { PRESET_IDS, generateDice, generatePreset, type PresetId } from "../core/sfx/generate";
 import { playSfx, sfxPlayhead, stopSfx } from "../core/sfx/synth";
+import { paintSfxButton } from "./sfxButtonArt";
 import { paintSfxWaveIcon } from "./sfxWaves";
 
 const ROTOR_ANGLE: Record<(typeof CHIP_IDS)[number], number> = {
@@ -106,18 +107,21 @@ export function mountSfxDisk(): SfxDisk {
 
   const top = el("div", "beast2d-sfx-top");
   const transport = el("div", "beast2d-sfx-transport");
-  const playButton = el("button", "beast2d-sfx-btn beast2d-sfx-btn-pink beast2d-sfx-icon-btn");
+  const playButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn");
   playButton.type = "button";
   playButton.title = "Play";
-  playButton.append(el("span", "beast2d-sfx-play-icon"));
-  const stopButton = el("button", "beast2d-sfx-btn beast2d-sfx-icon-btn");
+  const playIcon = el("canvas", "beast2d-sfx-btn-icon");
+  playButton.append(playIcon);
+  const stopButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn");
   stopButton.type = "button";
   stopButton.title = "Stop";
-  stopButton.append(el("span", "beast2d-sfx-stop-icon"));
-  const loopButton = el("button", "beast2d-sfx-btn beast2d-sfx-icon-btn");
+  const stopIcon = el("canvas", "beast2d-sfx-btn-icon");
+  stopButton.append(stopIcon);
+  const loopButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn");
   loopButton.type = "button";
   loopButton.title = "Loop";
-  loopButton.append(el("span", "beast2d-sfx-loop-icon", "↻"));
+  const loopIcon = el("canvas", "beast2d-sfx-btn-icon");
+  loopButton.append(loopIcon);
   pressable(playButton);
   pressable(stopButton);
   pressable(loopButton);
@@ -152,17 +156,24 @@ export function mountSfxDisk(): SfxDisk {
 
   const presets = el("div", "beast2d-sfx-presets");
   const presetButtons = new Map<string, HTMLButtonElement>();
+  const presetIcons = new Map<string, HTMLCanvasElement>();
   for (const preset of PRESET_IDS) {
-    const button = el("button", "beast2d-sfx-btn beast2d-sfx-preset");
+    const button = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset");
     button.type = "button";
-    button.append(el("span", "beast2d-sfx-preset-name", preset.toUpperCase()));
+    button.title = preset.toUpperCase();
+    const icon = el("canvas", "beast2d-sfx-btn-icon");
+    button.append(icon);
+    presetIcons.set(preset, icon);
     pressable(button);
     button.addEventListener("click", () => applyPreset(preset));
     presetButtons.set(preset, button);
     presets.append(button);
   }
-  const diceButton = el("button", "beast2d-sfx-btn beast2d-sfx-btn-pink", "DICE");
+  const diceButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn");
   diceButton.type = "button";
+  diceButton.title = "Dice";
+  const diceIcon = el("canvas", "beast2d-sfx-btn-icon");
+  diceButton.append(diceIcon);
   pressable(diceButton);
   diceButton.addEventListener("click", () => rollDice());
   presets.append(diceButton);
@@ -402,8 +413,26 @@ export function mountSfxDisk(): SfxDisk {
       node?.classList.toggle("is-on", id === chipId);
     }
     for (const preset of PRESET_IDS) {
-      presetButtons.get(preset)?.classList.toggle("is-selected", armed === preset);
+      const button = presetButtons.get(preset);
+      const icon = presetIcons.get(preset);
+      const on = armed === preset;
+      button?.classList.toggle("is-selected", on);
+      if (icon) {
+        paintSfxButton(icon, {
+          face: on ? "selected" : "cream",
+          char: preset[0]!.toUpperCase(),
+          pressed: button?.classList.contains("is-down"),
+        });
+      }
     }
+    paintSfxButton(playIcon, { face: "cream", icon: "play", pressed: playButton.classList.contains("is-down") });
+    paintSfxButton(stopIcon, { face: "cream", icon: "stop", pressed: stopButton.classList.contains("is-down") });
+    paintSfxButton(loopIcon, {
+      face: sound.loop ? "selected" : "cream",
+      icon: "loop",
+      pressed: loopButton.classList.contains("is-down"),
+    });
+    paintSfxButton(diceIcon, { face: "cream", char: "D", pressed: diceButton.classList.contains("is-down") });
     for (const id of WAVE_IDS) {
       const button = waveButtons.get(id);
       if (!button) continue;
@@ -478,6 +507,13 @@ export function mountSfxDisk(): SfxDisk {
     frame = requestAnimationFrame(loop);
     paintPlayhead();
   };
+  for (const btn of [playButton, stopButton, loopButton, diceButton, ...presetButtons.values()]) {
+    const bump = () => paint();
+    btn.addEventListener("pointerdown", bump);
+    btn.addEventListener("pointerup", bump);
+    btn.addEventListener("pointerleave", bump);
+  }
+
   subscribeSfxBank(paint);
   paint();
 

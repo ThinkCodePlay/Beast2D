@@ -566,15 +566,49 @@ body,
 }
 
 .beast2d-sfx-btn {
+  box-sizing: border-box;
   font: inherit;
   position: relative;
   color: #1f1424;
   background: #f4ead2;
-  border: calc(3px * var(--beast-scale)) solid #1f1424;
-  box-shadow: inset calc(-2px * var(--beast-scale)) calc(-2px * var(--beast-scale)) 0 #746678;
-  padding: calc(2px * var(--beast-scale)) calc(6px * var(--beast-scale));
-  line-height: calc(16px * var(--beast-scale));
+  border: calc(2px * var(--beast-scale)) solid #1f1424;
+  box-shadow: inset calc(-1px * var(--beast-scale)) calc(-1px * var(--beast-scale)) 0 #746678;
+  width: calc(16px * var(--beast-scale));
+  height: calc(16px * var(--beast-scale));
+  min-width: calc(16px * var(--beast-scale));
+  min-height: calc(16px * var(--beast-scale));
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(16px * var(--beast-scale));
+  line-height: 1;
   cursor: pointer;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.beast2d-sfx-pixel-btn {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+}
+
+.beast2d-sfx-pixel-btn.is-selected,
+.beast2d-sfx-pixel-btn.is-down:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.beast2d-sfx-btn-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
 }
 
 .beast2d-sfx-btn:disabled,
@@ -588,14 +622,14 @@ body,
 .beast2d-sfx-btn-pink {
   color: #f4ead2;
   background: #e86c9a;
-  box-shadow: calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #c1386e;
+  box-shadow: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale)) 0 #c1386e;
 }
 
 .beast2d-sfx-btn.is-selected,
 .beast2d-sfx-btn.is-down:not(:disabled) {
   background: #f1c766;
-  box-shadow: calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #e28649;
-  transform: translateY(calc(2px * var(--beast-scale)));
+  box-shadow: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale)) 0 #e28649;
+  transform: translateY(calc(1px * var(--beast-scale)));
 }
 
 .beast2d-sfx-top {
@@ -607,31 +641,28 @@ body,
 
 .beast2d-sfx-transport {
   display: flex;
-  gap: calc(4px * var(--beast-scale));
+  gap: calc(1px * var(--beast-scale));
   flex-shrink: 0;
+  padding: calc(1px * var(--beast-scale));
+  background: #1f1424;
 }
 
 .beast2d-sfx-icon-btn {
-  width: calc(32px * var(--beast-scale));
-  height: calc(26px * var(--beast-scale));
   padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .beast2d-sfx-play-icon {
   width: 0;
   height: 0;
-  border-top: calc(6px * var(--beast-scale)) solid transparent;
-  border-bottom: calc(6px * var(--beast-scale)) solid transparent;
-  border-left: calc(10px * var(--beast-scale)) solid currentColor;
-  margin-left: calc(2px * var(--beast-scale));
+  border-top: calc(4px * var(--beast-scale)) solid transparent;
+  border-bottom: calc(4px * var(--beast-scale)) solid transparent;
+  border-left: calc(6px * var(--beast-scale)) solid currentColor;
+  margin-left: calc(1px * var(--beast-scale));
 }
 
 .beast2d-sfx-stop-icon {
-  width: calc(10px * var(--beast-scale));
-  height: calc(10px * var(--beast-scale));
+  width: calc(6px * var(--beast-scale));
+  height: calc(6px * var(--beast-scale));
   background: currentColor;
 }
 
@@ -653,7 +684,7 @@ body,
 }
 
 .beast2d-sfx-loop-icon {
-  font-size: calc(18px * var(--beast-scale));
+  font-size: calc(12px * var(--beast-scale));
   line-height: 1;
   color: #1f1424;
 }
@@ -737,29 +768,21 @@ body,
 
 .beast2d-sfx-presets {
   display: flex;
-  flex-wrap: nowrap;
-  gap: calc(2px * var(--beast-scale));
-  flex-shrink: 0;
-}
-
-.beast2d-sfx-preset {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  min-height: calc(30px * var(--beast-scale));
-  padding: calc(2px * var(--beast-scale));
+  gap: calc(1px * var(--beast-scale));
+  flex-shrink: 0;
+  padding: calc(1px * var(--beast-scale));
+  background: #1f1424;
 }
 
 .beast2d-sfx-preset-name {
   display: block;
-  width: 100%;
   text-align: center;
-  font-size: calc(12px * var(--beast-scale));
-  line-height: calc(12px * var(--beast-scale));
+  font-size: calc(16px * var(--beast-scale));
+  line-height: 1;
   padding: 0;
+  pointer-events: none;
 }
 
 .beast2d-sfx-mid {
@@ -852,10 +875,14 @@ body,
   align-self: stretch;
 }
 
-.beast2d-sfx-wave {
+.beast2d-sfx-wave.beast2d-sfx-btn {
   width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
+}
+
+.beast2d-sfx-wave {
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -952,8 +979,10 @@ body,
 }
 
 .beast2d-sfx-knob {
-  width: calc(28px * var(--beast-scale));
-  height: calc(28px * var(--beast-scale));
+  width: calc(16px * var(--beast-scale));
+  height: calc(16px * var(--beast-scale));
+  min-width: calc(16px * var(--beast-scale));
+  min-height: calc(16px * var(--beast-scale));
   border-radius: 50%;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
   background: #f4ead2;
@@ -984,10 +1013,14 @@ body,
 }
 
 .beast2d-sfx-knob-label {
-  font-size: calc(10px * var(--beast-scale));
-  line-height: calc(10px * var(--beast-scale));
+  font-size: calc(8px * var(--beast-scale));
+  line-height: calc(8px * var(--beast-scale));
   color: #1f1424;
   text-align: center;
+  max-width: calc(16px * var(--beast-scale));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .beast2d-sfx-mod.is-dim .beast2d-sfx-knob-label {
@@ -1149,14 +1182,17 @@ body,
   inset: calc(10px * var(--beast-scale));
 }
 
-.beast2d-workspace-sfx .beast2d-sfx-preset {
-  min-height: calc(22px * var(--beast-scale));
-  padding: calc(2px * var(--beast-scale));
+
+.beast2d-workspace-sfx .beast2d-sfx-waves {
+  grid-template-columns: repeat(2, calc(28px * var(--beast-scale)));
+  flex: 0 0 calc(58px * var(--beast-scale));
+  width: calc(58px * var(--beast-scale));
+  height: calc(44px * var(--beast-scale));
 }
 
-.beast2d-workspace-sfx .beast2d-sfx-preset-name {
-  font-size: calc(10px * var(--beast-scale));
-  line-height: calc(10px * var(--beast-scale));
+.beast2d-workspace-sfx .beast2d-sfx-wave-icon {
+  width: calc(26px * var(--beast-scale));
+  height: calc(20px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-grid {
@@ -1173,17 +1209,6 @@ body,
   height: calc(8px * var(--beast-scale));
 }
 
-.beast2d-workspace-sfx .beast2d-sfx-waves {
-  grid-template-columns: repeat(2, calc(28px * var(--beast-scale)));
-  flex: 0 0 calc(58px * var(--beast-scale));
-  width: calc(58px * var(--beast-scale));
-  height: calc(44px * var(--beast-scale));
-}
-
-.beast2d-workspace-sfx .beast2d-sfx-wave-icon {
-  width: calc(26px * var(--beast-scale));
-  height: calc(20px * var(--beast-scale));
-}
 
 /* Picotron-style knob matrix: 12 columns, module width ∝ knob count. */
 .beast2d-workspace-sfx .beast2d-sfx-knobs {
@@ -1224,7 +1249,7 @@ body,
   align-items: center;
   gap: calc(1px * var(--beast-scale));
   padding: calc(2px * var(--beast-scale)) calc(1px * var(--beast-scale));
-  min-height: calc(36px * var(--beast-scale));
+  min-height: calc(28px * var(--beast-scale));
   box-sizing: border-box;
 }
 
@@ -1251,19 +1276,6 @@ body,
   line-height: calc(9px * var(--beast-scale));
 }
 
-.beast2d-workspace-sfx .beast2d-sfx-knob {
-  width: calc(18px * var(--beast-scale));
-  height: calc(18px * var(--beast-scale));
-}
-
-.beast2d-workspace-sfx .beast2d-sfx-knob-label {
-  font-size: calc(8px * var(--beast-scale));
-  line-height: calc(8px * var(--beast-scale));
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 /* Virtual resolution 320×240; preview frame sets integer CSS scale. */
 .game-container {
