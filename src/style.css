@@ -896,19 +896,16 @@ body,
   flex: 1 1 auto;
   height: calc(42px * var(--beast-scale));
   min-height: calc(42px * var(--beast-scale));
-  background-image: repeating-linear-gradient(
-    to right,
-    transparent,
-    transparent calc(100% * 11 / 32),
-    color-mix(in srgb, #3b2e3f 55%, transparent) calc(100% * 11 / 32),
-    color-mix(in srgb, #3b2e3f 55%, transparent) calc(100% * 12 / 32)
-  );
-  background-size: calc(100% * 12 / 32) 100%;
+}
+
+.beast2d-sfx-pitch .beast2d-sfx-cell:nth-child(12n + 1) {
+  box-shadow: inset calc(1px * var(--beast-scale)) 0 0 #3b2e3f;
 }
 
 .beast2d-sfx-volume {
-  flex: 0 0 calc(10px * var(--beast-scale));
-  height: calc(10px * var(--beast-scale));
+  flex: 0 0 calc(16px * var(--beast-scale));
+  height: calc(16px * var(--beast-scale));
+  min-height: calc(16px * var(--beast-scale));
 }
 
 .beast2d-sfx-cell {
@@ -929,7 +926,8 @@ body,
 
 .beast2d-sfx-vol-cell {
   align-items: stretch;
-  padding: calc(1px * var(--beast-scale));
+  padding: 0;
+  background: #4a784d;
 }
 
 .beast2d-sfx-vol-stack {
@@ -937,12 +935,14 @@ body,
   flex-direction: column-reverse;
   width: 100%;
   height: 100%;
-  gap: calc(1px * var(--beast-scale));
+  gap: 0;
+  padding: calc(1px * var(--beast-scale));
+  box-sizing: border-box;
 }
 
 .beast2d-sfx-vol-step {
   flex: 1 1 0;
-  min-height: 0;
+  min-height: calc(1px * var(--beast-scale));
   background: #3b2e3f;
 }
 
@@ -1297,8 +1297,9 @@ body,
 }
 
 .beast2d-workspace-sfx .beast2d-sfx-volume {
-  flex: 0 0 calc(10px * var(--beast-scale));
-  height: calc(10px * var(--beast-scale));
+  flex: 0 0 calc(16px * var(--beast-scale));
+  height: calc(16px * var(--beast-scale));
+  min-height: calc(16px * var(--beast-scale));
 }
 
 .beast2d-sfx-spare {

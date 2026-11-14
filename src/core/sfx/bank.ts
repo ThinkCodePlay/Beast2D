@@ -28,7 +28,13 @@ function persist(bankState: SfxBank): void {
   }
 }
 
+function requireBank(): SfxBank {
+  if (!bank) initSfxBank();
+  return bank!;
+}
+
 function publish(): void {
+  if (!bank) return;
   persist(bank);
   for (const listener of listeners) listener();
 }
@@ -58,8 +64,7 @@ export function initSfxBank(fileSeed?: unknown): void {
 
 /** The live cart bank. Playback reads this object, so an edit is heard on the next sfx(). */
 export function getSfxBank(): SfxBank {
-  if (!bank) initSfxBank();
-  return bank;
+  return requireBank();
 }
 
 export function replaceSfxBank(next: SfxBank): void {
@@ -68,12 +73,12 @@ export function replaceSfxBank(next: SfxBank): void {
 }
 
 export function updateSfxCartChip(chip: LiveChipId): void {
-  bank.chip = chip;
+  requireBank().chip = chip;
   publish();
 }
 
 export function updateSfxSlot(index: number, edit: (sound: SfxSound) => void): void {
-  const sound = bank.slots[index];
+  const sound = requireBank().slots[index];
   if (!sound) return;
   edit(sound);
   publish();

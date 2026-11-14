@@ -1,11 +1,11 @@
 import {
   CHIP_LABELS,
   CHIPS,
+  KNOB_IDS,
   SFX_SLOTS,
   WAVE_IDS,
   applyChip,
   effectiveChip,
-  type KnobId,
   type LiveChipId,
   type SfxSound,
 } from "../core/sfx/chips";
@@ -184,11 +184,12 @@ export function mountSfxDisk(): SfxDisk {
     sound.volume.forEach((value, index) => {
       const steps = gridUi.volumeSteps[index];
       if (!steps) return;
+      const lit = Math.max(0, Math.min(15, value));
       steps.forEach((block, stepIndex) => {
-        block.classList.toggle("is-on", stepIndex < value);
+        block.classList.toggle("is-on", stepIndex < lit);
       });
     });
-    for (const id of Object.keys(knobsUi.knobUi) as KnobId[]) {
+    for (const id of KNOB_IDS) {
       const ui = knobsUi.knobUi.get(id);
       if (!ui) continue;
       const enabled = spec.knobs[id];
