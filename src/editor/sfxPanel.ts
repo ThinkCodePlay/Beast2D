@@ -117,29 +117,11 @@ export function mountSfxDisk(): SfxDisk {
   for (const id of CHIP_IDS) {
     const live = CHIPS[id].live;
     const chip = live ? el("button", `beast2d-sfx-chip beast2d-sfx-chip-${id}`, CHIP_LABELS[id]) : el("span", `beast2d-sfx-chip beast2d-sfx-chip-${id} is-dim`, CHIP_LABELS[id]);
-    if (chip instanceof HTMLButtonElement) {
-      chip.type = "button";
-      chip.addEventListener("click", (event) => {
-        event.stopPropagation();
-        setChip(id as LiveChipId);
-      });
-    }
+    if (chip instanceof HTMLButtonElement) chip.type = "button";
     chipButtons.set(id, chip);
     rotor.append(chip);
   }
   rotor.append(dial);
-  rotor.addEventListener("click", (event) => {
-    const rect = rotor.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    const live =
-      x < rect.width / 2 && y < rect.height / 2 ? "pico"
-      : x < rect.width / 2 && y >= rect.height / 2 ? "gb"
-      : x >= rect.width / 2 && y < rect.height / 2 ? "snes"
-      : "gen";
-    if (!CHIPS[live].live) return;
-    setChip(live);
-  });
   top.append(transport, nameLcd, rotor);
 
   const presets = el("div", "beast2d-sfx-presets");
@@ -204,6 +186,7 @@ export function mountSfxDisk(): SfxDisk {
   }
   mid.append(gridWrap, waves);
 
+  const body = el("div", "beast2d-sfx-body");
   const knobs = el("div", "beast2d-sfx-knobs");
   const knobUi = new Map<KnobId, { button: HTMLButtonElement; needle: HTMLElement; label: HTMLElement; module: HTMLElement; note: HTMLElement | null }>();
   KNOB_ROWS.forEach((modules, rowIndex) => {
@@ -233,7 +216,8 @@ export function mountSfxDisk(): SfxDisk {
     knobs.append(knobRow);
   });
 
-  machine.append(top, presets, mid, knobs);
+  body.append(mid, knobs);
+  machine.append(top, presets, body);
 
   const bank = el("section", "beast2d-sfx-bank");
   bank.setAttribute("aria-label", "Sound bank");
@@ -448,6 +432,26 @@ export function mountSfxDisk(): SfxDisk {
     playhead.classList.add("is-on");
     playhead.style.left = `${((head.step + 0.5) / 32) * 100}%`;
   }
+
+  rotor.addEventListener("click", (event) => {
+    const rect = rotor.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const live =
+      x < rect.width / 2 && y < rect.height / 2 ? "pico"
+      : x < rect.width / 2 && y >= rect.height / 2 ? "gb"
+      : x >= rect.width / 2 && y < rect.height / 2 ? "snes"
+      : "gen";
+    if (!CHIPS[live].live) return;
+    setChip(live);
+  });
+  chipButtons.forEach((node, id) => {
+    if (!(node instanceof HTMLButtonElement)) return;
+    node.addEventListener("click", (event) => {
+      event.stopPropagation();
+      setChip(id as LiveChipId);
+    });
+  });
 
   playButton.addEventListener("click", () => playSfx(selected));
   stopButton.addEventListener("click", () => stopSfx());

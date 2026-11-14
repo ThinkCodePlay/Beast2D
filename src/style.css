@@ -525,6 +525,8 @@ body,
   padding: calc(2px * var(--beast-scale));
   border-right: calc(1px * var(--beast-scale)) solid #3b2e3f;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .beast2d-preview-column-bank {
@@ -548,13 +550,22 @@ body,
   display: none !important;
 }
 
+.beast2d-sfx-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: calc(2px * var(--beast-scale));
+}
+
 .beast2d-sfx {
   flex: 1;
   min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: calc(3px * var(--beast-scale));
+  gap: calc(2px * var(--beast-scale));
   box-sizing: border-box;
   padding: calc(4px * var(--beast-scale));
   color: #f4ead2;
