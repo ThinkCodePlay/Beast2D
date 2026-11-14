@@ -8,7 +8,7 @@ const W = 64;
 const H = 56;
 const CX = 32;
 const CY = 30;
-const KNOB_SCALE = 3;
+const STONE_MARGIN = 2;
 
 const LABEL_CENTER: Record<ChipId, { x: number; y: number }> = {
   pico: { x: 11, y: 8 },
@@ -37,10 +37,14 @@ function labelCenter(chip: ChipId): { x: number; y: number } {
 function drawStoneKnob(ctx: CanvasRenderingContext2D): void {
   const img = loadStoneKnob();
   if (!img.complete || img.naturalWidth === 0) return;
-  const w = KNOB_SPRITE_W * KNOB_SCALE;
-  const h = KNOB_SPRITE_H * KNOB_SCALE;
+  const scale = Math.min(
+    Math.floor((W - STONE_MARGIN * 2) / KNOB_SPRITE_W),
+    Math.floor((H - STONE_MARGIN * 2) / KNOB_SPRITE_H),
+  );
+  const w = KNOB_SPRITE_W * scale;
+  const h = KNOB_SPRITE_H * scale;
   const x = Math.round(CX - w / 2);
-  const y = Math.round(CY - h / 2 + 1);
+  const y = Math.round(CY - h / 2);
   ctx.drawImage(img, 0, 0, KNOB_SPRITE_W, KNOB_SPRITE_H, x, y, w, h);
 }
 
@@ -52,7 +56,11 @@ function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
   const dx = tx - capX;
   const dy = ty - capY;
   const len = Math.hypot(dx, dy) || 1;
-  const reach = KNOB_SCALE * 4;
+  const stoneScale = Math.min(
+    Math.floor((W - STONE_MARGIN * 2) / KNOB_SPRITE_W),
+    Math.floor((H - STONE_MARGIN * 2) / KNOB_SPRITE_H),
+  );
+  const reach = stoneScale * 4;
   const tipX = Math.round(capX + (dx / len) * reach);
   const tipY = Math.round(capY + (dy / len) * reach);
   const sx = Math.round(capX);

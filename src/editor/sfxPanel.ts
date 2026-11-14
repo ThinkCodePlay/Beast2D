@@ -144,8 +144,11 @@ export function mountSfxDisk(): SfxDisk {
       Number.parseInt(getComputedStyle(machine).getPropertyValue("--beast-scale"), 10) ||
       Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue("--beast-scale"), 10) ||
       1;
-    const rotorPx =
-      header.rotor.clientWidth > 0 ? Math.max(1, Math.round(header.rotor.clientWidth / 64)) : chromeScale;
+    const keyWpx =
+      Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-key-w"), 10) || 64 * chromeScale;
+    const keyHpx =
+      Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-key-h"), 10) || 56 * chromeScale;
+    const rotorPx = Math.max(1, Math.min(Math.round(keyWpx / 64), Math.round(keyHpx / 56)));
     paintSfxRotor(header.rotorCanvas, cartChip, rotorPx);
     for (const [id, node] of header.chipButtons) {
       node.classList.toggle("is-on", id === cartChip);

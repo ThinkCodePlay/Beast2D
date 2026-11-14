@@ -571,6 +571,7 @@ body,
   --sfx-key-w: calc(64px * var(--beast-scale));
   --sfx-key-h: calc(56px * var(--beast-scale));
   --sfx-rotor-w: var(--sfx-key-w);
+  --sfx-lcd-max-w: 100%;
   --sfx-knob-w: calc(32px * var(--beast-scale));
   --sfx-knob-h: calc(34px * var(--beast-scale));
   flex: 1 1 auto;
@@ -662,6 +663,9 @@ body,
   align-items: center;
   gap: var(--sfx-gap);
   flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .beast2d-sfx-transport {
@@ -704,7 +708,8 @@ body,
 
 .beast2d-sfx-name-lcd {
   flex: 1 1 auto;
-  min-width: calc(48px * var(--beast-scale));
+  min-width: calc(24px * var(--beast-scale));
+  max-width: var(--sfx-lcd-max-w, 100%);
 }
 
 .beast2d-sfx-name {
@@ -800,7 +805,7 @@ body,
 }
 
 .beast2d-sfx-rotor-label.is-dim {
-  color: #746678;
+  color: #d8c8dc;
 }
 
 .beast2d-sfx-rotor-label.is-on {
@@ -1080,13 +1085,17 @@ body,
   flex: 1 1 0;
   min-width: 0;
   width: auto;
+  height: var(--sfx-key-h);
+  min-height: var(--sfx-key-h);
+  max-height: var(--sfx-key-h);
   box-sizing: border-box;
-  padding: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale)) 0;
+  padding: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale))
+    calc(9px * var(--beast-scale));
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: calc(1px * var(--beast-scale));
+  justify-content: center;
+  gap: 0;
   background: #3b2e3f;
   border: calc(1px * var(--beast-scale)) solid #1f1424;
   position: relative;
@@ -1186,6 +1195,15 @@ body,
 
 .beast2d-sfx-knob:disabled {
   cursor: default;
+}
+
+.beast2d-sfx-fx-mod > .beast2d-sfx-knob-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(1px * var(--beast-scale));
+  margin: 0;
+  pointer-events: none;
 }
 
 .beast2d-sfx-knob-label {
