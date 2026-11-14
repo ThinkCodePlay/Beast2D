@@ -570,12 +570,9 @@ body,
   --sfx-pad: calc(8px * var(--beast-scale));
   --sfx-key-w: calc(64px * var(--beast-scale));
   --sfx-key-h: calc(56px * var(--beast-scale));
+  --sfx-rotor-w: var(--sfx-key-w);
   --sfx-knob-w: calc(32px * var(--beast-scale));
   --sfx-knob-h: calc(34px * var(--beast-scale));
-  --sfx-transport-w: calc(48px * var(--beast-scale));
-  --sfx-transport-h: calc(42px * var(--beast-scale));
-  --sfx-wave-sprite-w: calc(72px * var(--beast-scale));
-  --sfx-wave-sprite-h: calc(48px * var(--beast-scale));
   flex: 1 1 auto;
   min-height: 0;
   max-height: 100%;
@@ -688,8 +685,8 @@ body,
 
 .beast2d-sfx-transport-sprite {
   display: block;
-  width: var(--sfx-transport-w);
-  height: var(--sfx-transport-h);
+  width: var(--sfx-key-w);
+  height: var(--sfx-key-h);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
@@ -706,8 +703,8 @@ body,
 }
 
 .beast2d-sfx-name-lcd {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: calc(48px * var(--beast-scale));
 }
 
 .beast2d-sfx-name {
@@ -725,19 +722,25 @@ body,
 
 .beast2d-sfx-rotor {
   position: relative;
-  width: var(--sfx-key-w);
+  width: var(--sfx-rotor-w);
   height: var(--sfx-key-h);
-  flex-shrink: 0;
+  flex: 0 0 var(--sfx-rotor-w);
+  overflow: visible;
   cursor: pointer;
 }
 
 .beast2d-sfx-rotor-canvas {
   display: block;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: var(--sfx-key-w);
+  height: var(--sfx-key-h);
+  margin-left: calc(var(--sfx-key-w) / -2);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
+  z-index: 0;
 }
 
 .beast2d-sfx-chip {
@@ -790,7 +793,8 @@ body,
   line-height: calc(8px * var(--beast-scale));
   color: #f4ead2;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
+  white-space: nowrap;
   -webkit-font-smoothing: none;
   font-smooth: never;
 }
@@ -1077,12 +1081,12 @@ body,
   min-width: 0;
   width: auto;
   box-sizing: border-box;
-  padding: calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(1px * var(--beast-scale));
+  padding: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale)) 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: calc(2px * var(--beast-scale));
+  gap: calc(1px * var(--beast-scale));
   background: #3b2e3f;
   border: calc(1px * var(--beast-scale)) solid #1f1424;
   position: relative;

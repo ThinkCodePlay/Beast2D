@@ -1,7 +1,5 @@
 import { PRESET_SPRITE_H, PRESET_SPRITE_W } from "./presetSprites";
 import { KNOB_SPRITE_H, KNOB_SPRITE_W } from "./knobSprites";
-import { TRANSPORT_SPRITE_H, TRANSPORT_SPRITE_W } from "./transportSprites";
-import { WAVE_SPRITE_H, WAVE_SPRITE_W } from "./waveSprites";
 
 /** Largest integer scale so `native * scale * chrome ≤ limit` (pixel-snapped). */
 function fitIntegerScale(native: number, chrome: number, limitPx: number): number {
@@ -36,33 +34,22 @@ export function syncSfxBoardMetrics(machine: HTMLElement): void {
   keyW = Math.max(1, keyW);
   keyH = Math.max(1, keyH);
 
-  const modPad = 2 * chrome;
-  const knobLimitW = Math.max(1, keyW - modPad * 2);
-  const knobLimitH = Math.max(1, keyH - modPad - 10 * chrome);
+  const modPad = 1 * chrome;
+  const labelBand = 9 * chrome;
+  const knobAvailW = Math.max(1, cellW - modPad * 2);
+  const knobAvailH = Math.max(1, keyH - labelBand);
   const knobScale = Math.min(
-    fitIntegerScale(KNOB_SPRITE_W, chrome, knobLimitW),
-    fitIntegerScale(KNOB_SPRITE_H, chrome, knobLimitH),
+    fitIntegerScale(KNOB_SPRITE_W, chrome, knobAvailW),
+    fitIntegerScale(KNOB_SPRITE_H, chrome, knobAvailH),
     2,
   );
 
-  const transportScale = Math.min(
-    fitIntegerScale(TRANSPORT_SPRITE_W, chrome, keyW),
-    fitIntegerScale(TRANSPORT_SPRITE_H, chrome, keyH),
-    2,
-  );
-
-  const waveScale = Math.min(
-    fitIntegerScale(WAVE_SPRITE_W, chrome, keyW),
-    fitIntegerScale(WAVE_SPRITE_H, chrome, keyH),
-    2,
-  );
+  const cornerLabel = 9 * chrome;
+  const rotorW = keyW + cornerLabel * 2;
 
   machine.style.setProperty("--sfx-key-w", `${keyW}px`);
   machine.style.setProperty("--sfx-key-h", `${keyH}px`);
+  machine.style.setProperty("--sfx-rotor-w", `${rotorW}px`);
   machine.style.setProperty("--sfx-knob-w", `${KNOB_SPRITE_W * knobScale * chrome}px`);
   machine.style.setProperty("--sfx-knob-h", `${KNOB_SPRITE_H * knobScale * chrome}px`);
-  machine.style.setProperty("--sfx-transport-w", `${TRANSPORT_SPRITE_W * transportScale * chrome}px`);
-  machine.style.setProperty("--sfx-transport-h", `${TRANSPORT_SPRITE_H * transportScale * chrome}px`);
-  machine.style.setProperty("--sfx-wave-sprite-w", `${WAVE_SPRITE_W * waveScale * chrome}px`);
-  machine.style.setProperty("--sfx-wave-sprite-h", `${WAVE_SPRITE_H * waveScale * chrome}px`);
 }
