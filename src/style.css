@@ -550,6 +550,10 @@ body,
   display: none !important;
 }
 
+:root {
+  --beast-sfx-shrink: 1;
+}
+
 .beast2d-sfx-body {
   flex: 1 1 auto;
   min-height: 0;
@@ -566,6 +570,10 @@ body,
   display: flex;
   flex-direction: column;
   gap: calc(2px * var(--beast-scale));
+  transform: scale(var(--beast-sfx-shrink));
+  transform-origin: top left;
+  width: calc(100% / var(--beast-sfx-shrink));
+  height: calc(100% / var(--beast-sfx-shrink));
   box-sizing: border-box;
   padding: calc(4px * var(--beast-scale));
   color: #f4ead2;
@@ -614,6 +622,7 @@ body,
   align-items: center;
   gap: calc(6px * var(--beast-scale));
   flex-shrink: 0;
+  overflow: visible;
 }
 
 .beast2d-sfx-transport {
@@ -910,6 +919,8 @@ button.beast2d-sfx-chip {
 .beast2d-sfx-knob-row {
   display: grid;
   gap: calc(2px * var(--beast-scale));
+  flex: 0 0 auto;
+  min-height: calc(48px * var(--beast-scale));
 }
 
 .beast2d-sfx-knob-row-1 {
