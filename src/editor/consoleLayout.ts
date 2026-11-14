@@ -2,6 +2,9 @@ import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 
 export const BOOT_DURATION_MS = 1500;
 
+/** Set false to land on Home immediately (no boot overlay). */
+export const BOOT_SCREEN_ENABLED = false;
+
 /**
  * Monogram is drawn at 16px × this integer.
  * 2× once the window is tall enough for the mockup's chunky chrome.

@@ -19,7 +19,13 @@ import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 import type { GameManager } from "../core/GameManager";
 import { checkCartSyntax, compileCart } from "../core/cart/compile";
 import { DEFAULT_CONSOLE_DISKS } from "./disks";
-import { BOOT_DURATION_MS, chromeFontScale, fitPreviewScale, homeFloppyScale } from "./consoleLayout";
+import {
+  BOOT_DURATION_MS,
+  BOOT_SCREEN_ENABLED,
+  chromeFontScale,
+  fitPreviewScale,
+  homeFloppyScale,
+} from "./consoleLayout";
 import { CONSOLE_TOOLS, type ConsoleTool, type ConsoleViewState, type EditorMode } from "./consoleTypes";
 import {
   cycleTool,
@@ -28,6 +34,7 @@ import {
   isToolFunctional,
   moveDiskSelection,
   openEditor,
+  selectDisk,
   openPlay,
   setEditorMode,
   skipBoot,
@@ -120,7 +127,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   let saveEnabled = false;
   let runError: { message: string; line?: number } | null = null;
   let viewState: ConsoleViewState = initialViewState({
-    skipBoot: skipBootOption || playOnly,
+    skipBoot: skipBootOption || playOnly || !BOOT_SCREEN_ENABLED,
     startScreen: playOnly ? "play" : "home",
   });
 
@@ -257,8 +264,11 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     title.textContent = disk.title;
     btn.append(face, title);
     btn.addEventListener("click", () => {
-      viewState = moveDiskSelection(viewState, index - viewState.selectedDiskIndex, disks.length);
+      viewState = selectDisk(viewState, index, disks.length);
       applyViewState();
+      if (disk.kind === "cart") {
+        void openCartEditor();
+      }
     });
     homeShelf.appendChild(btn);
     return btn;

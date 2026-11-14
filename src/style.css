@@ -743,15 +743,14 @@ body,
 }
 
 .beast2d-sfx-preset {
-  position: relative;
   flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   min-height: calc(30px * var(--beast-scale));
-  padding: calc(9px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-preset-name {
@@ -761,18 +760,6 @@ body,
   font-size: calc(12px * var(--beast-scale));
   line-height: calc(12px * var(--beast-scale));
   padding: 0;
-}
-
-.beast2d-sfx-preset-badge {
-  position: absolute;
-  top: calc(1px * var(--beast-scale));
-  right: calc(1px * var(--beast-scale));
-  font-size: calc(9px * var(--beast-scale));
-  line-height: calc(10px * var(--beast-scale));
-  color: #93be64;
-  background: #4a784d;
-  padding: 0 calc(2px * var(--beast-scale));
-  border: calc(1px * var(--beast-scale)) solid #1f1424;
 }
 
 .beast2d-sfx-mid {
@@ -911,6 +898,10 @@ body,
   border: calc(2px * var(--beast-scale)) solid #1f1424;
 }
 
+.beast2d-sfx-mod-grey {
+  background: #746678;
+}
+
 .beast2d-sfx-mod-yellow {
   background: #f1c766;
 }
@@ -925,7 +916,7 @@ body,
 
 .beast2d-sfx-mod-title {
   text-align: center;
-  color: #1f1424;
+  color: #f4ead2;
   background: #3b2e3f;
   font-size: calc(12px * var(--beast-scale));
   line-height: calc(12px * var(--beast-scale));
@@ -933,7 +924,7 @@ body,
 }
 
 .beast2d-sfx-mod.is-dim .beast2d-sfx-mod-title {
-  color: #746678;
+  color: #f4ead2;
 }
 
 .beast2d-sfx-mod-note {
@@ -941,6 +932,10 @@ body,
   color: #f4ead2;
   font-size: calc(10px * var(--beast-scale));
   line-height: calc(10px * var(--beast-scale));
+}
+
+.beast2d-sfx-mod-note:empty {
+  display: none;
 }
 
 .beast2d-sfx-mod-knobs {
@@ -1123,6 +1118,151 @@ body,
   border-top: calc(5px * var(--beast-scale)) solid transparent;
   border-bottom: calc(5px * var(--beast-scale)) solid transparent;
   border-left: calc(8px * var(--beast-scale)) solid #e86c9a;
+}
+
+/* SFX edit: compact machine so knobs and presets fit the editor column. */
+.beast2d-workspace-sfx .beast2d-sfx {
+  gap: calc(2px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-top {
+  gap: calc(4px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-name {
+  padding: calc(2px * var(--beast-scale)) calc(4px * var(--beast-scale));
+  line-height: calc(14px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-rotor {
+  width: calc(48px * var(--beast-scale));
+  height: calc(48px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-chip {
+  font-size: calc(9px * var(--beast-scale));
+  line-height: calc(9px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-dial {
+  inset: calc(10px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-preset {
+  min-height: calc(22px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-preset-name {
+  font-size: calc(10px * var(--beast-scale));
+  line-height: calc(10px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-grid {
+  height: calc(44px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-pitch {
+  height: calc(30px * var(--beast-scale));
+  min-height: calc(30px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-volume {
+  flex: 0 0 calc(8px * var(--beast-scale));
+  height: calc(8px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-waves {
+  grid-template-columns: repeat(2, calc(28px * var(--beast-scale)));
+  flex: 0 0 calc(58px * var(--beast-scale));
+  width: calc(58px * var(--beast-scale));
+  height: calc(44px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-wave-icon {
+  width: calc(26px * var(--beast-scale));
+  height: calc(20px * var(--beast-scale));
+}
+
+/* Picotron-style knob matrix: 12 columns, module width ∝ knob count. */
+.beast2d-workspace-sfx .beast2d-sfx-knobs {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: calc(2px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-knob-row {
+  display: contents;
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod[data-col-span="3"] {
+  grid-column: span 3;
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod[data-col-span="4"] {
+  grid-column: span 4;
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod[data-col-span="5"] {
+  grid-column: span 5;
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod {
+  width: auto;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod-knobs {
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  gap: calc(1px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale)) calc(1px * var(--beast-scale));
+  min-height: calc(36px * var(--beast-scale));
+  box-sizing: border-box;
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod-knobs .beast2d-sfx-knob-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod-note {
+  margin: 0;
+  padding: calc(1px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod-title {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: calc(10px * var(--beast-scale));
+  line-height: calc(10px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-mod-note {
+  font-size: calc(9px * var(--beast-scale));
+  line-height: calc(9px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-knob {
+  width: calc(18px * var(--beast-scale));
+  height: calc(18px * var(--beast-scale));
+}
+
+.beast2d-workspace-sfx .beast2d-sfx-knob-label {
+  font-size: calc(8px * var(--beast-scale));
+  line-height: calc(8px * var(--beast-scale));
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Virtual resolution 320×240; preview frame sets integer CSS scale. */

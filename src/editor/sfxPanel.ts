@@ -25,13 +25,19 @@ const ROTOR_ANGLE: Record<(typeof CHIP_IDS)[number], number> = {
   gen: 135,
 };
 
-type ModuleTone = "yellow" | "orange";
+type ModuleTone = "yellow" | "orange" | "grey";
 
 type SfxModule = { title: string; knobs: readonly KnobId[]; tone: ModuleTone; note: boolean };
 
+/** Picotron-style 12-column spans per row (wider modules = more knobs). */
+const MODULE_COL_SPAN: readonly (readonly number[])[] = [
+  [3, 5, 4],
+  [3, 3, 3, 3],
+];
+
 const KNOB_ROWS: SfxModule[][] = [
   [
-    { title: "OUTPUT", knobs: ["vol"], tone: "yellow", note: false },
+    { title: "OUTPUT", knobs: ["vol"], tone: "grey", note: false },
     { title: "ENVELOPE", knobs: ["attack", "decay"], tone: "orange", note: false },
     { title: "SPEED", knobs: ["rate"], tone: "yellow", note: false },
   ],
@@ -70,6 +76,23 @@ function pressable(button: HTMLButtonElement): void {
 function dutyText(sound: SfxSound, cart: LiveChipId): string {
   const pct = applyChip(sound, cart).duty * 100;
   return `${Number.isInteger(pct) ? String(pct) : pct.toFixed(1)}%`;
+}
+
+/** Matches `paint()` needle: `rotate(-140 + value * 280deg)` with 12 o'clock = 0.5. */
+const KNOB_ANGLE_MIN = -140;
+const KNOB_ANGLE_MAX = 140;
+const KNOB_ANGLE_SPAN = KNOB_ANGLE_MAX - KNOB_ANGLE_MIN;
+
+function knobValueFromPointer(button: HTMLElement, clientX: number, clientY: number): number | null {
+  const rect = button.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const dx = clientX - cx;
+  const dy = clientY - cy;
+  if (dx === 0 && dy === 0) return null;
+  let deg = (Math.atan2(dx, -dy) * 180) / Math.PI;
+  deg = Math.min(KNOB_ANGLE_MAX, Math.max(KNOB_ANGLE_MIN, deg));
+  return (deg - KNOB_ANGLE_MIN) / KNOB_ANGLE_SPAN;
 }
 
 export function mountSfxDisk(): SfxDisk {
@@ -129,17 +152,13 @@ export function mountSfxDisk(): SfxDisk {
 
   const presets = el("div", "beast2d-sfx-presets");
   const presetButtons = new Map<string, HTMLButtonElement>();
-  const presetBadges = new Map<string, HTMLElement>();
   for (const preset of PRESET_IDS) {
     const button = el("button", "beast2d-sfx-btn beast2d-sfx-preset");
     button.type = "button";
-    const badge = el("span", "beast2d-sfx-preset-badge", "GB");
-    const label = el("span", "beast2d-sfx-preset-name", preset.toUpperCase());
-    button.append(label, badge);
+    button.append(el("span", "beast2d-sfx-preset-name", preset.toUpperCase()));
     pressable(button);
     button.addEventListener("click", () => applyPreset(preset));
     presetButtons.set(preset, button);
-    presetBadges.set(preset, badge);
     presets.append(button);
   }
   const diceButton = el("button", "beast2d-sfx-btn beast2d-sfx-btn-pink", "DICE");
@@ -193,8 +212,9 @@ export function mountSfxDisk(): SfxDisk {
   const knobUi = new Map<KnobId, { button: HTMLButtonElement; needle: HTMLElement; label: HTMLElement; module: HTMLElement; note: HTMLElement | null }>();
   KNOB_ROWS.forEach((modules, rowIndex) => {
     const knobRow = el("div", `beast2d-sfx-knob-row beast2d-sfx-knob-row-${rowIndex + 1}`);
-    for (const module of modules) {
+    for (const [moduleIndex, module] of modules.entries()) {
       const box = el("section", `beast2d-sfx-mod beast2d-sfx-mod-${module.tone} beast2d-sfx-mod-${module.title.toLowerCase()}`);
+      box.dataset.colSpan = String(MODULE_COL_SPAN[rowIndex]?.[moduleIndex] ?? 3);
       box.append(el("div", "beast2d-sfx-mod-title", module.title));
       const note = module.note ? el("div", "beast2d-sfx-mod-note", "") : null;
       if (note) box.append(note);
@@ -317,27 +337,32 @@ export function mountSfxDisk(): SfxDisk {
   }
 
   function bindKnob(id: KnobId, button: HTMLButtonElement): void {
+    const apply = (clientX: number, clientY: number) => {
+      const next = knobValueFromPointer(button, clientX, clientY);
+      if (next === null) return;
+      armed = null;
+      updateSfxSlot(selected, (slot) => {
+        slot.knobs[id] = next;
+      });
+    };
     button.addEventListener("pointerdown", (event) => {
       if (button.disabled) return;
       event.preventDefault();
-      armed = null;
-      const startY = event.clientY;
-      const start = current().knobs[id];
+      button.setPointerCapture(event.pointerId);
       button.classList.add("is-down");
-      const move = (ev: PointerEvent) => {
-        const next = Math.min(1, Math.max(0, start + (startY - ev.clientY) / 90));
-        updateSfxSlot(selected, (slot) => {
-          slot.knobs[id] = next;
-        });
-      };
-      const up = () => {
-        button.classList.remove("is-down");
-        window.removeEventListener("pointermove", move);
-        window.removeEventListener("pointerup", up);
-      };
-      window.addEventListener("pointermove", move);
-      window.addEventListener("pointerup", up);
+      apply(event.clientX, event.clientY);
     });
+    button.addEventListener("pointermove", (event) => {
+      if (!button.hasPointerCapture(event.pointerId)) return;
+      apply(event.clientX, event.clientY);
+    });
+    const release = (event: PointerEvent) => {
+      if (!button.hasPointerCapture(event.pointerId)) return;
+      button.releasePointerCapture(event.pointerId);
+      button.classList.remove("is-down");
+    };
+    button.addEventListener("pointerup", release);
+    button.addEventListener("pointercancel", release);
   }
 
   function bindDraw(target: HTMLElement, kind: "pitch" | "volume"): void {
@@ -378,8 +403,6 @@ export function mountSfxDisk(): SfxDisk {
     }
     for (const preset of PRESET_IDS) {
       presetButtons.get(preset)?.classList.toggle("is-selected", armed === preset);
-      const badge = presetBadges.get(preset);
-      if (badge) badge.textContent = spec.label;
     }
     for (const id of WAVE_IDS) {
       const button = waveButtons.get(id);
