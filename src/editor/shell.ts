@@ -348,12 +348,22 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       const columnW = Math.min(maxPreview, frameW + padX * 2);
       columnFlex = `0 0 ${columnW}px`;
     }
-    const key = `${fontScale}:${frameW}:${frameH}:${columnFlex}:${playing ? 1 : 0}`;
+    const sfxEdit =
+      viewState.screen === "editor" &&
+      viewState.activeTool === "SFX" &&
+      viewState.editorMode !== "run";
+    const key = `${fontScale}:${frameW}:${frameH}:${columnFlex}:${playing ? 1 : 0}:${sfxEdit ? 1 : 0}`;
     if (key === layoutKey) return;
     layoutKey = key;
     previewFrame.style.width = `${frameW}px`;
     previewFrame.style.height = `${frameH}px`;
-    previewColumn.style.flex = columnFlex;
+    if (sfxEdit) {
+      editorColumn.style.flex = "0 0 62%";
+      previewColumn.style.flex = "0 0 36%";
+    } else {
+      editorColumn.style.flex = "";
+      previewColumn.style.flex = columnFlex;
+    }
     repaintFloppies();
   };
   const repaintFloppies = () => {

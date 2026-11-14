@@ -522,16 +522,16 @@ body,
 }
 
 .beast2d-workspace-sfx .beast2d-editor-column-sfx {
-  flex: 1.2 1 0;
-  padding: calc(4px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
   border-right: calc(1px * var(--beast-scale)) solid #3b2e3f;
+  overflow: hidden;
 }
 
 .beast2d-preview-column-bank {
-  flex: 0 0 min(300px, 38%);
   align-items: stretch;
   justify-content: stretch;
-  padding: calc(4px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
+  overflow: hidden;
 }
 
 .beast2d-sfx-bank-mount {
@@ -551,12 +551,12 @@ body,
 .beast2d-sfx {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: calc(6px * var(--beast-scale));
+  gap: calc(3px * var(--beast-scale));
   box-sizing: border-box;
-  padding: calc(8px * var(--beast-scale));
+  padding: calc(4px * var(--beast-scale));
   color: #f4ead2;
   background: #746678;
   border: calc(3px * var(--beast-scale)) solid #1f1424;
@@ -599,10 +599,10 @@ body,
 }
 
 .beast2d-sfx-top {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: calc(8px * var(--beast-scale));
+  gap: calc(6px * var(--beast-scale));
+  flex-shrink: 0;
 }
 
 .beast2d-sfx-transport {
@@ -612,8 +612,8 @@ body,
 }
 
 .beast2d-sfx-icon-btn {
-  width: calc(36px * var(--beast-scale));
-  height: calc(28px * var(--beast-scale));
+  width: calc(32px * var(--beast-scale));
+  height: calc(26px * var(--beast-scale));
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -635,22 +635,37 @@ body,
   background: currentColor;
 }
 
-.beast2d-sfx-name {
+.beast2d-sfx-name-lcd {
   flex: 1;
   min-width: 0;
+}
+
+.beast2d-sfx-name {
+  width: 100%;
+  box-sizing: border-box;
   font: inherit;
   color: #93be64;
   background: #4a784d;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
   box-shadow: inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #3b2e3f;
-  padding: calc(4px * var(--beast-scale));
+  padding: calc(3px * var(--beast-scale)) calc(4px * var(--beast-scale));
   line-height: calc(16px * var(--beast-scale));
+}
+
+.beast2d-sfx-loop-icon {
+  font-size: calc(18px * var(--beast-scale));
+  line-height: 1;
+  color: #1f1424;
+}
+
+.beast2d-sfx-btn.is-selected .beast2d-sfx-loop-icon {
+  color: #1f1424;
 }
 
 .beast2d-sfx-rotor {
   position: relative;
-  width: calc(84px * var(--beast-scale));
-  height: calc(84px * var(--beast-scale));
+  width: calc(78px * var(--beast-scale));
+  height: calc(78px * var(--beast-scale));
   flex-shrink: 0;
 }
 
@@ -677,26 +692,22 @@ body,
 
 .beast2d-sfx-chip-pico {
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
 }
 
 .beast2d-sfx-chip-gb {
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 0;
+  bottom: 0;
 }
 
 .beast2d-sfx-chip-snes {
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  right: 0;
 }
 
 .beast2d-sfx-chip-gen {
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 0;
+  bottom: 0;
 }
 
 .beast2d-sfx-dial {
@@ -719,39 +730,45 @@ body,
   transform-origin: 50% 100%;
 }
 
-.beast2d-sfx-chip-note {
-  position: absolute;
-  right: calc(96px * var(--beast-scale));
-  top: 0;
-  color: #f1c766;
-  font-size: calc(12px * var(--beast-scale));
-  line-height: calc(12px * var(--beast-scale));
-}
-
 .beast2d-sfx-presets {
   display: flex;
-  flex-wrap: wrap;
-  gap: calc(4px * var(--beast-scale));
+  flex-wrap: nowrap;
+  gap: calc(2px * var(--beast-scale));
+  flex-shrink: 0;
 }
 
 .beast2d-sfx-preset {
   position: relative;
-  min-width: calc(52px * var(--beast-scale));
+  flex: 1 1 0;
+  min-width: 0;
+  padding: calc(6px * var(--beast-scale)) calc(4px * var(--beast-scale)) calc(2px * var(--beast-scale));
 }
 
-.beast2d-sfx-badge {
+.beast2d-sfx-preset-name {
+  display: block;
+  text-align: center;
+  font-size: calc(12px * var(--beast-scale));
+  line-height: calc(12px * var(--beast-scale));
+  padding-right: calc(14px * var(--beast-scale));
+}
+
+.beast2d-sfx-preset-badge {
   position: absolute;
   top: calc(1px * var(--beast-scale));
-  right: calc(2px * var(--beast-scale));
-  font-size: calc(10px * var(--beast-scale));
+  right: calc(1px * var(--beast-scale));
+  font-size: calc(9px * var(--beast-scale));
   line-height: calc(10px * var(--beast-scale));
   color: #93be64;
+  background: #4a784d;
+  padding: 0 calc(2px * var(--beast-scale));
+  border: calc(1px * var(--beast-scale)) solid #1f1424;
 }
 
 .beast2d-sfx-mid {
   display: flex;
-  gap: calc(6px * var(--beast-scale));
-  min-height: calc(120px * var(--beast-scale));
+  gap: calc(4px * var(--beast-scale));
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .beast2d-sfx-grid {
@@ -776,11 +793,12 @@ body,
 
 .beast2d-sfx-pitch {
   flex: 1;
-  min-height: calc(78px * var(--beast-scale));
+  min-height: 0;
 }
 
 .beast2d-sfx-volume {
-  height: calc(14px * var(--beast-scale));
+  flex-shrink: 0;
+  height: calc(12px * var(--beast-scale));
 }
 
 .beast2d-sfx-cell {
@@ -819,23 +837,36 @@ body,
 }
 
 .beast2d-sfx-waves {
-  display: flex;
-  flex-direction: column;
-  gap: calc(3px * var(--beast-scale));
+  display: grid;
+  grid-template-columns: repeat(2, calc(36px * var(--beast-scale)));
+  grid-template-rows: repeat(3, calc(28px * var(--beast-scale)));
+  gap: calc(2px * var(--beast-scale));
   flex-shrink: 0;
+  align-content: start;
 }
 
 .beast2d-sfx-wave {
-  width: calc(42px * var(--beast-scale));
-  padding-left: 0;
-  padding-right: 0;
-  text-align: center;
+  width: calc(36px * var(--beast-scale));
+  height: calc(28px * var(--beast-scale));
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #4a784d;
+}
+
+.beast2d-sfx-wave-icon {
+  display: block;
+  width: calc(32px * var(--beast-scale));
+  height: calc(24px * var(--beast-scale));
+  image-rendering: pixelated;
 }
 
 .beast2d-sfx-knobs {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: calc(4px * var(--beast-scale));
+  gap: calc(2px * var(--beast-scale));
+  flex-shrink: 0;
 }
 
 .beast2d-sfx-mod {
@@ -892,8 +923,8 @@ body,
 }
 
 .beast2d-sfx-knob {
-  width: calc(32px * var(--beast-scale));
-  height: calc(32px * var(--beast-scale));
+  width: calc(28px * var(--beast-scale));
+  height: calc(28px * var(--beast-scale));
   border-radius: 50%;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
   background: #f4ead2;
@@ -937,6 +968,7 @@ body,
 .beast2d-sfx-bank {
   flex: 1;
   min-height: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background: #1f1424;
@@ -949,9 +981,12 @@ body,
   align-items: center;
   justify-content: space-between;
   gap: calc(4px * var(--beast-scale));
-  padding: calc(4px * var(--beast-scale));
+  flex-shrink: 0;
+  padding: calc(2px * var(--beast-scale)) calc(4px * var(--beast-scale));
   color: #f4ead2;
   background: #3b2e3f;
+  font-size: calc(14px * var(--beast-scale));
+  line-height: calc(14px * var(--beast-scale));
 }
 
 .beast2d-sfx-bank-run {
@@ -963,16 +998,17 @@ body,
 .beast2d-sfx-list {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: calc(2px * var(--beast-scale));
-  padding: calc(4px * var(--beast-scale));
+  gap: calc(1px * var(--beast-scale));
+  padding: calc(2px * var(--beast-scale));
 }
 
 .beast2d-sfx-row {
-  display: flex;
-  gap: calc(4px * var(--beast-scale));
+  flex: 1 1 0;
+  min-height: calc(23px * var(--beast-scale));
+  max-height: calc(23px * var(--beast-scale));
   background: #1f1424;
 }
 
@@ -990,15 +1026,18 @@ body,
 }
 
 .beast2d-sfx-row-main {
-  flex: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: calc(6px * var(--beast-scale));
+  gap: calc(4px * var(--beast-scale));
   font: inherit;
+  font-size: calc(14px * var(--beast-scale));
+  line-height: calc(14px * var(--beast-scale));
   color: #f4ead2;
   background: #1f1424;
-  border: calc(2px * var(--beast-scale)) solid #3b2e3f;
-  padding: calc(2px * var(--beast-scale));
+  border: calc(1px * var(--beast-scale)) solid #3b2e3f;
+  padding: 0 calc(2px * var(--beast-scale));
   cursor: pointer;
   text-align: left;
 }
@@ -1021,13 +1060,34 @@ body,
   white-space: nowrap;
 }
 
+.beast2d-sfx-row-badge {
+  flex-shrink: 0;
+  font-size: calc(9px * var(--beast-scale));
+  line-height: calc(10px * var(--beast-scale));
+  color: #93be64;
+  background: #4a784d;
+  padding: 0 calc(2px * var(--beast-scale));
+  border: calc(1px * var(--beast-scale)) solid #1f1424;
+}
+
 .beast2d-sfx-row-play {
   flex-shrink: 0;
-  width: calc(28px * var(--beast-scale));
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0 calc(2px * var(--beast-scale));
+  cursor: pointer;
+  line-height: 0;
+}
+
+.beast2d-sfx-row-play-icon {
+  width: 0;
+  height: 0;
+  display: block;
+  border-top: calc(5px * var(--beast-scale)) solid transparent;
+  border-bottom: calc(5px * var(--beast-scale)) solid transparent;
+  border-left: calc(8px * var(--beast-scale)) solid #e86c9a;
 }
 
 /* Virtual resolution 320×240; preview frame sets integer CSS scale. */

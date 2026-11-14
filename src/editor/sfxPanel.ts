@@ -5,7 +5,6 @@ import {
   KNOB_IDS,
   SFX_SLOTS,
   WAVE_IDS,
-  WAVE_LABELS,
   applyChip,
   effectiveChip,
   type KnobId,
@@ -17,12 +16,13 @@ import { getSfxBank, subscribeSfxBank, updateSfxCartChip, updateSfxSlot } from "
 import { knobLabel } from "../core/sfx/format";
 import { PRESET_IDS, generateDice, generatePreset, type PresetId } from "../core/sfx/generate";
 import { playSfx, sfxPlayhead, stopSfx } from "../core/sfx/synth";
+import { paintSfxWaveIcon } from "./sfxWaves";
 
 const ROTOR_ANGLE: Record<(typeof CHIP_IDS)[number], number> = {
-  pico: 0,
-  gb: 90,
-  snes: 180,
-  gen: 270,
+  pico: 315,
+  gb: 225,
+  snes: 45,
+  gen: 135,
 };
 
 type ModuleTone = "yellow" | "orange";
@@ -85,25 +85,28 @@ export function mountSfxDisk(): SfxDisk {
   stopButton.type = "button";
   stopButton.title = "Stop";
   stopButton.append(el("span", "beast2d-sfx-stop-icon"));
-  const loopButton = el("button", "beast2d-sfx-btn", "LOOP");
+  const loopButton = el("button", "beast2d-sfx-btn beast2d-sfx-icon-btn");
   loopButton.type = "button";
+  loopButton.title = "Loop";
+  loopButton.append(el("span", "beast2d-sfx-loop-icon", "↻"));
   pressable(playButton);
   pressable(stopButton);
   pressable(loopButton);
   transport.append(playButton, stopButton, loopButton);
 
+  const nameLcd = el("div", "beast2d-sfx-name-lcd");
   const nameInput = el("input", "beast2d-sfx-name");
   nameInput.type = "text";
   nameInput.maxLength = 16;
   nameInput.spellcheck = false;
   nameInput.autocomplete = "off";
   nameInput.setAttribute("aria-label", "SFX name");
+  nameLcd.append(nameInput);
 
   const rotor = el("div", "beast2d-sfx-rotor");
   const dial = el("div", "beast2d-sfx-dial");
   const needle = el("i", "beast2d-sfx-needle");
   dial.append(needle);
-  const chipNote = el("div", "beast2d-sfx-chip-note", "CART");
   const chipButtons = new Map<string, HTMLElement>();
   for (const id of CHIP_IDS) {
     const live = CHIPS[id].live;
@@ -116,7 +119,7 @@ export function mountSfxDisk(): SfxDisk {
     rotor.append(chip);
   }
   rotor.append(dial);
-  top.append(transport, nameInput, chipNote, rotor);
+  top.append(transport, nameLcd, rotor);
 
   const presets = el("div", "beast2d-sfx-presets");
   const presetButtons = new Map<string, HTMLButtonElement>();
@@ -124,8 +127,9 @@ export function mountSfxDisk(): SfxDisk {
   for (const preset of PRESET_IDS) {
     const button = el("button", "beast2d-sfx-btn beast2d-sfx-preset");
     button.type = "button";
-    const badge = el("span", "beast2d-sfx-badge", "GB");
-    button.append(el("span", "beast2d-sfx-preset-name", preset.toUpperCase()), badge);
+    const badge = el("span", "beast2d-sfx-preset-badge", "GB");
+    const label = el("span", "beast2d-sfx-preset-name", preset.toUpperCase());
+    button.append(label, badge);
     pressable(button);
     button.addEventListener("click", () => applyPreset(preset));
     presetButtons.set(preset, button);
@@ -162,8 +166,11 @@ export function mountSfxDisk(): SfxDisk {
   const waves = el("div", "beast2d-sfx-waves");
   const waveButtons = new Map<WaveId, HTMLButtonElement>();
   for (const id of WAVE_IDS) {
-    const button = el("button", "beast2d-sfx-btn beast2d-sfx-wave", WAVE_LABELS[id]);
+    const button = el("button", "beast2d-sfx-btn beast2d-sfx-wave");
     button.type = "button";
+    button.title = id.toUpperCase();
+    const icon = el("canvas", "beast2d-sfx-wave-icon");
+    button.append(icon);
     pressable(button);
     button.addEventListener("click", () => {
       armed = null;
@@ -217,18 +224,19 @@ export function mountSfxDisk(): SfxDisk {
     main.type = "button";
     const slot = el("span", "beast2d-sfx-slot", String(index).padStart(2, "0"));
     const name = el("span", "beast2d-sfx-row-name", "empty");
-    const badge = el("span", "beast2d-sfx-badge", "GB");
-    main.append(slot, name, badge);
-    main.addEventListener("click", () => choose(index));
+    const badge = el("span", "beast2d-sfx-row-badge", "GB");
     const play = el("button", "beast2d-sfx-row-play");
     play.type = "button";
     play.title = "Play";
-    play.append(el("span", "beast2d-sfx-play-icon"));
-    play.addEventListener("click", () => {
+    play.append(el("span", "beast2d-sfx-row-play-icon"));
+    play.addEventListener("click", (event) => {
+      event.stopPropagation();
       choose(index);
       playSfx(index);
     });
-    row.append(main, play);
+    main.append(slot, name, badge, play);
+    main.addEventListener("click", () => choose(index));
+    row.append(main);
     list.append(row);
     rows.push(row);
     rowNames.push(name);
@@ -249,7 +257,6 @@ export function mountSfxDisk(): SfxDisk {
   function choose(index: number): void {
     selected = Math.max(0, Math.min(SFX_SLOTS - 1, index));
     paint();
-    rows[selected]?.scrollIntoView({ block: "nearest" });
   }
 
   function setChip(chip: LiveChipId): void {
@@ -354,7 +361,6 @@ export function mountSfxDisk(): SfxDisk {
       nameSlot = selected;
     }
     loopButton.classList.toggle("is-selected", sound.loop);
-    chipNote.textContent = sound.chip === null ? "CART" : "SOUND";
     needle.style.transform = `rotate(${ROTOR_ANGLE[chipId]}deg)`;
     for (const id of CHIP_IDS) {
       const node = chipButtons.get(id);
@@ -372,6 +378,8 @@ export function mountSfxDisk(): SfxDisk {
       button.disabled = !allowed;
       button.classList.toggle("is-dim", !allowed);
       button.classList.toggle("is-selected", allowed && sound.wave === id);
+      const icon = button.querySelector("canvas.beast2d-sfx-wave-icon");
+      if (icon instanceof HTMLCanvasElement) paintSfxWaveIcon(icon, id, !allowed);
     }
     sound.pitch.forEach((value, index) => {
       const bar = pitchBars[index];
