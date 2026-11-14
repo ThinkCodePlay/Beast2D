@@ -1,93 +1,94 @@
-import type { WaveId } from "../core/sfx/chips";
+import { WAVE_IDS, type WaveId } from "../core/sfx/chips";
 import { Beast2D16 } from "../core/ui/palette";
 import { hex } from "./sfxPixelArt";
-
-const W = 24;
-const H = 16;
+import { WAVE_SPRITE_H, WAVE_SPRITE_W, waveSpriteUrl } from "./sfx/waveSprites";
 
 export type SfxWavePaintState = {
   dim: boolean;
   selected: boolean;
 };
 
-/** Wide wave key: plum frame, moss/yellow/shadow screen, leaf/stone waveform. */
+type Rgb = { r: number; g: number; b: number };
+
+function rgb(hexColor: number): Rgb {
+  return { r: (hexColor >> 16) & 255, g: (hexColor >> 8) & 255, b: hexColor & 255 };
+}
+
+function samePixel(data: Uint8ClampedArray, i: number, c: Rgb): boolean {
+  return data[i] === c.r && data[i + 1] === c.g && data[i + 2] === c.b;
+}
+
+const SRC = {
+  moss: rgb(Beast2D16.MossGreen),
+  leaf: rgb(Beast2D16.LeafGreen),
+  cream: rgb(Beast2D16.Cream),
+};
+
+const waveImages = new Map<WaveId, HTMLImageElement>();
+
+function waveImage(id: WaveId): HTMLImageElement {
+  let img = waveImages.get(id);
+  if (!img) {
+    img = new Image();
+    img.src = waveSpriteUrl(id);
+    img.decoding = "sync";
+    waveImages.set(id, img);
+  }
+  return img;
+}
+
+for (const id of WAVE_IDS) {
+  void waveImage(id).decode?.();
+}
+
+function applyWavePalette(data: ImageData, state: SfxWavePaintState): void {
+  if (!state.dim && !state.selected) return;
+  const px = data.data;
+  const moss = state.dim ? rgb(Beast2D16.Shadow) : rgb(Beast2D16.Yellow);
+  const leaf = state.dim ? rgb(Beast2D16.StoneGray) : rgb(Beast2D16.Orange);
+  const cream = state.dim ? rgb(Beast2D16.StoneGray) : SRC.cream;
+  for (let i = 0; i < px.length; i += 4) {
+    if (px[i + 3] === 0) continue;
+    if (samePixel(px, i, SRC.moss)) {
+      px[i] = moss.r;
+      px[i + 1] = moss.g;
+      px[i + 2] = moss.b;
+    } else if (samePixel(px, i, SRC.leaf)) {
+      px[i] = leaf.r;
+      px[i + 1] = leaf.g;
+      px[i + 2] = leaf.b;
+    } else if (samePixel(px, i, SRC.cream)) {
+      px[i] = cream.r;
+      px[i + 1] = cream.g;
+      px[i + 2] = cream.b;
+    }
+  }
+}
+
+/** 36×24 wave key sprite with palette swap for selected / dimmed. */
 export function paintSfxWaveIcon(
   canvas: HTMLCanvasElement,
   wave: WaveId,
   state: SfxWavePaintState,
 ): void {
-
-  canvas.width = W;
-  canvas.height = H;
+  canvas.width = WAVE_SPRITE_W;
+  canvas.height = WAVE_SPRITE_H;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
 
-  ctx.fillStyle = hex(Beast2D16.PlumOutline);
-  ctx.fillRect(0, 0, W, H);
+  const img = waveImage(wave);
+  if (!img.complete || img.naturalWidth === 0) return;
 
-  const screen = state.dim ? Beast2D16.Shadow : state.selected ? Beast2D16.Yellow : Beast2D16.MossGreen;
-  ctx.fillStyle = hex(screen);
-  ctx.fillRect(1, 1, W - 2, H - 2);
+  ctx.clearRect(0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
+  ctx.drawImage(img, 0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
+  const frame = ctx.getImageData(0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
+  applyWavePalette(frame, state);
+  ctx.putImageData(frame, 0, 0);
 
   if (state.selected) {
     ctx.fillStyle = hex(Beast2D16.Orange);
-    for (let y = 0; y < H; y += 1) ctx.fillRect(W - 1, y, 1, 1);
-    for (let x = 0; x < W; x += 1) ctx.fillRect(x, H - 1, 1, 1);
-  }
-
-  const ink = state.dim ? Beast2D16.StoneGray : Beast2D16.LeafGreen;
-  ctx.fillStyle = hex(ink);
-
-  const thick = (x: number, y: number) => {
-    ctx.fillRect(x, y, 1, 1);
-    ctx.fillRect(x, y + 1, 1, 1);
-  };
-
-  const mid = 8;
-
-  if (wave === "sqr") {
-    for (let x = 2; x <= 20; x += 1) {
-      const top = x < 11 ? mid - 5 : mid + 4;
-      for (let y = top; y <= mid + 5; y += 1) ctx.fillRect(x, y, 1, 1);
-    }
-    return;
-  }
-  if (wave === "pls") {
-    for (let y = mid - 5; y <= mid + 5; y += 1) ctx.fillRect(3, y, 1, 1);
-    for (let y = mid - 7; y <= mid + 5; y += 1) ctx.fillRect(10, y, 1, 1);
-    for (let y = mid - 3; y <= mid + 5; y += 1) ctx.fillRect(17, y, 1, 1);
-    return;
-  }
-  if (wave === "wave") {
-    for (let x = 2; x <= 20; x += 1) {
-      const y = Math.round(mid + Math.sin((x / 20) * Math.PI * 2) * 4);
-      thick(x, y);
-    }
-    return;
-  }
-  if (wave === "noise") {
-    const heights = [mid - 4, mid + 3, mid - 2, mid + 5, mid - 3, mid + 2, mid - 5, mid + 4, mid - 1, mid + 1];
-    let x = 3;
-    for (const h of heights) {
-      if (x > 20) break;
-      ctx.fillRect(x, h, 1, 1);
-      ctx.fillRect(x, h + 1, 1, 1);
-      x += 2;
-    }
-    return;
-  }
-  if (wave === "saw") {
-    for (let x = 2; x <= 20; x += 1) {
-      const t = ((x - 2) % 6) / 6;
-      const y = Math.round(mid + 5 - t * 10);
-      thick(x, y);
-    }
-    return;
-  }
-  for (let x = 2; x <= 20; x += 1) {
-    const t = ((x - 2) % 12) / 12;
-    const y = Math.round(mid + Math.sin(t * Math.PI) * 5);
-    thick(x, y);
+    for (let y = 0; y < WAVE_SPRITE_H; y += 1) ctx.fillRect(WAVE_SPRITE_W - 1, y, 1, 1);
+    for (let x = 0; x < WAVE_SPRITE_W; x += 1) ctx.fillRect(x, WAVE_SPRITE_H - 1, 1, 1);
   }
 }

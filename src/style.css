@@ -995,10 +995,11 @@ body,
 .beast2d-sfx-wave {
   padding: 0;
   display: inline-flex;
-  align-items: stretch;
-  justify-content: stretch;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .beast2d-sfx-wave.beast2d-sfx-btn.is-dim,
@@ -1012,8 +1013,9 @@ body,
 
 .beast2d-sfx-wave-icon {
   display: block;
-  width: 100%;
-  height: 100%;
+  flex: 0 0 auto;
+  width: calc(18px * var(--beast-scale));
+  height: calc(12px * var(--beast-scale));
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
