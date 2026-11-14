@@ -1244,6 +1244,24 @@ body,
   align-items: center;
 }
 
+@media (max-width: 1040px) {
+  .beast2d-workspace-sfx .beast2d-sfx-mid {
+    flex-wrap: wrap;
+    row-gap: calc(2px * var(--beast-scale));
+  }
+
+  .beast2d-workspace-sfx .beast2d-sfx-effects {
+    flex: 0 0 100%;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .beast2d-workspace-sfx .beast2d-sfx-grid {
+    flex: 1 1 calc(140px * var(--beast-scale));
+    min-width: calc(80px * var(--beast-scale));
+  }
+}
+
 .beast2d-workspace-sfx .beast2d-sfx-grid {
   flex: 1 1 auto;
   min-width: 0;

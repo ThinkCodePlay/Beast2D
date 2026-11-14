@@ -331,7 +331,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   let layoutKey = "";
   const layoutPreview = () => {
     const fontScale = chromeFontScale(window.innerHeight, window.innerWidth);
-    document.documentElement.style.setProperty("--beast-scale", String(fontScale));
+    const scaleText = String(fontScale);
+    document.documentElement.style.setProperty("--beast-scale", scaleText);
+    document.body.style.setProperty("--beast-scale", scaleText);
+    consoleFrame.style.setProperty("--beast-scale", scaleText);
     const playing = viewState.screen === "play";
     workspace.classList.toggle("beast2d-workspace-play", playing);
     editorColumn.hidden = playing;
