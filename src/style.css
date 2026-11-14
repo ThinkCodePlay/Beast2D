@@ -812,10 +812,23 @@ body,
   font-smooth: never;
 }
 
-.beast2d-sfx-preset .beast2d-sfx-btn-icon {
+.beast2d-sfx-preset-sprite {
+  display: block;
   flex: 0 0 auto;
+  width: calc(64px * var(--beast-scale));
+  height: calc(56px * var(--beast-scale));
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+}
+
+.beast2d-sfx-preset.is-down .beast2d-sfx-preset-sprite {
+  transform: translateY(calc(1px * var(--beast-scale)));
+}
+
+.beast2d-console-narrow .beast2d-sfx-preset-sprite {
   width: calc(32px * var(--beast-scale));
-  height: calc(32px * var(--beast-scale));
+  height: calc(28px * var(--beast-scale));
 }
 
 .beast2d-sfx-preset-strip-chip {
@@ -1395,9 +1408,9 @@ body,
   padding: 0;
 }
 
-.beast2d-workspace-sfx-run .beast2d-sfx-preset .beast2d-sfx-btn-icon {
-  width: calc(24px * var(--beast-scale));
-  height: calc(24px * var(--beast-scale));
+.beast2d-workspace-sfx-run .beast2d-sfx-preset-sprite {
+  width: calc(32px * var(--beast-scale));
+  height: calc(28px * var(--beast-scale));
 }
 
 .beast2d-workspace-sfx-run .beast2d-sfx-preset-name {

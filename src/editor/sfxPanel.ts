@@ -13,7 +13,7 @@ import { getSfxBank, subscribeSfxBank, updateSfxCartChip, updateSfxSlot } from "
 import { PITCH_MAX, knobTo01 } from "../core/sfx/grid";
 import { PRESET_IDS, generateDice, generatePreset, type PresetId } from "../core/sfx/generate";
 import { playSfx, sfxPlayhead, stopSfx } from "../core/sfx/synth";
-import { paintSfxButton, paintSfxPresetIcon } from "./sfxButtonArt";
+import { paintSfxButton } from "./sfxButtonArt";
 import { paintSfxKnob } from "./sfxKnobArt";
 import { knobLabel } from "./sfxKnobLabels";
 import { paintSfxRotor } from "./sfxRotorArt";
@@ -145,16 +145,9 @@ export function mountSfxDisk(): SfxDisk {
     }
     for (const preset of PRESET_IDS) {
       const button = presetsUi.presetButtons.get(preset);
-      const icon = presetsUi.presetIcons.get(preset);
-      const on = armed === preset;
-      button?.classList.toggle("is-selected", on);
-      if (icon) {
-        paintSfxPresetIcon(icon, preset, {
-          face: on ? "selected" : "cream",
-          pressed: button?.classList.contains("is-down"),
-        });
-      }
+      button?.classList.toggle("is-selected", armed === preset);
     }
+    presetsUi.diceButton.classList.toggle("is-selected", armed === "dice");
     presetsUi.presetChipBadge.textContent = CHIP_LABELS[cartChip];
     paintSfxButton(header.playIcon, { face: "cream", icon: "play", pressed: header.playButton.classList.contains("is-down") });
     paintSfxButton(header.stopIcon, { face: "cream", icon: "stop", pressed: header.stopButton.classList.contains("is-down") });
@@ -162,10 +155,6 @@ export function mountSfxDisk(): SfxDisk {
       face: sound.loop ? "selected" : "cream",
       icon: "loop",
       pressed: header.loopButton.classList.contains("is-down"),
-    });
-    paintSfxPresetIcon(presetsUi.diceIcon, "dice", {
-      face: "pink",
-      pressed: presetsUi.diceButton.classList.contains("is-down"),
     });
     for (const id of WAVE_IDS) {
       const button = gridUi.waveButtons.get(id);
