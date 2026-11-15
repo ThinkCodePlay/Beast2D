@@ -8,7 +8,7 @@ const W = PRESET_SPRITE_W;
 const H = PRESET_SPRITE_H;
 const CX = W / 2;
 const CY = H / 2;
-const STONE_MARGIN = 1;
+const STONE_MARGIN = 0;
 
 const LABEL_CENTER: Record<ChipId, { x: number; y: number }> = {
   pico: { x: 4, y: 4 },

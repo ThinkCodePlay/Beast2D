@@ -684,6 +684,7 @@ body,
   height: var(--sfx-key-h);
   min-width: var(--sfx-key-w);
   min-height: var(--sfx-key-h);
+  flex: 0 0 var(--sfx-key-w);
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -697,7 +698,6 @@ body,
   max-width: var(--sfx-key-w);
   max-height: var(--sfx-key-h);
   flex: 0 0 auto;
-  object-fit: none;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
@@ -821,21 +821,21 @@ body,
 
 .beast2d-sfx-rotor-label-pico {
   top: 0;
-  left: 0;
+  left: calc((var(--sfx-rotor-w) - var(--sfx-key-w)) / 2);
 }
 
 .beast2d-sfx-rotor-label-snes {
   top: 0;
-  right: 0;
+  right: calc((var(--sfx-rotor-w) - var(--sfx-key-w)) / 2);
 }
 
 .beast2d-sfx-rotor-label-gb {
-  left: 0;
+  left: calc((var(--sfx-rotor-w) - var(--sfx-key-w)) / 2);
   bottom: 0;
 }
 
 .beast2d-sfx-rotor-label-gen {
-  right: 0;
+  right: calc((var(--sfx-rotor-w) - var(--sfx-key-w)) / 2);
   bottom: 0;
 }
 
@@ -851,15 +851,17 @@ body,
 
 .beast2d-sfx-preset.beast2d-sfx-btn {
   position: relative;
+  flex: 0 0 var(--sfx-key-w);
   flex-direction: column;
   align-items: center;
-  width: auto;
-  min-width: calc(28px * var(--beast-scale));
+  width: var(--sfx-key-w);
+  min-width: var(--sfx-key-w);
+  max-width: var(--sfx-key-w);
   height: auto;
-  min-height: 0;
+  min-height: var(--sfx-key-h);
   overflow: visible;
   gap: 0;
-  padding: calc(1px * var(--beast-scale));
+  padding: 0;
 }
 
 .beast2d-sfx-preset-name {
@@ -881,7 +883,6 @@ body,
   height: var(--sfx-key-h);
   max-width: var(--sfx-key-w);
   max-height: var(--sfx-key-h);
-  object-fit: none;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
@@ -892,13 +893,15 @@ body,
 }
 
 .beast2d-sfx-presets-tight {
-  gap: 0;
+  gap: var(--sfx-gap);
   padding: 0;
 }
 
 .beast2d-sfx-presets-tight .beast2d-sfx-preset.beast2d-sfx-btn {
   padding: 0;
-  min-width: 0;
+  width: var(--sfx-key-w);
+  min-width: var(--sfx-key-w);
+  flex: 0 0 var(--sfx-key-w);
 }
 
 .beast2d-sfx-sequencer {
@@ -1036,18 +1039,21 @@ body,
 }
 
 .beast2d-sfx-waves {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
   gap: var(--sfx-gap);
   flex: 0 0 auto;
   width: 100%;
+  padding: 0;
 }
 
 .beast2d-sfx-wave.beast2d-sfx-btn {
-  width: 100%;
+  width: var(--sfx-key-w);
   height: var(--sfx-key-h);
-  min-width: 0;
+  min-width: var(--sfx-key-w);
   min-height: var(--sfx-key-h);
+  flex: 0 0 var(--sfx-key-w);
 }
 
 .beast2d-sfx-wave {

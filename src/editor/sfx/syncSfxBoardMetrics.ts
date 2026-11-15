@@ -12,12 +12,11 @@ function fitIntegerScale(native: number, chrome: number, limitPx: number): numbe
 
 let rotorGutterMeasure: HTMLCanvasElement | null = null;
 
-function rotorCornerGutterPx(chrome: number): number {
+function longestChipLabelPx(chrome: number): number {
   const fontPx = 8 * chrome;
   let textW = 0;
   for (const id of CHIP_IDS) {
-    const len = CHIP_LABELS[id].length;
-    textW = Math.max(textW, len * fontPx * 0.62);
+    textW = Math.max(textW, CHIP_LABELS[id].length * fontPx * 0.62);
   }
   if (typeof document !== "undefined" && "fonts" in document) {
     rotorGutterMeasure ??= document.createElement("canvas");
@@ -29,12 +28,11 @@ function rotorCornerGutterPx(chrome: number): number {
       }
     }
   }
-  return Math.ceil(textW) + 2 * chrome;
+  return Math.ceil(textW);
 }
 
 /**
- * Board metrics: one integer key scale (32×28 px art), shared by presets/transport/waves/LCD height.
- * Knobs/rotor stone use 16×16 at their own integer scale. Gaps are multiples of chrome × key scale.
+ * One integer key scale for every 32×28 key row. Knobs use matching integer 16×16 scale.
  */
 export function syncSfxBoardMetrics(machine: HTMLElement): void {
   const chrome =
@@ -44,31 +42,38 @@ export function syncSfxBoardMetrics(machine: HTMLElement): void {
 
   const keyGap = 4 * chrome;
   const innerW = machine.clientWidth;
-  const cellW = Math.floor((innerW - 7 * keyGap) / 8);
+
+  const rowScale = (count: number) => {
+    const gaps = (count - 1) * keyGap;
+    const perKey = Math.floor((innerW - gaps) / count);
+    return Math.min(
+      fitIntegerScale(PRESET_SPRITE_W, chrome, perKey),
+      fitIntegerScale(PRESET_SPRITE_H, chrome, perKey),
+    );
+  };
 
   const maxKeyScale = 2;
-  const keyScale = Math.min(
-    fitIntegerScale(PRESET_SPRITE_W, chrome, cellW),
-    fitIntegerScale(PRESET_SPRITE_H, chrome, PRESET_SPRITE_H * maxKeyScale * chrome),
-    maxKeyScale,
-  );
+  const keyScale = Math.min(rowScale(6), rowScale(7), rowScale(8), maxKeyScale);
 
   const keyW = PRESET_SPRITE_W * keyScale * chrome;
   const keyH = PRESET_SPRITE_H * keyScale * chrome;
 
-  const cornerLabel = rotorCornerGutterPx(chrome);
-  const rotorW = keyW + cornerLabel * 2;
+  const labelPx = longestChipLabelPx(chrome);
+  const sidePad = Math.max(chrome, Math.ceil(labelPx * 0.15));
+  const rotorW = keyW + sidePad * 2;
 
   const transportW = 3 * keyW + 2 * keyGap;
   const topGaps = 2 * keyGap;
   const lcdMin = 24 * chrome;
   const lcdMax = Math.max(lcdMin, innerW - transportW - rotorW - topGaps);
 
+  const cellW = Math.floor((innerW - 7 * keyGap) / 8);
   const modPad = 1 * chrome;
   const labelBand = 9 * chrome;
   const knobAvailW = Math.max(1, cellW - modPad * 2);
   const knobAvailH = Math.max(1, keyH);
   const knobScale = Math.min(
+    keyScale,
     fitIntegerScale(KNOB_SPRITE_W, chrome, knobAvailW),
     fitIntegerScale(KNOB_SPRITE_H, chrome, knobAvailH),
     2,
