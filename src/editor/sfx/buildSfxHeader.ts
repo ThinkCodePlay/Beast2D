@@ -1,12 +1,12 @@
 import { CHIP_IDS, CHIP_LABELS, CHIPS, type LiveChipId } from "../../core/sfx/chips";
-import { transportSpriteUrl } from "./transportSprites";
+import { TRANSPORT_SPRITE_H, TRANSPORT_SPRITE_W, transportSpriteUrl } from "./transportSprites";
 import { el, pressable } from "./buildDom";
 
 function transportSpriteImg(id: "play" | "stop" | "loop"): HTMLImageElement {
   const img = el("img", "beast2d-sfx-transport-sprite") as HTMLImageElement;
   img.src = transportSpriteUrl(id);
-  img.width = 24;
-  img.height = 21;
+  img.width = TRANSPORT_SPRITE_W;
+  img.height = TRANSPORT_SPRITE_H;
   img.alt = "";
   img.draggable = false;
   return img;

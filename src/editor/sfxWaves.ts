@@ -65,14 +65,16 @@ function applyWavePalette(data: ImageData, state: SfxWavePaintState): void {
   }
 }
 
-/** 36×24 wave key sprite with palette swap for selected / dimmed. */
+/** 32×28 wave key; `pixel` = device pixels per art pixel (matches key scale × chrome). */
 export function paintSfxWaveIcon(
   canvas: HTMLCanvasElement,
   wave: WaveId,
   state: SfxWavePaintState,
+  pixel = 1,
 ): void {
-  canvas.width = WAVE_SPRITE_W;
-  canvas.height = WAVE_SPRITE_H;
+  const px = Math.max(1, Math.round(pixel));
+  canvas.width = WAVE_SPRITE_W * px;
+  canvas.height = WAVE_SPRITE_H * px;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
@@ -80,7 +82,8 @@ export function paintSfxWaveIcon(
   const img = waveImage(wave);
   if (!img.complete || img.naturalWidth === 0) return;
 
-  ctx.clearRect(0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.setTransform(px, 0, 0, px, 0, 0);
   ctx.drawImage(img, 0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
   const frame = ctx.getImageData(0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
   applyWavePalette(frame, state);

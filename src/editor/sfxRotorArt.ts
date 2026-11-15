@@ -1,20 +1,20 @@
 import type { ChipId } from "../core/sfx/chips";
 import { Beast2D16 } from "../core/ui/palette";
 import { hex } from "./sfxPixelArt";
+import { PRESET_SPRITE_H, PRESET_SPRITE_W } from "./sfx/presetSprites";
 import { KNOB_SPRITE_H, KNOB_SPRITE_W, knobSpriteUrl } from "./sfx/knobSprites";
 
-/** Logical pixels (64×56), matches `--sfx-key-w` / `--sfx-key-h`. */
-const W = 64;
-const H = 56;
-const CX = 32;
-const CY = 30;
-const STONE_MARGIN = 2;
+const W = PRESET_SPRITE_W;
+const H = PRESET_SPRITE_H;
+const CX = W / 2;
+const CY = H / 2;
+const STONE_MARGIN = 1;
 
 const LABEL_CENTER: Record<ChipId, { x: number; y: number }> = {
-  pico: { x: 11, y: 8 },
-  snes: { x: 53, y: 8 },
-  gb: { x: 11, y: 48 },
-  gen: { x: 53, y: 48 },
+  pico: { x: 4, y: 4 },
+  snes: { x: W - 4, y: 4 },
+  gb: { x: 4, y: H - 4 },
+  gen: { x: W - 4, y: H - 4 },
 };
 
 let stoneKnob: HTMLImageElement | null = null;
@@ -30,17 +30,17 @@ function loadStoneKnob(): HTMLImageElement {
 
 void loadStoneKnob().decode?.();
 
-function labelCenter(chip: ChipId): { x: number; y: number } {
-  return LABEL_CENTER[chip];
+function stoneScale(): number {
+  return Math.min(
+    Math.floor((W - STONE_MARGIN * 2) / KNOB_SPRITE_W),
+    Math.floor((H - STONE_MARGIN * 2) / KNOB_SPRITE_H),
+  );
 }
 
 function drawStoneKnob(ctx: CanvasRenderingContext2D): void {
   const img = loadStoneKnob();
   if (!img.complete || img.naturalWidth === 0) return;
-  const scale = Math.min(
-    Math.floor((W - STONE_MARGIN * 2) / KNOB_SPRITE_W),
-    Math.floor((H - STONE_MARGIN * 2) / KNOB_SPRITE_H),
-  );
+  const scale = stoneScale();
   const w = KNOB_SPRITE_W * scale;
   const h = KNOB_SPRITE_H * scale;
   const x = Math.round(CX - w / 2);
@@ -50,41 +50,38 @@ function drawStoneKnob(ctx: CanvasRenderingContext2D): void {
 
 /** Plum pointer from the cream cap toward the active chip label. */
 function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
-  const capX = CX;
-  const capY = CY - 2;
-  const { x: tx, y: ty } = labelCenter(chip);
+  const capX = Math.round(CX);
+  const capY = Math.round(CY - 1);
+  const { x: tx, y: ty } = LABEL_CENTER[chip];
   const dx = tx - capX;
   const dy = ty - capY;
   const len = Math.hypot(dx, dy) || 1;
-  const stoneScale = Math.min(
-    Math.floor((W - STONE_MARGIN * 2) / KNOB_SPRITE_W),
-    Math.floor((H - STONE_MARGIN * 2) / KNOB_SPRITE_H),
-  );
-  const reach = stoneScale * 4;
+  const reach = stoneScale() * 3;
   const tipX = Math.round(capX + (dx / len) * reach);
   const tipY = Math.round(capY + (dy / len) * reach);
-  const sx = Math.round(capX);
-  const sy = Math.round(capY);
+  const sx = capX;
+  const sy = capY;
   const steps = Math.max(Math.abs(tipX - sx), Math.abs(tipY - sy));
   ctx.fillStyle = hex(Beast2D16.PlumOutline);
   for (let i = 0; i <= steps; i += 1) {
     const t = steps === 0 ? 0 : i / steps;
     const x = Math.round(sx + (tipX - sx) * t);
-    const y = Math.round(sy + (ty - sy) * t);
+    const y = Math.round(sy + (tipY - sy) * t);
     ctx.fillRect(x, y, 1, 1);
     ctx.fillRect(x + 1, y, 1, 1);
     ctx.fillRect(x, y + 1, 1, 1);
   }
 }
 
-export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, scale = 1): void {
-  const pixel = Math.max(1, Math.round(scale));
-  canvas.width = W * pixel;
-  canvas.height = H * pixel;
+/** 32×28 key cell; `pixel` = device pixels per art pixel (integer × chrome). */
+export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, pixel = 1): void {
+  const px = Math.max(1, Math.round(pixel));
+  canvas.width = W * px;
+  canvas.height = H * px;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
-  ctx.setTransform(pixel, 0, 0, pixel, 0, 0);
+  ctx.setTransform(px, 0, 0, px, 0, 0);
   ctx.clearRect(0, 0, W, H);
   drawStoneKnob(ctx);
   drawPointerTo(ctx, chip);

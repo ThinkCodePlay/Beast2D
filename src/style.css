@@ -568,12 +568,15 @@ body,
 .beast2d-sfx {
   --sfx-gap: calc(4px * var(--beast-scale));
   --sfx-pad: calc(8px * var(--beast-scale));
-  --sfx-key-w: calc(64px * var(--beast-scale));
-  --sfx-key-h: calc(56px * var(--beast-scale));
+  --sfx-key-scale: 1;
+  --sfx-key-w: calc(32px * var(--beast-scale));
+  --sfx-key-h: calc(28px * var(--beast-scale));
   --sfx-rotor-w: var(--sfx-key-w);
   --sfx-lcd-max-w: 100%;
-  --sfx-knob-w: calc(32px * var(--beast-scale));
-  --sfx-knob-h: calc(34px * var(--beast-scale));
+  --sfx-knob-scale: 1;
+  --sfx-knob-w: calc(16px * var(--beast-scale));
+  --sfx-knob-h: calc(16px * var(--beast-scale));
+  --sfx-fx-mod-h: calc(28px * var(--beast-scale) + 9px * var(--beast-scale));
   flex: 1 1 auto;
   min-height: 0;
   max-height: 100%;
@@ -691,6 +694,10 @@ body,
   display: block;
   width: var(--sfx-key-w);
   height: var(--sfx-key-h);
+  max-width: var(--sfx-key-w);
+  max-height: var(--sfx-key-h);
+  flex: 0 0 auto;
+  object-fit: none;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
@@ -872,6 +879,9 @@ body,
   flex: 0 0 auto;
   width: var(--sfx-key-w);
   height: var(--sfx-key-h);
+  max-width: var(--sfx-key-w);
+  max-height: var(--sfx-key-h);
+  object-fit: none;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
@@ -927,7 +937,7 @@ body,
   .beast2d-sfx-fx-mod .beast2d-sfx-knob-sprite,
   .beast2d-sfx-fx-mod .beast2d-sfx-knob-pointer {
     width: calc(16px * var(--beast-scale));
-    height: calc(17px * var(--beast-scale));
+    height: calc(16px * var(--beast-scale));
   }
 }
 
@@ -1085,9 +1095,9 @@ body,
   flex: 1 1 0;
   min-width: 0;
   width: auto;
-  height: var(--sfx-key-h);
-  min-height: var(--sfx-key-h);
-  max-height: var(--sfx-key-h);
+  height: var(--sfx-fx-mod-h);
+  min-height: var(--sfx-fx-mod-h);
+  max-height: var(--sfx-fx-mod-h);
   box-sizing: border-box;
   padding: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale))
     calc(9px * var(--beast-scale));
