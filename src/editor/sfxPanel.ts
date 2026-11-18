@@ -25,8 +25,6 @@ import { playSfx, sfxPlayhead, stopSfx } from "../core/sfx/synth";
 import { knobSpriteUrl, knobSpriteVariant } from "./sfx/knobSprites";
 import { paintSfxKnobPointer } from "./sfx/knobPointer";
 import { knobLabel } from "./sfxKnobLabels";
-import { paintSfxRotor } from "./sfxRotorArt";
-import { paintSfxWaveIcon } from "./sfxWaves";
 import { buildSfxBank } from "./sfx/buildSfxBank";
 import { buildSfxGrid } from "./sfx/buildSfxGrid";
 import { buildSfxHeader } from "./sfx/buildSfxHeader";
@@ -189,7 +187,7 @@ export function mountSfxDisk(): SfxDisk {
             ) / 16,
           )
         : keySpritePx;
-    paintSfxRotor(header.rotorCanvas, cartChip, keySpritePx);
+    header.rotorMark.textContent = CHIPS[cartChip].label;
     for (const [id, node] of header.chipButtons) {
       node.classList.toggle("is-on", id === cartChip);
     }
@@ -212,18 +210,6 @@ export function mountSfxDisk(): SfxDisk {
       button.disabled = !allowed;
       button.classList.toggle("is-dim", !allowed);
       button.classList.toggle("is-selected", allowed && sound.wave === id);
-      const icon = button.querySelector("canvas.beast2d-sfx-wave-icon");
-      if (icon instanceof HTMLCanvasElement) {
-        paintSfxWaveIcon(
-          icon,
-          id,
-          {
-            dim: !allowed,
-            selected: allowed && sound.wave === id,
-          },
-          keySpritePx,
-        );
-      }
     }
     sound.pitch.forEach((value, index) => {
       const bar = gridUi.pitchBars[index];

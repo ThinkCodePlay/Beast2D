@@ -1,4 +1,4 @@
-import { SFX_STEPS, WAVE_IDS, type WaveId } from "../../core/sfx/chips";
+import { SFX_STEPS, WAVE_IDS, WAVE_LABELS, type WaveId } from "../../core/sfx/chips";
 import {
   PITCH_MAX,
   VOLUME_MAX,
@@ -59,12 +59,11 @@ export function buildSfxGrid(
   for (const id of WAVE_IDS) {
     const button = el(
       "button",
-      "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-wave",
+      "beast2d-sfx-btn beast2d-sfx-wave",
     ) as HTMLButtonElement;
     button.type = "button";
-    button.title = id.toUpperCase();
-    const icon = el("canvas", "beast2d-sfx-wave-icon") as HTMLCanvasElement;
-    button.append(icon);
+    button.title = WAVE_LABELS[id];
+    button.append(el("span", "beast2d-sfx-placeholder", WAVE_LABELS[id]));
     pressable(button);
     button.addEventListener("click", () => onWave(id));
     waveButtons.set(id, button);

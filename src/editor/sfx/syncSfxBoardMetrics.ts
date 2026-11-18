@@ -1,4 +1,3 @@
-import { CHIP_IDS, CHIP_LABELS } from "../../core/sfx/chips";
 import { PRESET_SPRITE_H, PRESET_SPRITE_W } from "./presetSprites";
 import { KNOB_SPRITE_H, KNOB_SPRITE_W } from "./knobSprites";
 
@@ -14,30 +13,7 @@ function fitIntegerScale(
   return Math.max(1, scale);
 }
 
-let rotorGutterMeasure: HTMLCanvasElement | null = null;
-
-function longestChipLabelPx(chrome: number): number {
-  const fontPx = 8 * chrome;
-  let textW = 0;
-  for (const id of CHIP_IDS) {
-    textW = Math.max(textW, CHIP_LABELS[id].length * fontPx * 0.62);
-  }
-  if (typeof document !== "undefined" && "fonts" in document) {
-    rotorGutterMeasure ??= document.createElement("canvas");
-    const ctx = rotorGutterMeasure.getContext("2d");
-    if (ctx) {
-      ctx.font = `${fontPx}px "Monogram", ui-monospace, monospace`;
-      for (const id of CHIP_IDS) {
-        textW = Math.max(textW, ctx.measureText(CHIP_LABELS[id]).width);
-      }
-    }
-  }
-  return Math.ceil(textW);
-}
-
-/**
- * One integer key scale for every 32×28 key row. Knobs use matching integer 16×16 scale.
- */
+/** Keys and the rotor are 32×32. Knobs stay on the 16×16 sprite scale. */
 export function syncSfxBoardMetrics(machine: HTMLElement): void {
   const chrome =
     Number.parseInt(
@@ -67,12 +43,9 @@ export function syncSfxBoardMetrics(machine: HTMLElement): void {
   const maxKeyScale = 2;
   const keyScale = Math.min(rowScale(6), rowScale(7), rowScale(8), maxKeyScale);
 
-  const keyW = PRESET_SPRITE_W * keyScale * chrome;
-  const keyH = PRESET_SPRITE_H * keyScale * chrome;
-
-  const labelPx = longestChipLabelPx(chrome);
-  const sidePad = Math.max(chrome, Math.ceil(labelPx * 0.15));
-  const rotorW = keyW + sidePad * 2;
+  const keyW = 32 * chrome;
+  const keyH = 32 * chrome;
+  const rotorW = keyW;
 
   const transportW = 3 * keyW + 2 * keyGap;
   const topGaps = 2 * keyGap;
