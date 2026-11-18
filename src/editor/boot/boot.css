@@ -1,0 +1,71 @@
+.beast2d-boot {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(12 * var(--px));
+  background: var(--plum);
+}
+
+.beast2d-boot[hidden] {
+  display: none;
+}
+
+.beast2d-boot-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--px));
+}
+
+.beast2d-boot-title {
+  color: var(--hot-pink);
+  font-size: calc(32 * var(--px));
+  line-height: calc(32 * var(--px));
+  letter-spacing: calc(2 * var(--px));
+}
+
+.beast2d-boot-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(6 * var(--px));
+  color: var(--cream);
+}
+
+.beast2d-boot-status {
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--px));
+}
+
+.beast2d-boot-block {
+  width: 0.55em;
+  height: 0.55em;
+  background: var(--hot-pink);
+  flex-shrink: 0;
+}
+
+.beast2d-boot-track {
+  align-self: stretch;
+  height: calc(8 * var(--px));
+  margin-top: calc(4 * var(--px));
+  background: var(--shadow);
+}
+
+.beast2d-boot-fill {
+  width: 8%;
+  height: 100%;
+  background: var(--hot-pink);
+}
+
+.beast2d-boot.is-loading .beast2d-boot-fill {
+  width: 78%;
+  transition: width 1.35s linear;
+}
+
+.beast2d-boot-prompt {
+  color: var(--cream);
+}

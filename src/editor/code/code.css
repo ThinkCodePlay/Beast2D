@@ -1,0 +1,83 @@
+.beast2d-code {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(4 * var(--px));
+}
+
+.beast2d-code[hidden] {
+  display: none;
+}
+
+.beast2d-code-error {
+  flex-shrink: 0;
+  padding: calc(2 * var(--px)) calc(4 * var(--px));
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16 * var(--px));
+  line-height: calc(16 * var(--px));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  color: var(--cream);
+  background: var(--deep-rose);
+  box-shadow: inset calc(3 * var(--px)) 0 0 var(--red);
+}
+
+.beast2d-code-error[hidden] {
+  display: none;
+}
+
+.beast2d-code-editor {
+  flex: 1;
+  min-height: 0;
+  background: var(--plum);
+  box-shadow: inset 0 0 0 calc(2 * var(--px)) var(--void);
+}
+
+.beast2d-code-editor .cm-editor {
+  height: 100%;
+}
+
+.beast2d-code-editor .cm-content,
+.beast2d-code-editor .cm-gutters {
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* CodeMirror's theme sets the cursor border, so these stay important. */
+.beast2d-code-editor .cm-cursor,
+.beast2d-code-editor .cm-dropCursor {
+  border-left-width: calc(6 * var(--px)) !important;
+  border-left-style: solid !important;
+  border-left-color: var(--hot-pink) !important;
+  width: 0;
+  margin-left: 0;
+  background: transparent;
+  mix-blend-mode: normal;
+}
+
+.beast2d-code-editor .cm-scroller {
+  scrollbar-color: var(--yellow) var(--plum);
+  scrollbar-width: auto;
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar {
+  width: calc(16 * var(--px));
+  height: calc(16 * var(--px));
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar-track {
+  background-color: var(--plum);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--shadow) 0,
+    var(--shadow) calc(2 * var(--px)),
+    var(--plum) calc(2 * var(--px)),
+    var(--plum) calc(4 * var(--px))
+  );
+}
+
+.beast2d-code-editor .cm-scroller::-webkit-scrollbar-thumb {
+  background: var(--yellow);
+  border: calc(2 * var(--px)) solid var(--plum);
+}

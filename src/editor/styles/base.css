@@ -1,0 +1,76 @@
+/* Monogram — datagoblin, CC0 (see public/ui/monogram.LICENSE.txt) */
+@font-face {
+  font-family: "Monogram";
+  src: url("/ui/monogram.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  background: var(--page);
+  color: var(--cream);
+  font-family: "Monogram", ui-monospace, monospace;
+}
+
+#app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 48px;
+}
+
+.beast2d-app {
+  position: relative;
+}
+
+.beast2d-console {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  width: min(1170px, 100%);
+  height: min(640px, 100%);
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--plum);
+  outline: calc(3 * var(--px)) solid var(--shadow);
+  box-shadow: calc(6 * var(--px)) calc(6 * var(--px)) 0 var(--plum);
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16 * var(--px));
+  line-height: calc(16 * var(--px));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.beast2d-console:has(.beast2d-workspace-sfx) {
+  height: min(696px, 100%);
+}
+
+/* Virtual resolution 320×240. Pixi sets inline canvas size, so these need !important. */
+.game-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--plum);
+}
+
+.game-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}

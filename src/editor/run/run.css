@@ -1,0 +1,75 @@
+.beast2d-footer-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: calc(18 * var(--px));
+  color: var(--stone);
+  background: var(--shadow);
+  box-shadow: inset 0 calc(2 * var(--px)) 0 var(--plum);
+}
+
+.beast2d-hints {
+  display: flex;
+  align-items: center;
+  gap: calc(20 * var(--px));
+}
+
+.beast2d-hint {
+  display: inline-flex;
+  align-items: baseline;
+  gap: calc(6 * var(--px));
+}
+
+.beast2d-footer-hint[hidden] {
+  display: none;
+}
+
+.beast2d-hint-key {
+  color: var(--yellow);
+}
+
+.beast2d-hint-word {
+  color: var(--stone);
+}
+
+.beast2d-signature {
+  font-family: "Monogram", ui-monospace, monospace;
+  font-size: calc(16 * var(--px));
+  line-height: calc(16 * var(--px));
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  color: var(--cream);
+  background: var(--shadow);
+  border: calc(2 * var(--px)) solid var(--yellow);
+  border-radius: 0;
+  padding: calc(2 * var(--px)) calc(4 * var(--px));
+}
+
+.beast2d-signature-active {
+  color: var(--plum);
+  background: var(--yellow);
+}
+
+.beast2d-workspace-sfx .beast2d-editor-column-sfx {
+  padding: calc(2 * var(--px));
+  border-right: calc(1 * var(--px)) solid var(--shadow);
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.beast2d-console-narrow
+  .beast2d-tool-row
+  .beast2d-floppy-canvas[data-floppy="tool"] {
+  width: calc(28 * var(--px));
+  height: calc(20 * var(--px));
+}
+
+.beast2d-preview-column-bank {
+  align-items: stretch;
+  justify-content: stretch;
+  padding: calc(2 * var(--px));
+  overflow: hidden;
+}

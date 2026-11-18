@@ -1,0 +1,30 @@
+/* Palette names and values match Beast2D16 in src/core/ui/palette.ts. */
+:root {
+  --beast-scale: 2;
+  /* One game pixel. Shell code sets --beast-scale to a whole number. */
+  --px: calc(1px * var(--beast-scale));
+  --gap: calc(2 * var(--px));
+  --pad: calc(4 * var(--px));
+
+  --plum: #1f1424; /* PlumOutline */
+  --dirt: #8a5a44; /* DirtBrown */
+  --shadow: #3b2e3f; /* Shadow */
+  --stone: #746678; /* StoneGray */
+  --cream: #f4ead2; /* Cream */
+  --deep-rose: #75273c; /* DeepRose */
+  --magenta: #c1386e; /* Magenta */
+  --hot-pink: #e86c9a; /* HotPink */
+  --light-pink: #f7abcc; /* LightPink */
+  --red: #cb4a50; /* Red */
+  --orange: #e28649; /* Orange */
+  --yellow: #f1c766; /* Yellow */
+  --moss: #4a784d; /* MossGreen */
+  --leaf: #93be64; /* LeafGreen */
+  --blue: #3a5b93; /* Blue */
+  --sky: #7ab2d5; /* SkyBlue */
+
+  /* Used by the shell, not part of Beast2D16. */
+  --page: #ffcbdd;
+  --void: #120c16;
+  --lilac: #d8c8dc;
+}

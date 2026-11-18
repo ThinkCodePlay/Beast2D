@@ -1,0 +1,149 @@
+.beast2d-stage-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.beast2d-home {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(20 * var(--px));
+  padding: calc(16 * var(--px));
+  background: var(--plum);
+}
+
+.beast2d-home[hidden] {
+  display: none;
+}
+
+.beast2d-home-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--px));
+}
+
+.beast2d-home-logo {
+  color: var(--hot-pink);
+  font-size: calc(32 * var(--px));
+  line-height: calc(32 * var(--px));
+  letter-spacing: calc(2 * var(--px));
+}
+
+.beast2d-mascot {
+  height: calc(32 * var(--px));
+  width: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+.beast2d-home-shelf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: calc(12 * var(--px));
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.beast2d-home-disk {
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(4 * var(--px));
+  border: none;
+  background: transparent;
+  color: var(--cream);
+  cursor: pointer;
+  padding: 0;
+}
+
+.beast2d-home-disk-title,
+.beast2d-tool-stub {
+  font-family: "Monogram", ui-monospace, monospace;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.beast2d-home-disk-title {
+  font-size: calc(16 * var(--px));
+  line-height: calc(16 * var(--px));
+  text-align: center;
+  white-space: nowrap;
+}
+
+.beast2d-workspace {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  background: var(--plum);
+}
+
+.beast2d-workspace[hidden] {
+  display: none;
+}
+
+.beast2d-editor-column {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  padding: calc(6 * var(--px));
+  border-right: calc(1 * var(--px)) solid var(--shadow);
+}
+
+.beast2d-editor-column[hidden] {
+  display: none;
+}
+
+.beast2d-workspace-play .beast2d-preview-frame {
+  outline: none;
+  box-shadow: none;
+}
+
+.beast2d-preview-column {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  background: var(--plum);
+  padding: 8px calc(8 * var(--px));
+}
+
+.beast2d-preview-frame {
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--plum);
+  outline: calc(1 * var(--px)) solid var(--stone);
+  outline-offset: calc(2 * var(--px));
+  box-shadow: 0 0 0 calc(4 * var(--px)) var(--shadow);
+}
+
+.beast2d-tool-stub {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(16 * var(--px));
+  line-height: calc(16 * var(--px));
+  color: var(--stone);
+  background: var(--shadow);
+  box-shadow: inset 0 0 0 calc(2 * var(--px)) var(--void);
+}
+
+.beast2d-tool-stub[hidden] {
+  display: none;
+}
