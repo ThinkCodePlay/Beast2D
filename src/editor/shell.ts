@@ -61,6 +61,7 @@ import { beast2dEditorTheme, beast2dSyntax } from "./theme";
 import { clockText } from "./clock";
 import { paintEmptySlot, paintHomeFloppy, paintToolFloppy } from "./pixelArt";
 import { loadEditorCart } from "./editorCart";
+import { BootScreen } from "./boot/BootScreen";
 import { mountSfxDisk } from "./sfxPanel";
 import { getSfxBank } from "../core/sfx/bank";
 import { serializeSfxBank } from "../core/sfx/format";
@@ -126,47 +127,8 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const consoleFrame = document.createElement("div");
   consoleFrame.className = "beast2d-console";
 
-  const bootOverlay = document.createElement("div");
-  bootOverlay.className = "beast2d-boot";
-  const bootBrand = document.createElement("div");
-  bootBrand.className = "beast2d-boot-brand";
-  const bootTitle = document.createElement("div");
-  bootTitle.className = "beast2d-boot-title";
-  bootTitle.textContent = "BEAST2D";
-  const bootMascot = document.createElement("img");
-  bootMascot.className = "beast2d-mascot";
-  bootMascot.alt = "";
-  bootMascot.src = "/ui/mascot.png";
-  bootBrand.append(bootTitle, bootMascot);
-  const bootCopy = document.createElement("div");
-  bootCopy.className = "beast2d-boot-copy";
-  const bootLine = (text: string) => {
-    const line = document.createElement("div");
-    line.textContent = text;
-    return line;
-  };
-  const bootStatus = document.createElement("div");
-  bootStatus.className = "beast2d-boot-status";
-  bootStatus.append(bootLine(`Loading disks... ${disks.length} found`));
-  const bootBlock = document.createElement("span");
-  bootBlock.className = "beast2d-boot-block";
-  bootStatus.append(bootBlock);
-  const bootTrack = document.createElement("div");
-  bootTrack.className = "beast2d-boot-track";
-  const bootFill = document.createElement("div");
-  bootFill.className = "beast2d-boot-fill";
-  bootTrack.append(bootFill);
-  const bootPrompt = document.createElement("div");
-  bootPrompt.className = "beast2d-boot-prompt";
-  bootPrompt.textContent = "press any key";
-  bootCopy.append(
-    bootLine("BEAST2D OS v0.1"),
-    bootLine("(c) 2026 ThinkCodePlay"),
-    bootLine("320x240 16 colors Monogram"),
-    bootStatus,
-    bootTrack,
-  );
-  bootOverlay.append(bootBrand, bootCopy, bootPrompt);
+  const boot = new BootScreen(disks.length);
+  let bootLoading = false;
 
   const bar = document.createElement("header");
   bar.className = "beast2d-top-bar";
@@ -317,7 +279,8 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const stageBody = document.createElement("div");
   stageBody.className = "beast2d-stage-body";
   stageBody.append(workspace, homePanel);
-  consoleFrame.append(bootOverlay, bar, diskRow, stageBody, footer);
+  boot.mount(consoleFrame);
+  consoleFrame.append(bar, diskRow, stageBody, footer);
   appRoot.classList.add("beast2d-app");
 
   let layoutKey = "";
@@ -600,7 +563,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   };
 
   const syncVisibility = () => {
-    bootOverlay.hidden = viewState.screen !== "boot";
+    boot.render({
+      hidden: viewState.screen !== "boot",
+      loading: bootLoading,
+    });
     homePanel.hidden = viewState.screen !== "home";
     bar.hidden = viewState.screen === "boot";
     diskRow.hidden = viewState.screen !== "editor";
@@ -797,7 +763,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       applyViewState();
 
       if (viewState.screen === "boot") {
-        requestAnimationFrame(() => bootOverlay.classList.add("is-loading"));
+        requestAnimationFrame(() => {
+          bootLoading = true;
+          boot.render({ hidden: false, loading: true });
+        });
         const bootTimer = window.setTimeout(() => {
           viewState = skipBoot(viewState);
           applyViewState();
@@ -807,13 +776,13 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
           viewState = skipBoot(viewState);
           applyViewState();
           window.removeEventListener("keydown", dismissBootKey);
-          bootOverlay.removeEventListener("click", dismissBoot);
+          boot.root.removeEventListener("click", dismissBoot);
         };
         const dismissBootKey = (event: KeyboardEvent) => {
           if (isTextInputTarget(event.target)) return;
           dismissBoot();
         };
-        bootOverlay.addEventListener("click", dismissBoot);
+        boot.root.addEventListener("click", dismissBoot);
         window.addEventListener("keydown", dismissBootKey);
       }
 
