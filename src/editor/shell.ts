@@ -13,7 +13,7 @@ import {
 } from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
 import { foldGutter, foldKeymap } from "@codemirror/language";
-import { linter, setDiagnostics, type Diagnostic } from "@codemirror/lint";
+import { linter, setDiagnostics } from "@codemirror/lint";
 import { EditorState, type Extension } from "@codemirror/state";
 import {
   drawSelection,
@@ -28,7 +28,7 @@ import {
 import type { Cart } from "../core/cart/Cart";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 import type { GameManager } from "../core/GameManager";
-import { checkCartSyntax, compileCart } from "../core/cart/compile";
+import { compileCart } from "../core/cart/compile";
 import { DEFAULT_CONSOLE_DISKS } from "./disks";
 import {
   BOOT_DURATION_MS,
@@ -64,10 +64,9 @@ import { loadEditorCart } from "./editorCart";
 import { mountSfxDisk } from "./sfxPanel";
 import { getSfxBank } from "../core/sfx/bank";
 import { serializeSfxBank } from "../core/sfx/format";
-
-const STORAGE_KEY = "beast2d-cart-script";
-const DEV_PING = "/__beast2d/dev";
-const SAVE_URL = "/__beast2d/save-cart";
+import { cartDiagnostics } from "./code/cartDiagnostics";
+import { loadCartSource, saveCartSource } from "./services/cartStorage";
+import { pingDevServer, saveCartToDevServer } from "./services/devServer";
 
 export type CartEditorOptions = {
   appRoot: HTMLElement;
@@ -95,33 +94,6 @@ export type CartEditorShell = {
   saveSource: () => Promise<void>;
   boot: () => Promise<void>;
 };
-
-function lineDiagnostic(
-  view: EditorView,
-  line: number | undefined,
-  message: string,
-): Diagnostic | null {
-  if (!line || view.state.doc.lines < 1) return null;
-  const lineObj = view.state.doc.line(Math.min(line, view.state.doc.lines));
-  return { from: lineObj.from, to: lineObj.to, severity: "error", message };
-}
-
-function cartDiagnostics(
-  view: EditorView,
-  runError: { message: string; line?: number } | null,
-): Diagnostic[] {
-  const diagnostics: Diagnostic[] = [];
-  const syntax = checkCartSyntax(view.state.doc.toString());
-  if (!syntax.ok) {
-    const mark = lineDiagnostic(view, syntax.line ?? 1, syntax.message);
-    if (mark) diagnostics.push(mark);
-  }
-  if (runError) {
-    const mark = lineDiagnostic(view, runError.line, runError.message);
-    if (mark) diagnostics.push(mark);
-  }
-  return diagnostics;
-}
 
 function isTextInputTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -463,8 +435,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   }, 1000);
   clockEl.textContent = clockText();
 
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const startSource = stored ?? initialSource;
+  const startSource = loadCartSource(initialSource);
 
   let shell!: CartEditorShell;
 
@@ -507,7 +478,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     ]),
     EditorView.updateListener.of((update: ViewUpdate) => {
       if (!update.docChanged) return;
-      localStorage.setItem(STORAGE_KEY, update.state.doc.toString());
+      saveCartSource(update.state.doc.toString());
       if (!errorStrip.hidden) queueMicrotask(() => shell.clearError());
     }),
   ];
@@ -810,23 +781,18 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     },
     async saveSource() {
       if (!saveEnabled) return;
-      const response = await fetch(SAVE_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          source: shell.getSource(),
-          sfx: serializeSfxBank(getSfxBank()),
-        }),
+      const saved = await saveCartToDevServer({
+        source: shell.getSource(),
+        sfx: serializeSfxBank(getSfxBank()),
       });
-      if (!response.ok) {
+      if (!saved) {
         shell.setError("Save failed");
         return;
       }
       shell.clearError();
     },
     async boot() {
-      const ping = await fetch(DEV_PING, { method: "GET" }).catch(() => null);
-      saveEnabled = ping?.ok === true;
+      saveEnabled = await pingDevServer();
       saveButton.disabled = !saveEnabled;
       applyViewState();
 
