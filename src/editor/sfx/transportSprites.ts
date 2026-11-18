@@ -1,5 +1,5 @@
-export const TRANSPORT_SPRITE_W = 24;
-export const TRANSPORT_SPRITE_H = 21;
+export const TRANSPORT_SPRITE_W = 32;
+export const TRANSPORT_SPRITE_H = 28;
 
 export type TransportSpriteId = "play" | "stop" | "loop";
 

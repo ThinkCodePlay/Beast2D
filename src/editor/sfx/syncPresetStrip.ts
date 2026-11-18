@@ -1,8 +1,4 @@
-/** Fit seven preset sprites: prefer 2×, fall back to 1×, then tighten gaps. */
-export function syncPresetStripLayout(strip: HTMLElement): void {
-  strip.classList.remove("beast2d-sfx-presets-tight");
-
-  if (strip.scrollWidth > strip.clientWidth + 1) {
-    strip.classList.add("beast2d-sfx-presets-tight");
-  }
+/** Preset row uses board key metrics; no shrinking below `--sfx-key-w`. */
+export function syncPresetStripLayout(_strip: HTMLElement): void {
+  /* key scale is chosen in syncSfxBoardMetrics so seven keys fit at full size */
 }

@@ -12,12 +12,11 @@ function fitIntegerScale(native: number, chrome: number, limitPx: number): numbe
 
 let rotorGutterMeasure: HTMLCanvasElement | null = null;
 
-function rotorCornerGutterPx(chrome: number): number {
+function longestChipLabelPx(chrome: number): number {
   const fontPx = 8 * chrome;
   let textW = 0;
   for (const id of CHIP_IDS) {
-    const len = CHIP_LABELS[id].length;
-    textW = Math.max(textW, len * fontPx * 0.62);
+    textW = Math.max(textW, CHIP_LABELS[id].length * fontPx * 0.62);
   }
   if (typeof document !== "undefined" && "fonts" in document) {
     rotorGutterMeasure ??= document.createElement("canvas");
@@ -29,12 +28,11 @@ function rotorCornerGutterPx(chrome: number): number {
       }
     }
   }
-  return Math.ceil(textW) + 2 * chrome;
+  return Math.ceil(textW);
 }
 
 /**
- * Key size from board width: 8 knob cells + 7 gaps (widest row).
- * Capped at preset 2× (64×56 design px × chrome). Sets `--sfx-key-w/h`, knob caps, LCD cap, rotor width.
+ * One integer key scale for every 32×28 key row. Knobs use matching integer 16×16 scale.
  */
 export function syncSfxBoardMetrics(machine: HTMLElement): void {
   const chrome =
@@ -42,43 +40,53 @@ export function syncSfxBoardMetrics(machine: HTMLElement): void {
     Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue("--beast-scale"), 10) ||
     1;
 
-  const gap = 4 * chrome;
+  const keyGap = 4 * chrome;
   const innerW = machine.clientWidth;
-  const cellW = Math.floor((innerW - 7 * gap) / 8);
 
-  const capW = PRESET_SPRITE_W * 2 * chrome;
-  const capH = PRESET_SPRITE_H * 2 * chrome;
-  let keyW = Math.min(cellW, capW);
-  let keyH = Math.round((keyW * PRESET_SPRITE_H) / PRESET_SPRITE_W);
-  if (keyH > capH) {
-    keyH = capH;
-    keyW = Math.round((keyH * PRESET_SPRITE_W) / PRESET_SPRITE_H);
-  }
-  keyW = Math.max(1, keyW);
-  keyH = Math.max(1, keyH);
+  const rowScale = (count: number) => {
+    const gaps = (count - 1) * keyGap;
+    const perKey = Math.floor((innerW - gaps) / count);
+    return Math.min(
+      fitIntegerScale(PRESET_SPRITE_W, chrome, perKey),
+      fitIntegerScale(PRESET_SPRITE_H, chrome, perKey),
+    );
+  };
 
-  const cornerLabel = rotorCornerGutterPx(chrome);
-  const rotorW = keyW + cornerLabel * 2;
+  const maxKeyScale = 2;
+  const keyScale = Math.min(rowScale(6), rowScale(7), rowScale(8), maxKeyScale);
 
-  const transportW = 3 * keyW + 2 * gap;
-  const topGaps = 2 * gap;
+  const keyW = PRESET_SPRITE_W * keyScale * chrome;
+  const keyH = PRESET_SPRITE_H * keyScale * chrome;
+
+  const labelPx = longestChipLabelPx(chrome);
+  const sidePad = Math.max(chrome, Math.ceil(labelPx * 0.15));
+  const rotorW = keyW + sidePad * 2;
+
+  const transportW = 3 * keyW + 2 * keyGap;
+  const topGaps = 2 * keyGap;
   const lcdMin = 24 * chrome;
   const lcdMax = Math.max(lcdMin, innerW - transportW - rotorW - topGaps);
 
+  const cellW = Math.floor((innerW - 7 * keyGap) / 8);
   const modPad = 1 * chrome;
+  const labelBand = 9 * chrome;
   const knobAvailW = Math.max(1, cellW - modPad * 2);
-  /** Bottom label is absolutely positioned; sprite may use the full key height. */
   const knobAvailH = Math.max(1, keyH);
   const knobScale = Math.min(
+    keyScale,
     fitIntegerScale(KNOB_SPRITE_W, chrome, knobAvailW),
     fitIntegerScale(KNOB_SPRITE_H, chrome, knobAvailH),
     2,
   );
+  const knobPx = KNOB_SPRITE_W * knobScale * chrome;
 
+  machine.style.setProperty("--sfx-key-scale", String(keyScale));
   machine.style.setProperty("--sfx-key-w", `${keyW}px`);
   machine.style.setProperty("--sfx-key-h", `${keyH}px`);
   machine.style.setProperty("--sfx-rotor-w", `${rotorW}px`);
   machine.style.setProperty("--sfx-lcd-max-w", `${lcdMax}px`);
-  machine.style.setProperty("--sfx-knob-w", `${KNOB_SPRITE_W * knobScale * chrome}px`);
-  machine.style.setProperty("--sfx-knob-h", `${KNOB_SPRITE_H * knobScale * chrome}px`);
+  machine.style.setProperty("--sfx-knob-scale", String(knobScale));
+  machine.style.setProperty("--sfx-knob-w", `${knobPx}px`);
+  machine.style.setProperty("--sfx-knob-h", `${knobPx}px`);
+  machine.style.setProperty("--sfx-fx-mod-h", `${keyH + labelBand}px`);
 }

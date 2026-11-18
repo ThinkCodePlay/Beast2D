@@ -35,7 +35,7 @@ export function buildSfxKnobs(): SfxKnobsUi {
     const sprite = el("img", "beast2d-sfx-knob-sprite") as HTMLImageElement;
     sprite.src = knobSpriteUrl(knobSpriteVariant(id, false));
     sprite.width = 16;
-    sprite.height = 17;
+    sprite.height = 16;
     sprite.alt = "";
     sprite.draggable = false;
     const pointer = el("canvas", "beast2d-sfx-knob-pointer") as HTMLCanvasElement;

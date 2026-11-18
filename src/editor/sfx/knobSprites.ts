@@ -1,7 +1,7 @@
 import type { KnobId } from "../../core/sfx/chips";
 
 export const KNOB_SPRITE_W = 16;
-export const KNOB_SPRITE_H = 17;
+export const KNOB_SPRITE_H = 16;
 
 export type KnobSpriteVariant = "red" | "yellow" | "sky" | "leaf" | "stone" | "hotpink";
 

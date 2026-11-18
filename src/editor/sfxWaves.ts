@@ -22,6 +22,8 @@ const SRC = {
   moss: rgb(Beast2D16.MossGreen),
   leaf: rgb(Beast2D16.LeafGreen),
   cream: rgb(Beast2D16.Cream),
+  stone: rgb(Beast2D16.StoneGray),
+  shadow: rgb(Beast2D16.Shadow),
 };
 
 const waveImages = new Map<WaveId, HTMLImageElement>();
@@ -41,6 +43,8 @@ for (const id of WAVE_IDS) {
   void waveImage(id).decode?.();
 }
 
+const OUTLINE = rgb(Beast2D16.PlumOutline);
+
 function applyWavePalette(data: ImageData, state: SfxWavePaintState): void {
   if (!state.dim && !state.selected) return;
   const px = data.data;
@@ -49,7 +53,9 @@ function applyWavePalette(data: ImageData, state: SfxWavePaintState): void {
   const cream = state.dim ? rgb(Beast2D16.StoneGray) : SRC.cream;
   for (let i = 0; i < px.length; i += 4) {
     if (px[i + 3] === 0) continue;
-    if (samePixel(px, i, SRC.moss)) {
+    const p = { r: px[i], g: px[i + 1], b: px[i + 2] };
+    if (p.r === OUTLINE.r && p.g === OUTLINE.g && p.b === OUTLINE.b) continue;
+    if (samePixel(px, i, SRC.moss) || samePixel(px, i, SRC.shadow)) {
       px[i] = moss.r;
       px[i + 1] = moss.g;
       px[i + 2] = moss.b;
@@ -65,21 +71,18 @@ function applyWavePalette(data: ImageData, state: SfxWavePaintState): void {
   }
 }
 
-/** 36×24 wave key sprite with palette swap for selected / dimmed. */
-export function paintSfxWaveIcon(
-  canvas: HTMLCanvasElement,
-  wave: WaveId,
+let scratchCanvas: HTMLCanvasElement | null = null;
+
+function logicalWaveFrame(
+  img: HTMLImageElement,
   state: SfxWavePaintState,
-): void {
-  canvas.width = WAVE_SPRITE_W;
-  canvas.height = WAVE_SPRITE_H;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+): HTMLCanvasElement {
+  scratchCanvas ??= document.createElement("canvas");
+  scratchCanvas.width = WAVE_SPRITE_W;
+  scratchCanvas.height = WAVE_SPRITE_H;
+  const ctx = scratchCanvas.getContext("2d");
+  if (!ctx) return scratchCanvas;
   ctx.imageSmoothingEnabled = false;
-
-  const img = waveImage(wave);
-  if (!img.complete || img.naturalWidth === 0) return;
-
   ctx.clearRect(0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
   ctx.drawImage(img, 0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
   const frame = ctx.getImageData(0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H);
@@ -91,4 +94,29 @@ export function paintSfxWaveIcon(
     for (let y = 0; y < WAVE_SPRITE_H; y += 1) ctx.fillRect(WAVE_SPRITE_W - 1, y, 1, 1);
     for (let x = 0; x < WAVE_SPRITE_W; x += 1) ctx.fillRect(x, WAVE_SPRITE_H - 1, 1, 1);
   }
+  return scratchCanvas;
+}
+
+/** 32×28 wave key; `pixel` = device pixels per art pixel (matches key scale × chrome). */
+export function paintSfxWaveIcon(
+  canvas: HTMLCanvasElement,
+  wave: WaveId,
+  state: SfxWavePaintState,
+  pixel = 1,
+): void {
+  const px = Math.max(1, Math.round(pixel));
+  const outW = WAVE_SPRITE_W * px;
+  const outH = WAVE_SPRITE_H * px;
+  canvas.width = outW;
+  canvas.height = outH;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+
+  const img = waveImage(wave);
+  if (!img.complete || img.naturalWidth === 0) return;
+
+  const logical = logicalWaveFrame(img, state);
+  ctx.clearRect(0, 0, outW, outH);
+  ctx.drawImage(logical, 0, 0, WAVE_SPRITE_W, WAVE_SPRITE_H, 0, 0, outW, outH);
 }

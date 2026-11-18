@@ -23,6 +23,7 @@ import { buildSfxHeader } from "./sfx/buildSfxHeader";
 import { buildSfxKnobs } from "./sfx/buildSfxKnobs";
 import { buildSfxPresets } from "./sfx/buildSfxPresets";
 import { syncPresetStripLayout } from "./sfx/syncPresetStrip";
+import { PRESET_SPRITE_W } from "./sfx/presetSprites";
 import { syncSfxBoardMetrics } from "./sfx/syncSfxBoardMetrics";
 
 export type SfxDisk = {
@@ -145,11 +146,16 @@ export function mountSfxDisk(): SfxDisk {
       Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue("--beast-scale"), 10) ||
       1;
     const keyWpx =
-      Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-key-w"), 10) || 64 * chromeScale;
-    const keyHpx =
-      Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-key-h"), 10) || 56 * chromeScale;
-    const rotorPx = Math.max(1, Math.min(Math.round(keyWpx / 64), Math.round(keyHpx / 56)));
-    paintSfxRotor(header.rotorCanvas, cartChip, rotorPx);
+      Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-key-w"), 10) ||
+      PRESET_SPRITE_W * chromeScale;
+    const keySpritePx = Math.max(1, Math.round(keyWpx / PRESET_SPRITE_W));
+    const knobSpritePx =
+      Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-knob-w"), 10) > 0
+        ? Math.round(
+            Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-knob-w"), 10) / 16,
+          )
+        : keySpritePx;
+    paintSfxRotor(header.rotorCanvas, cartChip, keySpritePx);
     for (const [id, node] of header.chipButtons) {
       node.classList.toggle("is-on", id === cartChip);
     }
@@ -172,10 +178,15 @@ export function mountSfxDisk(): SfxDisk {
       button.classList.toggle("is-selected", allowed && sound.wave === id);
       const icon = button.querySelector("canvas.beast2d-sfx-wave-icon");
       if (icon instanceof HTMLCanvasElement) {
-        paintSfxWaveIcon(icon, id, {
-          dim: !allowed,
-          selected: allowed && sound.wave === id,
-        });
+        paintSfxWaveIcon(
+          icon,
+          id,
+          {
+            dim: !allowed,
+            selected: allowed && sound.wave === id,
+          },
+          keySpritePx,
+        );
       }
     }
     sound.pitch.forEach((value, index) => {
@@ -200,7 +211,7 @@ export function mountSfxDisk(): SfxDisk {
       const shown = id === "duty" ? applied.duty : knobTo01(sound.knobs[id]);
       const dragging = ui.button.classList.contains("is-down");
       ui.sprite.src = knobSpriteUrl(knobSpriteVariant(id, dragging));
-      paintSfxKnobPointer(ui.pointer, shown);
+      paintSfxKnobPointer(ui.pointer, shown, knobSpritePx);
       ui.label.textContent = knobLabel(id);
       if (id === "cutoff") {
         ui.button.setAttribute("aria-label", enabled ? "CUT" : "NO GB");

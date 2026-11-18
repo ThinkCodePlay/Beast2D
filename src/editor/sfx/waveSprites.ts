@@ -1,7 +1,7 @@
 import type { WaveId } from "../../core/sfx/chips";
 
-export const WAVE_SPRITE_W = 36;
-export const WAVE_SPRITE_H = 24;
+export const WAVE_SPRITE_W = 32;
+export const WAVE_SPRITE_H = 28;
 
 const FILES: Record<WaveId, string> = {
   sqr: "wave-sqr.png",
