@@ -4,12 +4,12 @@ import { CanvasSize } from "../src/core/canvasSize";
 import { GameObject } from "../src/core/GameObject";
 import { Level1 } from "../src/game/Level1";
 import { Level2 } from "../src/game/Level2";
-import { SpaceShooter } from "../src/game/Space Shooter/SpaceShooter";
+import { SpaceShooter } from "../src/game/space-shooter/SpaceShooter";
 import { BreakoutPaddle } from "../src/game/BreakoutPaddle/BreakoutPaddle";
-import { Bullet } from "../src/game/Space Shooter/Game Objects/Bullet";
-import { Spaceship } from "../src/game/Space Shooter/Game Objects/Spaceship";
-import { ShooterEnemy } from "../src/game/Space Shooter/Game Objects/ShooterEnemy";
-import { ShooterPlayfield } from "../src/game/Space Shooter/Game Objects/ShooterPlayfield";
+import { Bullet } from "../src/game/space-shooter/game-objects/Bullet";
+import { Spaceship } from "../src/game/space-shooter/game-objects/Spaceship";
+import { ShooterEnemy } from "../src/game/space-shooter/game-objects/ShooterEnemy";
+import { ShooterPlayfield } from "../src/game/space-shooter/game-objects/ShooterPlayfield";
 import { HudHeaderUI } from "../src/core/components/UI/HudHeaderUI";
 import { Player } from "../src/game/Player";
 import { DialogUI } from "../src/core/components/UI/DialogUI";
@@ -109,7 +109,9 @@ describe("example levels run on the updated engine", () => {
   it("SpaceShooter declares the assets it needs", () => {
     const level = new SpaceShooter(fakeEngine(context));
     expect(level.assets).toContain("BeastShip.32x32.png");
-    expect(level.assets).toContain("space-shooter/enemies/scout-sheet.32x32.png");
+    expect(level.assets).toContain(
+      "space-shooter/enemies/scout-sheet.32x32.png",
+    );
   });
 });
 
@@ -141,9 +143,7 @@ describe("space shooter gameplay", () => {
   it("an enemy hitting the ship costs a heart and is removed", () => {
     const { level, root, playfield } = setup();
     const ship = findShip(root);
-    playfield.children
-      .find((c) => c.name === "ShooterEnemySpawner")
-      ?.destroy();
+    playfield.children.find((c) => c.name === "ShooterEnemySpawner")?.destroy();
     const foe = new ShooterEnemy(
       ship.transform!.x + 4,
       ship.transform!.y + 4,

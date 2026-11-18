@@ -14,9 +14,7 @@ export class ShooterEnemySpawner extends GameObject {
         0,
         (x, y) => {
           const parent = this.parent ?? this;
-          parent.addChild(
-            new ShooterEnemy(x, y, ShooterEnemy.randomKind()),
-          );
+          parent.addChild(new ShooterEnemy(x, y, ShooterEnemy.randomKind()));
         },
       ),
     );

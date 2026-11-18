@@ -84,8 +84,10 @@ export class GameObject {
   }
 
   getWorldPosition(): { x: number; y: number } {
-    return this.getComponent(TransformComponent)?.getWorldPosition() ??
-      this.parent?.getWorldPosition() ?? { x: 0, y: 0 };
+    return (
+      this.getComponent(TransformComponent)?.getWorldPosition() ??
+      this.parent?.getWorldPosition() ?? { x: 0, y: 0 }
+    );
   }
 
   // Component Methods
@@ -94,9 +96,7 @@ export class GameObject {
     const existing = this.components.get(key);
 
     if (existing) {
-      console.warn(
-        `Component ${key.name} already exists on this GameObject`,
-      );
+      console.warn(`Component ${key.name} already exists on this GameObject`);
       return existing as T;
     }
 
@@ -112,7 +112,9 @@ export class GameObject {
     return this;
   }
 
-  removeComponent<T extends Component>(componentClass: ComponentClass<T>): void {
+  removeComponent<T extends Component>(
+    componentClass: ComponentClass<T>,
+  ): void {
     const component = this.getComponent(componentClass);
     if (!component) return;
 
@@ -122,7 +124,9 @@ export class GameObject {
   }
 
   /** Finds a component by its class, or by a base class it extends. */
-  getComponent<T extends Component>(componentClass: ComponentClass<T>): T | null {
+  getComponent<T extends Component>(
+    componentClass: ComponentClass<T>,
+  ): T | null {
     const exact = this.components.get(componentClass);
     if (exact) return exact as T;
 
@@ -153,7 +157,9 @@ export class GameObject {
     return component;
   }
 
-  hasComponent<T extends Component>(componentClass: ComponentClass<T>): boolean {
+  hasComponent<T extends Component>(
+    componentClass: ComponentClass<T>,
+  ): boolean {
     return this.getComponent(componentClass) !== null;
   }
 

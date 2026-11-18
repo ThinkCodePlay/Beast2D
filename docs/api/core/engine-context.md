@@ -8,24 +8,24 @@ Created by `Engine` on mount with stage size and optional `inputTarget` (default
 
 ## Properties
 
-| Property | Type | Role |
-| --- | --- | --- |
-| `stage` | Pixi `Container` | Root display list |
-| `width`, `height` | `number` | Canvas logical size |
-| `debug` | `boolean` | Collider debug drawing |
-| `time` | `Time` | Delta, pause, scale |
-| `input` | `Input` | Keyboard actions |
-| `timers` | `Timers` | Scheduled callbacks |
-| `collisions` | `CollisionSystem` | Collider registry & pairs |
-| `collisionStepper` | `FixedTick` | Fixed 60 Hz collision consumption |
+| Property           | Type              | Role                              |
+| ------------------ | ----------------- | --------------------------------- |
+| `stage`            | Pixi `Container`  | Root display list                 |
+| `width`, `height`  | `number`          | Canvas logical size               |
+| `debug`            | `boolean`         | Collider debug drawing            |
+| `time`             | `Time`            | Delta, pause, scale               |
+| `input`            | `Input`           | Keyboard actions                  |
+| `timers`           | `Timers`          | Scheduled callbacks               |
+| `collisions`       | `CollisionSystem` | Collider registry & pairs         |
+| `collisionStepper` | `FixedTick`       | Fixed 60 Hz collision consumption |
 
 ## Methods
 
-| Method | Description |
-| --- | --- |
-| `resize(w, h)` | Updates width/height |
+| Method              | Description                                           |
+| ------------------- | ----------------------------------------------------- |
+| `resize(w, h)`      | Updates width/height                                  |
 | `resetLevelState()` | Clears collisions, timers, stepper (on level destroy) |
-| `dispose()` | Detaches input; clears level state |
+| `dispose()`         | Detaches input; clears level state                    |
 
 ## Related
 

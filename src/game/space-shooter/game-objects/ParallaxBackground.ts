@@ -4,7 +4,10 @@ import {
   type ParallaxLayerConfig,
 } from "../../../core/components/Render/ScrollingBackgroundComponent";
 
-import { TEXTURE_STARS_LAYER_1, TEXTURE_STARS_LAYER_2 } from "../../publicAssets";
+import {
+  TEXTURE_STARS_LAYER_1,
+  TEXTURE_STARS_LAYER_2,
+} from "../../publicAssets";
 
 const defaultLayers: ParallaxLayerConfig[] = [
   {

@@ -5,7 +5,7 @@ import {
   TEXTURE_BUNNY_IDLE,
   TEXTURE_BUNNY_WALK_ANIMATION,
 } from "../publicAssets";
-import { BunnyPlayer } from "./Game Objects/BunnyPlayer";
+import { BunnyPlayer } from "./game-objects/BunnyPlayer";
 
 export class BunnyHop extends Level {
   override assets = [TEXTURE_BUNNY_IDLE, TEXTURE_BUNNY_WALK_ANIMATION];

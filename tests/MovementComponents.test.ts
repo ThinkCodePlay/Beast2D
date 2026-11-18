@@ -172,8 +172,7 @@ describe("Movement + independent sources", () => {
 
     const rect = canvas.getBoundingClientRect();
     const targetGameX = 53;
-    const clientX =
-      rect.left + (targetGameX / 320) * rect.width;
+    const clientX = rect.left + (targetGameX / 320) * rect.width;
     const clientY = rect.top + (100 / 240) * rect.height;
 
     canvas.dispatchType("pointerdown", {

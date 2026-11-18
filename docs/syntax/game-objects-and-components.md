@@ -59,5 +59,5 @@ Subclasses override `protected onDestroy()` for cleanup. Components should relea
 
 ```ts
 level.getHierarchy(); // Level API
-obj.getHierarchy();   // GameObject tree with names/uuids
+obj.getHierarchy(); // GameObject tree with names/uuids
 ```

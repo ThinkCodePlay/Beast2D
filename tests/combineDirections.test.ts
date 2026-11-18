@@ -3,7 +3,12 @@ import { combineDirections } from "../src/core/components/Movement/combineDirect
 
 describe("combineDirections", () => {
   it("sums opposing horizontal to zero", () => {
-    expect(combineDirections([{ x: 1, y: 0 }, { x: -1, y: 0 }])).toEqual({
+    expect(
+      combineDirections([
+        { x: 1, y: 0 },
+        { x: -1, y: 0 },
+      ]),
+    ).toEqual({
       x: 0,
       y: 0,
     });

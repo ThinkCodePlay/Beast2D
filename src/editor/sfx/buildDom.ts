@@ -24,7 +24,11 @@ const KNOB_ANGLE_MIN = -140;
 const KNOB_ANGLE_MAX = 140;
 const KNOB_ANGLE_SPAN = KNOB_ANGLE_MAX - KNOB_ANGLE_MIN;
 
-export function knobValueFromPointer(button: HTMLElement, clientX: number, clientY: number): number | null {
+export function knobValueFromPointer(
+  button: HTMLElement,
+  clientX: number,
+  clientY: number,
+): number | null {
   const rect = button.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
@@ -36,7 +40,11 @@ export function knobValueFromPointer(button: HTMLElement, clientX: number, clien
   return (deg - KNOB_ANGLE_MIN) / KNOB_ANGLE_SPAN;
 }
 
-export function knobStepFromPointer(button: HTMLElement, clientX: number, clientY: number): number | null {
+export function knobStepFromPointer(
+  button: HTMLElement,
+  clientX: number,
+  clientY: number,
+): number | null {
   const next = knobValueFromPointer(button, clientX, clientY);
   if (next === null) return null;
   return Math.round(next * 255);

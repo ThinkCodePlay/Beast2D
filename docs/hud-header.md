@@ -6,11 +6,11 @@ Compact top band for single-screen Beast2D levels. Playfield begins at **y = 16*
 
 Defined in `src/core/ui/hudLayout.ts` (`HUD_LAYOUT`): widths, padding, heart size, score column — **no game-specific textures**.
 
-| Zone | Position | Content |
-|------|----------|---------|
-| Band | `(0,0)` 320×16 | Per-game texture via `HudStyle.bandTexture` |
-| Lives | Left | `heartTexture` (default `HeartBeast.32x32.png` at 12×12, 2px gap, 4px inset) |
-| Score | Right | Bitmap `SCORE <n>`, right edge inset 4px |
+| Zone  | Position       | Content                                                                      |
+| ----- | -------------- | ---------------------------------------------------------------------------- |
+| Band  | `(0,0)` 320×16 | Per-game texture via `HudStyle.bandTexture`                                  |
+| Lives | Left           | `heartTexture` (default `HeartBeast.32x32.png` at 12×12, 2px gap, 4px inset) |
+| Score | Right          | Bitmap `SCORE <n>`, right edge inset 4px                                     |
 
 ## Typography
 

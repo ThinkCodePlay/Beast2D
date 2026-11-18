@@ -8,8 +8,8 @@ Rendering components extend `RenderComponent`, which creates Pixi display object
 constructor(renderOptions?: RenderOptions)
 ```
 
-| Method | Description |
-| --- | --- |
+| Method                                    | Description                          |
+| ----------------------------------------- | ------------------------------------ |
 | `setHorizontalFacing(direction: 1 \| -1)` | Mirror sprite/animation horizontally |
 
 Subclasses implement `createGraphics()` returning a Pixi `Graphics` or compatible display object.
@@ -63,10 +63,10 @@ new SpriteAnimationComponent(
 )
 ```
 
-| Method | Description |
-| --- | --- |
-| `playClip(name, { restart? })` | Switch animation clip |
-| `currentClip` | Active clip name or null |
+| Method                         | Description              |
+| ------------------------------ | ------------------------ |
+| `playClip(name, { restart? })` | Switch animation clip    |
+| `currentClip`                  | Active clip name or null |
 
 Works with `HorizontalFacingComponent` / `HorizontalLocomotionAnimationComponent`.
 

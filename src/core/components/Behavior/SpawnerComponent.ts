@@ -42,7 +42,10 @@ export class SpawnerComponent extends Component {
 
     // Capped so a zero interval or a long frame cannot loop forever.
     let spawned = 0;
-    while (this.timeUntilNextSpawnSeconds <= 0 && spawned < MAX_SPAWNS_PER_UPDATE) {
+    while (
+      this.timeUntilNextSpawnSeconds <= 0 &&
+      spawned < MAX_SPAWNS_PER_UPDATE
+    ) {
       this.spawn();
       spawned += 1;
       this.timeUntilNextSpawnSeconds += Math.max(

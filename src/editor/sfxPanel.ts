@@ -8,9 +8,19 @@ import {
   type LiveChipId,
   type SfxSound,
 } from "../core/sfx/chips";
-import { getSfxBank, subscribeSfxBank, updateSfxCartChip, updateSfxSlot } from "../core/sfx/bank";
+import {
+  getSfxBank,
+  subscribeSfxBank,
+  updateSfxCartChip,
+  updateSfxSlot,
+} from "../core/sfx/bank";
 import { PITCH_MAX, knobTo01 } from "../core/sfx/grid";
-import { PRESET_IDS, generateDice, generatePreset, type PresetId } from "../core/sfx/generate";
+import {
+  PRESET_IDS,
+  generateDice,
+  generatePreset,
+  type PresetId,
+} from "../core/sfx/generate";
 import { playSfx, sfxPlayhead, stopSfx } from "../core/sfx/synth";
 import { knobSpriteUrl, knobSpriteVariant } from "./sfx/knobSprites";
 import { paintSfxKnobPointer } from "./sfx/knobPointer";
@@ -48,7 +58,8 @@ export function mountSfxDisk(): SfxDisk {
     armed = null;
   };
 
-  const current = (): SfxSound => getSfxBank().slots[selected] ?? getSfxBank().slots[0]!;
+  const current = (): SfxSound =>
+    getSfxBank().slots[selected] ?? getSfxBank().slots[0]!;
 
   function nextSeed(key: string): number {
     const seed = (seeds.get(key) ?? 0) + 1;
@@ -91,7 +102,11 @@ export function mountSfxDisk(): SfxDisk {
   function applyPreset(preset: PresetId): void {
     const bankState = getSfxBank();
     const sound = current();
-    const patch = generatePreset(preset, effectiveChip(sound.chip, bankState.chip), nextSeed(preset));
+    const patch = generatePreset(
+      preset,
+      effectiveChip(sound.chip, bankState.chip),
+      nextSeed(preset),
+    );
     armed = preset;
     updateSfxSlot(selected, (slot) => {
       slot.name = patch.name;
@@ -106,7 +121,10 @@ export function mountSfxDisk(): SfxDisk {
   function rollDice(): void {
     const bankState = getSfxBank();
     const sound = current();
-    const patch = generateDice(effectiveChip(sound.chip, bankState.chip), nextSeed("dice"));
+    const patch = generateDice(
+      effectiveChip(sound.chip, bankState.chip),
+      nextSeed("dice"),
+    );
     armed = "dice";
     updateSfxSlot(selected, (slot) => {
       slot.name = patch.name;
@@ -142,28 +160,46 @@ export function mountSfxDisk(): SfxDisk {
     syncSfxBoardMetrics(machine);
     syncPresetStripLayout(presetsUi.presets);
     const chromeScale =
-      Number.parseInt(getComputedStyle(machine).getPropertyValue("--beast-scale"), 10) ||
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue("--beast-scale"), 10) ||
+      Number.parseInt(
+        getComputedStyle(machine).getPropertyValue("--beast-scale"),
+        10,
+      ) ||
+      Number.parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--beast-scale",
+        ),
+        10,
+      ) ||
       1;
     const keyWpx =
-      Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-key-w"), 10) ||
-      PRESET_SPRITE_W * chromeScale;
+      Number.parseInt(
+        getComputedStyle(machine).getPropertyValue("--sfx-key-w"),
+        10,
+      ) || PRESET_SPRITE_W * chromeScale;
     const keySpritePx = Math.max(1, Math.round(keyWpx / PRESET_SPRITE_W));
     const knobSpritePx =
-      Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-knob-w"), 10) > 0
+      Number.parseInt(
+        getComputedStyle(machine).getPropertyValue("--sfx-knob-w"),
+        10,
+      ) > 0
         ? Math.round(
-            Number.parseInt(getComputedStyle(machine).getPropertyValue("--sfx-knob-w"), 10) / 16,
+            Number.parseInt(
+              getComputedStyle(machine).getPropertyValue("--sfx-knob-w"),
+              10,
+            ) / 16,
           )
         : keySpritePx;
     paintSfxRotor(header.rotorCanvas, cartChip, keySpritePx);
     for (const [id, node] of header.chipButtons) {
       node.classList.toggle("is-on", id === cartChip);
     }
-    header.rotor.querySelectorAll(".beast2d-sfx-rotor-label").forEach((node) => {
-      const id = (node as HTMLElement).dataset.chip;
-      node.classList.toggle("is-on", id === cartChip);
-      node.classList.toggle("is-dim", id === "snes" || id === "gen");
-    });
+    header.rotor
+      .querySelectorAll(".beast2d-sfx-rotor-label")
+      .forEach((node) => {
+        const id = (node as HTMLElement).dataset.chip;
+        node.classList.toggle("is-on", id === cartChip);
+        node.classList.toggle("is-dim", id === "snes" || id === "gen");
+      });
     for (const preset of PRESET_IDS) {
       const button = presetsUi.presetButtons.get(preset);
       button?.classList.toggle("is-selected", armed === preset);
@@ -229,14 +265,18 @@ export function mountSfxDisk(): SfxDisk {
       const name = bankUi.rowNames[index];
       if (name) name.textContent = slot.name || "empty";
       const badge = bankUi.rowBadges[index];
-      if (badge) badge.textContent = CHIPS[effectiveChip(slot.chip, bankState.chip)].label;
+      if (badge)
+        badge.textContent =
+          CHIPS[effectiveChip(slot.chip, bankState.chip)].label;
     });
     paintPlayhead();
   }
 
   function paintPlayhead(): void {
     const head = sfxPlayhead();
-    bankUi.rows.forEach((row, index) => row.classList.toggle("is-playing", head?.slot === index));
+    bankUi.rows.forEach((row, index) =>
+      row.classList.toggle("is-playing", head?.slot === index),
+    );
     if (!head || head.slot !== selected) {
       gridUi.playhead.classList.remove("is-on");
       return;
@@ -308,7 +348,11 @@ export function mountSfxDisk(): SfxDisk {
     handleKey(event) {
       if (event.metaKey || event.ctrlKey || event.altKey) return false;
       const target = event.target;
-      if (target instanceof HTMLElement && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return false;
+      if (
+        target instanceof HTMLElement &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA")
+      )
+        return false;
       if (event.key === " " || event.key === "Spacebar") {
         playSfx(selected);
         return true;

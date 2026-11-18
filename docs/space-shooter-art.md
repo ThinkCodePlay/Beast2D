@@ -10,10 +10,10 @@ All shooter PNGs use [Beast2D 16](./palette.md) indices only (alpha allowed). Sh
 
 See [display spec](./display.md) and [HUD header](./hud-header.md) (geometry in core; texture paths in `shooterAssets.ts`).
 
-| Region | Size | Notes |
-|--------|------|--------|
-| HUD | 320×16, y 0–15 | `HudHeaderUI` + `DEFAULT_BEAST2D_HUD_THEME` |
-| Playfield | 320×224, y 16–239 | Ship, enemies, effects |
+| Region    | Size              | Notes                                       |
+| --------- | ----------------- | ------------------------------------------- |
+| HUD       | 320×16, y 0–15    | `HudHeaderUI` + `DEFAULT_BEAST2D_HUD_THEME` |
+| Playfield | 320×224, y 16–239 | Ship, enemies, effects                      |
 
 ## Regenerate shared UI
 
@@ -29,12 +29,12 @@ Enemy and bullet PNGs under `public/space-shooter/` are committed sources (no in
 
 ## Code layout
 
-| Concern | Location |
-|---------|----------|
-| Texture paths | `src/game/Space Shooter/shooterAssets.ts` |
-| HUD / dialog chrome | `src/core/ui/defaultUiTheme.ts` |
-| Bitmap font | `src/core/ui/defaultBitmapFont.ts` (generated) |
-| Enemy prefabs | `Game Objects/` |
+| Concern             | Location                                       |
+| ------------------- | ---------------------------------------------- |
+| Texture paths       | `src/game/space-shooter/shooterAssets.ts`      |
+| HUD / dialog chrome | `src/core/ui/defaultUiTheme.ts`                |
+| Bitmap font         | `src/core/ui/defaultBitmapFont.ts` (generated) |
+| Enemy prefabs       | `game-objects/`                                |
 
 Engine reuse: `HudHeaderUI`, `DialogUI`, `BitmapText`, `SlicedSprite`, `PixelBurstEffect`, palette in `src/core/`.
 

@@ -7,9 +7,7 @@ import {
   resetBitmapTextAtlas,
 } from "../../core/ui/BitmapText";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../../core/ui/defaultBitmapFont";
-import {
-  DEFAULT_BEAST2D_DIALOG_THEME,
-} from "../../core/ui/defaultUiTheme";
+import { DEFAULT_BEAST2D_DIALOG_THEME } from "../../core/ui/defaultUiTheme";
 import { BreakoutPlayfieldHint } from "./BreakoutPlayfieldHint";
 import { START_LIVES } from "./breakoutLogic";
 

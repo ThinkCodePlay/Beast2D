@@ -3,7 +3,11 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
-import { isSfxBankJson, parseSfxBank, serializeSfxBank } from "./src/core/sfx/format";
+import {
+  isSfxBankJson,
+  parseSfxBank,
+  serializeSfxBank,
+} from "./src/core/sfx/format";
 
 const repoRoot = fileURLToPath(new URL(".", import.meta.url));
 const cartScriptPath = resolve(repoRoot, "src/game/carts/hello.script.ts");
@@ -38,7 +42,10 @@ function beast2dCartSavePlugin(): Plugin {
           req.on("end", () => {
             if (tooLarge) return;
             try {
-              const parsed = JSON.parse(body) as { source?: string; sfx?: unknown };
+              const parsed = JSON.parse(body) as {
+                source?: string;
+                sfx?: unknown;
+              };
               if (typeof parsed.source !== "string") {
                 res.statusCode = 400;
                 res.end("bad request");
@@ -52,7 +59,11 @@ function beast2dCartSavePlugin(): Plugin {
               fs.writeFileSync(cartScriptPath, parsed.source, "utf8");
               if (parsed.sfx !== undefined) {
                 const bank = serializeSfxBank(parseSfxBank(parsed.sfx));
-                fs.writeFileSync(cartSfxPath, `${JSON.stringify(bank, null, 2)}\n`, "utf8");
+                fs.writeFileSync(
+                  cartSfxPath,
+                  `${JSON.stringify(bank, null, 2)}\n`,
+                  "utf8",
+                );
               }
               res.statusCode = 200;
               res.end("ok");

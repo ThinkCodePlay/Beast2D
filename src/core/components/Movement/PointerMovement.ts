@@ -23,7 +23,10 @@ export class PointerMovement extends MovementInput {
     pointerTarget.acquire(this.requireContext());
   }
 
-  protected override computeDirection(deltaTime: number): { x: number; y: number } {
+  protected override computeDirection(deltaTime: number): {
+    x: number;
+    y: number;
+  } {
     const target = pointerTarget.getTarget();
     if (!target || !this.transform) return { x: 0, y: 0 };
 

@@ -10,11 +10,11 @@ Behavior is split into attachable **components** (movement, render, collision, i
 
 ### Lifecycle
 
-| Hook | When |
-| --- | --- |
-| `onInit()` | Once, on the first update of the owner, **after** all components on that object exist |
-| `update(dt)` | Every frame while `enabled` and not destroyed |
-| `onDestroy()` | Once when removed or when the owner is destroyed; only if `onInit` ran |
+| Hook          | When                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------- |
+| `onInit()`    | Once, on the first update of the owner, **after** all components on that object exist |
+| `update(dt)`  | Every frame while `enabled` and not destroyed                                         |
+| `onDestroy()` | Once when removed or when the owner is destroyed; only if `onInit` ran                |
 
 `addComponent()` only registers. Initialization is deferred until the object is updated inside an active level.
 

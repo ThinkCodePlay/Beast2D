@@ -11,7 +11,11 @@ export type SfxWavePaintState = {
 type Rgb = { r: number; g: number; b: number };
 
 function rgb(hexColor: number): Rgb {
-  return { r: (hexColor >> 16) & 255, g: (hexColor >> 8) & 255, b: hexColor & 255 };
+  return {
+    r: (hexColor >> 16) & 255,
+    g: (hexColor >> 8) & 255,
+    b: hexColor & 255,
+  };
 }
 
 function samePixel(data: Uint8ClampedArray, i: number, c: Rgb): boolean {
@@ -91,8 +95,10 @@ function logicalWaveFrame(
 
   if (state.selected) {
     ctx.fillStyle = hex(Beast2D16.Orange);
-    for (let y = 0; y < WAVE_SPRITE_H; y += 1) ctx.fillRect(WAVE_SPRITE_W - 1, y, 1, 1);
-    for (let x = 0; x < WAVE_SPRITE_W; x += 1) ctx.fillRect(x, WAVE_SPRITE_H - 1, 1, 1);
+    for (let y = 0; y < WAVE_SPRITE_H; y += 1)
+      ctx.fillRect(WAVE_SPRITE_W - 1, y, 1, 1);
+    for (let x = 0; x < WAVE_SPRITE_W; x += 1)
+      ctx.fillRect(x, WAVE_SPRITE_H - 1, 1, 1);
   }
   return scratchCanvas;
 }

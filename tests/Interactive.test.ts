@@ -3,13 +3,13 @@ import { GameObject } from "../src/core/GameObject";
 import { ClickableComponent } from "../src/core/components/Input/ClickableComponent";
 import { Movement } from "../src/core/components/Movement/Movement";
 import { KeyboardMovement } from "../src/core/components/Movement/KeyboardMovement";
-import { HorizontalFacingComponent } from "../src/game/Bunny Hop/components/HorizontalFacingComponent";
-import { HorizontalLocomotionAnimationComponent } from "../src/game/Bunny Hop/components/HorizontalLocomotionAnimationComponent";
+import { HorizontalFacingComponent } from "../src/game/bunny-hop/components/HorizontalFacingComponent";
+import { HorizontalLocomotionAnimationComponent } from "../src/game/bunny-hop/components/HorizontalLocomotionAnimationComponent";
 import {
   SpriteAnimationComponent,
   type SpritesheetAnimationClipsOptions,
 } from "../src/core/components/Render/SpriteAnimationComponent";
-import { SpaceShootInputComponent } from "../src/game/Space Shooter/components/SpaceShootInputComponent";
+import { SpaceShootInputComponent } from "../src/game/space-shooter/components/SpaceShootInputComponent";
 import { SpawnerComponent } from "../src/core/components/Behavior/SpawnerComponent";
 import { TransformComponent } from "../src/core/components/Movement/TransformComponent";
 import { RenderComponent } from "../src/core/components/Render/RenderComponent";
@@ -67,7 +67,9 @@ describe("ClickableComponent", () => {
     go.container.emit("pointertap", {} as never);
     go.container.emit("pointerover", {} as never);
     go.container.emit("pointerout", {} as never);
-    expect([click, over, out].map((f) => f.mock.calls.length)).toEqual([1, 1, 1]);
+    expect([click, over, out].map((f) => f.mock.calls.length)).toEqual([
+      1, 1, 1,
+    ]);
 
     go.getComponent(ClickableComponent)!.enabled = false;
     go.container.emit("pointertap", {} as never);

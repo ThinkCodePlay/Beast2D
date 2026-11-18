@@ -10,11 +10,17 @@ export type SfxBankUi = {
   onPlayRow: (index: number) => void;
 };
 
-export function buildSfxBank(onChoose: (index: number) => void, onPlayRow: (index: number) => void): SfxBankUi {
+export function buildSfxBank(
+  onChoose: (index: number) => void,
+  onPlayRow: (index: number) => void,
+): SfxBankUi {
   const bank = el("section", "beast2d-sfx-bank");
   bank.setAttribute("aria-label", "Sound bank");
   const bankHead = el("div", "beast2d-sfx-bank-head");
-  bankHead.append(el("span", "beast2d-sfx-bank-title", "SOUND BANK"), el("span", "beast2d-sfx-bank-run", "RUN → GAME"));
+  bankHead.append(
+    el("span", "beast2d-sfx-bank-title", "SOUND BANK"),
+    el("span", "beast2d-sfx-bank-run", "RUN → GAME"),
+  );
   const list = el("div", "beast2d-sfx-list");
   const rows: HTMLElement[] = [];
   const rowNames: HTMLElement[] = [];

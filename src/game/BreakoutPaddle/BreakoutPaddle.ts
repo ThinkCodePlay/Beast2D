@@ -7,10 +7,10 @@ import {
   spawnBreakoutHint,
 } from "./breakoutSetup";
 import { BreakoutPlayfieldHint } from "./BreakoutPlayfieldHint";
-import { BreakoutBackdrop } from "./Game Objects/BreakoutBackdrop";
-import { BrickWall } from "./Game Objects/BrickWall";
-import { BreakoutBallObj } from "./Game Objects/BreakoutBallObj";
-import { BreakoutPaddleObj } from "./Game Objects/BreakoutPaddleObj";
+import { BreakoutBackdrop } from "./game-objects/BreakoutBackdrop";
+import { BrickWall } from "./game-objects/BrickWall";
+import { BreakoutBallObj } from "./game-objects/BreakoutBallObj";
+import { BreakoutPaddleObj } from "./game-objects/BreakoutPaddleObj";
 import {
   newBreakoutSession,
   tickBreakoutSession,
@@ -64,15 +64,16 @@ export class BreakoutPaddle extends Level {
   protected update(deltaTime: number): void {
     super.update(deltaTime);
     if (import.meta.env.DEV) {
-      (globalThis as typeof globalThis & { __beast2dBreakout?: object }).__beast2dBreakout =
-        {
-          phase: this.session.phase,
-          lives: this.session.lives,
-          paddleX: this.paddle.readState().x,
-          dialogOpen: DialogUI.isOpen(),
-          dialogTextReady: DialogUI.isTextReady(),
-          hintTextReady: BreakoutPlayfieldHint.isTextReady(),
-        };
+      (
+        globalThis as typeof globalThis & { __beast2dBreakout?: object }
+      ).__beast2dBreakout = {
+        phase: this.session.phase,
+        lives: this.session.lives,
+        paddleX: this.paddle.readState().x,
+        dialogOpen: DialogUI.isOpen(),
+        dialogTextReady: DialogUI.isTextReady(),
+        hintTextReady: BreakoutPlayfieldHint.isTextReady(),
+      };
     }
     tickBreakoutSession(
       {

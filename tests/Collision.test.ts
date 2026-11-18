@@ -173,8 +173,7 @@ describe("CollisionSystem", () => {
     root.addChild(
       makeBox(1000, 1000, {
         mode: ColliderModes.Active,
-        onCollisionEnter: (_s, o) =>
-          hits.push(o.gameObject!.transform!.x),
+        onCollisionEnter: (_s, o) => hits.push(o.gameObject!.transform!.x),
       }),
     );
     for (let i = 0; i < 50; i += 1) root.addChild(makeBox(i * 40, 0, {}));
@@ -188,10 +187,15 @@ describe("CollisionSystem", () => {
     const order: number[] = [];
     const root = createRoot();
     root.addChild(
-      makeBox(0, 0, {
-        mode: ColliderModes.Active,
-        onCollisionEnter: (_s, o) => order.push(o.gameObject!.transform!.y),
-      }, 50),
+      makeBox(
+        0,
+        0,
+        {
+          mode: ColliderModes.Active,
+          onCollisionEnter: (_s, o) => order.push(o.gameObject!.transform!.y),
+        },
+        50,
+      ),
     );
     for (const y of [30, 10, 20]) root.addChild(makeBox(0, y, {}));
     frame(root);

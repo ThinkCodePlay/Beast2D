@@ -4,12 +4,12 @@ Exported from `./core` (`src/core/display.ts`).
 
 ## Display
 
-| Name | Value |
-| --- | --- |
-| `DISPLAY_WIDTH` | 320 |
-| `DISPLAY_HEIGHT` | 240 |
-| `PIXEL_GRID` | 16 |
-| `SPRITE_SIZE` | 32 |
+| Name             | Value |
+| ---------------- | ----- |
+| `DISPLAY_WIDTH`  | 320   |
+| `DISPLAY_HEIGHT` | 240   |
+| `PIXEL_GRID`     | 16    |
+| `SPRITE_SIZE`    | 32    |
 
 ## Textures (path constants)
 
@@ -23,11 +23,11 @@ Bunny animation helpers: `BUNNY_SPRITE_SIZE`, `BUNNY_WALK_ANIMATION_COLUMNS`, `B
 
 ## ColliderModes
 
-| Value | Meaning |
-| --- | --- |
-| `active` | Moves and generates contacts |
+| Value     | Meaning                                         |
+| --------- | ----------------------------------------------- |
+| `active`  | Moves and generates contacts                    |
 | `passive` | Can be hit; does not drive broadphase as active |
-| `both` | Active and passive roles |
+| `both`    | Active and passive roles                        |
 
 ## CollisionLayers
 

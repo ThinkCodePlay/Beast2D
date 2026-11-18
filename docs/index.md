@@ -4,12 +4,12 @@ Beast2D is a component-based 2D engine (TypeScript, Vite, PixiJS). These pages d
 
 ## How this site is organized
 
-| Section | Purpose |
-| --- | --- |
-| [Guide](./guide/getting-started.md) | Install, first level, mental model |
-| [Syntax](./syntax/overview.md) | Authoring patterns: levels, objects, composition |
-| [API reference](./api/index.md) | Classes, methods, and component catalogs |
-| [Meta](./meta/integration.md) | Building HTML, editor integration, manifest |
+| Section                             | Purpose                                          |
+| ----------------------------------- | ------------------------------------------------ |
+| [Guide](./guide/getting-started.md) | Install, first level, mental model               |
+| [Syntax](./syntax/overview.md)      | Authoring patterns: levels, objects, composition |
+| [API reference](./api/index.md)     | Classes, methods, and component catalogs         |
+| [Meta](./meta/integration.md)       | Building HTML, editor integration, manifest      |
 
 ## Quick links
 

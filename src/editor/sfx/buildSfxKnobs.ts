@@ -26,7 +26,8 @@ export function buildSfxKnobs(): SfxKnobsUi {
   for (const id of KNOB_IDS) {
     const box = el("section", "beast2d-sfx-fx-mod");
     box.dataset.knob = id;
-    const tag = id === "cutoff" ? el("span", "beast2d-sfx-fx-mod-tag", "") : null;
+    const tag =
+      id === "cutoff" ? el("span", "beast2d-sfx-fx-mod-tag", "") : null;
     if (tag) tag.hidden = true;
     const button = el("button", "beast2d-sfx-knob") as HTMLButtonElement;
     button.type = "button";
@@ -38,7 +39,10 @@ export function buildSfxKnobs(): SfxKnobsUi {
     sprite.height = 16;
     sprite.alt = "";
     sprite.draggable = false;
-    const pointer = el("canvas", "beast2d-sfx-knob-pointer") as HTMLCanvasElement;
+    const pointer = el(
+      "canvas",
+      "beast2d-sfx-knob-pointer",
+    ) as HTMLCanvasElement;
     stack.append(sprite, pointer);
     button.append(stack);
     const label = el("span", "beast2d-sfx-knob-label", knobLabel(id));

@@ -31,7 +31,9 @@ export function paintDrawList(
   for (const command of list.commands) {
     if (command.op === "cls") {
       layer.addChild(
-        new Graphics().rect(0, 0, width, height).fill({ color: paletteIndex(command.color) }),
+        new Graphics()
+          .rect(0, 0, width, height)
+          .fill({ color: paletteIndex(command.color) }),
       );
       continue;
     }

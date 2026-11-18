@@ -46,7 +46,8 @@ body,
   overflow: hidden;
   background: #1f1424;
   outline: calc(3px * var(--beast-scale)) solid #3b2e3f;
-  box-shadow: calc(6px * var(--beast-scale)) calc(6px * var(--beast-scale)) 0 #1f1424;
+  box-shadow: calc(6px * var(--beast-scale)) calc(6px * var(--beast-scale)) 0
+    #1f1424;
   font-family: "Monogram", ui-monospace, monospace;
   font-size: calc(16px * var(--beast-scale));
   line-height: calc(16px * var(--beast-scale));
@@ -539,7 +540,9 @@ body,
   min-height: 0;
 }
 
-.beast2d-console-narrow .beast2d-tool-row .beast2d-floppy-canvas[data-floppy="tool"] {
+.beast2d-console-narrow
+  .beast2d-tool-row
+  .beast2d-floppy-canvas[data-floppy="tool"] {
   width: calc(28px * var(--beast-scale));
   height: calc(20px * var(--beast-scale));
 }
@@ -590,8 +593,10 @@ body,
   background: #746678;
   border: calc(3px * var(--beast-scale)) solid #1f1424;
   box-shadow:
-    inset calc(3px * var(--beast-scale)) calc(3px * var(--beast-scale)) 0 #746678,
-    inset calc(-3px * var(--beast-scale)) calc(-3px * var(--beast-scale)) 0 #3b2e3f;
+    inset calc(3px * var(--beast-scale)) calc(3px * var(--beast-scale)) 0
+      #746678,
+    inset calc(-3px * var(--beast-scale)) calc(-3px * var(--beast-scale)) 0
+      #3b2e3f;
 }
 
 .beast2d-sfx-btn {
@@ -601,7 +606,8 @@ body,
   color: #1f1424;
   background: #f4ead2;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
-  box-shadow: inset calc(-1px * var(--beast-scale)) calc(-1px * var(--beast-scale)) 0 #746678;
+  box-shadow: inset calc(-1px * var(--beast-scale))
+    calc(-1px * var(--beast-scale)) 0 #746678;
   width: calc(16px * var(--beast-scale));
   height: calc(16px * var(--beast-scale));
   min-width: calc(16px * var(--beast-scale));
@@ -651,13 +657,15 @@ body,
 .beast2d-sfx-btn-pink {
   color: #f4ead2;
   background: #e86c9a;
-  box-shadow: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale)) 0 #c1386e;
+  box-shadow: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale)) 0
+    #c1386e;
 }
 
 .beast2d-sfx-btn.is-selected,
 .beast2d-sfx-btn.is-down:not(:disabled) {
   background: #f1c766;
-  box-shadow: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale)) 0 #e28649;
+  box-shadow: calc(1px * var(--beast-scale)) calc(1px * var(--beast-scale)) 0
+    #e28649;
   transform: translateY(calc(1px * var(--beast-scale)));
 }
 
@@ -727,7 +735,8 @@ body,
   color: #93be64;
   background: #4a784d;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
-  box-shadow: inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #3b2e3f;
+  box-shadow: inset calc(2px * var(--beast-scale))
+    calc(2px * var(--beast-scale)) 0 #3b2e3f;
   padding: 0 calc(4px * var(--beast-scale));
   line-height: var(--sfx-key-h);
 }
@@ -927,7 +936,8 @@ body,
   .beast2d-sfx-fx-mod {
     flex: 0 0 calc(28px * var(--beast-scale));
     width: calc(28px * var(--beast-scale));
-    padding: calc(3px * var(--beast-scale)) calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale));
+    padding: calc(3px * var(--beast-scale)) calc(2px * var(--beast-scale))
+      calc(2px * var(--beast-scale));
   }
 
   .beast2d-sfx-fx-mod .beast2d-sfx-knob {
@@ -957,7 +967,8 @@ body,
   padding: 0;
   background: #4a784d;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
-  box-shadow: inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #3b2e3f;
+  box-shadow: inset calc(2px * var(--beast-scale))
+    calc(2px * var(--beast-scale)) 0 #3b2e3f;
 }
 
 .beast2d-sfx-pitch,
@@ -1123,10 +1134,14 @@ body,
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(#746678, #746678) 0 0 / calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) no-repeat,
-    linear-gradient(#746678, #746678) 100% 0 / calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) no-repeat,
-    linear-gradient(#746678, #746678) 0 100% / calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) no-repeat,
-    linear-gradient(#746678, #746678) 100% 100% / calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) no-repeat;
+    linear-gradient(#746678, #746678) 0 0 / calc(2px * var(--beast-scale))
+      calc(2px * var(--beast-scale)) no-repeat,
+    linear-gradient(#746678, #746678) 100% 0 / calc(2px * var(--beast-scale))
+      calc(2px * var(--beast-scale)) no-repeat,
+    linear-gradient(#746678, #746678) 0 100% / calc(2px * var(--beast-scale))
+      calc(2px * var(--beast-scale)) no-repeat,
+    linear-gradient(#746678, #746678) 100% 100% / calc(2px * var(--beast-scale))
+      calc(2px * var(--beast-scale)) no-repeat;
 }
 
 .beast2d-sfx-fx-mod.is-dim {
@@ -1238,7 +1253,8 @@ body,
   flex-direction: column;
   background: #1f1424;
   border: calc(2px * var(--beast-scale)) solid #1f1424;
-  box-shadow: inset calc(2px * var(--beast-scale)) calc(2px * var(--beast-scale)) 0 #746678;
+  box-shadow: inset calc(2px * var(--beast-scale))
+    calc(2px * var(--beast-scale)) 0 #746678;
 }
 
 .beast2d-sfx-bank-head {

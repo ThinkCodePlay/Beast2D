@@ -17,11 +17,14 @@ import { Beast2D16 } from "../../core/ui/palette";
 import { DEFAULT_BEAST2D_BITMAP_FONT } from "../../core/ui/defaultBitmapFont";
 import { DEFAULT_BEAST2D_DIALOG_THEME } from "../../core/ui/defaultUiTheme";
 import { useBitmapFont } from "../../core/ui/bitmapFontRegistry";
-import { resetBitmapTextAtlas, preloadBitmapFont } from "../../core/ui/BitmapText";
-import { Spaceship } from "./Game Objects/Spaceship";
-import { ShooterEnemySpawner } from "./Game Objects/ShooterEnemySpawner";
-import { ParallaxBackground } from "./Game Objects/ParallaxBackground";
-import { ShooterPlayfield } from "./Game Objects/ShooterPlayfield";
+import {
+  resetBitmapTextAtlas,
+  preloadBitmapFont,
+} from "../../core/ui/BitmapText";
+import { Spaceship } from "./game-objects/Spaceship";
+import { ShooterEnemySpawner } from "./game-objects/ShooterEnemySpawner";
+import { ParallaxBackground } from "./game-objects/ParallaxBackground";
+import { ShooterPlayfield } from "./game-objects/ShooterPlayfield";
 import { DialogUI } from "../../core/components/UI/DialogUI";
 import {
   TEXTURE_ENEMY_CRUISER_SHEET,

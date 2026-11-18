@@ -33,7 +33,7 @@ describe("engine / example boundary", () => {
 
   it("Space Shooter runtime has no capture mode helper", () => {
     const level = readFileSync(
-      join(process.cwd(), "src/game/Space Shooter/SpaceShooter.ts"),
+      join(process.cwd(), "src/game/space-shooter/SpaceShooter.ts"),
       "utf8",
     );
     expect(level).not.toMatch(/captureMode|getShooterCapture|CaptureEnemy/);

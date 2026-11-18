@@ -1,5 +1,14 @@
-import { CHIP_IDS, CHIP_LABELS, CHIPS, type LiveChipId } from "../../core/sfx/chips";
-import { TRANSPORT_SPRITE_H, TRANSPORT_SPRITE_W, transportSpriteUrl } from "./transportSprites";
+import {
+  CHIP_IDS,
+  CHIP_LABELS,
+  CHIPS,
+  type LiveChipId,
+} from "../../core/sfx/chips";
+import {
+  TRANSPORT_SPRITE_H,
+  TRANSPORT_SPRITE_W,
+  transportSpriteUrl,
+} from "./transportSprites";
 import { el, pressable } from "./buildDom";
 
 function transportSpriteImg(id: "play" | "stop" | "loop"): HTMLImageElement {
@@ -28,20 +37,31 @@ export type SfxHeaderUi = {
   onRotorPick: (chip: LiveChipId) => void;
 };
 
-export function buildSfxHeader(onRotorPick: (chip: LiveChipId) => void): SfxHeaderUi {
+export function buildSfxHeader(
+  onRotorPick: (chip: LiveChipId) => void,
+): SfxHeaderUi {
   const top = el("div", "beast2d-sfx-top");
   const transport = el("div", "beast2d-sfx-transport");
-  const playButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn") as HTMLButtonElement;
+  const playButton = el(
+    "button",
+    "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn",
+  ) as HTMLButtonElement;
   playButton.type = "button";
   playButton.title = "Play";
   const playSprite = transportSpriteImg("play");
   playButton.append(playSprite);
-  const stopButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn") as HTMLButtonElement;
+  const stopButton = el(
+    "button",
+    "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn",
+  ) as HTMLButtonElement;
   stopButton.type = "button";
   stopButton.title = "Stop";
   const stopSprite = transportSpriteImg("stop");
   stopButton.append(stopSprite);
-  const loopButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn") as HTMLButtonElement;
+  const loopButton = el(
+    "button",
+    "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-transport-btn",
+  ) as HTMLButtonElement;
   loopButton.type = "button";
   loopButton.title = "Loop";
   const loopSprite = transportSpriteImg("loop");
@@ -61,11 +81,18 @@ export function buildSfxHeader(onRotorPick: (chip: LiveChipId) => void): SfxHead
   nameLcd.append(nameInput);
 
   const rotor = el("div", "beast2d-sfx-rotor");
-  const rotorCanvas = el("canvas", "beast2d-sfx-rotor-canvas") as HTMLCanvasElement;
+  const rotorCanvas = el(
+    "canvas",
+    "beast2d-sfx-rotor-canvas",
+  ) as HTMLCanvasElement;
   rotor.append(rotorCanvas);
   const chipButtons = new Map<string, HTMLElement>();
   for (const id of CHIP_IDS) {
-    const label = el("span", `beast2d-sfx-rotor-label beast2d-sfx-rotor-label-${id}`, CHIP_LABELS[id]);
+    const label = el(
+      "span",
+      `beast2d-sfx-rotor-label beast2d-sfx-rotor-label-${id}`,
+      CHIP_LABELS[id],
+    );
     label.dataset.chip = id;
     label.setAttribute("aria-hidden", "true");
     rotor.append(label);
@@ -73,7 +100,10 @@ export function buildSfxHeader(onRotorPick: (chip: LiveChipId) => void): SfxHead
   for (const id of CHIP_IDS) {
     const live = CHIPS[id].live;
     const chip = live
-      ? (el("button", `beast2d-sfx-chip beast2d-sfx-chip-${id}`) as HTMLButtonElement)
+      ? (el(
+          "button",
+          `beast2d-sfx-chip beast2d-sfx-chip-${id}`,
+        ) as HTMLButtonElement)
       : el("span", `beast2d-sfx-chip beast2d-sfx-chip-${id} is-dim`);
     chip.setAttribute("aria-label", CHIP_LABELS[id]);
     if (chip instanceof HTMLButtonElement) {
@@ -91,10 +121,13 @@ export function buildSfxHeader(onRotorPick: (chip: LiveChipId) => void): SfxHead
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const live =
-      x < rect.width / 2 && y < rect.height / 2 ? "pico"
-      : x < rect.width / 2 && y >= rect.height / 2 ? "gb"
-      : x >= rect.width / 2 && y < rect.height / 2 ? "snes"
-      : "gen";
+      x < rect.width / 2 && y < rect.height / 2
+        ? "pico"
+        : x < rect.width / 2 && y >= rect.height / 2
+          ? "gb"
+          : x >= rect.width / 2 && y < rect.height / 2
+            ? "snes"
+            : "gen";
     if (!CHIPS[live].live) return;
     onRotorPick(live as LiveChipId);
   });

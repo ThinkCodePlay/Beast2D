@@ -1,14 +1,26 @@
 import { describe, expect, it } from "vitest";
 import { CHIPS } from "../src/core/sfx/chips";
-import { PRESET_IDS, generateDice, generatePreset } from "../src/core/sfx/generate";
+import {
+  PRESET_IDS,
+  generateDice,
+  generatePreset,
+} from "../src/core/sfx/generate";
 
 describe("sfx generators", () => {
   it("repeats a preset and a dice roll for the same seed", () => {
-    expect(generatePreset("shoot", "gb", 4)).toEqual(generatePreset("shoot", "gb", 4));
-    expect(generatePreset("jump", "pico", 9)).toEqual(generatePreset("jump", "pico", 9));
+    expect(generatePreset("shoot", "gb", 4)).toEqual(
+      generatePreset("shoot", "gb", 4),
+    );
+    expect(generatePreset("jump", "pico", 9)).toEqual(
+      generatePreset("jump", "pico", 9),
+    );
     expect(generateDice("pico", 3)).toEqual(generateDice("pico", 3));
-    expect(generatePreset("shoot", "gb", 1).pitch).not.toEqual(generatePreset("shoot", "gb", 2).pitch);
-    expect(generateDice("gb", 1).pitch).not.toEqual(generateDice("gb", 2).pitch);
+    expect(generatePreset("shoot", "gb", 1).pitch).not.toEqual(
+      generatePreset("shoot", "gb", 2).pitch,
+    );
+    expect(generateDice("gb", 1).pitch).not.toEqual(
+      generateDice("gb", 2).pitch,
+    );
   });
 
   it("stays on waves that chip can play", () => {

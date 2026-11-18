@@ -4,22 +4,22 @@ This page describes how to publish these docs as HTML and how a future **visual 
 
 ## Recommended stack: VitePress (included)
 
-| Goal | Approach |
-| --- | --- |
-| Authoring | Markdown in `docs/` |
-| Local preview | `pnpm run docs:dev` |
-| Static HTML | `pnpm run docs:build` → `docs/.vitepress/dist` |
-| Hosting | Upload `dist` to any static host, or `pnpm run docs:preview` |
+| Goal          | Approach                                                     |
+| ------------- | ------------------------------------------------------------ |
+| Authoring     | Markdown in `docs/`                                          |
+| Local preview | `pnpm run docs:dev`                                          |
+| Static HTML   | `pnpm run docs:build` → `docs/.vitepress/dist`               |
+| Hosting       | Upload `dist` to any static host, or `pnpm run docs:preview` |
 
 VitePress fits the repo because the game already uses **Vite**. The sidebar mirrors the hierarchy in `docs/.vitepress/config.ts`.
 
 ### Alternatives (not configured)
 
-| Tool | When to consider |
-| --- | --- |
-| **TypeDoc** | Auto-generated signatures from TSDoc; pair with narrative docs, not a replacement |
-| **Docusaurus** | Larger doc sites with versioning and blog |
-| **Custom Vite route** | Embed a markdown viewer inside the game shell |
+| Tool                  | When to consider                                                                  |
+| --------------------- | --------------------------------------------------------------------------------- |
+| **TypeDoc**           | Auto-generated signatures from TSDoc; pair with narrative docs, not a replacement |
+| **Docusaurus**        | Larger doc sites with versioning and blog                                         |
+| **Custom Vite route** | Embed a markdown viewer inside the game shell                                     |
 
 A practical long-term split: **VitePress for prose + TypeDoc JSON** linked from API pages.
 

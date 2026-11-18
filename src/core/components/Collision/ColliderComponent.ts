@@ -111,7 +111,9 @@ export abstract class ColliderComponent extends Component {
   }
 
   isActiveMode(): boolean {
-    return this.mode === ColliderModes.Active || this.mode === ColliderModes.Both;
+    return (
+      this.mode === ColliderModes.Active || this.mode === ColliderModes.Both
+    );
   }
 
   isPassiveMode(): boolean {

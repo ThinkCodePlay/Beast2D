@@ -12,8 +12,8 @@ That framebuffer is scaled up to the browser window by **whole numbers only** (1
 
 Gameplay and art align to **32×32** tiles:
 
-- 320 ÷ 32 = **10** columns  
-- 240 ÷ 32 = **7.5** rows  
+- 320 ÷ 32 = **10** columns
+- 240 ÷ 32 = **7.5** rows
 
 Runtime sprites default to **32×32** (`SPRITE_SIZE`). The engine also exposes **`PIXEL_GRID` (16)** for half-tile layout snap (UI margins, fine placement).
 
@@ -23,7 +23,7 @@ Levels that fit one screen (for example the Jetpack clone in issue #4) use a **1
 
 The leftover **320×16** strip is the **HUD** (score, fuel, lives):
 
-- **HUD:** **y = 0–15** (top edge)  
+- **HUD:** **y = 0–15** (top edge)
 - **Level:** **y = 16–239**
 
 Space Shooter follows this pattern today: hearts and score sit along the top at `y = PIXEL_GRID` (16 px).
@@ -34,10 +34,10 @@ Side-scrollers and platformers (for example Bunny Hop) can be **any size in tile
 
 ## Sprite sizes
 
-| Size | Typical use |
-| --- | --- |
-| **32 px** | Tiles, player, enemies, pickups (`SPRITE_SIZE`) |
-| **16 px** | Small things—bullets, particles, icons, gems |
+| Size      | Typical use                                                                                                      |
+| --------- | ---------------------------------------------------------------------------------------------------------------- |
+| **32 px** | Tiles, player, enemies, pickups (`SPRITE_SIZE`)                                                                  |
+| **16 px** | Small things—bullets, particles, icons, gems                                                                     |
 | **64 px** | Bosses, title art, and **64 px masters** in `public/`; shrink to 32 with nearest-neighbor, then touch up by hand |
 
 Some shipped levels draw **64×64** frames at runtime (see `BUNNY_SPRITE_SIZE` in Bunny Hop).

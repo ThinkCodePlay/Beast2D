@@ -17,9 +17,11 @@ Guidance for AI coding agents working in this repository.
 - Type-check only: `pnpm run typecheck`
 - Tests: `pnpm test` (Vitest, `tests/`)
 - Preview build: `pnpm run preview`
+- Lint: `pnpm run lint` (ESLint, typescript-eslint recommended)
+- Format: `pnpm run format` (Prettier). Check only: `pnpm run format:check`
 
 Notes:
-- There is no lint script in `package.json`.
+
 - TypeScript is strict; expect `noUnusedLocals` and `noUnusedParameters` errors.
 
 ## Where To Start Reading
@@ -29,7 +31,7 @@ Notes:
 3. `src/core/GameObject.ts` (scene graph + component registry)
 4. `src/core/Level.ts` (level lifecycle)
 5. `src/core/components/Component.ts` (component base)
-6. `src/game/Space Shooter/SpaceShooter.ts` (feature-complete level example)
+6. `src/game/space-shooter/SpaceShooter.ts` (feature-complete level example)
 
 ## Architecture Map
 
@@ -55,6 +57,7 @@ Notes:
 ## Component Lifecycle
 
 Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `README.md`).
+
 - `addComponent` only registers; `onInit` runs once on the first update of the owning `GameObject`, after all its components are added (siblings are available).
 - `GameObject.destroy()` is idempotent and safe inside `update`/callbacks: it detaches immediately; `onDestroy` of components (and the object's own protected `onDestroy()`) run at the end of the frame via `GameObject.flushDestroyed()` (called by `Level.tick`). Component `onDestroy` only runs if `onInit` ran. Do not override `destroy()`, override `onDestroy()`.
 - `update(dt)` uses frame units (1 = 1/60 s). Seconds: `context.time.deltaSeconds`.
@@ -62,7 +65,7 @@ Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `READM
 ## Repo Gotchas
 
 - **Display spec**: fixed **320×240** (4∶3), **16 px** grid, runtime sprites **32×32** (`SPRITE_SIZE`; fitted copies like `BeastShip.32x32.png`) — see `DISPLAY_*`, `PIXEL_GRID`, `SPRITE_SIZE`, `TEXTURE_*` in `src/core/display.ts`. Window integer CSS scale via `src/core/displayScale.ts` + `image-rendering: pixelated`. **`public/`** = only assets loaded at runtime (Vite serves them at `/…`). **`assets/`** = source masters / lossless (not shipped).
-- Paths with spaces exist and are valid (for example `src/game/Space Shooter/` and nested `Game Objects/`). Keep import paths exact.
+- Game sample folders are kebab-case (`src/game/space-shooter/`, `src/game/bunny-hop/`, nested `game-objects/`). Keep import paths exact.
 - Components are keyed by class reference; adding a second component of the same class returns the existing one. `getComponent(Base)` finds subclasses.
 - `TransformComponent` drives the GameObject container (applied after updates). Render/collider graphics are drawn at the object origin. Children inherit the parent transform, so spawn world-space objects (bullets) into the level root (`this.root`), not under a moving parent.
 - Components needing engine services use `this.requireContext()` (throws if the object is not in a level). `CanvasSize` is only a facade for construction-time values like canvas size.
@@ -75,11 +78,11 @@ Components have three hooks: `onInit()`, `update(dt)`, `onDestroy()` (see `READM
 
 Treat as **temporary** (non-exhaustive; grep `generate-`, `capture`, `devCapture`, `scripts/pixel` before closing out demos):
 
-| Area | Examples | Keep after cleanup |
-|------|----------|-------------------|
-| Level / dev capture | (removed from `src/game/`) | Runtime levels + `src/main.ts` only |
-| Per-level image generators | (removed from `src/game/Space Shooter/scripts/`) | `public/…` art already committed |
-| Shared asset tooling | `scripts/pixel/`, `scripts/generate-beast2d-ui.ts` (`pnpm dlx tsx`; not in `package.json`) | `public/ui/` + committed art |
+| Area                       | Examples                                                                                   | Keep after cleanup                  |
+| -------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------- |
+| Level / dev capture        | (removed from `src/game/`)                                                                 | Runtime levels + `src/main.ts` only |
+| Per-level image generators | (removed from `src/game/space-shooter/scripts/`)                                           | `public/…` art already committed    |
+| Shared asset tooling       | `scripts/pixel/`, `scripts/generate-beast2d-ui.ts` (`pnpm dlx tsx`; not in `package.json`) | `public/ui/` + committed art        |
 
 When removing generators, update docs that reference them (`docs/space-shooter-art.md`, `scripts/README.md`) so agents do not resurrect deleted workflows.
 

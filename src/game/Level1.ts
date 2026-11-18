@@ -29,10 +29,15 @@ export class Level1 extends Level {
     this.levelRoot.addChild(this.box);
 
     // Create a circle
-    this.circle = new Circle(PIXEL_GRID * 3, PIXEL_GRID * 3, PIXEL_GRID * 2 + PIXEL_GRID / 2, {
-      color: 0x00ff00,
-      strokeWidth: 2,
-    });
+    this.circle = new Circle(
+      PIXEL_GRID * 3,
+      PIXEL_GRID * 3,
+      PIXEL_GRID * 2 + PIXEL_GRID / 2,
+      {
+        color: 0x00ff00,
+        strokeWidth: 2,
+      },
+    );
     this.levelRoot.addChild(this.circle);
 
     // create player object
@@ -46,6 +51,8 @@ export class Level1 extends Level {
     this.box?.transform?.setRotation(
       this.box.transform.rotation + 0.01 * deltaTime,
     );
-    this.circle?.transform?.setScale(1 + 0.3 * Math.sin(this.context.time.elapsed * 5));
+    this.circle?.transform?.setScale(
+      1 + 0.3 * Math.sin(this.context.time.elapsed * 5),
+    );
   }
 }

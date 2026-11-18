@@ -18,7 +18,9 @@ export const BEAST2D_16_HEX = [
   "#7ab2d5",
 ] as const;
 
-export const BEAST2D_16 = BEAST2D_16_HEX.map((hex) => parseInt(hex.slice(1), 16)) as readonly number[];
+export const BEAST2D_16 = BEAST2D_16_HEX.map((hex) =>
+  parseInt(hex.slice(1), 16),
+) as readonly number[];
 
 export const PALETTE_NAMES = [
   "Plum Outline",
@@ -39,12 +41,15 @@ export const PALETTE_NAMES = [
   "Sky Blue",
 ] as const;
 
-export type PaletteIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+export type PaletteIndex =
+  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 /** Transparent cell marker in ASCII art grids. */
 export const TRANSPARENT = -1;
 
-export function paletteIndexToRgba(index: PaletteIndex): [number, number, number, number] {
+export function paletteIndexToRgba(
+  index: PaletteIndex,
+): [number, number, number, number] {
   const n = BEAST2D_16[index];
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255, 255];
 }

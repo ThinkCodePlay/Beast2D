@@ -1,9 +1,9 @@
 import type { EngineContext } from "../../core/EngineContext";
 import { DialogUI } from "../../core/components/UI/DialogUI";
 import { HudHeaderUI } from "../../core/components/UI/HudHeaderUI";
-import type { BrickWall } from "./Game Objects/BrickWall";
-import type { BreakoutBallObj } from "./Game Objects/BreakoutBallObj";
-import type { BreakoutPaddleObj } from "./Game Objects/BreakoutPaddleObj";
+import type { BrickWall } from "./game-objects/BrickWall";
+import type { BreakoutBallObj } from "./game-objects/BreakoutBallObj";
+import type { BreakoutPaddleObj } from "./game-objects/BreakoutPaddleObj";
 import { BreakoutPlayfieldHint } from "./BreakoutPlayfieldHint";
 import {
   aliveBrickCount,

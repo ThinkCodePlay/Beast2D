@@ -3,7 +3,11 @@ import { frameToAngleDeg, hex, valueToFrame } from "../sfxPixelArt";
 import { KNOB_SPRITE_H, KNOB_SPRITE_W } from "./knobSprites";
 
 /** Plum pointer over the cream knob cap (sprite body is a separate img). */
-export function paintSfxKnobPointer(canvas: HTMLCanvasElement, value: number, pixel = 1): void {
+export function paintSfxKnobPointer(
+  canvas: HTMLCanvasElement,
+  value: number,
+  pixel = 1,
+): void {
   const px = Math.max(1, Math.round(pixel));
   const frame = valueToFrame(value);
   canvas.width = KNOB_SPRITE_W * px;

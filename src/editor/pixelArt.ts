@@ -34,7 +34,7 @@ export type PixelGrid = readonly string[];
  * Titles stay off the shell — the name band is left empty.
  */
 export const DISK_ART: Record<string, PixelGrid> = {
-  "hello": [
+  hello: [
     "lllllllllllllmmmmmmllllllmmmmmmlllllllllllllllmmlll",
     "lllllllllllllmmppmmllllllmmppmmllllllllllllllmmmmml",
     "llllllllllllmmppppmmllllmmppppmmlllllllllllmmmlllml",
@@ -82,7 +82,7 @@ export const DISK_ART: Record<string, PixelGrid> = {
     "ddddddddydddddddddddddddddddddddddddddddddddddddddd",
     "ddddddddddddddddddddddddddddddddddddddddddddddddddd",
   ],
-  "paddle": [
+  paddle: [
     "dddddddddddddddddddddddddddddddddddddmmmmmmmmmmmmdd",
     "ddddddddddddddddddddddddddddddddddmmmmpppmllllmmmdd",
     "ddcdddddddddddddddddddddddddddddmmmmppppmmllllmmmdd",
@@ -134,13 +134,27 @@ export const DISK_ART: Record<string, PixelGrid> = {
 
 type Ctx = CanvasRenderingContext2D;
 
-function fill(ctx: Ctx, x: number, y: number, w: number, h: number, color: string, scale: number): void {
+function fill(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  color: string,
+  scale: number,
+): void {
   if (w <= 0 || h <= 0) return;
   ctx.fillStyle = color;
   ctx.fillRect(x * scale, y * scale, w * scale, h * scale);
 }
 
-function inRound(x: number, y: number, w: number, h: number, radius: number): boolean {
+function inRound(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  radius: number,
+): boolean {
   const r = Math.max(0, Math.min(radius, Math.floor(Math.min(w, h) / 2)));
   if (r <= 0) return x >= 0 && y >= 0 && x < w && y < h;
   let dx = 0;
@@ -181,7 +195,12 @@ export function isFloppySelectionPixel(x: number, y: number): boolean {
   return nearFloppyBody(x, y, FLOPPY_FRAME_OFFSET);
 }
 
-function strokeFloppyFrame(ctx: Ctx, color: string, scale: number, logicalH = TOOL_FLOPPY_H): void {
+function strokeFloppyFrame(
+  ctx: Ctx,
+  color: string,
+  scale: number,
+  logicalH = TOOL_FLOPPY_H,
+): void {
   for (let y = 0; y < logicalH; y += 1) {
     for (let x = 0; x < TOOL_FLOPPY_W; x += 1) {
       if (!isFloppySelectionPixel(x, y)) continue;
@@ -272,7 +291,11 @@ export function paintHomeFloppy(
   if (image.complete && image.naturalWidth > 0) {
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
   } else {
-    image.addEventListener("load", () => paintHomeFloppy(canvas, diskId, selected, scale), { once: true });
+    image.addEventListener(
+      "load",
+      () => paintHomeFloppy(canvas, diskId, selected, scale),
+      { once: true },
+    );
   }
   const motif = DISK_ART[diskId];
   if (motif) {
@@ -333,5 +356,10 @@ export function paintToolFloppy(
     if (selected) strokeFloppyFrame(ctx, PINK, pixel, logicalH);
   };
   if (image.complete && image.naturalWidth > 0) draw();
-  else image.addEventListener("load", () => paintToolFloppy(canvas, tool, selected, scale, iconsOnly), { once: true });
+  else
+    image.addEventListener(
+      "load",
+      () => paintToolFloppy(canvas, tool, selected, scale, iconsOnly),
+      { once: true },
+    );
 }

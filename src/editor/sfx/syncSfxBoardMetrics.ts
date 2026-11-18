@@ -3,7 +3,11 @@ import { PRESET_SPRITE_H, PRESET_SPRITE_W } from "./presetSprites";
 import { KNOB_SPRITE_H, KNOB_SPRITE_W } from "./knobSprites";
 
 /** Largest integer scale so `native * scale * chrome ≤ limit` (pixel-snapped). */
-function fitIntegerScale(native: number, chrome: number, limitPx: number): number {
+function fitIntegerScale(
+  native: number,
+  chrome: number,
+  limitPx: number,
+): number {
   if (native <= 0 || chrome <= 0 || limitPx <= 0) return 1;
   const unit = native * chrome;
   const scale = Math.floor(limitPx / unit);
@@ -36,8 +40,16 @@ function longestChipLabelPx(chrome: number): number {
  */
 export function syncSfxBoardMetrics(machine: HTMLElement): void {
   const chrome =
-    Number.parseInt(getComputedStyle(machine).getPropertyValue("--beast-scale"), 10) ||
-    Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue("--beast-scale"), 10) ||
+    Number.parseInt(
+      getComputedStyle(machine).getPropertyValue("--beast-scale"),
+      10,
+    ) ||
+    Number.parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue(
+        "--beast-scale",
+      ),
+      10,
+    ) ||
     1;
 
   const keyGap = 4 * chrome;

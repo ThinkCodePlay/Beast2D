@@ -27,12 +27,18 @@ export default defineConfig({
           text: "Syntax",
           items: [
             { text: "Overview", link: "/syntax/overview" },
-            { text: "Levels and lifecycle", link: "/syntax/levels-and-lifecycle" },
+            {
+              text: "Levels and lifecycle",
+              link: "/syntax/levels-and-lifecycle",
+            },
             {
               text: "GameObjects and components",
               link: "/syntax/game-objects-and-components",
             },
-            { text: "Prefabs and composition", link: "/syntax/prefabs-and-composition" },
+            {
+              text: "Prefabs and composition",
+              link: "/syntax/prefabs-and-composition",
+            },
             { text: "Cart mode", link: "/syntax/cart" },
           ],
         },
@@ -62,12 +68,17 @@ export default defineConfig({
             { text: "Movement", link: "/api/components/movement" },
             { text: "Render", link: "/api/components/render" },
             { text: "Collision", link: "/api/components/collision" },
-            { text: "Input and behavior", link: "/api/components/input-behavior" },
+            {
+              text: "Input and behavior",
+              link: "/api/components/input-behavior",
+            },
           ],
         },
         {
           text: "Prefabs",
-          items: [{ text: "Box, Circle, Player, Spawner", link: "/api/prefabs" }],
+          items: [
+            { text: "Box, Circle, Player, Spawner", link: "/api/prefabs" },
+          ],
         },
       ],
       "/meta/": [

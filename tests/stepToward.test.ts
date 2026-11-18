@@ -18,12 +18,10 @@ describe("stepToward", () => {
   });
 
   it("respects axis mask", () => {
-    const next = stepToward(
-      { x: 0, y: 0 },
-      { x: 20, y: 20 },
-      5,
-      { x: true, y: false },
-    );
+    const next = stepToward({ x: 0, y: 0 }, { x: 20, y: 20 }, 5, {
+      x: true,
+      y: false,
+    });
     expect(next.x).toBe(5);
     expect(next.y).toBe(0);
   });

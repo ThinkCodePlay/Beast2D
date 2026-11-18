@@ -12,11 +12,15 @@ class PlayfieldPointerSessionImpl {
   private activePointerId: number | null = null;
 
   private readonly onWindowBlur = () => this.clearPointer();
-  private readonly onPointerDown = (event: PointerEvent) => this.handleDown(event);
-  private readonly onPointerMove = (event: PointerEvent) => this.handleMove(event);
+  private readonly onPointerDown = (event: PointerEvent) =>
+    this.handleDown(event);
+  private readonly onPointerMove = (event: PointerEvent) =>
+    this.handleMove(event);
   private readonly onPointerUp = (event: PointerEvent) => this.handleUp(event);
-  private readonly onPointerCancel = (event: PointerEvent) => this.handleUp(event);
-  private readonly onLostCapture = (event: PointerEvent) => this.handleUp(event);
+  private readonly onPointerCancel = (event: PointerEvent) =>
+    this.handleUp(event);
+  private readonly onLostCapture = (event: PointerEvent) =>
+    this.handleUp(event);
 
   acquire(context: EngineContext): void {
     this.refCount += 1;
@@ -28,8 +32,12 @@ class PlayfieldPointerSessionImpl {
     this.context = context;
     this.canvas = canvas;
     canvas.style.touchAction = "none";
-    canvas.addEventListener("pointerdown", this.onPointerDown, { capture: true });
-    canvas.addEventListener("pointermove", this.onPointerMove, { capture: true });
+    canvas.addEventListener("pointerdown", this.onPointerDown, {
+      capture: true,
+    });
+    canvas.addEventListener("pointermove", this.onPointerMove, {
+      capture: true,
+    });
     canvas.addEventListener("pointerup", this.onPointerUp, { capture: true });
     canvas.addEventListener("pointercancel", this.onPointerCancel, {
       capture: true,
@@ -54,7 +62,9 @@ class PlayfieldPointerSessionImpl {
       canvas.removeEventListener("pointermove", this.onPointerMove, {
         capture: true,
       });
-      canvas.removeEventListener("pointerup", this.onPointerUp, { capture: true });
+      canvas.removeEventListener("pointerup", this.onPointerUp, {
+        capture: true,
+      });
       canvas.removeEventListener("pointercancel", this.onPointerCancel, {
         capture: true,
       });

@@ -46,9 +46,9 @@ describe("computeIntegerDisplayScale", () => {
   });
 
   it("handles invalid or empty space defensively", () => {
-    expect(computeIntegerDisplayScale(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT)).toBe(
-      1,
-    );
+    expect(
+      computeIntegerDisplayScale(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT),
+    ).toBe(1);
     expect(
       computeIntegerDisplayScale(100, 100, DISPLAY_WIDTH, DISPLAY_HEIGHT, 80),
     ).toBe(1);

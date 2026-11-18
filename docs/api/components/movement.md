@@ -8,15 +8,15 @@ Local transform applied to the GameObject container after updates.
 new TransformComponent(x?: number, y?: number)
 ```
 
-| Property | Description |
-| --- | --- |
-| `x`, `y` | Position |
-| `rotation` | Radians |
-| `scaleX`, `scaleY` | Scale |
+| Property           | Description |
+| ------------------ | ----------- |
+| `x`, `y`           | Position    |
+| `rotation`         | Radians     |
+| `scaleX`, `scaleY` | Scale       |
 
-| Method | Description |
-| --- | --- |
-| `getWorldPosition()` | Composed position |
+| Method               | Description                                           |
+| -------------------- | ----------------------------------------------------- |
+| `getWorldPosition()` | Composed position                                     |
 | `applyToContainer()` | Writes to Pixi container (called by `syncTransforms`) |
 
 ## UserInputComponent

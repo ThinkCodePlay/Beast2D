@@ -45,18 +45,24 @@ export function onSfxApplied(listener: AppliedListener): () => void {
 
 export function sfxPlayhead(): { slot: number; step: number } | null {
   if (!transport) return null;
-  const now = transport.clock ? transport.clock.currentTime : performance.now() / 1000;
+  const now = transport.clock
+    ? transport.clock.currentTime
+    : performance.now() / 1000;
   const elapsed = now - transport.started;
   if (elapsed < 0) return { slot: transport.slot, step: 0 };
   const step = Math.floor(elapsed / transport.stepDur);
   if (!transport.loop && step >= SFX_STEPS) return null;
-  return { slot: transport.slot, step: ((step % SFX_STEPS) + SFX_STEPS) % SFX_STEPS };
+  return {
+    slot: transport.slot,
+    step: ((step % SFX_STEPS) + SFX_STEPS) % SFX_STEPS,
+  };
 }
 
 function context(): AudioContext | null {
   const Ctor =
     globalThis.AudioContext ??
-    (globalThis as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    (globalThis as { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext;
   if (!Ctor) return null;
   if (!audio) audio = new Ctor();
   if (audio.state === "suspended") void audio.resume();
@@ -103,7 +109,8 @@ function pulseWave(ctx: AudioContext, duty: number): PeriodicWave {
   const imag = new Float32Array(32);
   const width = Math.min(0.9, Math.max(0.05, duty));
   for (let harmonic = 1; harmonic < real.length; harmonic += 1) {
-    imag[harmonic] = (2 / (harmonic * Math.PI)) * Math.sin(harmonic * Math.PI * width);
+    imag[harmonic] =
+      (2 / (harmonic * Math.PI)) * Math.sin(harmonic * Math.PI * width);
   }
   const wave = ctx.createPeriodicWave(real, imag);
   pulseWaves.set(key, wave);
@@ -132,11 +139,22 @@ function noiseBuffer(ctx: AudioContext): AudioBuffer {
   return buffer;
 }
 
-function beginTransport(slot: number, started: number, stepDur: number, loop: boolean, clock: AudioContext | null): void {
+function beginTransport(
+  slot: number,
+  started: number,
+  stepDur: number,
+  loop: boolean,
+  clock: AudioContext | null,
+): void {
   transport = { slot, started, stepDur, loop, clock };
 }
 
-function schedule(ctx: AudioContext, applied: AppliedSfx, token: number, slot: number): void {
+function schedule(
+  ctx: AudioContext,
+  applied: AppliedSfx,
+  token: number,
+  slot: number,
+): void {
   if (playToken !== token) return;
   const spec = CHIPS[applied.chip];
   const stepDur = lerpRange(spec.stepSeconds, knobTo01(applied.knobs.rate));
@@ -189,7 +207,8 @@ function schedule(ctx: AudioContext, applied: AppliedSfx, token: number, slot: n
   for (let index = 0; index < SFX_STEPS; index += 1) {
     const time = started + index * stepDur;
     const elapsed = index * stepDur;
-    const amp = volumeTo01(applied.volume[index] ?? 0) * envelope(elapsed, attack, decay);
+    const amp =
+      volumeTo01(applied.volume[index] ?? 0) * envelope(elapsed, attack, decay);
     voiceGain.gain.setValueAtTime(Math.max(0, amp), time);
     const hz = pitchHz(applied, spec, index);
     const next = pitchHz(applied, spec, Math.min(SFX_STEPS - 1, index + 1));
@@ -219,7 +238,12 @@ function schedule(ctx: AudioContext, applied: AppliedSfx, token: number, slot: n
   nodes.push(source);
 }
 
-function setOscWave(ctx: AudioContext, osc: OscillatorNode, wave: WaveId, duty: number): void {
+function setOscWave(
+  ctx: AudioContext,
+  osc: OscillatorNode,
+  wave: WaveId,
+  duty: number,
+): void {
   if (wave === "saw") {
     osc.type = "sawtooth";
     return;

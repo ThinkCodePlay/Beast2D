@@ -78,14 +78,14 @@ function draw() {
 
 Colors are palette indexes `0` through `15` (`Beast2D16`). `0` is plum, `4` is cream, `10` is orange.
 
-| Helper | Effect |
-| --- | --- |
-| `cls(color)` | Fills the 320×240 screen. |
-| `rect(x, y, w, h, color)` | 1 px outline. |
-| `rectfill(x, y, w, h, color)` | Filled rectangle. |
+| Helper                             | Effect                                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------- |
+| `cls(color)`                       | Fills the 320×240 screen.                                                           |
+| `rect(x, y, w, h, color)`          | 1 px outline.                                                                       |
+| `rectfill(x, y, w, h, color)`      | Filled rectangle.                                                                   |
 | `print(text, x, y, color, scale?)` | Bitmap text. `scale` defaults to `1`. `2` draws the same 5×7 glyphs at double size. |
-| `btn(action)` | True while the action is held. |
-| `btnp(action)` | True on the frame the action was pressed. |
+| `btn(action)`                      | True while the action is held.                                                      |
+| `btnp(action)`                     | True on the frame the action was pressed.                                           |
 
 Actions match the engine bindings: `left`, `right`, `up`, `down`, `shoot`.
 

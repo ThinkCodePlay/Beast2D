@@ -56,9 +56,10 @@ export const beast2dEditorTheme = EditorView.theme(
     ".cm-activeLine": {
       backgroundColor: paletteRgba(Beast2D16.Cream, 0.06),
     },
-    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {
-      backgroundColor: paletteRgba(Beast2D16.Yellow, 0.35),
-    },
+    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection":
+      {
+        backgroundColor: paletteRgba(Beast2D16.Yellow, 0.35),
+      },
     ".cm-cursor, .cm-dropCursor": {
       borderLeftColor: hotPink,
       borderLeftWidth: "calc(6px * var(--beast-scale, 2))",

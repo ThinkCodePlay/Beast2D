@@ -12,15 +12,15 @@ Sprites, backgrounds, enemy art, bullets, and HUD/dialog chrome for the Space Sh
 
 ### Scope (non-exhaustive)
 
-| Area | Paths / refs |
-|------|----------------|
-| Player ship | `TEXTURE_BEAST_SHIP` → `BeastShip.32x32.png` (`publicAssets.ts`) |
-| Parallax BG | `TEXTURE_STARS_LAYER_1/2` under `public/background/` |
-| Enemies | Sheets/frames in `shooterAssets.ts` (`space-shooter/enemies/*`) |
-| Bullet | `TEXTURE_SHOOTER_BULLET` |
-| HUD / dialog | `TEXTURE_SHOOTER_*` from `shooterAssets.ts` / shared `public/ui/` |
-| Hearts | `TEXTURE_HEART` |
-| Optional tooling | `pnpm dlx tsx scripts/generate-beast2d-ui.ts` |
+| Area             | Paths / refs                                                      |
+| ---------------- | ----------------------------------------------------------------- |
+| Player ship      | `TEXTURE_BEAST_SHIP` → `BeastShip.32x32.png` (`publicAssets.ts`)  |
+| Parallax BG      | `TEXTURE_STARS_LAYER_1/2` under `public/background/`              |
+| Enemies          | Sheets/frames in `shooterAssets.ts` (`space-shooter/enemies/*`)   |
+| Bullet           | `TEXTURE_SHOOTER_BULLET`                                          |
+| HUD / dialog     | `TEXTURE_SHOOTER_*` from `shooterAssets.ts` / shared `public/ui/` |
+| Hearts           | `TEXTURE_HEART`                                                   |
+| Optional tooling | `pnpm dlx tsx scripts/generate-beast2d-ui.ts`                     |
 
 ### Expected behavior
 

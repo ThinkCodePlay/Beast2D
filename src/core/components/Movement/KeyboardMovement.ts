@@ -9,7 +9,10 @@ export class KeyboardMovement extends MovementInput {
     this.input = this.requireContext().input;
   }
 
-  protected override computeDirection(_deltaTime: number): { x: number; y: number } {
+  protected override computeDirection(_deltaTime: number): {
+    x: number;
+    y: number;
+  } {
     if (!this.input) return { x: 0, y: 0 };
 
     let x = 0;

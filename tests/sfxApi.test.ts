@@ -12,7 +12,10 @@ function run(body: () => void): void {
   withCartContext({ drawList: new DrawList(), input: new Input() }, body);
 }
 
-function captureApplied(): { stop: () => void; latest: () => AppliedSfx | null } {
+function captureApplied(): {
+  stop: () => void;
+  latest: () => AppliedSfx | null;
+} {
   let applied: AppliedSfx | null = null;
   const stop = onSfxApplied((next) => {
     applied = next;
@@ -57,7 +60,9 @@ describe("sfx(n)", () => {
     const played: number[] = [];
     const stopPlay = onSfxPlayed((slot) => played.push(slot));
     const applied = captureApplied();
-    const compiled = compileCart(`function init(){ sfx(4); }\nfunction update(){}\nfunction draw(){}`);
+    const compiled = compileCart(
+      `function init(){ sfx(4); }\nfunction update(){}\nfunction draw(){}`,
+    );
     expect(compiled.ok).toBe(true);
     if (!compiled.ok) return;
     run(() => compiled.cart.init());
@@ -77,7 +82,11 @@ describe("sfx(n)", () => {
     const applied = captureApplied();
     run(() => sfx(0));
     expect(slot).toEqual(before);
-    expect(applied.latest()).toMatchObject({ wave: "sqr", duty: 0.25, cutoff: null });
+    expect(applied.latest()).toMatchObject({
+      wave: "sqr",
+      duty: 0.25,
+      cutoff: null,
+    });
     slot.chip = "pico";
     run(() => sfx(0));
     expect(slot.knobs.duty).toBe(84);

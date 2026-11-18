@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { KNOB_IDS, SFX_SLOTS, SFX_STEPS } from "../src/core/sfx/chips";
 import { createDefaultSfxBank } from "../src/core/sfx/defaultBank";
-import { isSfxBankJson, parseSfxBank, serializeSfxBank } from "../src/core/sfx/format";
+import {
+  isSfxBankJson,
+  parseSfxBank,
+  serializeSfxBank,
+} from "../src/core/sfx/format";
 
 describe("sfx bank format", () => {
   it("ships 16 slots of 32 steps with the cart chip separate from the grid", () => {
@@ -40,7 +44,15 @@ describe("sfx bank format", () => {
     const repaired = parseSfxBank({
       version: 1,
       chip: "nope",
-      slots: [{ name: "x", wave: "nope", knobs: { duty: 4, vol: -2 }, pitch: [2], volume: [] }],
+      slots: [
+        {
+          name: "x",
+          wave: "nope",
+          knobs: { duty: 4, vol: -2 },
+          pitch: [2],
+          volume: [],
+        },
+      ],
     });
     expect(repaired.chip).toBe("gb");
     expect(repaired.slots[0]?.wave).toBe("sqr");

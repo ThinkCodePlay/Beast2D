@@ -5,9 +5,7 @@
 import { GameObject } from "../../core/GameObject";
 import { DISPLAY_WIDTH, PLAYFIELD_TOP } from "../../core/display";
 import { TransformComponent } from "../../core/components/Movement/TransformComponent";
-import {
-  BreakoutPlayfieldHintRender,
-} from "./BreakoutPlayfieldHintRender";
+import { BreakoutPlayfieldHintRender } from "./BreakoutPlayfieldHintRender";
 
 export class BreakoutPlayfieldHint extends GameObject {
   private static current: BreakoutPlayfieldHint | null = null;
@@ -18,7 +16,9 @@ export class BreakoutPlayfieldHint extends GameObject {
     this.name = "BreakoutPlayfieldHint";
     this.runWhenPaused = true;
     BreakoutPlayfieldHint.current = this;
-    this.addComponent(new TransformComponent(DISPLAY_WIDTH / 2, PLAYFIELD_TOP + 2));
+    this.addComponent(
+      new TransformComponent(DISPLAY_WIDTH / 2, PLAYFIELD_TOP + 2),
+    );
     this.render = this.addComponent(new BreakoutPlayfieldHintRender(message));
   }
 

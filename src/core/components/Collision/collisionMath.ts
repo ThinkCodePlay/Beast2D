@@ -2,7 +2,12 @@
   Pure geometry helpers for collision shapes (world space).
 */
 
-export type CircleShape = { type: "circle"; x: number; y: number; radius: number };
+export type CircleShape = {
+  type: "circle";
+  x: number;
+  y: number;
+  radius: number;
+};
 export type RectShape = {
   type: "rect";
   x: number;

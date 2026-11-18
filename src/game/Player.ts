@@ -4,7 +4,12 @@ import { SpriteRenderComponent } from "../core/components/Render/SpriteRenderCom
 import { Movement } from "../core/components/Movement/Movement";
 import { KeyboardMovement } from "../core/components/Movement/KeyboardMovement";
 import type { RenderOptions } from "../core/components/Render/RenderComponent";
-import { ObjectNames, CollisionLayers, ColliderModes, SPRITE_SIZE } from "../core/display";
+import {
+  ObjectNames,
+  CollisionLayers,
+  ColliderModes,
+  SPRITE_SIZE,
+} from "../core/display";
 import { TEXTURE_BEAST_SHIP } from "./publicAssets";
 import { SquareColliderComponent } from "../core/components/Collision/SquareColliderComponent";
 

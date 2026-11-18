@@ -170,7 +170,10 @@ describe("LevelManager", () => {
     const engine = fakeEngine();
     const resolvers: (() => void)[] = [];
     vi.spyOn(Assets, "load").mockImplementation(
-      () => new Promise<any>((resolve) => resolvers.push(() => resolve(Texture.EMPTY))),
+      () =>
+        new Promise<any>((resolve) =>
+          resolvers.push(() => resolve(Texture.EMPTY)),
+        ),
     );
 
     const a = new TestLevel(engine);

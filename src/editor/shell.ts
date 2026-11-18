@@ -1,5 +1,16 @@
-import { acceptCompletion, autocompletion, nextSnippetField, prevSnippetField } from "@codemirror/autocomplete";
-import { defaultKeymap, history, historyKeymap, indentLess, indentMore } from "@codemirror/commands";
+import {
+  acceptCompletion,
+  autocompletion,
+  nextSnippetField,
+  prevSnippetField,
+} from "@codemirror/autocomplete";
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentLess,
+  indentMore,
+} from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
 import { foldGutter, foldKeymap } from "@codemirror/language";
 import { linter, setDiagnostics, type Diagnostic } from "@codemirror/lint";
@@ -26,7 +37,12 @@ import {
   fitPreviewScale,
   homeFloppyScale,
 } from "./consoleLayout";
-import { CONSOLE_TOOLS, type ConsoleTool, type ConsoleViewState, type EditorMode } from "./consoleTypes";
+import {
+  CONSOLE_TOOLS,
+  type ConsoleTool,
+  type ConsoleViewState,
+  type EditorMode,
+} from "./consoleTypes";
 import {
   cycleTool,
   goHome,
@@ -80,7 +96,11 @@ export type CartEditorShell = {
   boot: () => Promise<void>;
 };
 
-function lineDiagnostic(view: EditorView, line: number | undefined, message: string): Diagnostic | null {
+function lineDiagnostic(
+  view: EditorView,
+  line: number | undefined,
+  message: string,
+): Diagnostic | null {
   if (!line || view.state.doc.lines < 1) return null;
   const lineObj = view.state.doc.line(Math.min(line, view.state.doc.lines));
   return { from: lineObj.from, to: lineObj.to, severity: "error", message };
@@ -340,7 +360,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     document.documentElement.style.setProperty("--beast-scale", scaleText);
     document.body.style.setProperty("--beast-scale", scaleText);
     consoleFrame.style.setProperty("--beast-scale", scaleText);
-    consoleFrame.classList.toggle("beast2d-console-narrow", window.innerWidth < 1280);
+    consoleFrame.classList.toggle(
+      "beast2d-console-narrow",
+      window.innerWidth < 1280,
+    );
     const playing = viewState.screen === "play";
     workspace.classList.toggle("beast2d-workspace-play", playing);
     editorColumn.hidden = playing;
@@ -352,16 +375,25 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     let frameH: number;
     let columnFlex: string;
     if (playing) {
-      const scale = fitPreviewScale(Math.max(0, consoleW - padX * 2), Math.max(0, workH - padY * 2));
+      const scale = fitPreviewScale(
+        Math.max(0, consoleW - padX * 2),
+        Math.max(0, workH - padY * 2),
+      );
       frameW = DISPLAY_WIDTH * scale;
       frameH = DISPLAY_HEIGHT * scale;
       columnFlex = "1 1 auto";
     } else {
       const twoXColumn = DISPLAY_WIDTH * 2 + padX * 2;
       const editorShare = Math.floor(consoleW * 0.45);
-      const editorFloor = Math.min(editorShare, Math.max(0, consoleW - twoXColumn));
+      const editorFloor = Math.min(
+        editorShare,
+        Math.max(0, consoleW - twoXColumn),
+      );
       const maxPreview = Math.max(DISPLAY_WIDTH, consoleW - editorFloor);
-      const scale = fitPreviewScale(maxPreview - padX * 2, Math.max(0, workH - padY * 2));
+      const scale = fitPreviewScale(
+        maxPreview - padX * 2,
+        Math.max(0, workH - padY * 2),
+      );
       frameW = DISPLAY_WIDTH * scale;
       frameH = DISPLAY_HEIGHT * scale;
       const columnW = Math.min(maxPreview, frameW + padX * 2);
@@ -393,21 +425,34 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     const pixel = chromeFontScale(window.innerHeight, window.innerWidth);
     const homePixel = homeFloppyScale(pixel);
     const iconsOnly = window.innerWidth < 1280;
-    consoleFrame.querySelectorAll<HTMLCanvasElement>(".beast2d-floppy-canvas").forEach((canvas) => {
-      const kind = canvas.dataset.floppy;
-      if (kind === "tool") {
-        const tool = canvas.dataset.tool ?? "CODE";
-        paintToolFloppy(canvas, tool, tool === viewState.activeTool, pixel, iconsOnly);
-        return;
-      }
-      if (kind === "home") {
-        const diskId = canvas.dataset.disk ?? "hello";
-        const index = disks.findIndex((disk) => disk.id === diskId);
-        paintHomeFloppy(canvas, diskId, index === viewState.selectedDiskIndex, homePixel);
-        return;
-      }
-      paintEmptySlot(canvas, homePixel);
-    });
+    consoleFrame
+      .querySelectorAll<HTMLCanvasElement>(".beast2d-floppy-canvas")
+      .forEach((canvas) => {
+        const kind = canvas.dataset.floppy;
+        if (kind === "tool") {
+          const tool = canvas.dataset.tool ?? "CODE";
+          paintToolFloppy(
+            canvas,
+            tool,
+            tool === viewState.activeTool,
+            pixel,
+            iconsOnly,
+          );
+          return;
+        }
+        if (kind === "home") {
+          const diskId = canvas.dataset.disk ?? "hello";
+          const index = disks.findIndex((disk) => disk.id === diskId);
+          paintHomeFloppy(
+            canvas,
+            diskId,
+            index === viewState.selectedDiskIndex,
+            homePixel,
+          );
+          return;
+        }
+        paintEmptySlot(canvas, homePixel);
+      });
   };
   layoutPreview();
   window.addEventListener("resize", layoutPreview);
@@ -490,7 +535,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
 
   const syncHomeSelection = () => {
     diskButtons.forEach((btn, i) => {
-      btn.classList.toggle("beast2d-home-disk-selected", i === viewState.selectedDiskIndex);
+      btn.classList.toggle(
+        "beast2d-home-disk-selected",
+        i === viewState.selectedDiskIndex,
+      );
     });
     repaintFloppies();
   };
@@ -506,7 +554,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     const sfxPreviewGame = showSfx && viewState.editorMode === "run";
     sfxBankMount.hidden = !showSfx || sfxPreviewGame;
     previewFrame.hidden = showSfx && !sfxPreviewGame;
-    previewColumn.classList.toggle("beast2d-preview-column-bank", showSfx && !sfxPreviewGame);
+    previewColumn.classList.toggle(
+      "beast2d-preview-column-bank",
+      showSfx && !sfxPreviewGame,
+    );
     workspace.classList.toggle("beast2d-workspace-sfx", showSfx);
     workspace.classList.toggle("beast2d-workspace-sfx-run", sfxPreviewGame);
     editorColumn.classList.toggle("beast2d-editor-column-sfx", showSfx);
@@ -595,7 +646,8 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     layoutPreview();
     maybeRepaintSfxChrome();
     repaintFloppies();
-    if (viewState.screen === "editor" || viewState.screen === "play") pokePlayfield();
+    if (viewState.screen === "editor" || viewState.screen === "play")
+      pokePlayfield();
   };
 
   const pokePlayfield = () => {
@@ -693,9 +745,13 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       errorStrip.textContent = line ? `Line ${line}: ${message}` : message;
       errorStrip.hidden = false;
       const mark = () => {
-        view.dispatch(setDiagnostics(view.state, cartDiagnostics(view, runError)));
+        view.dispatch(
+          setDiagnostics(view.state, cartDiagnostics(view, runError)),
+        );
         if (line && view.state.doc.lines >= 1) {
-          const lineObj = view.state.doc.line(Math.min(line, view.state.doc.lines));
+          const lineObj = view.state.doc.line(
+            Math.min(line, view.state.doc.lines),
+          );
           view.dispatch({
             selection: { anchor: lineObj.from, head: lineObj.to },
             effects: EditorView.scrollIntoView(lineObj.from, { y: "center" }),
@@ -757,7 +813,10 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       const response = await fetch(SAVE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ source: shell.getSource(), sfx: serializeSfxBank(getSfxBank()) }),
+        body: JSON.stringify({
+          source: shell.getSource(),
+          sfx: serializeSfxBank(getSfxBank()),
+        }),
       });
       if (!response.ok) {
         shell.setError("Save failed");
@@ -875,7 +934,8 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
           return;
         }
         if (event.key === "Tab") {
-          const coding = viewState.editorMode === "code" && viewState.activeTool === "CODE";
+          const coding =
+            viewState.editorMode === "code" && viewState.activeTool === "CODE";
           if (!coding) {
             viewState = cycleTool(viewState);
             applyViewState();

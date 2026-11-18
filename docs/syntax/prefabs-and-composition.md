@@ -4,18 +4,18 @@
 
 ## Built-in prefabs
 
-| Class | Constructor highlights |
-| --- | --- |
-| `Box` | `(x, y, width, height, renderOptions?)` → transform + box render |
-| `Circle` | `(x, y, radius, renderOptions?)` → transform + circle render |
-| `Player` | Space-shooter style ship setup |
-| `Spawner` | Object with `SpawnerComponent` pre-wired |
+| Class     | Constructor highlights                                           |
+| --------- | ---------------------------------------------------------------- |
+| `Box`     | `(x, y, width, height, renderOptions?)` → transform + box render |
+| `Circle`  | `(x, y, radius, renderOptions?)` → transform + circle render     |
+| `Player`  | Space-shooter style ship setup                                   |
+| `Spawner` | Object with `SpawnerComponent` pre-wired                         |
 
 See [Prefabs API](../api/prefabs.md) for details.
 
 ## Pattern: game-specific prefab
 
-Mirror `src/game/Bunny Hop/Game Objects/BunnyPlayer.ts`:
+Mirror `src/game/bunny-hop/game-objects/BunnyPlayer.ts`:
 
 1. Extend `GameObject`
 2. Set `name` and `TransformComponent`

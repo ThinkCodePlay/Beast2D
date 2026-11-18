@@ -91,7 +91,16 @@ export class SlicedSprite extends Container {
         dw: s,
         dh: height - s * 2,
       },
-      { sx: 0, sy: texH - s, sw: s, sh: s, dx: 0, dy: height - s, dw: s, dh: s },
+      {
+        sx: 0,
+        sy: texH - s,
+        sw: s,
+        sh: s,
+        dx: 0,
+        dy: height - s,
+        dw: s,
+        dh: s,
+      },
       {
         sx: s,
         sy: texH - s,

@@ -3,7 +3,8 @@ import type { KnobId } from "../../core/sfx/chips";
 export const KNOB_SPRITE_W = 16;
 export const KNOB_SPRITE_H = 16;
 
-export type KnobSpriteVariant = "red" | "yellow" | "sky" | "leaf" | "stone" | "hotpink";
+export type KnobSpriteVariant =
+  "red" | "yellow" | "sky" | "leaf" | "stone" | "hotpink";
 
 const FILES: Record<KnobSpriteVariant, string> = {
   red: "knob-red.png",
@@ -25,7 +26,10 @@ const KNOB_VARIANT: Record<KnobId, KnobSpriteVariant> = {
   cutoff: "stone",
 };
 
-export function knobSpriteVariant(id: KnobId, dragging: boolean): KnobSpriteVariant {
+export function knobSpriteVariant(
+  id: KnobId,
+  dragging: boolean,
+): KnobSpriteVariant {
   if (dragging) return "hotpink";
   return KNOB_VARIANT[id];
 }

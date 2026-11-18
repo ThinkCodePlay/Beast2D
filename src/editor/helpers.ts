@@ -21,11 +21,23 @@ export const CART_FUNCTIONS: CartFunction[] = [
   { name: "cls", params: [{ name: "color" }] },
   {
     name: "rect",
-    params: [{ name: "x" }, { name: "y" }, { name: "w" }, { name: "h" }, { name: "color" }],
+    params: [
+      { name: "x" },
+      { name: "y" },
+      { name: "w" },
+      { name: "h" },
+      { name: "color" },
+    ],
   },
   {
     name: "rectfill",
-    params: [{ name: "x" }, { name: "y" }, { name: "w" }, { name: "h" }, { name: "color" }],
+    params: [
+      { name: "x" },
+      { name: "y" },
+      { name: "w" },
+      { name: "h" },
+      { name: "color" },
+    ],
   },
   {
     name: "print",
@@ -73,7 +85,9 @@ export const CART_HELPER_COMPLETIONS: Completion[] = CART_FUNCTIONS.map((fn) =>
   }),
 );
 
-export const cartHelperCompletion: CompletionSource = (context: CompletionContext) => {
+export const cartHelperCompletion: CompletionSource = (
+  context: CompletionContext,
+) => {
   const word = context.matchBefore(/\w*/);
   if (!word || (word.from === word.to && !context.explicit)) return null;
   return {

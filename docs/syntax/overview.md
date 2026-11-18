@@ -62,12 +62,12 @@ Path aliases depend on your Vite/TS config; game code typically uses relative pa
 
 ## File layout convention
 
-| Location | Role |
-| --- | --- |
-| `src/core/` | Engine (stable API) |
-| `src/core/components/<domain>/` | Reusable behaviors |
-| `src/core/prefabs/` | Constructor-configured objects |
-| `src/game/<Game Name>/` | Levels and game-specific objects |
+| Location                        | Role                             |
+| ------------------------------- | -------------------------------- |
+| `src/core/`                     | Engine (stable API)              |
+| `src/core/components/<domain>/` | Reusable behaviors               |
+| `src/core/prefabs/`             | Constructor-configured objects   |
+| `src/game/<Game Name>/`         | Levels and game-specific objects |
 
 ## Related pages
 

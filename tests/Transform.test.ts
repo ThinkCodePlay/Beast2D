@@ -17,8 +17,7 @@ describe("TransformComponent", () => {
   });
 
   it("localToWorld applies scale, rotation and translation", () => {
-    const t = new GameObject().with(new TransformComponent(10, 20))
-      .transform!;
+    const t = new GameObject().with(new TransformComponent(10, 20)).transform!;
     t.setScale(2);
     t.setRotation(Math.PI / 2);
     const p = t.localToWorld(1, 0);

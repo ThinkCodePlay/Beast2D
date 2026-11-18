@@ -6,9 +6,9 @@ Collision uses `ColliderComponent` shapes registered with `context.collisions`. 
 
 ```ts
 interface ColliderOptions {
-  layer?: CollisionLayer;   // default "default"
-  mode?: ColliderMode;      // default "passive"
-  mask?: CollisionLayer[];  // empty = collide with all layers
+  layer?: CollisionLayer; // default "default"
+  mode?: ColliderMode; // default "passive"
+  mask?: CollisionLayer[]; // empty = collide with all layers
   onCollisionEnter?: (self, other) => void;
   onCollisionStay?: (self, other) => void;
   onCollisionExit?: (self, other) => void;
@@ -17,8 +17,8 @@ interface ColliderOptions {
 
 ## ColliderComponent (abstract)
 
-| Property | Description |
-| --- | --- |
+| Property      | Description            |
+| ------------- | ---------------------- |
 | `isColliding` | True while overlapping |
 
 Subclasses implement shape in local space; system transforms to world space.

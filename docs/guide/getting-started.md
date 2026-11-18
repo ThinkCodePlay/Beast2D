@@ -16,14 +16,14 @@ Open the URL Vite prints (usually `http://localhost:5173`). Levels registered in
 
 ## Other commands
 
-| Command | Description |
-| --- | --- |
-| `pnpm run build` | Type-check (`tsc`) + production game build |
-| `pnpm run typecheck` | TypeScript only |
-| `pnpm test` | Vitest (`tests/`) |
-| `pnpm run preview` | Preview production build |
-| `pnpm run docs:dev` | Documentation dev server |
-| `pnpm run docs:build` | Static documentation site |
+| Command               | Description                                |
+| --------------------- | ------------------------------------------ |
+| `pnpm run build`      | Type-check (`tsc`) + production game build |
+| `pnpm run typecheck`  | TypeScript only                            |
+| `pnpm test`           | Vitest (`tests/`)                          |
+| `pnpm run preview`    | Preview production build                   |
+| `pnpm run docs:dev`   | Documentation dev server                   |
+| `pnpm run docs:build` | Static documentation site                  |
 
 ## Minimal level
 
@@ -35,7 +35,9 @@ import { Engine, Level, Box, Movement, KeyboardMovement } from "./core";
 class MyLevel extends Level {
   protected init() {
     this.levelRoot.addChild(
-      new Box(100, 100, 32, 32).with(new Movement(4)).with(new KeyboardMovement()),
+      new Box(100, 100, 32, 32)
+        .with(new Movement(4))
+        .with(new KeyboardMovement()),
     );
   }
 
@@ -52,11 +54,11 @@ await game.loadLevel("main");
 
 ## Where examples live
 
-| Path | Content |
-| --- | --- |
-| `src/game/Level1`, `Level2` | Small demos |
-| `src/game/Space Shooter/` | Full gameplay sample |
-| `src/game/Bunny Hop/` | Spritesheet animation sample |
+| Path                        | Content                      |
+| --------------------------- | ---------------------------- |
+| `src/game/Level1`, `Level2` | Small demos                  |
+| `src/game/space-shooter/`   | Full gameplay sample         |
+| `src/game/bunny-hop/`       | Spritesheet animation sample |
 
 ## Next steps
 

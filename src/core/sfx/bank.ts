@@ -22,7 +22,10 @@ function readStored(): SfxBank | null {
 
 function persist(bankState: SfxBank): void {
   try {
-    globalThis.localStorage?.setItem(CART_SFX_STORAGE_KEY, JSON.stringify(serializeSfxBank(bankState)));
+    globalThis.localStorage?.setItem(
+      CART_SFX_STORAGE_KEY,
+      JSON.stringify(serializeSfxBank(bankState)),
+    );
   } catch {
     /* Private mode and tests without storage keep the in-memory bank. */
   }
@@ -40,7 +43,9 @@ function publish(): void {
 }
 
 function bankHasContent(bankState: SfxBank): boolean {
-  return bankState.slots.some((slot) => slot.name !== "empty" && slot.name !== "");
+  return bankState.slots.some(
+    (slot) => slot.name !== "empty" && slot.name !== "",
+  );
 }
 
 /**
@@ -77,7 +82,10 @@ export function updateSfxCartChip(chip: LiveChipId): void {
   publish();
 }
 
-export function updateSfxSlot(index: number, edit: (sound: SfxSound) => void): void {
+export function updateSfxSlot(
+  index: number,
+  edit: (sound: SfxSound) => void,
+): void {
   const sound = requireBank().slots[index];
   if (!sound) return;
   edit(sound);

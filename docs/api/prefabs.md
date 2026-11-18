@@ -37,7 +37,7 @@ See `src/core/prefabs/Spawner.ts` for signature.
 
 ## Extending
 
-Create game prefabs under `src/game/.../Game Objects/` by extending `GameObject` and calling `addComponent` in the constructor — same pattern as core prefabs.
+Create game prefabs under `src/game/.../game-objects/` by extending `GameObject` and calling `addComponent` in the constructor — same pattern as core prefabs.
 
 ## Related
 

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { CHIPS, KNOB_IDS, applyChip, type SfxSound } from "../src/core/sfx/chips";
+import {
+  CHIPS,
+  KNOB_IDS,
+  applyChip,
+  type SfxSound,
+} from "../src/core/sfx/chips";
 import { createDefaultSfxBank } from "../src/core/sfx/defaultBank";
 
 function sound(): SfxSound {
@@ -19,7 +24,14 @@ describe("sfx chip limits", () => {
     expect(CHIPS.gb.live).toBe(true);
     expect(CHIPS.snes.live).toBe(false);
     expect(CHIPS.gen.live).toBe(false);
-    expect(CHIPS.pico.waves).toEqual(["sqr", "pls", "wave", "noise", "saw", "tri"]);
+    expect(CHIPS.pico.waves).toEqual([
+      "sqr",
+      "pls",
+      "wave",
+      "noise",
+      "saw",
+      "tri",
+    ]);
     expect(CHIPS.gb.waves).not.toContain("saw");
     expect(CHIPS.gb.waves).not.toContain("tri");
     expect(CHIPS.gb.knobs.cutoff).toBe(false);

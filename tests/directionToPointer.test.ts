@@ -32,10 +32,17 @@ function applyPointerFrame(
 
 describe("directionToPointer", () => {
   it("requests partial magnitude when target is less than one step away", () => {
-    const d = directionToPointer(0, 0, 5, 0, { arriveRadius: 24, maxStep: 8 }, {
-      x: true,
-      y: false,
-    });
+    const d = directionToPointer(
+      0,
+      0,
+      5,
+      0,
+      { arriveRadius: 24, maxStep: 8 },
+      {
+        x: true,
+        y: false,
+      },
+    );
     expect(d.x).toBeCloseTo(5 / 8);
     expect(d.y).toBe(0);
     const after = applyPointerFrame({ x: 0, y: 0 }, { x: 5, y: 0 }, 8, 1);
@@ -43,18 +50,32 @@ describe("directionToPointer", () => {
   });
 
   it("uses full magnitude when just above one step", () => {
-    const d = directionToPointer(0, 0, 9, 0, { arriveRadius: 24, maxStep: 8 }, {
-      x: true,
-      y: false,
-    });
+    const d = directionToPointer(
+      0,
+      0,
+      9,
+      0,
+      { arriveRadius: 24, maxStep: 8 },
+      {
+        x: true,
+        y: false,
+      },
+    );
     expect(d.x).toBeCloseTo(1);
   });
 
   it("respects axis mask with vertical offset", () => {
-    const d = directionToPointer(0, 0, 10, 40, { arriveRadius: 24, maxStep: 4 }, {
-      x: true,
-      y: false,
-    });
+    const d = directionToPointer(
+      0,
+      0,
+      10,
+      40,
+      { arriveRadius: 24, maxStep: 4 },
+      {
+        x: true,
+        y: false,
+      },
+    );
     expect(d.y).toBe(0);
     expect(d.x).toBeCloseTo(1);
   });
@@ -91,12 +112,7 @@ describe("directionToPointer", () => {
   });
 
   it("large dt single frame does not overshoot close target", () => {
-    const pos = applyPointerFrame(
-      { x: 0, y: 0 },
-      { x: 4, y: 0 },
-      10,
-      2,
-    );
+    const pos = applyPointerFrame({ x: 0, y: 0 }, { x: 4, y: 0 }, 10, 2);
     expect(pos.x).toBeCloseTo(4);
     expect(pos.x).toBeLessThanOrEqual(4);
   });

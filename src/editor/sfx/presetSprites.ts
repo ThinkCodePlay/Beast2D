@@ -16,5 +16,6 @@ const SPRITE_FILES: Record<PresetSpriteId, string> = {
 };
 
 export function presetSpriteUrl(id: PresetSpriteId): string {
-  return new URL(`../assets/sfx-presets/${SPRITE_FILES[id]}`, import.meta.url).href;
+  return new URL(`../assets/sfx-presets/${SPRITE_FILES[id]}`, import.meta.url)
+    .href;
 }

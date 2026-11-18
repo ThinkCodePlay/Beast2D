@@ -6,11 +6,11 @@ Services live on `EngineContext`. Components should prefer `this.requireContext(
 
 Export: `Time`, `FRAMES_PER_SECOND`.
 
-| Field / method | Description |
-| --- | --- |
-| `deltaSeconds` | Last frame duration in seconds |
-| `paused` | Game time frozen when true |
-| `timeScale` | Multiplier on delta (slow motion) |
+| Field / method | Description                       |
+| -------------- | --------------------------------- |
+| `deltaSeconds` | Last frame duration in seconds    |
+| `paused`       | Game time frozen when true        |
+| `timeScale`    | Multiplier on delta (slow motion) |
 
 Frame argument `dt` in `update(dt)` is in **frame units** (`1 / FRAMES_PER_SECOND` seconds per unit at nominal rate).
 
@@ -20,14 +20,14 @@ Export: `Input`, `DefaultBindings`.
 
 Default actions: `left`, `right`, `up`, `down`, `shoot` (see `DefaultBindings` for key codes).
 
-| Method | Description |
-| --- | --- |
-| `bind(action, codes)` | Map action → `KeyboardEvent.code` values |
-| `isDown(action)` | Held this frame |
-| `wasPressed(action)` | Edge press |
-| `wasReleased(action)` | Edge release |
-| `isKeyDown(code)` | Raw code |
-| `attach(target)` / `detach()` | Event target (engine attaches window) |
+| Method                        | Description                              |
+| ----------------------------- | ---------------------------------------- |
+| `bind(action, codes)`         | Map action → `KeyboardEvent.code` values |
+| `isDown(action)`              | Held this frame                          |
+| `wasPressed(action)`          | Edge press                               |
+| `wasReleased(action)`         | Edge release                             |
+| `isKeyDown(code)`             | Raw code                                 |
+| `attach(target)` / `detach()` | Event target (engine attaches window)    |
 
 Keys release on window blur.
 
@@ -35,11 +35,11 @@ Keys release on window blur.
 
 Export: `Timers`, `TimerHandle`.
 
-| Method | Description |
-| --- | --- |
+| Method               | Description           |
+| -------------------- | --------------------- |
 | `after(seconds, fn)` | One-shot on game time |
-| `every(seconds, fn)` | Repeating |
-| `clear(handle)` | Cancel |
+| `every(seconds, fn)` | Repeating             |
+| `clear(handle)`      | Cancel                |
 
 Updated from `Level.tick` using `deltaSeconds` (respects pause via time service).
 

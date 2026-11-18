@@ -74,7 +74,11 @@ function drawPointerTo(ctx: CanvasRenderingContext2D, chip: ChipId): void {
 }
 
 /** 32×28 key cell; `pixel` = device pixels per art pixel (integer × chrome). */
-export function paintSfxRotor(canvas: HTMLCanvasElement, chip: ChipId, pixel = 1): void {
+export function paintSfxRotor(
+  canvas: HTMLCanvasElement,
+  chip: ChipId,
+  pixel = 1,
+): void {
   const px = Math.max(1, Math.round(pixel));
   canvas.width = W * px;
   canvas.height = H * px;

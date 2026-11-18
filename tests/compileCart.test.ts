@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { compileCart, checkCartSyntax, guardCart, runtimeErrorLine } from "../src/core/cart/compile";
+import {
+  compileCart,
+  checkCartSyntax,
+  guardCart,
+  runtimeErrorLine,
+} from "../src/core/cart/compile";
 
 const validCart = `
 let x = 0;
@@ -20,7 +25,8 @@ describe("compileCart", () => {
   });
 
   it("reports syntax errors with a line when possible", () => {
-    const bad = "function init() { cls(0;\nfunction update() {}\nfunction draw() {}";
+    const bad =
+      "function init() { cls(0;\nfunction update() {}\nfunction draw() {}";
     const syntax = checkCartSyntax(bad);
     expect(syntax.ok).toBe(false);
     if (!syntax.ok) {
@@ -74,7 +80,8 @@ function draw() {
     expect(caught).toBeDefined();
     const line = runtimeErrorLine(caught);
     const throwLine =
-      source.split("\n").findIndex((row) => row.includes("throw new Error")) + 1;
+      source.split("\n").findIndex((row) => row.includes("throw new Error")) +
+      1;
     expect(line).toBe(throwLine);
   });
 

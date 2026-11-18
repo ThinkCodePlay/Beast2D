@@ -30,11 +30,11 @@ After bootstrap:
 
 ## Properties
 
-| Member | Description |
-| --- | --- |
-| `app` | Pixi `Application` |
-| `gameManager` | Level registration and pause |
-| `context` | `EngineContext` (throws if not mounted) |
+| Member        | Description                             |
+| ------------- | --------------------------------------- |
+| `app`         | Pixi `Application`                      |
+| `gameManager` | Level registration and pause            |
+| `context`     | `EngineContext` (throws if not mounted) |
 
 ## Global debug hook
 

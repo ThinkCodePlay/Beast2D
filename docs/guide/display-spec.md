@@ -8,10 +8,10 @@ Beast2D targets a fixed **320×240** virtual resolution (4∶3), scaled in CSS f
 
 The cart console shell (`src/editor/shell.ts`) uses the same integer scaling for the **playfield plus a 16 px bar**: `computeIntegerDisplayScale` sizes the stage from `DISPLAY_WIDTH`×(`DISPLAY_HEIGHT`+16) with 16 px padding so the editor chrome stays pixel-crisp when the window is resized.
 
-| Viewport vs native | Behavior |
-| --- | --- |
-| Larger | 2×, 3×, … up to what fits; centered on the page |
-| Exactly fits at *n*× | Uses *n*× |
+| Viewport vs native         | Behavior                                         |
+| -------------------------- | ------------------------------------------------ |
+| Larger                     | 2×, 3×, … up to what fits; centered on the page  |
+| Exactly fits at *n*×       | Uses *n*×                                        |
 | Smaller than 320×240 at 1× | Stays **1×**; may clip (no fractional downscale) |
 
 The Pixi renderer stays at 320×240 backing pixels (`Engine` `resolution: 1`); only the CSS box grows or shrinks.
@@ -20,12 +20,12 @@ The Pixi renderer stays at 320×240 backing pixels (`Engine` `resolution: 1`); o
 
 Defined in `src/core/display.ts` (also exported from `./core`):
 
-| Constant | Value | Meaning |
-| --- | --- | --- |
-| `DISPLAY_WIDTH` | 320 | Logical canvas width |
-| `DISPLAY_HEIGHT` | 240 | Logical canvas height |
-| `PIXEL_GRID` | 16 | Layout snap grid |
-| `SPRITE_SIZE` | 32 | Default runtime sprite footprint (2×2 cells) |
+| Constant         | Value | Meaning                                      |
+| ---------------- | ----- | -------------------------------------------- |
+| `DISPLAY_WIDTH`  | 320   | Logical canvas width                         |
+| `DISPLAY_HEIGHT` | 240   | Logical canvas height                        |
+| `PIXEL_GRID`     | 16    | Layout snap grid                             |
+| `SPRITE_SIZE`    | 32    | Default runtime sprite footprint (2×2 cells) |
 
 Keep `Engine` options, `main.ts`, and `style.css` aligned with these values.
 

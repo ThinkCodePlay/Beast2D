@@ -15,8 +15,12 @@ describe("console view state", () => {
   it("starts on boot unless skipBoot", () => {
     expect(initialViewState().screen).toBe("boot");
     expect(initialViewState({ skipBoot: true }).screen).toBe("home");
-    expect(initialViewState({ skipBoot: true, startScreen: "editor" }).screen).toBe("editor");
-    expect(initialViewState({ skipBoot: true, startScreen: "play" }).screen).toBe("play");
+    expect(
+      initialViewState({ skipBoot: true, startScreen: "editor" }).screen,
+    ).toBe("editor");
+    expect(
+      initialViewState({ skipBoot: true, startScreen: "play" }).screen,
+    ).toBe("play");
   });
 
   it("leaves boot for home, and ignores the transition off boot", () => {

@@ -52,7 +52,11 @@ export abstract class Level {
     this.init();
 
     if (this.showHud) {
-      this.hud = new HudHeaderUI(0, HUD_LAYOUT.defaultLives, DEFAULT_BEAST2D_HUD_THEME);
+      this.hud = new HudHeaderUI(
+        0,
+        HUD_LAYOUT.defaultLives,
+        DEFAULT_BEAST2D_HUD_THEME,
+      );
       this.levelRoot.addChild(this.hud);
     }
   }
@@ -82,7 +86,10 @@ export abstract class Level {
 
     this.update(deltaTime);
 
-    if (!context.time.paused && context.collisionStepper.consume(deltaTime) > 0) {
+    if (
+      !context.time.paused &&
+      context.collisionStepper.consume(deltaTime) > 0
+    ) {
       context.collisions.update();
     }
 

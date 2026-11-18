@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { chromeFontScale, fitPreviewScale, homeFloppyScale } from "../src/editor/consoleLayout";
+import {
+  chromeFontScale,
+  fitPreviewScale,
+  homeFloppyScale,
+} from "../src/editor/consoleLayout";
 
 describe("console layout", () => {
   it("uses 16px chrome below 640px and 32px at mockup height", () => {

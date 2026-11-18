@@ -37,7 +37,11 @@ export function blitGrid(
   }
 }
 
-export function plumFrame(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+export function plumFrame(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+): void {
   ctx.fillStyle = hex(Beast2D16.PlumOutline);
   ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = hex(Beast2D16.Cream);

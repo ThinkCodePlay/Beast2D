@@ -49,7 +49,11 @@ export function indicesToRgba(
 }
 
 /** Parse fixed-width ASCII rows into index cells (`.` = transparent). */
-export function parseAsciiGrid(rows: string[]): { width: number; height: number; cells: Int8Array } {
+export function parseAsciiGrid(rows: string[]): {
+  width: number;
+  height: number;
+  cells: Int8Array;
+} {
   const height = rows.length;
   const width = rows[0]?.length ?? 0;
   for (const row of rows) {

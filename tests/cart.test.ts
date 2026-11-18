@@ -63,8 +63,12 @@ describe("cart draw API", () => {
   it("rejects non-finite color arguments", () => {
     const ctx = cartContext();
     withCartContext(ctx, () => {
-      expect(() => rectfill(0, 0, 1, 1, Number.NaN)).toThrow(/color must be a finite number/);
-      expect(() => cls(Number.POSITIVE_INFINITY)).toThrow(/color must be a finite number/);
+      expect(() => rectfill(0, 0, 1, 1, Number.NaN)).toThrow(
+        /color must be a finite number/,
+      );
+      expect(() => cls(Number.POSITIVE_INFINITY)).toThrow(
+        /color must be a finite number/,
+      );
     });
     expect(ctx.drawList.commands).toEqual([]);
   });

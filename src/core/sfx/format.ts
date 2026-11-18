@@ -51,7 +51,11 @@ export function emptySound(): SfxSound {
   };
 }
 
-function intList(value: unknown, fallback: number, migrate: (n: number) => number): number[] {
+function intList(
+  value: unknown,
+  fallback: number,
+  migrate: (n: number) => number,
+): number[] {
   const source = Array.isArray(value) ? value : [];
   return Array.from({ length: SFX_STEPS }, (_, index) => {
     const item = source[index];
@@ -60,7 +64,10 @@ function intList(value: unknown, fallback: number, migrate: (n: number) => numbe
 }
 
 function readKnobs(value: unknown): KnobValues {
-  const record = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const record =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
   const knobs = { ...DEFAULT_KNOBS };
   for (const id of KNOB_IDS) {
     const item = record[id];
@@ -72,9 +79,16 @@ function readKnobs(value: unknown): KnobValues {
 function readSound(value: unknown): SfxSound {
   if (!value || typeof value !== "object") return emptySound();
   const record = value as Record<string, unknown>;
-  const chip = typeof record.chip === "string" && isLiveChip(record.chip) ? record.chip : null;
-  const wave: WaveId = typeof record.wave === "string" && isWaveId(record.wave) ? record.wave : "sqr";
-  const name = typeof record.name === "string" ? record.name.slice(0, 16) : "empty";
+  const chip =
+    typeof record.chip === "string" && isLiveChip(record.chip)
+      ? record.chip
+      : null;
+  const wave: WaveId =
+    typeof record.wave === "string" && isWaveId(record.wave)
+      ? record.wave
+      : "sqr";
+  const name =
+    typeof record.name === "string" ? record.name.slice(0, 16) : "empty";
   return {
     name,
     chip,
@@ -91,9 +105,14 @@ export function parseSfxBank(value: unknown): SfxBank {
   if (!value || typeof value !== "object") return createDefaultSfxBank();
   const record = value as Record<string, unknown>;
   if (record.version !== 1) return createDefaultSfxBank();
-  const chip: LiveChipId = typeof record.chip === "string" && isLiveChip(record.chip) ? record.chip : "gb";
+  const chip: LiveChipId =
+    typeof record.chip === "string" && isLiveChip(record.chip)
+      ? record.chip
+      : "gb";
   const source = Array.isArray(record.slots) ? record.slots : [];
-  const slots = Array.from({ length: SFX_SLOTS }, (_, index) => readSound(source[index]));
+  const slots = Array.from({ length: SFX_SLOTS }, (_, index) =>
+    readSound(source[index]),
+  );
   return { version: 1, chip, slots };
 }
 
@@ -106,7 +125,9 @@ export function serializeSfxBank(bank: SfxBank): SfxBank {
       chip: sound.chip,
       wave: sound.wave,
       loop: sound.loop,
-      knobs: Object.fromEntries(KNOB_IDS.map((id) => [id, clampKnob(sound.knobs[id])])) as KnobValues,
+      knobs: Object.fromEntries(
+        KNOB_IDS.map((id) => [id, clampKnob(sound.knobs[id])]),
+      ) as KnobValues,
       pitch: sound.pitch.map((step) => clampPitch(step)),
       volume: sound.volume.map((step) => clampVolume(step)),
     })),
@@ -117,7 +138,13 @@ function isPitchList(value: unknown): boolean {
   return (
     Array.isArray(value) &&
     value.length === SFX_STEPS &&
-    value.every((item) => typeof item === "number" && Number.isInteger(item) && item >= 0 && item <= PITCH_MAX)
+    value.every(
+      (item) =>
+        typeof item === "number" &&
+        Number.isInteger(item) &&
+        item >= 0 &&
+        item <= PITCH_MAX,
+    )
   );
 }
 
@@ -125,7 +152,13 @@ function isVolumeList(value: unknown): boolean {
   return (
     Array.isArray(value) &&
     value.length === SFX_STEPS &&
-    value.every((item) => typeof item === "number" && Number.isInteger(item) && item >= 0 && item <= VOLUME_MAX)
+    value.every(
+      (item) =>
+        typeof item === "number" &&
+        Number.isInteger(item) &&
+        item >= 0 &&
+        item <= VOLUME_MAX,
+    )
   );
 }
 
@@ -134,7 +167,13 @@ function isKnobsJson(value: unknown): boolean {
   const knobs = value as Record<string, unknown>;
   for (const id of KNOB_IDS) {
     const item = knobs[id];
-    if (typeof item !== "number" || !Number.isInteger(item) || item < 0 || item > KNOB_MAX) return false;
+    if (
+      typeof item !== "number" ||
+      !Number.isInteger(item) ||
+      item < 0 ||
+      item > KNOB_MAX
+    )
+      return false;
   }
   return true;
 }
@@ -143,7 +182,11 @@ function isSoundJson(value: unknown): boolean {
   if (!value || typeof value !== "object") return false;
   const record = value as Record<string, unknown>;
   if (typeof record.name !== "string") return false;
-  if (record.chip !== null && (typeof record.chip !== "string" || !isLiveChip(record.chip))) return false;
+  if (
+    record.chip !== null &&
+    (typeof record.chip !== "string" || !isLiveChip(record.chip))
+  )
+    return false;
   if (typeof record.wave !== "string" || !isWaveId(record.wave)) return false;
   if (typeof record.loop !== "boolean") return false;
   if (!isKnobsJson(record.knobs)) return false;
@@ -156,6 +199,7 @@ export function isSfxBankJson(value: unknown): boolean {
   const record = value as Record<string, unknown>;
   if (record.version !== 1) return false;
   if (typeof record.chip !== "string" || !isLiveChip(record.chip)) return false;
-  if (!Array.isArray(record.slots) || record.slots.length !== SFX_SLOTS) return false;
+  if (!Array.isArray(record.slots) || record.slots.length !== SFX_SLOTS)
+    return false;
   return record.slots.every(isSoundJson);
 }

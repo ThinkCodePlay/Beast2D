@@ -111,8 +111,7 @@ export class CollisionSystem {
   private finishExits(
     collider: ColliderComponent,
     current: Set<ColliderComponent>,
-    previous: Set<ColliderComponent> = this.contacts.get(collider) ??
-      new Set(),
+    previous: Set<ColliderComponent> = this.contacts.get(collider) ?? new Set(),
   ): void {
     for (const other of previous) {
       if (current.has(other)) continue;
@@ -124,7 +123,10 @@ export class CollisionSystem {
     this.contacts.set(collider, current);
   }
 
-  private forEachCell(shape: ColliderShape, visit: (key: string) => void): void {
+  private forEachCell(
+    shape: ColliderShape,
+    visit: (key: string) => void,
+  ): void {
     const b = shapeBounds(shape);
     const x0 = Math.floor(b.minX / this.cellSize);
     const x1 = Math.floor(b.maxX / this.cellSize);

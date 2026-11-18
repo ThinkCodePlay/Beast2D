@@ -59,8 +59,7 @@ const ROW_COLORS = [
 const MIN_VERTICAL_SPEED = 1.15;
 
 export function brickGridOrigin(): { x: number; y: number } {
-  const gridW =
-    BRICK_COLS * BRICK_W + (BRICK_COLS - 1) * BRICK_GAP_X;
+  const gridW = BRICK_COLS * BRICK_W + (BRICK_COLS - 1) * BRICK_GAP_X;
   return {
     x: Math.floor((FIELD_WIDTH - gridW) / 2),
     y: PLAYFIELD_TOP + 8,

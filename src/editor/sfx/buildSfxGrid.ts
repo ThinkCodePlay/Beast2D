@@ -1,5 +1,10 @@
 import { SFX_STEPS, WAVE_IDS, type WaveId } from "../../core/sfx/chips";
-import { PITCH_MAX, VOLUME_MAX, clampPitch, clampVolume } from "../../core/sfx/grid";
+import {
+  PITCH_MAX,
+  VOLUME_MAX,
+  clampPitch,
+  clampVolume,
+} from "../../core/sfx/grid";
 import { updateSfxSlot } from "../../core/sfx/bank";
 import { el, pressable } from "./buildDom";
 
@@ -52,7 +57,10 @@ export function buildSfxGrid(
   const waves = el("div", "beast2d-sfx-waves");
   const waveButtons = new Map<WaveId, HTMLButtonElement>();
   for (const id of WAVE_IDS) {
-    const button = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-wave") as HTMLButtonElement;
+    const button = el(
+      "button",
+      "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-wave",
+    ) as HTMLButtonElement;
     button.type = "button";
     button.title = id.toUpperCase();
     const icon = el("canvas", "beast2d-sfx-wave-icon") as HTMLCanvasElement;
@@ -67,12 +75,26 @@ export function buildSfxGrid(
   const sequencer = el("div", "beast2d-sfx-sequencer");
   sequencer.append(mid, effects);
 
-  function bindDraw(target: HTMLElement, kind: "pitch" | "volume", getSelected: () => number, clearArmed: () => void): void {
+  function bindDraw(
+    target: HTMLElement,
+    kind: "pitch" | "volume",
+    getSelected: () => number,
+    clearArmed: () => void,
+  ): void {
     const draw = (event: PointerEvent) => {
       const rect = target.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
-      const col = Math.min(SFX_STEPS - 1, Math.max(0, Math.floor(((event.clientX - rect.left) / rect.width) * SFX_STEPS)));
-      const amount = Math.min(1, Math.max(0, 1 - (event.clientY - rect.top) / rect.height));
+      const col = Math.min(
+        SFX_STEPS - 1,
+        Math.max(
+          0,
+          Math.floor(((event.clientX - rect.left) / rect.width) * SFX_STEPS),
+        ),
+      );
+      const amount = Math.min(
+        1,
+        Math.max(0, 1 - (event.clientY - rect.top) / rect.height),
+      );
       clearArmed();
       updateSfxSlot(getSelected(), (slot) => {
         if (kind === "pitch") {

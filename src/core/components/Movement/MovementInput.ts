@@ -18,7 +18,10 @@ export abstract class MovementInput extends Component {
     return this.direction;
   }
 
-  protected abstract computeDirection(deltaTime: number): { x: number; y: number };
+  protected abstract computeDirection(deltaTime: number): {
+    x: number;
+    y: number;
+  };
 
   override onDestroy(): void {
     this.direction.x = 0;

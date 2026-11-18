@@ -12,7 +12,16 @@ export type ChipId = (typeof CHIP_IDS)[number];
 export const LIVE_CHIP_IDS = ["pico", "gb"] as const;
 export type LiveChipId = (typeof LIVE_CHIP_IDS)[number];
 
-export const KNOB_IDS = ["vol", "attack", "decay", "rate", "slide", "vibrato", "duty", "cutoff"] as const;
+export const KNOB_IDS = [
+  "vol",
+  "attack",
+  "decay",
+  "rate",
+  "slide",
+  "vibrato",
+  "duty",
+  "cutoff",
+] as const;
 export type KnobId = (typeof KNOB_IDS)[number];
 
 export type KnobValues = Record<KnobId, number>;
@@ -155,7 +164,10 @@ export function nearest(value: number, points: readonly number[]): number {
   return best;
 }
 
-export function effectiveChip(soundChip: LiveChipId | null, cartChip: LiveChipId): LiveChipId {
+export function effectiveChip(
+  soundChip: LiveChipId | null,
+  cartChip: LiveChipId,
+): LiveChipId {
   return soundChip ?? cartChip;
 }
 
@@ -185,7 +197,9 @@ export type SfxSound = {
 /** Playback view. Does not write chip limits back onto the stored sound. */
 export function applyChip(sound: SfxSound, cartChip: LiveChipId): AppliedSfx {
   const chip = CHIPS[effectiveChip(sound.chip, cartChip)];
-  const wave = chip.waves.includes(sound.wave) ? sound.wave : chip.waves[0] ?? "sqr";
+  const wave = chip.waves.includes(sound.wave)
+    ? sound.wave
+    : (chip.waves[0] ?? "sqr");
   const dutyT = sound.knobs.duty / 255;
   const duty = chip.dutySnap ? nearest(dutyT, chip.dutySnap) : dutyT;
   return {

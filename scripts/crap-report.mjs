@@ -19,7 +19,10 @@ import { fileURLToPath } from "node:url";
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
 const srcRoot = path.join(repoRoot, "src");
 const coveragePath = path.join(repoRoot, "coverage", "coverage-final.json");
 const CRAP_THRESHOLD = 30;
@@ -101,7 +104,8 @@ function cyclomaticComplexity(fn) {
 function functionLabel(node) {
   if (ts.isConstructorDeclaration(node)) {
     const cls = node.parent;
-    const className = cls && ts.isClassLike(cls) && cls.name ? cls.name.text : "class";
+    const className =
+      cls && ts.isClassLike(cls) && cls.name ? cls.name.text : "class";
     return `${className}.constructor`;
   }
   if (
@@ -110,7 +114,8 @@ function functionLabel(node) {
     ts.isSetAccessorDeclaration(node)
   ) {
     const cls = node.parent;
-    const className = cls && ts.isClassLike(cls) && cls.name ? cls.name.text : "";
+    const className =
+      cls && ts.isClassLike(cls) && cls.name ? cls.name.text : "";
     const kind = ts.isGetAccessorDeclaration(node)
       ? "get "
       : ts.isSetAccessorDeclaration(node)
@@ -119,21 +124,34 @@ function functionLabel(node) {
     const name = propertyName(node.name);
     return className ? `${className}.${kind}${name}` : `${kind}${name}`;
   }
-  if ((ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) && node.name) {
+  if (
+    (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) &&
+    node.name
+  ) {
     return node.name.text;
   }
   const parent = node.parent;
-  if (parent && ts.isVariableDeclaration(parent) && ts.isIdentifier(parent.name)) {
+  if (
+    parent &&
+    ts.isVariableDeclaration(parent) &&
+    ts.isIdentifier(parent.name)
+  ) {
     return parent.name.text;
   }
-  if (parent && ts.isPropertyAssignment(parent)) return propertyName(parent.name);
-  if (parent && ts.isPropertyDeclaration(parent)) return propertyName(parent.name);
+  if (parent && ts.isPropertyAssignment(parent))
+    return propertyName(parent.name);
+  if (parent && ts.isPropertyDeclaration(parent))
+    return propertyName(parent.name);
   return "(anonymous)";
 }
 
 function propertyName(name) {
   if (!name) return "(anonymous)";
-  if (ts.isIdentifier(name) || ts.isPrivateIdentifier(name) || ts.isStringLiteral(name)) {
+  if (
+    ts.isIdentifier(name) ||
+    ts.isPrivateIdentifier(name) ||
+    ts.isStringLiteral(name)
+  ) {
     return name.text;
   }
   if (ts.isNumericLiteral(name)) return name.text;
@@ -147,7 +165,13 @@ function posOf(sourceFile, position) {
 
 function collectFunctions(filePath) {
   const text = readFileSync(filePath, "utf8");
-  const sourceFile = ts.createSourceFile(filePath, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
   const functions = [];
   const visit = (node) => {
     if (isFunctionWithBody(node)) {
@@ -215,7 +239,9 @@ function innermost(functions, line, column) {
 
 function crapScore(complexity, coverage) {
   const uncovered = 1 - coverage;
-  return complexity * complexity * uncovered * uncovered * uncovered + complexity;
+  return (
+    complexity * complexity * uncovered * uncovered * uncovered + complexity
+  );
 }
 
 function rel(filePath) {
@@ -232,7 +258,9 @@ const rows = [];
 for (const file of walkTs(srcRoot)) {
   const functions = collectFunctions(file);
   const data = coverage.get(normalizeKey(file));
-  const statementHits = new Map(functions.map((fn) => [fn, { total: 0, covered: 0 }]));
+  const statementHits = new Map(
+    functions.map((fn) => [fn, { total: 0, covered: 0 }]),
+  );
   const functionHits = new Map(functions.map((fn) => [fn, false]));
 
   if (data?.statementMap && data.s) {
@@ -273,12 +301,19 @@ for (const file of walkTs(srcRoot)) {
   }
 }
 
-rows.sort((a, b) => b.crap - a.crap || b.complexity - a.complexity || a.file.localeCompare(b.file));
+rows.sort(
+  (a, b) =>
+    b.crap - a.crap ||
+    b.complexity - a.complexity ||
+    a.file.localeCompare(b.file),
+);
 
 const over = rows.filter((row) => row.crap > CRAP_THRESHOLD);
 const untested = rows.filter((row) => row.coverage === 0).length;
 const mean =
-  rows.length === 0 ? 0 : rows.reduce((sum, row) => sum + row.crap, 0) / rows.length;
+  rows.length === 0
+    ? 0
+    : rows.reduce((sum, row) => sum + row.crap, 0) / rows.length;
 
 console.log("");
 console.log("CRAP (Change Risk Anti-Patterns)");
@@ -289,11 +324,18 @@ console.log(`Functions: ${rows.length}`);
 console.log(`Untested (0% statement coverage): ${untested}`);
 console.log(`CRAP > ${CRAP_THRESHOLD}: ${over.length}`);
 console.log(`Mean CRAP: ${mean.toFixed(2)}`);
-if (rows[0]) console.log(`Highest: ${rows[0].crap.toFixed(2)}  ${rows[0].file}:${rows[0].line} ${rows[0].name}`);
+if (rows[0])
+  console.log(
+    `Highest: ${rows[0].crap.toFixed(2)}  ${rows[0].file}:${rows[0].line} ${rows[0].name}`,
+  );
 console.log("");
 
 const shown = over.length > 0 ? over : rows.slice(0, 25);
-console.log(over.length > 0 ? `Functions over ${CRAP_THRESHOLD}:` : "No function is over 30. Highest 25:");
+console.log(
+  over.length > 0
+    ? `Functions over ${CRAP_THRESHOLD}:`
+    : "No function is over 30. Highest 25:",
+);
 console.log("");
 console.log(`${pad("CRAP", 8)} ${pad("COMP", 5)} ${pad("COV", 7)}  LOCATION`);
 for (const row of shown) {

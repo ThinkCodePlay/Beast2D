@@ -85,16 +85,10 @@ export class SpriteAnimationComponent extends RenderComponent {
 
   playClip(name: string, options: { restart?: boolean } = {}): void {
     if (!this.clipsOptions.clips[name]) {
-      throw new Error(
-        `SpriteAnimationComponent: unknown clip "${name}"`,
-      );
+      throw new Error(`SpriteAnimationComponent: unknown clip "${name}"`);
     }
 
-    if (
-      name === this.currentClipName &&
-      !options.restart &&
-      this.animated
-    ) {
+    if (name === this.currentClipName && !options.restart && this.animated) {
       return;
     }
 
@@ -137,8 +131,7 @@ export class SpriteAnimationComponent extends RenderComponent {
       this.clipFrames.set(name, buildGridFrames(sheet, config));
     }
 
-    const initialClip =
-      this.pendingClipName ?? this.clipsOptions.defaultClip;
+    const initialClip = this.pendingClipName ?? this.clipsOptions.defaultClip;
     this.pendingClipName = null;
     this.mountAnimatedSprite(graphics, initialClip);
   }

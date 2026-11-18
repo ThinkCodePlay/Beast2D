@@ -7,8 +7,8 @@ import { configurePixelArtRendering } from "./core/displayScale";
 configurePixelArtRendering();
 import { Level1 } from "./game/Level1";
 import { Level2 } from "./game/Level2";
-import { SpaceShooter } from "./game/Space Shooter/SpaceShooter";
-import { BunnyHop } from "./game/Bunny Hop/BunnyHop";
+import { SpaceShooter } from "./game/space-shooter/SpaceShooter";
+import { BunnyHop } from "./game/bunny-hop/BunnyHop";
 import { BreakoutPaddle } from "./game/BreakoutPaddle/BreakoutPaddle";
 import { helloCart } from "./game/carts/HelloCart";
 import helloScript from "./game/carts/hello.script.ts?raw";
@@ -51,7 +51,9 @@ engine
     game.registerLevel("breakoutPaddle", new BreakoutPaddle(engine));
 
     const levelQuery = bootstrapParams.get("level");
-    const playOnly = bootstrapParams.get("play") === "1" || bootstrapParams.get("standalone") === "1";
+    const playOnly =
+      bootstrapParams.get("play") === "1" ||
+      bootstrapParams.get("standalone") === "1";
 
     if (levelQuery) {
       await game.loadLevel(levelQuery);

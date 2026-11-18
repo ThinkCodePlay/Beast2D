@@ -10,7 +10,10 @@ export const BOOT_SCREEN_ENABLED = false;
  * 2× once the window is tall enough for the mockup's chunky chrome.
  */
 /** Integer UI scale for chrome. Narrow viewports step down so SFX + bank fit without clipping. */
-export function chromeFontScale(viewportHeight: number, viewportWidth = 9999): number {
+export function chromeFontScale(
+  viewportHeight: number,
+  viewportWidth = 9999,
+): number {
   let scale = viewportHeight >= 640 ? 2 : 1;
   if (viewportWidth < 1040) scale = 1;
   return scale;
@@ -28,7 +31,15 @@ export function fitPreviewScale(
   designWidth = DISPLAY_WIDTH,
   designHeight = DISPLAY_HEIGHT,
 ): number {
-  if (panelWidth <= 0 || panelHeight <= 0 || designWidth <= 0 || designHeight <= 0) return 1;
-  const scale = Math.floor(Math.min(panelWidth / designWidth, panelHeight / designHeight));
+  if (
+    panelWidth <= 0 ||
+    panelHeight <= 0 ||
+    designWidth <= 0 ||
+    designHeight <= 0
+  )
+    return 1;
+  const scale = Math.floor(
+    Math.min(panelWidth / designWidth, panelHeight / designHeight),
+  );
   return Math.max(1, scale);
 }

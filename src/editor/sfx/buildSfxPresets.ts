@@ -21,12 +21,18 @@ function spriteImg(id: PresetSpriteId): HTMLImageElement {
   return img;
 }
 
-export function buildSfxPresets(onPreset: (preset: PresetId) => void, onDice: () => void): SfxPresetsUi {
+export function buildSfxPresets(
+  onPreset: (preset: PresetId) => void,
+  onDice: () => void,
+): SfxPresetsUi {
   const presets = el("div", "beast2d-sfx-presets");
   const presetButtons = new Map<string, HTMLButtonElement>();
   const presetSprites = new Map<string, HTMLImageElement>();
   for (const preset of PRESET_IDS) {
-    const button = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset") as HTMLButtonElement;
+    const button = el(
+      "button",
+      "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset",
+    ) as HTMLButtonElement;
     button.type = "button";
     button.title = preset.toUpperCase();
     const img = spriteImg(preset);
@@ -38,7 +44,10 @@ export function buildSfxPresets(onPreset: (preset: PresetId) => void, onDice: ()
     presetButtons.set(preset, button);
     presets.append(button);
   }
-  const diceButton = el("button", "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset") as HTMLButtonElement;
+  const diceButton = el(
+    "button",
+    "beast2d-sfx-btn beast2d-sfx-pixel-btn beast2d-sfx-preset",
+  ) as HTMLButtonElement;
   diceButton.type = "button";
   diceButton.title = "Dice";
   const diceImg = spriteImg("dice");

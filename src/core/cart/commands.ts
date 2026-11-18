@@ -3,8 +3,22 @@
 export type DrawCommand =
   | { op: "cls"; color: number }
   | { op: "rect"; x: number; y: number; w: number; h: number; color: number }
-  | { op: "rectfill"; x: number; y: number; w: number; h: number; color: number }
-  | { op: "print"; text: string; x: number; y: number; color: number; scale: number };
+  | {
+      op: "rectfill";
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      color: number;
+    }
+  | {
+      op: "print";
+      text: string;
+      x: number;
+      y: number;
+      color: number;
+      scale: number;
+    };
 
 export class DrawList {
   readonly commands: DrawCommand[] = [];

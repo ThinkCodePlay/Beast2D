@@ -23,13 +23,19 @@ export {
 
 export { Component } from "./components/Component";
 export { TransformComponent } from "./components/Movement/TransformComponent";
-export { ClampComponent, type ClampEdges } from "./components/Movement/ClampComponent";
+export {
+  ClampComponent,
+  type ClampEdges,
+} from "./components/Movement/ClampComponent";
 export { ConstantMoveComponent } from "./components/Movement/ConstantMoveComponent";
 export { Movement } from "./components/Movement/Movement";
 export { KeyboardMovement } from "./components/Movement/KeyboardMovement";
 export { PointerMovement } from "./components/Movement/PointerMovement";
 export { MovementInput } from "./components/Movement/MovementInput";
-export { stepToward, type MoveTowardsAxes } from "./components/Movement/stepToward";
+export {
+  stepToward,
+  type MoveTowardsAxes,
+} from "./components/Movement/stepToward";
 export {
   combineDirections,
   type MovementDirection,

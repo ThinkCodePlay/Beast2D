@@ -18,11 +18,20 @@ function colorIndex(index: number): number {
 
 /** Clears the screen to a palette index. */
 export function cls(color: number): void {
-  requireCartContext("cls").drawList.push({ op: "cls", color: colorIndex(color) });
+  requireCartContext("cls").drawList.push({
+    op: "cls",
+    color: colorIndex(color),
+  });
 }
 
 /** Draws a 1 px rectangle outline. */
-export function rect(x: number, y: number, w: number, h: number, color: number): void {
+export function rect(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  color: number,
+): void {
   requireCartContext("rect").drawList.push({
     op: "rect",
     x: finite("x", x),
@@ -34,7 +43,13 @@ export function rect(x: number, y: number, w: number, h: number, color: number):
 }
 
 /** Draws a filled rectangle. */
-export function rectfill(x: number, y: number, w: number, h: number, color: number): void {
+export function rectfill(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  color: number,
+): void {
   requireCartContext("rectfill").drawList.push({
     op: "rectfill",
     x: finite("x", x),

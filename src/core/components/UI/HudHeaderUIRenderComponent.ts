@@ -88,9 +88,7 @@ export class HudHeaderUIRenderComponent extends RenderComponent {
     const heartTex = Assets.get(heartTexture);
     if (heartTex) {
       pixelTexture(heartTex);
-      const heartY = Math.floor(
-        (HUD_LAYOUT.height - HUD_LAYOUT.heartSize) / 2,
-      );
+      const heartY = Math.floor((HUD_LAYOUT.height - HUD_LAYOUT.heartSize) / 2);
       for (let i = 0; i < this.hearts; i += 1) {
         const sprite = new Sprite(heartTex);
         sprite.width = HUD_LAYOUT.heartSize;

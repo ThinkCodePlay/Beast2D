@@ -28,7 +28,9 @@ export class LevelManager {
 
     const token = ++this.loadToken;
     if (level.assets.length > 0) {
-      await Assets.load([...new Set([...ENGINE_FRAME_ASSETS, ...level.assets])]);
+      await Assets.load([
+        ...new Set([...ENGINE_FRAME_ASSETS, ...level.assets]),
+      ]);
       // A newer loadLevel call superseded this one while loading.
       if (token !== this.loadToken) return;
     }

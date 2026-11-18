@@ -19,13 +19,21 @@
     "crap": "vitest run --coverage && node scripts/crap-report.mjs",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/pngjs": "^6.0.5",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
     "@vitest/coverage-v8": "^5.0.5",
     "pngjs": "^7.0.0",
     "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
     "vitepress": "^1.6.3",
     "vitest": "^5.0.5"
