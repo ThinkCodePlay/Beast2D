@@ -1,30 +1,3 @@
-import {
-  acceptCompletion,
-  autocompletion,
-  nextSnippetField,
-  prevSnippetField,
-} from "@codemirror/autocomplete";
-import {
-  defaultKeymap,
-  history,
-  historyKeymap,
-  indentLess,
-  indentMore,
-} from "@codemirror/commands";
-import { javascript } from "@codemirror/lang-javascript";
-import { foldGutter, foldKeymap } from "@codemirror/language";
-import { linter, setDiagnostics } from "@codemirror/lint";
-import { EditorState, type Extension } from "@codemirror/state";
-import {
-  drawSelection,
-  EditorView,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-  keymap,
-  lineNumbers,
-  tooltips,
-  type ViewUpdate,
-} from "@codemirror/view";
 import type { Cart } from "../core/cart/Cart";
 import { DISPLAY_HEIGHT, DISPLAY_WIDTH } from "../core/display";
 import type { GameManager } from "../core/GameManager";
@@ -37,17 +10,11 @@ import {
   fitPreviewScale,
   homeFloppyScale,
 } from "./consoleLayout";
-import {
-  CONSOLE_TOOLS,
-  type ConsoleTool,
-  type ConsoleViewState,
-  type EditorMode,
-} from "./consoleTypes";
+import { type ConsoleViewState, type EditorMode } from "./consoleTypes";
 import {
   cycleTool,
   goHome,
   initialViewState,
-  isToolFunctional,
   moveDiskSelection,
   openEditor,
   selectDisk,
@@ -55,17 +22,16 @@ import {
   setEditorMode,
   skipBoot,
 } from "./viewState";
-import { cartHelperCompletion } from "./helpers";
-import { cartSignatureHints } from "./signature";
-import { beast2dEditorTheme, beast2dSyntax } from "./theme";
-import { clockText } from "./clock";
 import { paintEmptySlot, paintHomeFloppy, paintToolFloppy } from "./pixelArt";
 import { loadEditorCart } from "./editorCart";
 import { BootScreen } from "./boot/BootScreen";
+import { CodeScreen } from "./code/CodeScreen";
+import { HomeScreen } from "./home/HomeScreen";
+import { RunScreen } from "./run/RunScreen";
+import { TopBar } from "./topbar/TopBar";
 import { mountSfxDisk } from "./sfxPanel";
 import { getSfxBank } from "../core/sfx/bank";
 import { serializeSfxBank } from "../core/sfx/format";
-import { cartDiagnostics } from "./code/cartDiagnostics";
 import { loadCartSource, saveCartSource } from "./services/cartStorage";
 import { pingDevServer, saveCartToDevServer } from "./services/devServer";
 
@@ -118,7 +84,6 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   } = options;
 
   let saveEnabled = false;
-  let runError: { message: string; line?: number } | null = null;
   let viewState: ConsoleViewState = initialViewState({
     skipBoot: skipBootOption || playOnly || !BOOT_SCREEN_ENABLED,
     startScreen: playOnly ? "play" : "home",
@@ -130,157 +95,63 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   const boot = new BootScreen(disks.length);
   let bootLoading = false;
 
-  const bar = document.createElement("header");
-  bar.className = "beast2d-top-bar";
+  const startSource = loadCartSource(initialSource);
+  let shell!: CartEditorShell;
 
-  const breadcrumb = document.createElement("div");
-  breadcrumb.className = "beast2d-breadcrumb";
-
-  const actions = document.createElement("div");
-  actions.className = "beast2d-top-actions";
-
-  const clockEl = document.createElement("span");
-  clockEl.className = "beast2d-clock";
-
-  const saveButton = document.createElement("button");
-  saveButton.type = "button";
-  saveButton.className = "beast2d-top-save";
-  saveButton.textContent = "SAVE";
-  saveButton.disabled = true;
-
-  const runButton = document.createElement("button");
-  runButton.type = "button";
-  runButton.className = "beast2d-top-run";
-  runButton.textContent = "RUN";
-
-  actions.append(clockEl, saveButton, runButton);
-  bar.append(breadcrumb, actions);
-
-  const diskRow = document.createElement("div");
-  diskRow.className = "beast2d-tool-row";
-  const toolTabs = CONSOLE_TOOLS.map((tool) => {
-    const tab = document.createElement("button");
-    tab.type = "button";
-    tab.className = "beast2d-tool-tab";
-    tab.dataset.tool = tool;
-    tab.disabled = !isToolFunctional(tool);
-    const glyph = document.createElement("canvas");
-    glyph.className = "beast2d-floppy-canvas";
-    glyph.dataset.floppy = "tool";
-    glyph.dataset.tool = tool;
-    tab.appendChild(glyph);
-    tab.addEventListener("click", () => {
-      if (!isToolFunctional(tool)) return;
+  const topBar = new TopBar(
+    disks,
+    (tool) => {
       viewState = { ...viewState, activeTool: tool };
       applyViewState();
-    });
-    diskRow.appendChild(tab);
-    return tab;
+    },
+    () => {
+      void shell.saveSource();
+    },
+    () => {
+      void shell.runCart();
+    },
+  );
+  const home = new HomeScreen(disks, (index, disk) => {
+    viewState = selectDisk(viewState, index, disks.length);
+    applyViewState();
+    if (disk.kind === "cart") void openCartEditor();
   });
-
-  const homePanel = document.createElement("div");
-  homePanel.className = "beast2d-home";
-  const homeBrand = document.createElement("div");
-  homeBrand.className = "beast2d-home-brand";
-  const homeLogo = document.createElement("div");
-  homeLogo.className = "beast2d-home-logo";
-  homeLogo.textContent = "BEAST2D";
-  const mascot = document.createElement("img");
-  mascot.className = "beast2d-mascot";
-  mascot.alt = "";
-  mascot.src = "/ui/mascot.png";
-  homeBrand.append(homeLogo, mascot);
-  const homeShelf = document.createElement("div");
-  homeShelf.className = "beast2d-home-shelf";
-  const newDiskSlot = document.createElement("button");
-  newDiskSlot.type = "button";
-  newDiskSlot.className = "beast2d-home-disk beast2d-home-disk-new";
-  newDiskSlot.title = "Coming soon";
-  const emptySlot = document.createElement("canvas");
-  emptySlot.className = "beast2d-floppy-canvas";
-  emptySlot.dataset.floppy = "empty";
-  const newTitle = document.createElement("span");
-  newTitle.className = "beast2d-home-disk-title";
-  newTitle.textContent = "+ New disk";
-  newDiskSlot.append(emptySlot, newTitle);
-
-  const diskButtons = disks.map((disk, index) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "beast2d-home-disk";
-    btn.dataset.diskIndex = String(index);
-    const face = document.createElement("canvas");
-    face.className = "beast2d-floppy-canvas";
-    face.dataset.floppy = "home";
-    face.dataset.disk = disk.id;
-    const title = document.createElement("span");
-    title.className = "beast2d-home-disk-title";
-    title.textContent = disk.title;
-    btn.append(face, title);
-    btn.addEventListener("click", () => {
-      viewState = selectDisk(viewState, index, disks.length);
-      applyViewState();
-      if (disk.kind === "cart") {
-        void openCartEditor();
-      }
-    });
-    homeShelf.appendChild(btn);
-    return btn;
+  const code = new CodeScreen(startSource, {
+    onChange: () => {
+      saveCartSource(code.getSource());
+      if (code.hasVisibleError()) queueMicrotask(() => shell.clearError());
+    },
+    onRun: () => {
+      void shell.runCart();
+    },
+    onSave: () => {
+      void shell.saveSource();
+    },
   });
-  homeShelf.appendChild(newDiskSlot);
-  homePanel.append(homeBrand, homeShelf);
+  const run = new RunScreen();
+  const sfxDisk = mountSfxDisk();
+  code.root.append(sfxDisk.machine);
+  sfxDisk.machine.hidden = true;
+  run.attachBank(sfxDisk.bank);
+
+  gameContainer.parentElement?.insertBefore(consoleFrame, gameContainer);
+  run.attachGame(gameContainer);
 
   const workspace = document.createElement("div");
   workspace.className = "beast2d-workspace";
-
-  const editorColumn = document.createElement("div");
-  editorColumn.className = "beast2d-editor-column";
-
-  const codePanel = document.createElement("div");
-  codePanel.className = "beast2d-code";
-
-  const errorStrip = document.createElement("div");
-  errorStrip.className = "beast2d-code-error";
-  errorStrip.hidden = true;
-
-  const stubPanel = document.createElement("div");
-  stubPanel.className = "beast2d-tool-stub";
-  stubPanel.hidden = true;
-  stubPanel.textContent = "Coming soon";
-
-  const editorMount = document.createElement("div");
-  editorMount.className = "beast2d-code-editor";
-
-  codePanel.append(errorStrip, editorMount);
-  editorColumn.append(stubPanel, codePanel);
-
-  const sfxDisk = mountSfxDisk();
-  editorColumn.append(sfxDisk.machine);
-  sfxDisk.machine.hidden = true;
-
-  const previewColumn = document.createElement("div");
-  previewColumn.className = "beast2d-preview-column";
-  const sfxBankMount = document.createElement("div");
-  sfxBankMount.className = "beast2d-sfx-bank-mount";
-  sfxBankMount.hidden = true;
-  sfxBankMount.append(sfxDisk.bank);
-  const previewFrame = document.createElement("div");
-  previewFrame.className = "beast2d-preview-frame";
-
-  gameContainer.parentElement?.insertBefore(consoleFrame, gameContainer);
-  previewFrame.appendChild(gameContainer);
-  previewColumn.append(sfxBankMount, previewFrame);
-
-  workspace.append(editorColumn, previewColumn);
+  code.mount(workspace);
+  run.mount(workspace);
 
   const footer = document.createElement("footer");
   footer.className = "beast2d-footer-hint";
 
   const stageBody = document.createElement("div");
   stageBody.className = "beast2d-stage-body";
-  stageBody.append(workspace, homePanel);
+  stageBody.append(workspace);
+  home.mount(stageBody);
   boot.mount(consoleFrame);
-  consoleFrame.append(bar, diskRow, stageBody, footer);
+  topBar.mount(consoleFrame);
+  consoleFrame.append(stageBody, footer);
   appRoot.classList.add("beast2d-app");
 
   let layoutKey = "";
@@ -301,7 +172,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     );
     const playing = viewState.screen === "play";
     workspace.classList.toggle("beast2d-workspace-play", playing);
-    editorColumn.hidden = playing;
+    code.root.hidden = playing;
     const padX = 8 * fontScale;
     const padY = 8;
     const consoleW = consoleFrame.clientWidth;
@@ -344,14 +215,14 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       return;
     }
     layoutKey = key;
-    previewFrame.style.width = `${frameW}px`;
-    previewFrame.style.height = `${frameH}px`;
+    run.frame.style.width = `${frameW}px`;
+    run.frame.style.height = `${frameH}px`;
     if (sfxEdit) {
-      editorColumn.style.flex = "0 0 62%";
-      previewColumn.style.flex = "0 0 36%";
+      code.root.style.flex = "0 0 62%";
+      run.root.style.flex = "0 0 36%";
     } else {
-      editorColumn.style.flex = "";
-      previewColumn.style.flex = columnFlex;
+      code.root.style.flex = "";
+      run.root.style.flex = columnFlex;
     }
     maybeRepaintSfxChrome();
     repaintFloppies();
@@ -393,132 +264,25 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   window.addEventListener("resize", layoutPreview);
   const previewObserver = new ResizeObserver(() => layoutPreview());
   previewObserver.observe(workspace);
-  window.setInterval(() => {
-    clockEl.textContent = clockText();
-  }, 1000);
-  clockEl.textContent = clockText();
-
-  const startSource = loadCartSource(initialSource);
-
-  let shell!: CartEditorShell;
-
-  const extensions: Extension[] = [
-    lineNumbers(),
-    highlightActiveLineGutter(),
-    highlightActiveLine(),
-    drawSelection(),
-    foldGutter(),
-    history(),
-    javascript(),
-    beast2dEditorTheme,
-    beast2dSyntax,
-    EditorView.lineWrapping,
-    tooltips({ parent: document.body }),
-    autocompletion({ override: [cartHelperCompletion] }),
-    cartSignatureHints,
-    linter((view) => cartDiagnostics(view, runError), { delay: 350 }),
-    keymap.of([
-      { key: "Tab", run: acceptCompletion, shift: prevSnippetField },
-      { key: "Tab", run: nextSnippetField, shift: indentLess },
-      { key: "Tab", run: indentMore, shift: indentLess },
-      ...defaultKeymap,
-      ...historyKeymap,
-      ...foldKeymap,
-      {
-        key: "Mod-Enter",
-        run: () => {
-          void shell.runCart();
-          return true;
-        },
-      },
-      {
-        key: "Mod-s",
-        run: () => {
-          void shell.saveSource();
-          return true;
-        },
-      },
-    ]),
-    EditorView.updateListener.of((update: ViewUpdate) => {
-      if (!update.docChanged) return;
-      saveCartSource(update.state.doc.toString());
-      if (!errorStrip.hidden) queueMicrotask(() => shell.clearError());
-    }),
-  ];
-
-  const view = new EditorView({
-    state: EditorState.create({ doc: startSource, extensions }),
-    parent: editorMount,
-  });
   void document.fonts.load('16px "Monogram"').then(() => {
-    view.requestMeasure();
+    code.view.requestMeasure();
     repaintFloppies();
   });
 
   const selectedDisk = () => disks[viewState.selectedDiskIndex] ?? disks[0]!;
 
-  const syncToolTabs = () => {
-    for (const tab of toolTabs) {
-      const tool = tab.dataset.tool as ConsoleTool;
-      const active = viewState.activeTool === tool;
-      tab.classList.toggle("beast2d-tool-tab-active", active);
-      tab.setAttribute("aria-selected", active ? "true" : "false");
-    }
-    repaintFloppies();
-  };
-
-  const syncHomeSelection = () => {
-    diskButtons.forEach((btn, i) => {
-      btn.classList.toggle(
-        "beast2d-home-disk-selected",
-        i === viewState.selectedDiskIndex,
-      );
-    });
-    repaintFloppies();
-  };
-
-  const syncEditorPanes = () => {
-    const onEditorScreen = viewState.screen === "editor";
-    const showSfx = onEditorScreen && viewState.activeTool === "SFX";
-    const showCode = onEditorScreen && viewState.activeTool === "CODE";
-    const showStub = onEditorScreen && !showCode && !showSfx;
-    codePanel.hidden = !showCode;
-    stubPanel.hidden = !showStub;
-    sfxDisk.machine.hidden = !showSfx;
+  const syncWorkspace = () => {
+    const showSfx =
+      viewState.screen === "editor" && viewState.activeTool === "SFX";
     const sfxPreviewGame = showSfx && viewState.editorMode === "run";
-    sfxBankMount.hidden = !showSfx || sfxPreviewGame;
-    previewFrame.hidden = showSfx && !sfxPreviewGame;
-    previewColumn.classList.toggle(
-      "beast2d-preview-column-bank",
-      showSfx && !sfxPreviewGame,
-    );
+    sfxDisk.machine.hidden = !showSfx;
     workspace.classList.toggle("beast2d-workspace-sfx", showSfx);
     workspace.classList.toggle("beast2d-workspace-sfx-run", sfxPreviewGame);
-    editorColumn.classList.toggle("beast2d-editor-column-sfx", showSfx);
+    workspace.classList.toggle(
+      "beast2d-workspace-play",
+      viewState.screen === "play",
+    );
     sfxDisk.setLive(showSfx);
-    if (showCode && viewState.editorMode === "code") {
-      requestAnimationFrame(() => view.focus());
-    }
-  };
-
-  const syncHeader = () => {
-    const disk = selectedDisk();
-    if (viewState.screen === "home" || viewState.screen === "boot") {
-      breadcrumb.textContent = "BEAST2D OS";
-      saveButton.hidden = true;
-      runButton.hidden = true;
-      return;
-    }
-    if (viewState.screen === "play") {
-      breadcrumb.textContent = `BEAST2D OS > ${disk.title}`;
-      saveButton.hidden = true;
-      runButton.hidden = true;
-      return;
-    }
-    breadcrumb.textContent = `BEAST2D OS > ${disk.title}`;
-    const editorTool = viewState.activeTool;
-    saveButton.hidden = editorTool !== "CODE" && editorTool !== "SFX";
-    runButton.hidden = editorTool !== "CODE" && editorTool !== "SFX";
   };
 
   const hint = (pairs: [string, string][]) =>
@@ -567,19 +331,17 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       hidden: viewState.screen !== "boot",
       loading: bootLoading,
     });
-    homePanel.hidden = viewState.screen !== "home";
-    bar.hidden = viewState.screen === "boot";
-    diskRow.hidden = viewState.screen !== "editor";
     footer.hidden = viewState.screen === "boot";
   };
 
   const applyViewState = () => {
     syncVisibility();
-    syncHeader();
+    topBar.render(viewState);
+    home.render(viewState);
+    code.render(viewState);
+    run.render(viewState);
+    syncWorkspace();
     syncFooter();
-    syncToolTabs();
-    syncHomeSelection();
-    syncEditorPanes();
     layoutPreview();
     maybeRepaintSfxChrome();
     repaintFloppies();
@@ -608,7 +370,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     viewState = openEditor(viewState, mode);
     applyViewState();
     game.resume();
-    if (mode === "code") view.focus();
+    if (mode === "code") code.view.focus();
   };
 
   /** E on the cart disk: show the editor and replace whatever level was running. */
@@ -632,7 +394,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     if (viewState.screen !== "editor") return;
     game.resume();
     pokePlayfield();
-    view.focus();
+    code.view.focus();
   };
 
   const playSelected = async (): Promise<void> => {
@@ -675,37 +437,16 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
   };
 
   shell = {
-    getSource: () => view.state.doc.toString(),
+    getSource: () => code.getSource(),
     getViewState: () => ({ ...viewState }),
     setError(message, line, runtime = false) {
-      runError = runtime ? { message, line } : null;
-      errorStrip.textContent = line ? `Line ${line}: ${message}` : message;
-      errorStrip.hidden = false;
-      const mark = () => {
-        view.dispatch(
-          setDiagnostics(view.state, cartDiagnostics(view, runError)),
-        );
-        if (line && view.state.doc.lines >= 1) {
-          const lineObj = view.state.doc.line(
-            Math.min(line, view.state.doc.lines),
-          );
-          view.dispatch({
-            selection: { anchor: lineObj.from, head: lineObj.to },
-            effects: EditorView.scrollIntoView(lineObj.from, { y: "center" }),
-          });
-        }
-      };
-      mark();
-      requestAnimationFrame(mark);
+      code.showError(message, line, runtime);
       if (viewState.screen !== "editor" || viewState.editorMode !== "code") {
         enterEditor("code");
       }
     },
     clearError() {
-      runError = null;
-      errorStrip.hidden = true;
-      errorStrip.textContent = "";
-      view.dispatch(setDiagnostics(view.state, cartDiagnostics(view, null)));
+      code.clearError();
     },
     showCode() {
       if (viewState.screen !== "editor") enterEditor("code");
@@ -714,7 +455,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
         viewState = { ...viewState, activeTool: "CODE" };
         applyViewState();
         game.resume();
-        view.focus();
+        code.view.focus();
       }
     },
     showRun() {
@@ -759,7 +500,7 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
     },
     async boot() {
       saveEnabled = await pingDevServer();
-      saveButton.disabled = !saveEnabled;
+      topBar.setSaveEnabled(saveEnabled);
       applyViewState();
 
       if (viewState.screen === "boot") {
@@ -802,13 +543,6 @@ export function mountCartEditor(options: CartEditorOptions): CartEditorShell {
       if (fallbackCart) await loadCart(fallbackCart);
     },
   };
-
-  saveButton.addEventListener("click", () => {
-    void shell.saveSource();
-  });
-  runButton.addEventListener("click", () => {
-    void shell.runCart();
-  });
 
   window.addEventListener(
     "keydown",
