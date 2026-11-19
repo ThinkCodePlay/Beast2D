@@ -44,19 +44,38 @@ function createButtonFace(colors: (typeof toneColors)[ButtonTone], selected: boo
 }
 
 function drawChamferedRect(graphic: Graphics, x: number, y: number, width: number, height: number, cut: number, color: number): void {
+  const step = Math.min(2, cut / 2);
+  const right = x + width;
+  const bottom = y + height;
   graphic
     .moveTo(x + cut, y)
-    .lineTo(x + width - cut, y)
-    .lineTo(x + width - cut, y + cut)
-    .lineTo(x + width, y + cut)
-    .lineTo(x + width, y + height - cut)
-    .lineTo(x + width - cut, y + height - cut)
-    .lineTo(x + width - cut, y + height)
-    .lineTo(x + cut, y + height)
-    .lineTo(x + cut, y + height - cut)
-    .lineTo(x, y + height - cut)
+    .lineTo(right - cut, y)
+    .lineTo(right - cut, y + step)
+    .lineTo(right - cut + step, y + step)
+    .lineTo(right - cut + step, y + 2 * step)
+    .lineTo(right - step, y + 2 * step)
+    .lineTo(right - step, y + cut)
+    .lineTo(right, y + cut)
+    .lineTo(right, bottom - cut)
+    .lineTo(right - step, bottom - cut)
+    .lineTo(right - step, bottom - 2 * step)
+    .lineTo(right - cut + step, bottom - 2 * step)
+    .lineTo(right - cut + step, bottom - step)
+    .lineTo(right - cut, bottom - step)
+    .lineTo(right - cut, bottom)
+    .lineTo(x + cut, bottom)
+    .lineTo(x + cut, bottom - step)
+    .lineTo(x + cut - step, bottom - step)
+    .lineTo(x + cut - step, bottom - 2 * step)
+    .lineTo(x + step, bottom - 2 * step)
+    .lineTo(x + step, bottom - cut)
+    .lineTo(x, bottom - cut)
     .lineTo(x, y + cut)
-    .lineTo(x + cut, y + cut)
+    .lineTo(x + step, y + cut)
+    .lineTo(x + step, y + 2 * step)
+    .lineTo(x + cut - step, y + 2 * step)
+    .lineTo(x + cut - step, y + step)
+    .lineTo(x + cut, y + step)
     .closePath()
     .fill(color);
 }
@@ -64,8 +83,8 @@ function drawChamferedRect(graphic: Graphics, x: number, y: number, width: numbe
 function createTransportIcon(icon: string): Graphics {
   const graphic = new Graphics();
   if (icon === '▶') {
-    graphic.poly([6, 5, 22, 14, 6, 23]).fill(0x47243f)
-      .poly([5, 4, 21, 13, 5, 22]).fill(0x9f6233)
+    graphic.poly([6, 5, 22, 14, 6, 23]).fill(0x281735)
+      .poly([5, 4, 21, 13, 5, 22]).fill(0x47243f)
       .poly([5, 4, 19, 13, 5, 21]).fill(0xffc84d)
       .rect(5, 4, 3, 14).fill(0xffed9e);
   } else if (icon === '■') {
@@ -82,7 +101,9 @@ function createTransportIcon(icon: string): Graphics {
       .poly([8, 23, 3, 22, 6, 17]).fill(0x3a2345)
       .poly([8, 22, 5, 21, 7, 18]).fill(0xfff4dc);
   }
-  graphic.position.set(0, 0);
+  const iconScale = 0.9;
+  graphic.scale.set(iconScale);
+  graphic.position.set((BUTTON_SIZE - FACE_SIZE * iconScale) / 2, (BUTTON_SIZE - FACE_SIZE * iconScale) / 2);
   return graphic;
 }
 
