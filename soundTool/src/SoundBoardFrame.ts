@@ -4,12 +4,12 @@ import { SoundBoardHeader } from './SoundBoardHeader';
 import { SoundBankPanel } from './SoundBankPanel';
 import { SoundCreationPanel } from './SoundCreationPanel';
 
-const FRAME_INSET = 10;
-const CONTENT_TOP = 34;
-const CONTENT_BOTTOM = 10;
+const FRAME_INSET = 8;
+const CONTENT_TOP = 32;
+const CONTENT_BOTTOM = 8;
 const HEADER_WIDTH_INSET = 16;
-const PANEL_GAP = 4;
-const CREATION_WIDTH_RATIO = 0.75;
+const PANEL_GAP = 16;
+const BANK_PANEL_WIDTH = 96;
 
 /**
  * Self-contained sound board frame composition.
@@ -35,8 +35,8 @@ export class SoundBoardFrame extends Container {
     this.content.position.set(FRAME_INSET, CONTENT_TOP);
 
     const panelWidth = this.contentWidth - PANEL_GAP;
-    const creationWidth = Math.floor(panelWidth * CREATION_WIDTH_RATIO);
-    const bankWidth = panelWidth - creationWidth;
+    const creationWidth = panelWidth - BANK_PANEL_WIDTH;
+    const bankWidth = BANK_PANEL_WIDTH;
     this.creationPanel = new SoundCreationPanel(creationWidth, this.contentHeight);
     this.bankPanel = new SoundBankPanel(bankWidth, this.contentHeight);
     this.bankPanel.position.set(creationWidth + PANEL_GAP, 0);
