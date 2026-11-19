@@ -3,7 +3,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 type TabIcon = 'note' | 'gamepad' | 'folder' | 'gear';
 type TabTone = 'selected' | 'violet';
 
-const TAB_WIDTH = 72;
+const TAB_WIDTH = 75;
 const TAB_HEIGHT = 28;
 const TAB_ITEMS: { label: string; icon: TabIcon; tone: TabTone }[] = [
   { label: 'SFX', icon: 'note', tone: 'selected' },
@@ -39,7 +39,6 @@ function drawTabFace(tone: TabTone): Graphics {
   const fill = selected ? 0xe4aa54 : 0x59316f;
   const edge = selected ? 0xffcf72 : 0x9b60b7;
   const tab = new Graphics();
-  drawChamfer(tab, 2, 2, TAB_WIDTH, TAB_HEIGHT, 4, 0x140b20);
   drawChamfer(tab, 0, 0, TAB_WIDTH - 2, TAB_HEIGHT - 2, 4, 0x432851);
   drawChamfer(tab, 2, 2, TAB_WIDTH - 6, TAB_HEIGHT - 6, 2, fill);
   tab

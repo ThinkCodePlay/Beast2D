@@ -28,18 +28,18 @@ function drawHeader(width: number): Graphics {
 
 function createLogo(texture: Texture): Sprite {
   const logo = new Sprite(texture);
-  logo.width = 20;
-  logo.height = 22;
-  logo.position.set(3, 1);
+  logo.width = 24;
+  logo.height = 26;
+  logo.position.set(9, 0);
   return logo;
 }
 
 function createTitle(): Text {
   const title = new Text({
     text: 'beast2d sound board',
-    style: { fontFamily: 'monogram', fontSize: 18, fontWeight: 'bold', fill: TEXT_COLOR }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 21, fontWeight: 'bold', fill: TEXT_COLOR }, resolution: 3,
   });
-  title.position.set(32, 0);
+  title.position.set(44, 0);
   return title;
 }
 
@@ -53,7 +53,7 @@ function createSpeaker(width: number): Container {
   const waves = new Graphics()
     .arc(10, 12, 8, -0.8, 0.8).stroke({ color: 0x8fe28b, width: 2 })
     .arc(10, 12, 12, -0.8, 0.8).stroke({ color: 0x8fe28b, width: 2 });
-  speaker.position.x = width - 232;
+  speaker.position.x = width - 198;
   speaker.addChild(icon, waves);
   return speaker;
 }
@@ -61,10 +61,10 @@ function createSpeaker(width: number): Container {
 function createLevelMeter(width: number): Graphics {
   const levels = [6, 10, 12, 12, 12, 12, 10, 6];
   const meter = new Graphics()
-    .rect(width - 200, 4, 64, 16).fill(0x281635)
-    .rect(width - 198, 6, 60, 12).stroke({ color: 0x79468f, width: 2 });
+    .rect(width - 166, 4, 64, 16).fill(0x281635)
+    .rect(width - 164, 6, 60, 12).stroke({ color: 0x79468f, width: 2 });
   levels.forEach((height, index) => {
-    meter.rect(width - 192 + index * 8, 18 - height, 4, height)
+    meter.rect(width - 158 + index * 8, 18 - height, 4, height)
       .fill(index < 5 ? 0xff91c8 : 0x513366);
   });
   return meter;
@@ -75,12 +75,12 @@ function createClock(width: number): Text {
     text: 'SAT 14:20',
     style: { fontFamily: 'monogram', fontSize: 10, fontWeight: 'bold', fill: TEXT_COLOR }, resolution: 3,
   });
-  clock.position.set(width - 120, 12);
+  clock.position.set(width - 86, 12);
   return clock;
 }
 
 function createRunButton(width: number): PixelButton {
   const button = new PixelButton('RUN', 'pink');
-  button.position.set(width - 40, 0);
+  button.position.set(width - 32, 0);
   return button;
 }

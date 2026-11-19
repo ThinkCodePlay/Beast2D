@@ -5,9 +5,9 @@ import { PixelKnob } from './ui/PixelKnob';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
 
-const BUTTON_GAP = 8;
-const PAD_STEP_X = 52;
-const PAD_STEP_Y = 44;
+const BUTTON_GAP = 12;
+const PAD_STEP_X = 53;
+const PAD_STEP_Y = 43;
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
@@ -16,15 +16,15 @@ export class SoundCreationPanel extends Container {
     this.addChild(new RaisedPanelFrame(width, height));
     this.addChild(createTransport());
     this.addChild(createPresetGrid(presetTextures));
-    const waveform = new WaveformDisplay(width - 8);
-    waveform.position.set(4, 136);
+    const waveform = new WaveformDisplay(width - 4);
+    waveform.position.set(2, 136);
     this.addChild(waveform);
   }
 }
 
 function createTransport(): Container {
   const row = new Container();
-  row.position.set(16, 8);
+  row.position.set(5, 8);
   const play = new PixelButton('▶', 'pink');
   const stop = new PixelButton('■', 'cream');
   const loop = new PixelButton('↻', 'green');
@@ -33,8 +33,8 @@ function createTransport(): Container {
   volume.scale.set(1.25);
   stop.position.x = 32 + BUTTON_GAP;
   loop.position.x = 64 + BUTTON_GAP * 2;
-  namePlate.position.x = 96 + BUTTON_GAP * 3;
-  volume.position.set(224, -8);
+  namePlate.position.x = 137;
+  volume.position.set(268, -8);
   row.addChild(play, stop, loop, namePlate, volume);
   return row;
 }
@@ -61,7 +61,7 @@ function createPresetGrid(presetTextures: PresetTextures): Container {
     const column = index % 6;
     const row = Math.floor(index / 6);
     const pad = new PresetPad(icon, presetTextures, index === 0);
-    pad.position.set(8 + column * PAD_STEP_X, 50 + row * PAD_STEP_Y);
+    pad.position.set(7 + column * PAD_STEP_X, 54 + row * PAD_STEP_Y);
     grid.addChild(pad);
   });
   return grid;

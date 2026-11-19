@@ -32,7 +32,6 @@ export class PixelButton extends Container {
 
 function createButtonFace(colors: (typeof toneColors)[ButtonTone], selected: boolean): Graphics {
   const button = new Graphics();
-  drawChamferedRect(button, 2, 2, FACE_SIZE, FACE_SIZE, CORNER, 0x1b1027);
   drawChamferedRect(button, 0, 0, FACE_SIZE, FACE_SIZE, CORNER, 0x432851);
   drawChamferedRect(button, 2, 2, FACE_SIZE - 4, FACE_SIZE - 4, 2, colors.face);
   button
