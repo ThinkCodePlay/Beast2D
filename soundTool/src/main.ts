@@ -1,4 +1,5 @@
 import { Application } from 'pixi.js';
+import { SoundBoardFrame } from './SoundBoardFrame';
 
 const mount = document.querySelector<HTMLElement>('#app');
 
@@ -15,5 +16,8 @@ await app.init({
   autoDensity: false,
   resolution: 1,
 });
+
+const board = new SoundBoardFrame(320, 240);
+app.stage.addChild(board);
 
 mount.appendChild(app.canvas);
