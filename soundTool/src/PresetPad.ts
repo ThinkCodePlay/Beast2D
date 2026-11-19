@@ -44,11 +44,38 @@ function drawPadFace(selected: boolean): Graphics {
 }
 
 function drawChamfer(graphic: Graphics, x: number, y: number, width: number, height: number, cut: number, color: number): void {
+  const step = Math.min(2, cut / 2);
+  const right = x + width;
+  const bottom = y + height;
   graphic
-    .moveTo(x + cut, y).lineTo(x + width - cut, y)
-    .lineTo(x + width - cut, y + cut).lineTo(x + width, y + cut)
-    .lineTo(x + width, y + height - cut).lineTo(x + width - cut, y + height - cut)
-    .lineTo(x + width - cut, y + height).lineTo(x + cut, y + height)
-    .lineTo(x + cut, y + height - cut).lineTo(x, y + height - cut)
-    .lineTo(x, y + cut).lineTo(x + cut, y + cut).closePath().fill(color);
+    .moveTo(x + cut, y)
+    .lineTo(right - cut, y)
+    .lineTo(right - cut, y + step)
+    .lineTo(right - cut + step, y + step)
+    .lineTo(right - cut + step, y + 2 * step)
+    .lineTo(right - step, y + 2 * step)
+    .lineTo(right - step, y + cut)
+    .lineTo(right, y + cut)
+    .lineTo(right, bottom - cut)
+    .lineTo(right - step, bottom - cut)
+    .lineTo(right - step, bottom - 2 * step)
+    .lineTo(right - cut + step, bottom - 2 * step)
+    .lineTo(right - cut + step, bottom - step)
+    .lineTo(right - cut, bottom - step)
+    .lineTo(right - cut, bottom)
+    .lineTo(x + cut, bottom)
+    .lineTo(x + cut, bottom - step)
+    .lineTo(x + cut - step, bottom - step)
+    .lineTo(x + cut - step, bottom - 2 * step)
+    .lineTo(x + step, bottom - 2 * step)
+    .lineTo(x + step, bottom - cut)
+    .lineTo(x, bottom - cut)
+    .lineTo(x, y + cut)
+    .lineTo(x + step, y + cut)
+    .lineTo(x + step, y + 2 * step)
+    .lineTo(x + cut - step, y + 2 * step)
+    .lineTo(x + cut - step, y + step)
+    .lineTo(x + cut, y + step)
+    .closePath()
+    .fill(color);
 }

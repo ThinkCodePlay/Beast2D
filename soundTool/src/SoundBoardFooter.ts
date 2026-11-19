@@ -6,13 +6,13 @@ export class SoundBoardFooter extends Container {
     super();
     this.addChild(drawBackground(width));
     this.addChild(createLabel('SPACE', 56, 0xffcf72));
-    this.addChild(createLabel('PLAY / STOP', 94, 0xb88acb));
+    this.addChild(createLabel('play / stop', 94, 0xb88acb));
     this.addChild(createLabel('↑↓', 182, 0xffcf72));
-    this.addChild(createLabel('SELECT', 208, 0xb88acb));
+    this.addChild(createLabel('select', 208, 0xb88acb));
     this.addChild(createLabel('DEL', 273, 0xffcf72));
-    this.addChild(createLabel('DELETE', 299, 0xb88acb));
+    this.addChild(createLabel('delete', 299, 0xb88acb));
     this.addChild(createLabel('TAB', 372, 0xffcf72));
-    this.addChild(createLabel('NEXT TAB', 398, 0xb88acb));
+    this.addChild(createLabel('next tab', 398, 0xb88acb));
   }
 }
 
@@ -33,7 +33,7 @@ function drawBackground(width: number): Graphics {
 function createLabel(value: string, x: number, color: number): Text {
   const label = new Text({
     text: value,
-    style: { fontFamily: 'monogram', fontSize: 14, fontWeight: 'bold', fill: color }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 14, fontWeight: color === 0xffcf72 ? 'bold' : 'normal', fill: color }, resolution: 3,
   });
   label.position.set(x, 3);
   return label;

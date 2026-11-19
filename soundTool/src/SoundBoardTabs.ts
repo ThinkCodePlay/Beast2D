@@ -27,10 +27,9 @@ export class SoundBoardTabs extends Container {
 class SoundBoardTab extends Container {
   constructor(label: string, icon: TabIcon, tone: TabTone) {
     super();
-    const selected = tone === 'selected';
     this.addChild(drawTabFace(tone));
-    this.addChild(drawTabIcon(icon, selected));
-    this.addChild(createTabLabel(label, selected));
+    this.addChild(drawTabIcon(icon));
+    this.addChild(createTabLabel(label));
   }
 }
 
@@ -59,8 +58,8 @@ function drawChamfer(graphic: Graphics, x: number, y: number, width: number, hei
     .lineTo(x, y + cut).lineTo(x + cut, y + cut).closePath().fill(color);
 }
 
-function drawTabIcon(icon: TabIcon, selected: boolean): Graphics | Text {
-  const color = selected ? 0x392044 : 0xd8b8e2;
+function drawTabIcon(icon: TabIcon): Graphics | Text {
+  const color = 0x392044;
   if (icon === 'note') {
     const glyph = new Text({
       text: '♫',
@@ -100,10 +99,10 @@ function drawGamepad(color: number): Graphics {
     .rect(20, 12, 4, 2).fill(color);
 }
 
-function createTabLabel(label: string, selected: boolean): Text {
+function createTabLabel(label: string): Text {
   const text = new Text({
     text: label,
-    style: { fontFamily: 'monogram', fontSize: 13, fontWeight: 'bold', fill: selected ? 0x392044 : 0xd8b8e2 }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 13, fontWeight: 'bold', fill: 0x392044 }, resolution: 3,
   });
   text.position.set(28, 10);
   return text;

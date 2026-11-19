@@ -12,9 +12,9 @@ const KNOBS = [
   { label: 'CUT', value: 0.65, color: 0xffcf72 },
 ] as const;
 
-const KNOB_PITCH = 48.5;
-const KNOB_TILE_WIDTH = 42;
-const KNOB_TILE_HEIGHT = 40;
+const KNOB_PITCH = 45;
+const KNOB_TILE_WIDTH = 40;
+const KNOB_TILE_HEIGHT = 38;
 
 /** Shared bottom strip with six 32px dials and the waveform edit control. */
 export class SoundControlStrip extends Container {
@@ -22,10 +22,10 @@ export class SoundControlStrip extends Container {
     super();
     this.addChild(new RaisedPanelFrame(width, height));
     KNOBS.forEach((knob, index) => {
-      const x = 5.5 + index * KNOB_PITCH;
+      const x = 6 + index * KNOB_PITCH;
       this.addChild(createKnobTile(x));
       const control = new PixelKnob(knob.label, knob.value, knob.color);
-      control.position.set(x + 5, 4);
+      control.position.set(x + 4, 4);
       this.addChild(control);
     });
     const edit = new EditButton();
@@ -36,7 +36,7 @@ export class SoundControlStrip extends Container {
 
 function createKnobTile(x: number): Graphics {
   const left = x;
-  const top = 1;
+  const top = 2;
   const width = KNOB_TILE_WIDTH;
   const height = KNOB_TILE_HEIGHT - 2;
   return new Graphics()

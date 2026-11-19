@@ -11,7 +11,7 @@ export class SoundBankRow extends Container {
     this.addChild(drawRow(selected, width));
     this.addChild(createIndex(index, selected));
     this.addChild(createName(name, selected));
-    this.addChild(createPreviewGlyph(width, selected));
+    if (name !== 'empty') this.addChild(createPreviewGlyph(width, selected));
   }
 }
 
@@ -19,14 +19,15 @@ function drawRow(selected: boolean, width: number): Graphics {
   const fill = selected ? 0xffcf72 : 0x38214c;
   const border = selected ? 0xf0c060 : 0x76508c;
   const divider = selected ? 0x9a5b3c : 0x76508c;
-  return new Graphics()
+  const row = new Graphics()
     .rect(ROW_LEFT, 0, width, BANK_ROW_HEIGHT).fill(fill)
     .rect(ROW_LEFT, 0, 16, BANK_ROW_HEIGHT).fill(selected ? 0xf2b954 : 0x251531)
     .rect(ROW_LEFT, 0, width, BANK_ROW_HEIGHT).stroke({ color: border, width: 1 })
     .moveTo(ROW_LEFT + 16, 0).lineTo(ROW_LEFT + 16, BANK_ROW_HEIGHT)
     .stroke({ color: divider, width: 1 })
-    .moveTo(width - 32, 2).lineTo(width - 32, BANK_ROW_HEIGHT - 2)
-    .stroke({ color: divider, width: 1 });
+    .rect(width - 1, 0, 1, BANK_ROW_HEIGHT).fill(border);
+  if (selected) row.rect(NAME_LEFT + 1, 3, 2, 8).fill(0x4c2e38);
+  return row;
 }
 
 function createIndex(index: number, selected: boolean): Text {
@@ -45,7 +46,10 @@ function createName(name: string, selected: boolean): Text {
 }
 
 function createPreviewGlyph(width: number, selected: boolean): Text {
-  const label = createText('▶', selected ? 0x392044 : 0xd889ed);
+  const label = new Text({
+    text: '▶',
+    style: { fontFamily: 'monogram', fontSize: 9, fill: selected ? 0x392044 : 0xd889ed }, resolution: 3,
+  });
   label.anchor.set(0, 0.5);
   label.position.set(width - 16, BANK_ROW_HEIGHT / 2);
   return label;
@@ -54,6 +58,6 @@ function createPreviewGlyph(width: number, selected: boolean): Text {
 function createText(value: string, color: number): Text {
   return new Text({
     text: value,
-    style: { fontFamily: 'monogram', fontSize: 13, fontWeight: 'bold', fill: color }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 13, fill: color }, resolution: 3,
   });
 }
