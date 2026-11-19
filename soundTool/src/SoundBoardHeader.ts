@@ -1,6 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 
 const HEADER_HEIGHT = 24;
+const HEADER_ICON_SIZE = 16;
 const HEADER_INSET_X = 8;
 const HEADER_INSET_Y = 7;
 
@@ -22,9 +23,9 @@ export class SoundBoardHeader extends Container {
 
     // Placeholder app mark: a bright pixel equalizer tile, kept separate from the title.
     const icon = new Graphics()
-      .roundRect(4, 3, 16, 15, 3)
+      .roundRect(4, 3, HEADER_ICON_SIZE, HEADER_ICON_SIZE, 3)
       .fill(0x321b47)
-      .roundRect(4, 3, 16, 15, 3)
+      .roundRect(4, 3, HEADER_ICON_SIZE, HEADER_ICON_SIZE, 3)
       .stroke({ color: 0xe08be9, width: 1 })
       .rect(8, 10, 2, 4)
       .fill(0xffcf72)
