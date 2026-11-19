@@ -7,8 +7,12 @@ const CONTENT_TOP = 34;
 const CONTENT_BOTTOM = 10;
 const HEADER_WIDTH_INSET = 16;
 
-/** Composes the raised cabinet, title bar and future board contents. */
-export class SoundBoardFrame extends Container {
+/**
+ * Self-contained sound board shell.
+ * Owns the decorative frame, header, and the content slot for board controls.
+ */
+export class SoundBoardShell extends Container {
+  readonly header: SoundBoardHeader;
   readonly content: Container;
   readonly contentWidth: number;
   readonly contentHeight: number;
@@ -18,12 +22,13 @@ export class SoundBoardFrame extends Container {
 
     this.contentWidth = width - FRAME_INSET * 2;
     this.contentHeight = height - CONTENT_TOP - CONTENT_BOTTOM;
+
+    const frame = new BoardFrame(width, height);
+    this.header = new SoundBoardHeader(width - HEADER_WIDTH_INSET);
     this.content = new Container();
     this.content.position.set(FRAME_INSET, CONTENT_TOP);
 
-    const boardFrame = new BoardFrame(width, height);
-    const header = new SoundBoardHeader(width - HEADER_WIDTH_INSET);
-
-    this.addChild(boardFrame, header, this.content);
+    // The shell owns its complete structure; callers only supply board content.
+    this.addChild(frame, this.header, this.content);
   }
 }
