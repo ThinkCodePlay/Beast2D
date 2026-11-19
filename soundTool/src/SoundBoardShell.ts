@@ -1,11 +1,15 @@
 import { Container } from 'pixi.js';
 import { BoardFrame } from './BoardFrame';
 import { SoundBoardHeader } from './SoundBoardHeader';
+import { SoundBankPanel } from './SoundBankPanel';
+import { SoundCreationPanel } from './SoundCreationPanel';
 
 const FRAME_INSET = 10;
 const CONTENT_TOP = 34;
 const CONTENT_BOTTOM = 10;
 const HEADER_WIDTH_INSET = 16;
+const PANEL_GAP = 4;
+const CREATION_WIDTH_RATIO = 0.75;
 
 /**
  * Self-contained sound board shell.
@@ -16,6 +20,8 @@ export class SoundBoardShell extends Container {
   readonly content: Container;
   readonly contentWidth: number;
   readonly contentHeight: number;
+  readonly creationPanel: SoundCreationPanel;
+  readonly bankPanel: SoundBankPanel;
 
   constructor(width = 320, height = 240) {
     super();
@@ -28,7 +34,15 @@ export class SoundBoardShell extends Container {
     this.content = new Container();
     this.content.position.set(FRAME_INSET, CONTENT_TOP);
 
-    // The shell owns its complete structure; callers only supply board content.
+    const panelWidth = this.contentWidth - PANEL_GAP;
+    const creationWidth = Math.floor(panelWidth * CREATION_WIDTH_RATIO);
+    const bankWidth = panelWidth - creationWidth;
+    this.creationPanel = new SoundCreationPanel(creationWidth, this.contentHeight);
+    this.bankPanel = new SoundBankPanel(bankWidth, this.contentHeight);
+    this.bankPanel.position.set(creationWidth + PANEL_GAP, 0);
+    this.content.addChild(this.creationPanel, this.bankPanel);
+
+    // Each section owns its own contents; the shell only sets their shared layout.
     this.addChild(frame, this.header, this.content);
   }
 }
