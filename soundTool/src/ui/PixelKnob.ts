@@ -13,7 +13,7 @@ export class PixelKnob extends Container {
   constructor(label: string, value: number, color: number, variant: KnobVariant = 'standard') {
     super();
     if (variant === 'master') {
-      this.addChild(createMasterFace(color, value));
+      this.addChild(createMasterFace(value));
       this.addChild(createLabel(label, 26, 12));
       return;
     }
@@ -53,7 +53,7 @@ function createStandardFace(color: number, value: number, accented: boolean): Gr
     .fill(0x70428a);
 }
 
-function createMasterFace(color: number, value: number): Graphics {
+function createMasterFace(value: number): Graphics {
   const angle = angleForValue(value);
   const indicatorX = MASTER_CENTER_X + Math.round(Math.cos(angle) * 8);
   const indicatorY = MASTER_CENTER_Y + Math.round(Math.sin(angle) * 8);
@@ -65,7 +65,9 @@ function createMasterFace(color: number, value: number): Graphics {
     const outerY = MASTER_CENTER_Y + Math.round(Math.sin(tickAngle) * 17);
     const innerX = MASTER_CENTER_X + Math.round(Math.cos(tickAngle) * 15);
     const innerY = MASTER_CENTER_Y + Math.round(Math.sin(tickAngle) * 15);
-    dial.moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0xffcf72, width: 2 });
+    dial
+      .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0x3b223d, width: 3 })
+      .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0xfff4dc, width: 1 });
   }
 
   return dial
@@ -81,7 +83,10 @@ function createMasterFace(color: number, value: number): Graphics {
     .fill(0xfff4dc)
     .moveTo(MASTER_CENTER_X, MASTER_CENTER_Y)
     .lineTo(indicatorX, indicatorY)
-    .stroke({ color, width: 2 })
+    .stroke({ color: 0x482d3b, width: 4 })
+    .moveTo(MASTER_CENTER_X, MASTER_CENTER_Y)
+    .lineTo(indicatorX, indicatorY)
+    .stroke({ color: 0xa4673f, width: 1 })
     .rect(MASTER_CENTER_X - 1, MASTER_CENTER_Y - 1, 2, 2)
     .fill(0x70428a);
 }

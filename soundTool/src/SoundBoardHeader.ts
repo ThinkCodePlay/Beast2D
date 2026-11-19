@@ -23,14 +23,14 @@ function drawHeader(width: number): Graphics {
     .rect(0, 0, width, HEADER_HEIGHT).fill(0x45285c)
     .rect(0, 0, width, 2).fill(0xc276d7)
     .rect(0, HEADER_HEIGHT - 2, width, 2).fill(0x281635)
-    .rect(4, 4, width - 8, HEADER_HEIGHT - 8).stroke({ color: 0x79468f, width: 2 });
+    .rect(4, 4, width - 8, HEADER_HEIGHT - 8).stroke({ color: 0x79468f, width: 1 });
 }
 
 function createLogo(texture: Texture): Sprite {
   const logo = new Sprite(texture);
   logo.width = 24;
   logo.height = 26;
-  logo.position.set(9, 0);
+  logo.position.set(13, 0);
   return logo;
 }
 
