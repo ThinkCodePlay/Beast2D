@@ -1,51 +1,105 @@
 import { Container, Graphics, Text } from 'pixi.js';
 
-const KNOB_SIZE = 32;
-const KNOB_CENTER_X = 16;
-const KNOB_CENTER_Y = 10;
+const CONTROL_SIZE = 32;
+const STANDARD_CENTER_X = 16;
+const STANDARD_CENTER_Y = 10;
+const MASTER_CENTER_X = 16;
+const MASTER_CENTER_Y = 14;
 
-/** Fixed 32×32 dial with a pixel indicator and a short label. */
+type KnobVariant = 'standard' | 'master';
+
+/** 32×32 dial, with an enlarged tick-marked master-volume face option. */
 export class PixelKnob extends Container {
-  constructor(label: string, value: number, color: number) {
+  constructor(label: string, value: number, color: number, variant: KnobVariant = 'standard') {
     super();
-    this.addChild(createKnobFace(color, value));
-    this.addChild(createLabel(label));
+    if (variant === 'master') {
+      this.addChild(createMasterFace(color, value));
+      this.addChild(createLabel(label, 30));
+      return;
+    }
+    this.addChild(createKnobBase());
+    this.addChild(createStandardFace(color, value));
+    this.addChild(createLabel(label, 22));
   }
 }
 
-function createKnobFace(color: number, value: number): Graphics {
-  const valueInRange = Math.max(0, Math.min(1, value));
-  const angle = Math.PI * 0.75 + valueInRange * Math.PI * 1.5;
-  const indicatorX = KNOB_CENTER_X + Math.round(Math.cos(angle) * 6);
-  const indicatorY = KNOB_CENTER_Y + Math.round(Math.sin(angle) * 6);
-
+function createKnobBase(): Graphics {
   return new Graphics()
-    .circle(KNOB_CENTER_X + 2, KNOB_CENTER_Y + 2, 10)
+    .rect(2, 2, 28, 28)
     .fill(0x140b20)
-    .circle(KNOB_CENTER_X, KNOB_CENTER_Y, 10)
+    .rect(0, 0, 28, 28)
+    .fill(0x604077)
+    .rect(2, 2, 24, 2)
+    .fill(0xd697e5)
+    .rect(2, 2, 2, 20)
+    .fill(0xb77bcf)
+    .rect(26, 4, 2, 20)
+    .fill(0x36203f)
+    .rect(4, 26, 20, 2)
+    .fill(0x36203f);
+}
+
+function createStandardFace(color: number, value: number): Graphics {
+  const angle = angleForValue(value);
+  const indicatorX = STANDARD_CENTER_X + Math.round(Math.cos(angle) * 5);
+  const indicatorY = STANDARD_CENTER_Y + Math.round(Math.sin(angle) * 5);
+  return new Graphics()
+    .circle(STANDARD_CENTER_X + 2, STANDARD_CENTER_Y + 2, 9)
+    .fill(0x140b20)
+    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 9)
     .fill(0x321b47)
-    .circle(KNOB_CENTER_X, KNOB_CENTER_Y, 8)
+    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 7)
     .fill(0xeee1d0)
-    .circle(KNOB_CENTER_X, KNOB_CENTER_Y, 6)
+    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 5)
     .fill(0xfff4dc)
-    .moveTo(KNOB_CENTER_X, KNOB_CENTER_Y)
+    .moveTo(STANDARD_CENTER_X, STANDARD_CENTER_Y)
     .lineTo(indicatorX, indicatorY)
     .stroke({ color, width: 2 })
-    .rect(KNOB_CENTER_X - 1, KNOB_CENTER_Y - 1, 2, 2)
+    .rect(STANDARD_CENTER_X - 1, STANDARD_CENTER_Y - 1, 2, 2)
     .fill(0x70428a);
 }
 
-function createLabel(value: string): Text {
+function createMasterFace(color: number, value: number): Graphics {
+  const angle = angleForValue(value);
+  const indicatorX = MASTER_CENTER_X + Math.round(Math.cos(angle) * 7);
+  const indicatorY = MASTER_CENTER_Y + Math.round(Math.sin(angle) * 7);
+  const dial = new Graphics();
+
+  for (let tick = 0; tick <= 6; tick += 1) {
+    const tickAngle = Math.PI * 0.75 + (tick / 6) * Math.PI * 1.5;
+    const outerX = MASTER_CENTER_X + Math.round(Math.cos(tickAngle) * 14);
+    const outerY = MASTER_CENTER_Y + Math.round(Math.sin(tickAngle) * 14);
+    const innerX = MASTER_CENTER_X + Math.round(Math.cos(tickAngle) * 12);
+    const innerY = MASTER_CENTER_Y + Math.round(Math.sin(tickAngle) * 12);
+    dial.moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0xffcf72, width: 2 });
+  }
+
+  return dial
+    .circle(MASTER_CENTER_X + 2, MASTER_CENTER_Y + 2, 11)
+    .fill(0x140b20)
+    .circle(MASTER_CENTER_X, MASTER_CENTER_Y, 11)
+    .fill(0x321b47)
+    .circle(MASTER_CENTER_X, MASTER_CENTER_Y, 9)
+    .fill(0xeee1d0)
+    .circle(MASTER_CENTER_X, MASTER_CENTER_Y, 7)
+    .fill(0xfff4dc)
+    .moveTo(MASTER_CENTER_X, MASTER_CENTER_Y)
+    .lineTo(indicatorX, indicatorY)
+    .stroke({ color, width: 2 })
+    .rect(MASTER_CENTER_X - 1, MASTER_CENTER_Y - 1, 2, 2)
+    .fill(0x70428a);
+}
+
+function angleForValue(value: number): number {
+  return Math.PI * 0.75 + Math.max(0, Math.min(1, value)) * Math.PI * 1.5;
+}
+
+function createLabel(value: string, y: number): Text {
   const label = new Text({
     text: value,
-    style: {
-      fontFamily: 'monospace',
-      fontSize: 8,
-      fontWeight: 'bold',
-      fill: 0xffeaff,
-    },
+    style: { fontFamily: 'monospace', fontSize: 8, fontWeight: 'bold', fill: 0xffeaff },
   });
   label.anchor.set(0.5, 0);
-  label.position.set(KNOB_SIZE / 2, 22);
+  label.position.set(CONTROL_SIZE / 2, y);
   return label;
 }

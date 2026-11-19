@@ -6,19 +6,19 @@ import { SoundBoardHeader } from './SoundBoardHeader';
 import { SoundBoardTabs } from './SoundBoardTabs';
 import { SoundCreationPanel } from './SoundCreationPanel';
 
-const DISPLAY_WIDTH = 480;
-const DISPLAY_HEIGHT = 320;
+const DISPLAY_WIDTH = 512;
+const DISPLAY_HEIGHT = 1024 / 3;
 const OUTER_INSET = 16;
 const HEADER_TOP = 8;
 const TABS_TOP = 48;
 const CONTENT_TOP = 80;
-const CONTENT_HEIGHT = 192;
-const FOOTER_TOP = 296;
-const PANEL_GAP = 32;
+const CONTENT_HEIGHT = 224;
+const FOOTER_TOP = 312;
+const PANEL_GAP = 16;
 const CREATION_WIDTH = 288;
-const BANK_WIDTH = 128;
+const BANK_WIDTH = 160;
 
-/** Full sound-board composition at the Game Boy Advance 3:2 aspect ratio. */
+/** 3:2 sound-board design rendered on the requested 1536×1024 canvas. */
 export class SoundBoardFrame extends Container {
   readonly header: SoundBoardHeader;
   readonly tabs: SoundBoardTabs;
@@ -29,7 +29,7 @@ export class SoundBoardFrame extends Container {
 
   constructor() {
     super();
-
+    this.scale.set(3);
     const board = new BoardFrameArtwork(DISPLAY_WIDTH, DISPLAY_HEIGHT);
     this.header = new SoundBoardHeader(DISPLAY_WIDTH - OUTER_INSET * 2);
     this.header.position.set(OUTER_INSET, HEADER_TOP);

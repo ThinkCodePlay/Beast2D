@@ -1,8 +1,8 @@
 import { Application } from 'pixi.js';
 import { SoundBoardFrame } from './SoundBoardFrame';
 
-const DISPLAY_WIDTH = 480;
-const DISPLAY_HEIGHT = 320;
+const DISPLAY_WIDTH = 1536;
+const DISPLAY_HEIGHT = 1024;
 const mount = document.querySelector<HTMLElement>('#app');
 
 if (!mount) {
