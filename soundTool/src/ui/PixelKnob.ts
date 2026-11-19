@@ -14,12 +14,12 @@ export class PixelKnob extends Container {
     super();
     if (variant === 'master') {
       this.addChild(createMasterFace(color, value));
-      this.addChild(createLabel(label, 30, 11));
+      this.addChild(createLabel(label, 30, 12));
       return;
     }
     this.addChild(createKnobBase());
     this.addChild(createStandardFace(color, value));
-    this.addChild(createLabel(label, 22, 13));
+    this.addChild(createLabel(label, 22, 14));
   }
 }
 

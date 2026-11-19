@@ -29,7 +29,7 @@ function drawBackground(width: number): Graphics {
 function createLabel(value: string, x: number, color: number): Text {
   const label = new Text({
     text: value,
-    style: { fontFamily: 'monogram', fontSize: 11, fontWeight: 'bold', fill: color }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 12, fontWeight: 'bold', fill: color }, resolution: 3,
   });
   label.position.set(x, 4);
   return label;

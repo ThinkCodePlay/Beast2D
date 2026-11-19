@@ -48,7 +48,7 @@ function createSoundName(width: number): Container {
     .rect(4, 4, width - 8, 24).stroke({ color: 0x9867b5, width: 2 });
   const name = new Text({
     text: 'coin_pickup',
-    style: { fontFamily: 'monogram', fontSize: 12, fontWeight: 'bold', fill: 0xffeaff }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 14, fontWeight: 'bold', fill: 0xffeaff }, resolution: 3,
   });
   name.position.set(8, 12);
   plate.addChild(face, name);

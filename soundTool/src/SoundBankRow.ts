@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 
 export const BANK_ROW_HEIGHT = 14;
-const ROW_LEFT = 8;
+const ROW_LEFT = 4;
 const NAME_LEFT = 24;
 
 /** One 16px bank slot, widened to its panel and rendered with list detail. */
@@ -54,6 +54,6 @@ function createPreviewGlyph(width: number, selected: boolean): Text {
 function createText(value: string, color: number): Text {
   return new Text({
     text: value,
-    style: { fontFamily: 'monogram', fontSize: 12, fontWeight: 'bold', fill: color }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 13, fontWeight: 'bold', fill: color }, resolution: 3,
   });
 }

@@ -3,7 +3,8 @@ import { Container, Graphics, Text } from 'pixi.js';
 export type ButtonTone = 'pink' | 'gold' | 'violet' | 'purple' | 'dark' | 'green' | 'cream';
 
 const BUTTON_SIZE = 32;
-const BUTTON_FACE_SIZE = 28;
+const FACE_SIZE = 28;
+const CORNER = 4;
 
 const toneColors: Record<ButtonTone, { face: number; light: number; shade: number; text: number }> = {
   pink: { face: 0xe94f88, light: 0xffa5bb, shade: 0xa93162, text: 0xfff1f8 },
@@ -15,7 +16,7 @@ const toneColors: Record<ButtonTone, { face: number; light: number; shade: numbe
   cream: { face: 0xf6f0e3, light: 0xfffdf4, shade: 0xb19b9a, text: 0x392044 },
 };
 
-/** Fixed 32×32 pixel-art button for transport, tabs, and other controls. */
+/** Fixed 32×32 chamfered pixel-art button for transport and other controls. */
 export class PixelButton extends Container {
   constructor(icon: string, tone: ButtonTone = 'purple', selected = false) {
     super();
@@ -30,35 +31,49 @@ export class PixelButton extends Container {
 }
 
 function createButtonFace(colors: (typeof toneColors)[ButtonTone], selected: boolean): Graphics {
-  return new Graphics()
-    .rect(4, 4, BUTTON_FACE_SIZE, BUTTON_FACE_SIZE).fill(0x1b1027)
-    .rect(0, 0, BUTTON_FACE_SIZE, BUTTON_FACE_SIZE).fill(0x432851)
-    .rect(2, 2, BUTTON_FACE_SIZE - 4, BUTTON_FACE_SIZE - 4).fill(colors.face)
-    .rect(4, 3, BUTTON_FACE_SIZE - 8, 2).fill(colors.light)
-    .rect(3, 5, 2, BUTTON_FACE_SIZE - 10).fill(colors.light)
-    .rect(6, 5, BUTTON_FACE_SIZE - 12, 2).fill(selected ? 0xfff0bd : colors.light)
-    .rect(BUTTON_FACE_SIZE - 5, 5, 2, BUTTON_FACE_SIZE - 10).fill(colors.shade)
-    .rect(5, BUTTON_FACE_SIZE - 5, BUTTON_FACE_SIZE - 10, 2).fill(colors.shade)
-    .rect(BUTTON_FACE_SIZE - 7, BUTTON_FACE_SIZE - 7, 3, 3).fill(0x291537);
+  const button = new Graphics();
+  drawChamferedRect(button, 2, 2, FACE_SIZE, FACE_SIZE, CORNER, 0x1b1027);
+  drawChamferedRect(button, 0, 0, FACE_SIZE, FACE_SIZE, CORNER, 0x432851);
+  drawChamferedRect(button, 2, 2, FACE_SIZE - 4, FACE_SIZE - 4, 2, colors.face);
+  button
+    .rect(6, 4, FACE_SIZE - 12, 2).fill(selected ? 0xfff0bd : colors.light)
+    .rect(4, 6, 2, FACE_SIZE - 12).fill(colors.light)
+    .rect(FACE_SIZE - 4, 6, 2, FACE_SIZE - 12).fill(colors.shade)
+    .rect(6, FACE_SIZE - 4, FACE_SIZE - 12, 2).fill(colors.shade)
+    .rect(FACE_SIZE - 6, FACE_SIZE - 6, 2, 2).fill(0x291537);
+  return button;
+}
+
+function drawChamferedRect(graphic: Graphics, x: number, y: number, width: number, height: number, cut: number, color: number): void {
+  graphic
+    .moveTo(x + cut, y)
+    .lineTo(x + width - cut, y)
+    .lineTo(x + width - cut, y + cut)
+    .lineTo(x + width, y + cut)
+    .lineTo(x + width, y + height - cut)
+    .lineTo(x + width - cut, y + height - cut)
+    .lineTo(x + width - cut, y + height)
+    .lineTo(x + cut, y + height)
+    .lineTo(x + cut, y + height - cut)
+    .lineTo(x, y + height - cut)
+    .lineTo(x, y + cut)
+    .lineTo(x + cut, y + cut)
+    .closePath()
+    .fill(color);
 }
 
 function createTransportIcon(icon: string): Graphics {
   const graphic = new Graphics();
   if (icon === '▶') {
-    graphic.rect(9, 7, 4, 18).fill(0x47243f)
-      .rect(13, 9, 4, 14).fill(0x47243f)
-      .rect(17, 11, 4, 10).fill(0x47243f)
-      .rect(21, 13, 3, 6).fill(0x47243f)
-      .rect(10, 8, 3, 14).fill(0xffe18a)
-      .rect(13, 10, 3, 10).fill(0xffcc50)
-      .rect(16, 12, 3, 6).fill(0xffbd39)
-      .rect(19, 14, 3, 2).fill(0xffac32);
+    graphic.poly([10, 8, 26, 16, 10, 24]).fill(0x47243f)
+      .poly([8, 6, 24, 14, 8, 22]).fill(0x9f6233)
+      .poly([8, 6, 22, 14, 8, 22]).fill(0xffc84d)
+      .rect(8, 6, 3, 14).fill(0xffed9e);
   } else if (icon === '■') {
     graphic.rect(9, 9, 16, 16).fill(0x281735)
       .rect(9, 9, 14, 14).fill(0x472b54)
       .rect(11, 11, 10, 10).fill(0x321b47);
   } else {
-    // Opposing curved arrows, edged in purple so the pale mark reads on green.
     graphic.arc(16, 16, 7, -2.7, 0.1).stroke({ color: 0x3a2345, width: 5 })
       .arc(16, 16, 7, 0.45, 3.25).stroke({ color: 0x3a2345, width: 5 })
       .arc(16, 16, 7, -2.7, 0.1).stroke({ color: 0xfff4dc, width: 2.5 })

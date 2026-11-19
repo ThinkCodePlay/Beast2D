@@ -12,7 +12,7 @@ const TAB_ITEMS: { label: string; icon: TabIcon; tone: TabTone }[] = [
   { label: 'SETTINGS', icon: 'gear', tone: 'violet' },
 ];
 
-/** Navigation tabs with icons and labels on one shared raised button face. */
+/** Navigation tabs with icons and labels on one shared stepped face. */
 export class SoundBoardTabs extends Container {
   constructor() {
     super();
@@ -38,13 +38,27 @@ function drawTabFace(tone: TabTone): Graphics {
   const selected = tone === 'selected';
   const fill = selected ? 0xe4aa54 : 0x59316f;
   const edge = selected ? 0xffcf72 : 0x9b60b7;
-  return new Graphics()
-    .rect(4, 4, TAB_WIDTH, TAB_HEIGHT).fill(0x140b20)
-    .rect(0, 0, TAB_WIDTH, TAB_HEIGHT).fill(fill)
-    .rect(4, 2, TAB_WIDTH - 8, 2).fill(0xe3a1ef)
-    .rect(2, 4, 2, TAB_HEIGHT - 8).fill(0xe3a1ef)
-    .rect(TAB_WIDTH - 2, 4, 2, TAB_HEIGHT - 8).fill(edge)
-    .rect(4, TAB_HEIGHT - 2, TAB_WIDTH - 8, 2).fill(edge);
+  const tab = new Graphics();
+  drawChamfer(tab, 2, 2, TAB_WIDTH, TAB_HEIGHT, 4, 0x140b20);
+  drawChamfer(tab, 0, 0, TAB_WIDTH - 2, TAB_HEIGHT - 2, 4, 0x432851);
+  drawChamfer(tab, 2, 2, TAB_WIDTH - 6, TAB_HEIGHT - 6, 2, fill);
+  tab
+    .rect(6, 2, TAB_WIDTH - 12, 2).fill(0xe3a1ef)
+    .rect(2, 6, 2, TAB_HEIGHT - 12).fill(0xe3a1ef)
+    .rect(6, TAB_HEIGHT - 2, TAB_WIDTH - 12, 2).fill(edge)
+    .rect(TAB_WIDTH - 2, 6, 2, TAB_HEIGHT - 12).fill(edge)
+    .rect(2, 2, 4, 2).fill(selected ? 0xfff0bd : 0xc58bdd);
+  return tab;
+}
+
+function drawChamfer(graphic: Graphics, x: number, y: number, width: number, height: number, cut: number, color: number): void {
+  graphic
+    .moveTo(x + cut, y).lineTo(x + width - cut, y)
+    .lineTo(x + width - cut, y + cut).lineTo(x + width, y + cut)
+    .lineTo(x + width, y + height - cut).lineTo(x + width - cut, y + height - cut)
+    .lineTo(x + width - cut, y + height).lineTo(x + cut, y + height)
+    .lineTo(x + cut, y + height - cut).lineTo(x, y + height - cut)
+    .lineTo(x, y + cut).lineTo(x + cut, y + cut).closePath().fill(color);
 }
 
 function drawTabIcon(icon: TabIcon, selected: boolean): Graphics | Text {
@@ -58,9 +72,7 @@ function drawTabIcon(icon: TabIcon, selected: boolean): Graphics | Text {
     glyph.position.set(14, 16);
     return glyph;
   }
-  if (icon === 'gamepad') {
-    return drawGamepad(color);
-  }
+  if (icon === 'gamepad') return drawGamepad(color);
   if (icon === 'folder') {
     return new Graphics()
       .rect(5, 10, 10, 4).fill(color)
@@ -93,7 +105,7 @@ function drawGamepad(color: number): Graphics {
 function createTabLabel(label: string, selected: boolean): Text {
   const text = new Text({
     text: label,
-    style: { fontFamily: 'monogram', fontSize: 12, fontWeight: 'bold', fill: selected ? 0x392044 : 0xd8b8e2 }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 13, fontWeight: 'bold', fill: selected ? 0x392044 : 0xd8b8e2 }, resolution: 3,
   });
   text.position.set(28, 10);
   return text;
