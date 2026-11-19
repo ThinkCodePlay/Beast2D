@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { PixelButton } from './ui/PixelButton';
 
-const HEADER_HEIGHT = 32;
+const HEADER_HEIGHT = 28;
 const TEXT_COLOR = 0xffeaff;
 
 /** Title/status strip with separate logo, sound meter, clock, and RUN control. */
@@ -41,6 +41,7 @@ function createLogo(): Container {
     .rect(26, 18, 2, 2).fill(0x321b47)
     .rect(22, 24, 4, 2).fill(0xffcf72);
   logo.addChild(art);
+  logo.scale.set(0.75);
   return logo;
 }
 

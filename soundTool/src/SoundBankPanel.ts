@@ -1,15 +1,15 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
-import { SoundBankRow } from './SoundBankRow';
+import { SoundBankRow, BANK_ROW_HEIGHT } from './SoundBankRow';
 
 const BANK_ITEMS = [
   'jump', 'coin', 'hit', 'laser', 'boom_big', 'power_up',
   'enemy_die', 'select', 'empty', 'empty', 'empty', 'empty',
 ] as const;
-const ROW_HEIGHT = 16;
+const BANK_ROW_TOP = 32;
 const SCROLL_BUTTON_SIZE = 16;
 
-/** Right sound bank with twelve named/empty rows and scroll affordances. */
+/** Right-side sound list with twelve visible rows and separate scroll controls. */
 export class SoundBankPanel extends Container {
   constructor(width: number, height: number) {
     super();
@@ -26,25 +26,25 @@ function createTitle(): Text {
     text: 'SOUND BANK',
     style: { fontFamily: 'monospace', fontSize: 8, fontWeight: 'bold', fill: 0xffeaff },
   });
-  title.position.set(16, 4);
+  title.position.set(8, 3);
   return title;
 }
 
 function createSubtitle(): Text {
   const subtitle = new Text({
     text: 'RUN → GAME',
-    style: { fontFamily: 'monospace', fontSize: 8, fontWeight: 'bold', fill: 0xb88acb },
+    style: { fontFamily: 'monospace', fontSize: 7, fontWeight: 'bold', fill: 0xb88acb },
   });
-  subtitle.position.set(16, 20);
+  subtitle.position.set(8, 17);
   return subtitle;
 }
 
 function createRows(width: number): Container {
   const rows = new Container();
-  rows.position.set(4, 32);
+  rows.position.set(4, BANK_ROW_TOP);
   BANK_ITEMS.forEach((name, index) => {
     const row = new SoundBankRow(index, name, name === 'laser', width - 40);
-    row.position.y = index * ROW_HEIGHT;
+    row.position.y = index * BANK_ROW_HEIGHT;
     rows.addChild(row);
   });
   return rows;
@@ -53,29 +53,24 @@ function createRows(width: number): Container {
 function createScrollButtons(width: number, height: number): Container {
   const x = width - SCROLL_BUTTON_SIZE - 4;
   const scroll = new Container();
-  scroll.addChild(createArrowButton(x, 32, true));
+  scroll.addChild(createArrowButton(x, BANK_ROW_TOP, true));
   scroll.addChild(createArrowButton(x, height - SCROLL_BUTTON_SIZE - 4, false));
   return scroll;
 }
 
-function createArrowButton(x: number, y: number, up: boolean): Graphics {
-  const button = new Graphics()
-    .rect(x + 2, y + 2, 16, 16).fill(0x140b20)
-    .rect(x, y, 16, 16).fill(0x7c5ad1)
-    .rect(x + 2, y + 2, 12, 2).fill(0xd6c6ff)
-    .rect(x + 2, y + 2, 2, 10).fill(0xd6c6ff);
-
-  const rows = up ? [
-    { left: 7, y: 3, width: 2 },
-    { left: 5, y: 5, width: 6 },
-    { left: 3, y: 7, width: 10 },
-    { left: 1, y: 9, width: 14 },
-  ] : [
-    { left: 1, y: 5, width: 14 },
-    { left: 3, y: 7, width: 10 },
-    { left: 5, y: 9, width: 6 },
-    { left: 7, y: 11, width: 2 },
-  ];
-  rows.forEach((row) => button.rect(x + row.left, y + row.y, row.width, 2).fill(0xfff1f8));
+function createArrowButton(x: number, y: number, up: boolean): Container {
+  const button = new Container();
+  button.addChild(new Graphics()
+    .rect(x + 2, y + 2, 14, 14).fill(0x140b20)
+    .rect(x, y, 14, 14).fill(0x7c5ad1)
+    .rect(x + 2, y + 2, 10, 2).fill(0xd6c6ff)
+    .rect(x + 2, y + 2, 2, 8).fill(0xd6c6ff));
+  const glyph = new Text({
+    text: up ? '▲' : '▼',
+    style: { fontFamily: 'monospace', fontSize: 10, fontWeight: 'bold', fill: 0xfff1f8 },
+  });
+  glyph.anchor.set(0.5);
+  glyph.position.set(x + 7, y + 7);
+  button.addChild(glyph);
   return button;
 }

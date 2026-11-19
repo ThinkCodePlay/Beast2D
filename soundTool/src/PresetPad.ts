@@ -6,17 +6,17 @@ export type PresetIcon =
 
 const TILE = 4;
 const ICON_ART: Record<PresetIcon, string[]> = {
-  coin: ['..ddd..', '.dgggd.', 'dgggggd', 'dggyygd', 'dgggggd', '.dgggd.', '..ddd..'],
-  star: ['...d...', '..dyd..', '.dyyyd.', 'dyyyyyd', '.dyyyd.', 'd.d.d.d', 'd.....d'],
-  heart: ['.pp.pp.', 'ppppppp', 'ppppppp', '.ppppp.', '..ppp..', '...p...', '.......'],
-  gem: ['..ddd..', '.dbbbd.', 'dbbcbcd', 'dbbcbcd', '.dbbbd.', '..ddd..', '.......'],
-  potion: ['...ddd.', '...dyd.', '...ddd.', '..drrd.', '.drrrd.', '.dgggd.', '..ddd..'],
+  coin: ['..ddd..', '.dgggd.', 'dgggggd', 'dggyygd', 'dggyygd', 'dgggggd', '.dgggd.'],
+  star: ['...d...', '..dyd..', '.dyyd..', 'dyyyyyd', '..dyd..', '.d...d.', 'd.....d'],
+  heart: ['.dd.dd.', 'dppdppd', 'dpppppd', '.dpppd.', '..dpd..', '...d...', '.......'],
+  gem: ['..ddd..', '.dbbbd.', 'dbbcbcd', 'dbbccbd', '.dbbbd.', '..ddd..', '.......'],
+  potion: ['...ddd.', '...dyd.', '...ddd.', '..drrd.', '.drrrd.', '.drrrd.', '..ddd..'],
   chest: ['ddddddd', 'dgggggd', 'dgyyygd', 'dggygyd', 'dgyyygd', 'dgggggd', 'ddddddd'],
   boot: ['...dd..', '...dgd.', '..ddgd.', '.dgggd.', '.dggggd', 'dgggggd', 'ddddddd'],
-  bomb: ['....d..', '...dyd.', '..dggd.', '.dgggd.', '.dgggd.', '..dggd.', '...ddd.'],
-  burst: ['...y...', '..ypy..', '.yyyyy.', 'yypypyy', '.yyyyy.', '..ypy..', '...y...'],
-  sparkle: ['...p...', '..ppp..', '.p.y.p.', 'ppyyypp', '.p.y.p.', '..ppp..', '...p...'],
-  bell: ['...yyy.', '..yggg.', '.yggggg', '.yggggg', '.yggggg', '..yygy.', '...yyy.'],
+  bomb: ['....dd.', '...dyd.', '..ddggd', '.dggggd', '.dggggd', '..dggd.', '...ddd.'],
+  burst: ['...d...', '..dyd..', '.dyyyd.', 'dyyyyyd', '.dyyyd.', '..dyd..', '...d...'],
+  sparkle: ['...d...', '..dyd..', '.d.y.d.', 'dyyyyyd', '.d.y.d.', '..dyd..', '...d...'],
+  bell: ['...ddd.', '..dyyyd', '.dggggd', '.dggggd', '.dggggd', '..ddgd.', '...ddd.'],
   skull: ['..ddd..', '.dwwwd.', 'dwwwwwd', 'dwwwwwd', 'dwdwdwd', '.dwdwd.', '..ddd..'],
 };
 
@@ -25,13 +25,11 @@ const COLORS: Record<string, number> = {
   b: 0x548be2, c: 0xa7d4ff, w: 0xfff4dc, r: 0xc85167,
 };
 
-/** 32×32 gold preset pad with a pixel icon and strong selected bevel. */
+/** 32×32 gold preset pad with a recognizable pixel-art symbol. */
 export class PresetPad extends Container {
   constructor(icon: PresetIcon, selected = false) {
     super();
-    this.addChild(drawPadFace(selected));
-    if (selected) this.addChild(drawSelectedIcon(ICON_ART[icon]));
-    this.addChild(drawIcon(icon));
+    this.addChild(drawPadFace(selected), drawIcon(icon));
   }
 }
 
@@ -47,14 +45,6 @@ function drawPadFace(selected: boolean): Graphics {
     .rect(25, 4, 2, 20).fill(selected ? 0xb94378 : 0xa66c3f)
     .rect(4, 24, 20, 2).fill(0x9a5b3c)
     .rect(22, 22, 4, 4).fill(selected ? 0xfff2bd : 0x36203f);
-}
-
-function drawSelectedIcon(rows: string[]): Graphics {
-  const outline = new Graphics();
-  rows.forEach((row, y) => [...row].forEach((pixel, x) => {
-    if (pixel !== '.') outline.rect(2 + x * TILE, 2 + y * TILE, TILE, TILE).fill(0x4b2a50);
-  }));
-  return outline;
 }
 
 function drawIcon(icon: PresetIcon): Graphics {

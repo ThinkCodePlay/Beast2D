@@ -1,12 +1,12 @@
 import { Container, Graphics } from 'pixi.js';
 
-const DISPLAY_HEIGHT = 16;
+const DISPLAY_HEIGHT = 56;
 const BAR_WIDTH = 4;
 const BAR_STEP = 8;
-const BAR_BASELINE = 14;
-const BAR_HEIGHTS = [4, 8, 12, 8, 4, 12, 8, 4, 8, 12, 4, 8, 12, 4, 8, 4, 12, 8, 4, 8, 12, 4, 8, 12, 8, 4, 12, 8, 4, 8, 12, 4];
+const BAR_HEIGHTS = [40, 56, 72, 64, 48, 36, 44, 32, 40, 28, 36, 24, 32, 24, 40, 32, 48, 56, 36, 32, 44, 28, 36, 24, 32, 28, 40, 36, 24, 32, 40, 28];
+const WAVE_COLOR = 0xffcf72;
 
-/** Compact pixel waveform display. Width is supplied by its parent; height is 16px. */
+/** Tall waveform window with grid lines and gold-to-orange bars. */
 export class WaveformDisplay extends Container {
   constructor(width: number) {
     super();
@@ -16,19 +16,20 @@ export class WaveformDisplay extends Container {
 
 function drawWaveform(width: number): Graphics {
   const waveform = new Graphics()
-    .rect(0, 0, width, DISPLAY_HEIGHT)
-    .fill(0x241530)
-    .rect(0, 0, width, 2)
-    .fill(0x9260ad)
-    .rect(0, DISPLAY_HEIGHT - 2, width, 2)
-    .fill(0x39214c);
+    .rect(0, 0, width, DISPLAY_HEIGHT).fill(0x241530)
+    .rect(0, 0, width, 2).fill(0x9260ad)
+    .rect(0, DISPLAY_HEIGHT - 2, width, 2).fill(0x39214c);
+
+  for (let x = 8; x < width; x += 16) {
+    waveform.rect(x, 4, 1, DISPLAY_HEIGHT - 8).fill({ color: 0x76508c, alpha: 0.45 });
+  }
 
   BAR_HEIGHTS.forEach((height, index) => {
     const x = 4 + index * BAR_STEP;
     if (x + BAR_WIDTH > width - 4) return;
-    waveform.rect(x, BAR_BASELINE - height, BAR_WIDTH, height)
-      .fill(index < 22 ? 0xffcf72 : 0xff985f);
+    const barHeight = Math.min(height, DISPLAY_HEIGHT - 8);
+    const color = index > 21 ? 0xff985f : WAVE_COLOR;
+    waveform.rect(x, DISPLAY_HEIGHT - 4 - barHeight, BAR_WIDTH, barHeight).fill(color);
   });
-
   return waveform;
 }

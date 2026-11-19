@@ -4,19 +4,21 @@ import { SoundBankPanel } from './SoundBankPanel';
 import { SoundBoardFooter } from './SoundBoardFooter';
 import { SoundBoardHeader } from './SoundBoardHeader';
 import { SoundBoardTabs } from './SoundBoardTabs';
+import { SoundControlStrip } from './SoundControlStrip';
 import { SoundCreationPanel } from './SoundCreationPanel';
 
 const DISPLAY_WIDTH = 512;
 const DISPLAY_HEIGHT = 1024 / 3;
 const OUTER_INSET = 16;
-const HEADER_TOP = 8;
-const TABS_TOP = 48;
-const CONTENT_TOP = 80;
-const CONTENT_HEIGHT = 224;
+const HEADER_TOP = 4;
+const TABS_TOP = 32;
+const CONTENT_TOP = 64;
+const CONTENT_HEIGHT = 208;
+const CONTROLS_TOP = 272;
 const FOOTER_TOP = 312;
-const PANEL_GAP = 16;
-const CREATION_WIDTH = 288;
-const BANK_WIDTH = 160;
+const PANEL_GAP = 8;
+const CREATION_WIDTH = 320;
+const BANK_WIDTH = 152;
 
 /** 3:2 sound-board design rendered on the requested 1536×1024 canvas. */
 export class SoundBoardFrame extends Container {
@@ -25,6 +27,7 @@ export class SoundBoardFrame extends Container {
   readonly content: Container;
   readonly creationPanel: SoundCreationPanel;
   readonly bankPanel: SoundBankPanel;
+  readonly controls: SoundControlStrip;
   readonly footer: SoundBoardFooter;
 
   constructor() {
@@ -44,9 +47,11 @@ export class SoundBoardFrame extends Container {
     this.bankPanel.position.x = CREATION_WIDTH + PANEL_GAP;
     this.content.addChild(this.creationPanel, this.bankPanel);
 
+    this.controls = new SoundControlStrip(DISPLAY_WIDTH - OUTER_INSET * 2, 40);
+    this.controls.position.set(OUTER_INSET, CONTROLS_TOP);
     this.footer = new SoundBoardFooter(DISPLAY_WIDTH - OUTER_INSET * 2);
     this.footer.position.set(OUTER_INSET, FOOTER_TOP);
 
-    this.addChild(board, this.header, this.tabs, this.content, this.footer);
+    this.addChild(board, this.header, this.tabs, this.content, this.controls, this.footer);
   }
 }
