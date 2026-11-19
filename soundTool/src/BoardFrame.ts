@@ -2,15 +2,18 @@ import { Container, Graphics } from 'pixi.js';
 
 const CORNER_STEP = 4;
 
-/** Compact stepped cabinet frame with a narrow bevel around the board face. */
+/** Stepped cabinet frame with a layered pixel bevel and dark drop edge. */
 export class BoardFrame extends Container {
   constructor(width = 512, height = 1024 / 3) {
     super();
     this.addChild(
-      drawSteppedFace(width, height, 0, 0x713f87),
-      new Graphics().rect(4, 4, width - 8, height - 8).fill(0x59316f),
-      drawBevel(width, height),
-      drawCornerPixels(width, height),
+      drawSteppedFace(width, height, 0, 0x20132b),
+      drawSteppedFace(width, height, 1, 0xa45cbd),
+      drawSteppedFace(width, height, 3, 0x291537),
+      drawSteppedFace(width, height, 4, 0x704083),
+      drawSteppedFace(width, height, 6, 0x523064),
+      drawSteppedFace(width, height, 8, 0x59316f),
+      drawFrameHighlights(width, height),
     );
   }
 }
@@ -38,16 +41,12 @@ function drawSteppedFace(width: number, height: number, inset: number, color: nu
     .fill(color);
 }
 
-function drawBevel(width: number, height: number): Graphics {
+function drawFrameHighlights(width: number, height: number): Graphics {
   return new Graphics()
-    .moveTo(4, 2).lineTo(width - 6, 2).stroke({ color: 0xe3a1ef, width: 1 })
-    .moveTo(2, 4).lineTo(2, height - 6).stroke({ color: 0xe3a1ef, width: 1 })
-    .moveTo(width - 2, 4).lineTo(width - 2, height - 4).stroke({ color: 0x2a1738, width: 1 })
-    .moveTo(4, height - 2).lineTo(width - 4, height - 2).stroke({ color: 0x2a1738, width: 1 });
-}
-
-function drawCornerPixels(width: number, height: number): Graphics {
-  return new Graphics()
+    .rect(8, 1, width - 16, 1).fill(0xd88ce7)
+    .rect(1, 8, 1, height - 16).fill(0xd88ce7)
+    .rect(8, height - 2, width - 16, 1).fill(0x2a1738)
+    .rect(width - 2, 8, 1, height - 16).fill(0x2a1738)
     .rect(3, 3, 2, 2).fill(0xffc2f4)
     .rect(width - 5, 3, 2, 2).fill(0xffa7e8)
     .rect(3, height - 5, 2, 2).fill(0xcb82e5)

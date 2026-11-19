@@ -20,21 +20,24 @@ export class WaveformDisplay extends Container {
 
 function drawWaveform(width: number): Graphics {
   const waveform = new Graphics()
-    .rect(0, 0, width, DISPLAY_HEIGHT).fill(0x241530)
-    .rect(0, 0, width, 2).fill(0x9260ad)
-    .rect(0, DISPLAY_HEIGHT - 2, width, 2).fill(0x39214c);
+    .rect(0, 0, width, DISPLAY_HEIGHT).fill(0x21132b)
+    .rect(2, 2, width - 4, DISPLAY_HEIGHT - 4).fill(0x241530)
+    .rect(3, 3, width - 6, 1).fill(0x76508c)
+    .rect(3, 3, 1, DISPLAY_HEIGHT - 6).fill(0x76508c)
+    .rect(3, DISPLAY_HEIGHT - 4, width - 6, 1).fill(0x39214c)
+    .rect(width - 4, 3, 1, DISPLAY_HEIGHT - 6).fill(0x39214c);
 
-  for (let x = 8; x < width; x += 16) {
-    waveform.rect(x, 4, 1, DISPLAY_HEIGHT - 8).fill({ color: 0x76508c, alpha: 0.45 });
+  for (let x = 8; x < width - 4; x += 16) {
+    waveform.rect(x, 5, 1, DISPLAY_HEIGHT - 10).fill({ color: 0x76508c, alpha: 0.45 });
   }
 
   BAR_HEIGHTS.forEach((height, index) => {
     const x = 4 + index * BAR_STEP;
     if (x + BAR_WIDTH > width - 4) return;
     const color = index > 22 ? 0xff9257 : WAVE_COLOR;
-    const barHeight = Math.min(height, DISPLAY_HEIGHT - 8);
-    waveform.rect(x, DISPLAY_HEIGHT - 4 - barHeight, BAR_WIDTH, barHeight).fill(color);
-    waveform.rect(x, DISPLAY_HEIGHT - 6, BAR_WIDTH, 2).fill(index > 22 ? 0xf16d5a : 0xffa643);
+    const barHeight = Math.min(height, DISPLAY_HEIGHT - 10);
+    waveform.rect(x + 1, DISPLAY_HEIGHT - 5 - barHeight, BAR_WIDTH - 1, barHeight).fill(color);
+    waveform.rect(x + 1, DISPLAY_HEIGHT - 7, BAR_WIDTH - 1, 2).fill(index > 22 ? 0xf16d5a : 0xffa643);
   });
   return waveform;
 }

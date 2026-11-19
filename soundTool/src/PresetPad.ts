@@ -13,7 +13,7 @@ const PAD_HEIGHT = 38;
 const ICON_SIZE = 24;
 const PAD_CORNER = 4;
 
-/** Pixel-art preset tile with a thin stepped bevel and separate sprite. */
+/** Pixel-art preset tile with a stepped rim, crisp highlights, and a sprite face. */
 export class PresetPad extends Container {
   constructor(icon: PresetIcon, textures: PresetTextures, selected = false) {
     super();
@@ -27,54 +27,52 @@ export class PresetPad extends Container {
 }
 
 function drawPadFace(selected: boolean): Graphics {
-  const graphic = new Graphics();
-  const outer = 0x24152e;
-  const rim = selected ? 0xe95186 : 0x9f542d;
-  const face = selected ? 0xf3ad58 : 0xf2b94c;
-  drawChamfer(graphic, 0, 0, PAD_WIDTH, PAD_HEIGHT, PAD_CORNER, outer);
-  drawChamfer(graphic, 2, 2, PAD_WIDTH - 2, PAD_HEIGHT - 2, 3, 0x432649);
-  drawChamfer(graphic, 2, 2, PAD_WIDTH - 4, PAD_HEIGHT - 4, 2, rim);
-  drawChamfer(graphic, 4, 4, PAD_WIDTH - 8, PAD_HEIGHT - 8, 2, face);
-  graphic
-    .rect(8, 5, PAD_WIDTH - 16, 1).fill(selected ? 0xffb6cc : 0xffdc7d)
-    .rect(5, 8, 1, PAD_HEIGHT - 16).fill(selected ? 0xffb6cc : 0xffdc7d)
-    .rect(PAD_WIDTH - 6, 8, 1, PAD_HEIGHT - 16).fill(0xc87336)
-    .rect(8, PAD_HEIGHT - 6, PAD_WIDTH - 16, 1).fill(0xc87336);
-  return graphic;
+  const face = new Graphics();
+  const edge = selected ? 0x291537 : 0x24152e;
+  const rim = selected ? 0xe95186 : 0x8f4b35;
+  const topLight = selected ? 0xffbed5 : 0xffdf8a;
+  const faceColor = selected ? 0xf3ad58 : 0xf2b94c;
+  const shadow = selected ? 0x5d284d : 0x311a36;
+
+  drawChamfer(face, 2, 3, PAD_WIDTH, PAD_HEIGHT, PAD_CORNER, shadow);
+  drawChamfer(face, 0, 0, PAD_WIDTH, PAD_HEIGHT, PAD_CORNER, edge);
+  drawChamfer(face, 2, 2, PAD_WIDTH - 4, PAD_HEIGHT - 4, PAD_CORNER - 1, rim);
+  drawChamfer(face, 4, 4, PAD_WIDTH - 8, PAD_HEIGHT - 8, 3, faceColor);
+  drawChamfer(face, 5, 5, PAD_WIDTH - 12, PAD_HEIGHT - 12, 2, selected ? 0xffcf72 : 0xf8ca5e);
+  face
+    .rect(9, 5, PAD_WIDTH - 18, 2).fill(topLight)
+    .rect(5, 9, 2, PAD_HEIGHT - 18).fill(topLight)
+    .rect(PAD_WIDTH - 7, 9, 2, PAD_HEIGHT - 18).fill(selected ? 0xc34c72 : 0xb56537)
+    .rect(9, PAD_HEIGHT - 7, PAD_WIDTH - 18, 2).fill(selected ? 0x713452 : 0xa64e34)
+    .rect(7, PAD_HEIGHT - 4, 3, 2).fill(edge)
+    .rect(PAD_WIDTH - 10, PAD_HEIGHT - 4, 3, 2).fill(edge);
+  return face;
 }
 
 function drawChamfer(graphic: Graphics, x: number, y: number, width: number, height: number, cut: number, color: number): void {
-  const step = Math.min(2, cut / 2);
+  const step = Math.min(2, Math.floor(cut / 2));
   const right = x + width;
   const bottom = y + height;
   graphic
     .moveTo(x + cut, y)
     .lineTo(right - cut, y)
     .lineTo(right - cut, y + step)
-    .lineTo(right - cut + step, y + step)
-    .lineTo(right - cut + step, y + 2 * step)
-    .lineTo(right - step, y + 2 * step)
+    .lineTo(right - step, y + step)
     .lineTo(right - step, y + cut)
     .lineTo(right, y + cut)
     .lineTo(right, bottom - cut)
     .lineTo(right - step, bottom - cut)
-    .lineTo(right - step, bottom - 2 * step)
-    .lineTo(right - cut + step, bottom - 2 * step)
-    .lineTo(right - cut + step, bottom - step)
+    .lineTo(right - step, bottom - step)
     .lineTo(right - cut, bottom - step)
     .lineTo(right - cut, bottom)
     .lineTo(x + cut, bottom)
     .lineTo(x + cut, bottom - step)
-    .lineTo(x + cut - step, bottom - step)
-    .lineTo(x + cut - step, bottom - 2 * step)
-    .lineTo(x + step, bottom - 2 * step)
+    .lineTo(x + step, bottom - step)
     .lineTo(x + step, bottom - cut)
     .lineTo(x, bottom - cut)
     .lineTo(x, y + cut)
     .lineTo(x + step, y + cut)
-    .lineTo(x + step, y + 2 * step)
-    .lineTo(x + cut - step, y + 2 * step)
-    .lineTo(x + cut - step, y + step)
+    .lineTo(x + step, y + step)
     .lineTo(x + cut, y + step)
     .closePath()
     .fill(color);

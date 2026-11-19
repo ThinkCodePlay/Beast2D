@@ -83,23 +83,33 @@ function drawChamferedRect(graphic: Graphics, x: number, y: number, width: numbe
 function createTransportIcon(icon: string): Graphics {
   const graphic = new Graphics();
   if (icon === '▶') {
-    graphic.poly([6, 5, 22, 14, 6, 23]).fill(0x281735)
-      .poly([5, 4, 21, 13, 5, 22]).fill(0x47243f)
-      .poly([5, 4, 19, 13, 5, 21]).fill(0xffc84d)
-      .rect(5, 4, 3, 14).fill(0xffed9e);
+    graphic
+      .poly([5, 3, 22, 13, 22, 16, 5, 26]).fill(0x281735)
+      .poly([4, 2, 21, 12, 21, 15, 4, 25]).fill(0x6c3150)
+      .poly([5, 3, 19, 12, 19, 15, 5, 23]).fill(0xffae42)
+      .poly([6, 5, 17, 12, 17, 15, 6, 21]).fill(0xffdb59)
+      .rect(5, 4, 3, 15).fill(0xfff0a1)
+      .rect(8, 6, 2, 3).fill(0xfff0a1);
   } else if (icon === '■') {
-    graphic.rect(6, 6, 16, 16).fill(0x281735)
-      .rect(6, 6, 14, 14).fill(0x472b54)
-      .rect(8, 8, 10, 10).fill(0x321b47);
+    graphic
+      .rect(6, 6, 18, 18).fill(0x281735)
+      .rect(6, 6, 16, 16).fill(0x604477)
+      .rect(8, 8, 12, 12).fill(0xfff4dc)
+      .rect(10, 10, 8, 8).fill(0x321b47)
+      .rect(8, 8, 3, 2).fill(0xfffdf4)
+      .rect(8, 10, 2, 3).fill(0xfffdf4)
+      .rect(20, 9, 2, 11).fill(0x9f898b)
+      .rect(10, 20, 10, 2).fill(0xb19b9a);
   } else {
-    graphic.arc(14, 14, 7, -2.7, 0.1).stroke({ color: 0x3a2345, width: 5 })
-      .arc(14, 14, 7, 0.45, 3.25).stroke({ color: 0x3a2345, width: 5 })
-      .arc(14, 14, 7, -2.7, 0.1).stroke({ color: 0xfff4dc, width: 2.5 })
-      .arc(14, 14, 7, 0.45, 3.25).stroke({ color: 0xfff4dc, width: 2.5 })
-      .poly([20, 5, 25, 6, 22, 11]).fill(0x3a2345)
-      .poly([20, 6, 23, 7, 21, 10]).fill(0xfff4dc)
-      .poly([8, 23, 3, 22, 6, 17]).fill(0x3a2345)
-      .poly([8, 22, 5, 21, 7, 18]).fill(0xfff4dc);
+    graphic
+      .arc(14, 14, 8, -2.7, 0.1).stroke({ color: 0x281735, width: 5 })
+      .arc(14, 14, 8, 0.45, 3.25).stroke({ color: 0x281735, width: 5 })
+      .arc(14, 14, 8, -2.7, 0.1).stroke({ color: 0xfff4dc, width: 2 })
+      .arc(14, 14, 8, 0.45, 3.25).stroke({ color: 0xfff4dc, width: 2 })
+      .poly([19, 11, 25, 15, 20, 19]).fill(0x281735)
+      .poly([19, 12, 23, 15, 20, 18]).fill(0xfff4dc)
+      .poly([9, 9, 3, 13, 8, 17]).fill(0x281735)
+      .poly([8, 10, 5, 13, 8, 16]).fill(0xfff4dc);
   }
   const iconScale = 0.9;
   graphic.scale.set(iconScale);
