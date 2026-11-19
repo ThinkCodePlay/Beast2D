@@ -64,24 +64,25 @@ function drawChamferedRect(graphic: Graphics, x: number, y: number, width: numbe
 function createTransportIcon(icon: string): Graphics {
   const graphic = new Graphics();
   if (icon === '▶') {
-    graphic.poly([10, 8, 26, 16, 10, 24]).fill(0x47243f)
-      .poly([8, 6, 24, 14, 8, 22]).fill(0x9f6233)
-      .poly([8, 6, 22, 14, 8, 22]).fill(0xffc84d)
-      .rect(8, 6, 3, 14).fill(0xffed9e);
+    graphic.poly([6, 5, 22, 14, 6, 23]).fill(0x47243f)
+      .poly([5, 4, 21, 13, 5, 22]).fill(0x9f6233)
+      .poly([5, 4, 19, 13, 5, 21]).fill(0xffc84d)
+      .rect(5, 4, 3, 14).fill(0xffed9e);
   } else if (icon === '■') {
-    graphic.rect(9, 9, 16, 16).fill(0x281735)
-      .rect(9, 9, 14, 14).fill(0x472b54)
-      .rect(11, 11, 10, 10).fill(0x321b47);
+    graphic.rect(6, 6, 16, 16).fill(0x281735)
+      .rect(6, 6, 14, 14).fill(0x472b54)
+      .rect(8, 8, 10, 10).fill(0x321b47);
   } else {
-    graphic.arc(16, 16, 7, -2.7, 0.1).stroke({ color: 0x3a2345, width: 5 })
-      .arc(16, 16, 7, 0.45, 3.25).stroke({ color: 0x3a2345, width: 5 })
-      .arc(16, 16, 7, -2.7, 0.1).stroke({ color: 0xfff4dc, width: 2.5 })
-      .arc(16, 16, 7, 0.45, 3.25).stroke({ color: 0xfff4dc, width: 2.5 })
-      .poly([22, 7, 27, 8, 24, 13]).fill(0x3a2345)
-      .poly([22, 8, 25, 9, 23, 12]).fill(0xfff4dc)
-      .poly([10, 25, 5, 24, 8, 19]).fill(0x3a2345)
-      .poly([10, 24, 7, 23, 9, 20]).fill(0xfff4dc);
+    graphic.arc(14, 14, 7, -2.7, 0.1).stroke({ color: 0x3a2345, width: 5 })
+      .arc(14, 14, 7, 0.45, 3.25).stroke({ color: 0x3a2345, width: 5 })
+      .arc(14, 14, 7, -2.7, 0.1).stroke({ color: 0xfff4dc, width: 2.5 })
+      .arc(14, 14, 7, 0.45, 3.25).stroke({ color: 0xfff4dc, width: 2.5 })
+      .poly([20, 5, 25, 6, 22, 11]).fill(0x3a2345)
+      .poly([20, 6, 23, 7, 21, 10]).fill(0xfff4dc)
+      .poly([8, 23, 3, 22, 6, 17]).fill(0x3a2345)
+      .poly([8, 22, 5, 21, 7, 18]).fill(0xfff4dc);
   }
+  graphic.position.set(0, 0);
   return graphic;
 }
 
@@ -92,6 +93,6 @@ function createTextIcon(icon: string, color: number): Text {
     style: { fontFamily: 'monogram', fontSize: isRun ? 12 : 18, fontWeight: 'bold', fill: color }, resolution: 3,
   });
   label.anchor.set(0.5);
-  label.position.set(BUTTON_SIZE / 2, BUTTON_SIZE / 2 - (isRun ? 0 : 1));
+  label.position.set(BUTTON_SIZE / 2, BUTTON_SIZE / 2 - (isRun ? 2 : 3));
   return label;
 }

@@ -7,7 +7,7 @@ import { WaveformDisplay } from './ui/WaveformDisplay';
 
 const PAD_STEP_X = 160 / 3; // 160 output pixels at the 3× stage scale.
 const PAD_STEP_Y = 43;
-const TRANSPORT_POSITIONS = { stop: 44, loop: 96, name: 142, volume: 290 } as const;
+const TRANSPORT_POSITIONS = { stop: 42, loop: 92, name: 134, volume: 268 } as const;
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
@@ -28,6 +28,9 @@ function createTransport(): Container {
   const play = new PixelButton('▶', 'pink');
   const stop = new PixelButton('■', 'cream');
   const loop = new PixelButton('↻', 'green');
+  play.scale.set(1.35);
+  stop.scale.set(1.35);
+  loop.scale.set(1.35);
   const namePlate = createSoundName(118);
   const volume = new PixelKnob('VOL', 0.5, 0xff91c8, 'master');
   volume.scale.set(1.25);
@@ -42,15 +45,18 @@ function createTransport(): Container {
 function createSoundName(width: number): Container {
   const plate = new Container();
   const face = new Graphics()
-    .rect(0, 0, width, 32).fill(0x21142f)
-    .rect(0, 0, width, 4).fill(0xe3a1ef)
-    .rect(0, 28, width, 4).fill(0x281635)
-    .rect(4, 4, width - 8, 24).stroke({ color: 0x9867b5, width: 2 });
+    .poly([4, 0, width - 4, 0, width, 4, width, 28, width - 4, 32, 4, 32, 0, 28, 0, 4]).fill(0x24152e)
+    .poly([6, 2, width - 6, 2, width - 2, 6, width - 2, 26, width - 6, 30, 6, 30, 2, 26, 2, 6]).fill(0x9b60b7)
+    .poly([7, 4, width - 7, 4, width - 4, 7, width - 4, 25, width - 7, 28, 7, 28, 4, 25, 4, 7]).fill(0x291838)
+    .rect(9, 5, width - 18, 1).fill(0xc58bdd)
+    .rect(5, 9, 1, 14).fill(0xb77bcf)
+    .rect(width - 6, 8, 1, 16).fill(0x1b1027)
+    .rect(9, 27, width - 18, 1).fill(0x1b1027);
   const name = new Text({
     text: 'coin_pickup',
-    style: { fontFamily: 'monogram', fontSize: 14, fontWeight: 'bold', fill: 0xffeaff }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 16, fontWeight: 'bold', fill: 0xffeaff }, resolution: 3,
   });
-  name.position.set(8, 12);
+  name.position.set(8, 6);
   plate.addChild(face, name);
   return plate;
 }

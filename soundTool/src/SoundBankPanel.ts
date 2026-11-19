@@ -8,7 +8,7 @@ const BANK_ITEMS = [
 const BANK_ROW_TOP = 28;
 const SCROLL_BUTTON_SIZE = 16;
 
-/** Flat, inset sound-bank area with a fine board-colored boundary. */
+/** Stepped sound-bank shell with individually rendered rows. */
 export class SoundBankPanel extends Container {
   constructor(width: number, height: number) {
     super();
@@ -22,12 +22,17 @@ export class SoundBankPanel extends Container {
 
 function drawFlatBoundary(width: number, height: number): Graphics {
   return new Graphics()
-    .rect(0, 0, width, height).fill(0x40264f)
-    .rect(0, 0, width, 1).fill(0x9b60b7)
-    .rect(0, 0, 1, height).fill(0x9b60b7)
-    .rect(1, height - 1, width - 1, 1).fill(0x301b42)
-    .rect(width - 1, 1, 1, height - 2).fill(0x301b42)
-    .rect(2, 25, width - 4, 1).fill(0x56316b);
+    .poly([4, 0, width - 4, 0, width, 4, width, height - 4, width - 4, height,
+      4, height, 0, height - 4, 0, 4]).fill(0x24152e)
+    .poly([5, 2, width - 5, 2, width - 2, 5, width - 2, height - 6,
+      width - 6, height - 2, 5, height - 2, 2, height - 5, 2, 5]).fill(0x8a55a4)
+    .poly([6, 4, width - 6, 4, width - 4, 6, width - 4, height - 8,
+      width - 8, height - 4, 6, height - 4, 4, height - 6, 4, 6]).fill(0x351f49)
+    .rect(7, 5, width - 14, 1).fill(0xb67bc8)
+    .rect(5, 7, 1, height - 14).fill(0x704584)
+    .rect(width - 6, 7, 1, height - 14).fill(0x281635)
+    .rect(7, height - 6, width - 14, 1).fill(0x281635)
+    .rect(5, 25, width - 10, 1).fill(0x56316b);
 }
 
 function createTitle(): Text {

@@ -28,15 +28,18 @@ export class PresetPad extends Container {
 
 function drawPadFace(selected: boolean): Graphics {
   const graphic = new Graphics();
-  const border = selected ? 0xe95186 : 0x432649;
-  const side = selected ? 0xb94368 : 0xb86538;
-  drawChamfer(graphic, 0, 0, PAD_WIDTH, PAD_HEIGHT, PAD_CORNER, border);
-  drawChamfer(graphic, 2, 2, PAD_WIDTH - 4, PAD_HEIGHT - 4, 2, 0xf6c355);
+  const outer = 0x24152e;
+  const rim = selected ? 0xe95186 : 0x9f542d;
+  const face = selected ? 0xf3ad58 : 0xf2b94c;
+  drawChamfer(graphic, 0, 0, PAD_WIDTH, PAD_HEIGHT, PAD_CORNER, outer);
+  drawChamfer(graphic, 2, 2, PAD_WIDTH - 2, PAD_HEIGHT - 2, 3, 0x432649);
+  drawChamfer(graphic, 2, 2, PAD_WIDTH - 4, PAD_HEIGHT - 4, 2, rim);
+  drawChamfer(graphic, 4, 4, PAD_WIDTH - 8, PAD_HEIGHT - 8, 2, face);
   graphic
-    .rect(6, 3, PAD_WIDTH - 12, 2).fill(selected ? 0xffa6bf : 0xffefb5)
-    .rect(3, 6, 2, PAD_HEIGHT - 12).fill(selected ? 0xffa6bf : 0xffefb5)
-    .rect(PAD_WIDTH - 4, 6, 1, PAD_HEIGHT - 12).fill(side)
-    .rect(6, PAD_HEIGHT - 4, PAD_WIDTH - 12, 1).fill(side);
+    .rect(8, 5, PAD_WIDTH - 16, 1).fill(selected ? 0xffb6cc : 0xffdc7d)
+    .rect(5, 8, 1, PAD_HEIGHT - 16).fill(selected ? 0xffb6cc : 0xffdc7d)
+    .rect(PAD_WIDTH - 6, 8, 1, PAD_HEIGHT - 16).fill(0xc87336)
+    .rect(8, PAD_HEIGHT - 6, PAD_WIDTH - 16, 1).fill(0xc87336);
   return graphic;
 }
 

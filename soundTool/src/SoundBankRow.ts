@@ -16,15 +16,15 @@ export class SoundBankRow extends Container {
 }
 
 function drawRow(selected: boolean, width: number): Graphics {
-  const baseColor = selected ? 0xffcf72 : 0x38214c;
-  const edgeColor = selected ? 0xf2b954 : 0x251531;
+  const fill = selected ? 0xffcf72 : 0x38214c;
   const divider = selected ? 0x9a5b3c : 0x76508c;
   return new Graphics()
-    .rect(ROW_LEFT, 0, width, BANK_ROW_HEIGHT).fill(baseColor)
-    .rect(ROW_LEFT, 0, 16, BANK_ROW_HEIGHT).fill(edgeColor)
-    .rect(ROW_LEFT, 0, width, BANK_ROW_HEIGHT)
-    .stroke({ color: selected ? 0xf0c060 : 0x76508c, width: 1 })
-    .moveTo(ROW_LEFT + 16, 0).lineTo(ROW_LEFT + 16, BANK_ROW_HEIGHT)
+    .rect(ROW_LEFT, 0, width, BANK_ROW_HEIGHT).fill(0x24152e)
+    .rect(ROW_LEFT + 1, 1, width - 2, BANK_ROW_HEIGHT - 2).fill(fill)
+    .rect(ROW_LEFT + 1, 1, 16, BANK_ROW_HEIGHT - 2).fill(selected ? 0xf0b84f : 0x251531)
+    .rect(ROW_LEFT + 1, 1, width - 2, 1).fill(selected ? 0xffe295 : 0x76508c)
+    .rect(ROW_LEFT + 1, BANK_ROW_HEIGHT - 2, width - 2, 1).fill(selected ? 0xa46139 : 0x251531)
+    .moveTo(ROW_LEFT + 17, 1).lineTo(ROW_LEFT + 17, BANK_ROW_HEIGHT - 1)
     .stroke({ color: divider, width: 1 })
     .moveTo(width - 32, 2).lineTo(width - 32, BANK_ROW_HEIGHT - 2)
     .stroke({ color: divider, width: 1 });

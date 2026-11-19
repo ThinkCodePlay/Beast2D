@@ -12,8 +12,8 @@ const KNOBS = [
   { label: 'CUT', value: 0.54, color: 0xffcf72 },
 ] as const;
 
-const KNOB_PITCH = 36;
-const KNOB_TILE_WIDTH = 32;
+const KNOB_PITCH = 48.5;
+const KNOB_TILE_WIDTH = 42;
 const KNOB_TILE_HEIGHT = 40;
 
 /** Shared bottom strip with six 32px dials and the waveform edit control. */
@@ -22,25 +22,34 @@ export class SoundControlStrip extends Container {
     super();
     this.addChild(new RaisedPanelFrame(width, height));
     KNOBS.forEach((knob, index) => {
-      const x = 4 + index * KNOB_PITCH;
+      const x = 5.5 + index * KNOB_PITCH;
       this.addChild(createKnobTile(x));
       const control = new PixelKnob(knob.label, knob.value, knob.color);
-      control.position.set(x, 4);
+      control.position.set(x + 5, 4);
       this.addChild(control);
     });
     const edit = new EditButton();
-    edit.position.set(264, 4);
+    edit.position.set(300, 4);
     this.addChild(edit);
   }
 }
 
 function createKnobTile(x: number): Graphics {
+  const left = x;
+  const top = 1;
+  const width = KNOB_TILE_WIDTH;
+  const height = KNOB_TILE_HEIGHT - 2;
   return new Graphics()
-    .rect(x + 2, 3, KNOB_TILE_WIDTH, KNOB_TILE_HEIGHT).fill(0x20132c)
-    .rect(x, 1, KNOB_TILE_WIDTH, KNOB_TILE_HEIGHT - 2).fill(0x724492)
-    .rect(x + 2, 3, KNOB_TILE_WIDTH - 4, KNOB_TILE_HEIGHT - 6).fill(0x59316f)
-    .rect(x + 4, 2, KNOB_TILE_WIDTH - 8, 1).fill(0xd89de7)
-    .rect(x + 1, 4, 1, KNOB_TILE_HEIGHT - 8).fill(0xb77bcf)
-    .rect(x + KNOB_TILE_WIDTH - 1, 4, 1, KNOB_TILE_HEIGHT - 8).fill(0x36203f)
-    .rect(x + 4, KNOB_TILE_HEIGHT - 1, KNOB_TILE_WIDTH - 6, 1).fill(0x36203f);
+    .poly([left + 3, top, left + width - 3, top, left + width, top + 3, left + width, top + height - 3,
+      left + width - 3, top + height, left + 3, top + height, left, top + height - 3, left, top + 3]).fill(0x24152e)
+    .poly([left + 5, top + 2, left + width - 5, top + 2, left + width - 2, top + 5,
+      left + width - 2, top + height - 4, left + width - 5, top + height - 2,
+      left + 5, top + height - 2, left + 2, top + height - 5, left + 2, top + 5]).fill(0x704584)
+    .poly([left + 7, top + 4, left + width - 7, top + 4, left + width - 4, top + 7,
+      left + width - 4, top + height - 6, left + width - 7, top + height - 4,
+      left + 7, top + height - 4, left + 4, top + height - 7, left + 4, top + 7]).fill(0x59316f)
+    .rect(left + 8, top + 4, width - 16, 1).fill(0xb985d2)
+    .rect(left + 4, top + 8, 1, height - 16).fill(0x9160aa)
+    .rect(left + width - 5, top + 8, 1, height - 16).fill(0x342043)
+    .rect(left + 8, top + height - 5, width - 16, 1).fill(0x342043);
 }

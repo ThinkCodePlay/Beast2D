@@ -3,7 +3,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 type TabIcon = 'note' | 'gamepad' | 'folder' | 'gear';
 type TabTone = 'selected' | 'violet';
 
-const TAB_WIDTH = 70;
+const TAB_WIDTH = 75;
 const TAB_HEIGHT = 32;
 const TAB_ITEMS: { label: string; icon: TabIcon; tone: TabTone }[] = [
   { label: 'SFX', icon: 'note', tone: 'selected' },
@@ -36,17 +36,16 @@ class SoundBoardTab extends Container {
 
 function drawTabFace(tone: TabTone): Graphics {
   const selected = tone === 'selected';
-  const fill = selected ? 0xe4aa54 : 0x59316f;
-  const edge = selected ? 0xffcf72 : 0x9b60b7;
+  const fill = selected ? 0xe6ab51 : 0x69427d;
   const tab = new Graphics();
-  drawChamfer(tab, 0, 0, TAB_WIDTH - 2, TAB_HEIGHT - 2, 4, 0x432851);
-  drawChamfer(tab, 2, 2, TAB_WIDTH - 6, TAB_HEIGHT - 6, 2, fill);
+  drawChamfer(tab, 0, 0, TAB_WIDTH - 2, TAB_HEIGHT - 2, 4, 0x24152e);
+  drawChamfer(tab, 2, 2, TAB_WIDTH - 6, TAB_HEIGHT - 6, 3, 0x342044);
+  drawChamfer(tab, 3, 3, TAB_WIDTH - 8, TAB_HEIGHT - 8, 2, fill);
   tab
-    .rect(6, 2, TAB_WIDTH - 12, 2).fill(0xe3a1ef)
-    .rect(2, 6, 2, TAB_HEIGHT - 12).fill(0xe3a1ef)
-    .rect(6, TAB_HEIGHT - 2, TAB_WIDTH - 12, 2).fill(edge)
-    .rect(TAB_WIDTH - 2, 6, 2, TAB_HEIGHT - 12).fill(edge)
-    .rect(2, 2, 4, 2).fill(selected ? 0xfff0bd : 0xc58bdd);
+    .rect(8, 4, TAB_WIDTH - 18, 1).fill(selected ? 0xffdf8b : 0xb985d2)
+    .rect(4, 8, 1, TAB_HEIGHT - 16).fill(selected ? 0xffdf8b : 0xb985d2)
+    .rect(TAB_WIDTH - 6, 7, 1, TAB_HEIGHT - 14).fill(selected ? 0xa65c37 : 0x40234f)
+    .rect(8, TAB_HEIGHT - 5, TAB_WIDTH - 18, 1).fill(selected ? 0xa65c37 : 0x40234f);
   return tab;
 }
 
