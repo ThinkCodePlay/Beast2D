@@ -43,7 +43,7 @@ export class SoundCreationPanel extends Container {
     this.addChild(createTransport());
     this.addChild(createPresetGrid());
     const waveform = new WaveformDisplay(width - 32);
-    waveform.position.set(16, 144);
+    waveform.position.set(16, 136);
     this.addChild(waveform);
     this.addChild(createKnobRow());
   }
@@ -114,7 +114,7 @@ function createKnobRow(): Container {
   const startX = 28;
   KNOBS.forEach((knob, index) => {
     const control = new PixelKnob(knob.label, knob.value, knob.color);
-    control.position.set(startX + index * KNOB_STEP, 160);
+    control.position.set(startX + index * KNOB_STEP, 152);
     row.addChild(control);
   });
   return row;
