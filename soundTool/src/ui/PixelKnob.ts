@@ -26,28 +26,29 @@ function createStandardFace(color: number, value: number, accented: boolean): Gr
   const angle = angleForValue(value);
   const indicatorX = STANDARD_CENTER_X + Math.round(Math.cos(angle) * 6);
   const indicatorY = STANDARD_CENTER_Y + Math.round(Math.sin(angle) * 6);
-  const rim = accented ? (color === 0xff91c8 ? 0xe94f88 : 0x79b94d) : 0x321b47;
-  const highlight = accented ? (color === 0xff91c8 ? 0xffb6d1 : 0xc5f0a6) : 0xfff4dc;
+  const rim = accented ? (color === 0xff91c8 ? 0xe94f88 : 0x79b94d) : 0x4a2b5c;
+  const rimLight = accented ? (color === 0xff91c8 ? 0xffb6d1 : 0xc5f0a6) : 0xfff4dc;
   return new Graphics()
-    .circle(STANDARD_CENTER_X + 2, STANDARD_CENTER_Y + 2, 12)
+    .circle(STANDARD_CENTER_X + 2, STANDARD_CENTER_Y + 2, 11)
     .fill(0x140b20)
-    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 12)
-    .fill(0x321b47)
     .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 11)
-    .fill(accented ? color : 0x604077)
+    .fill(0x321b47)
     .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 10)
     .fill(rim)
-    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 9)
+    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 8)
     .fill(0xeee1d0)
-    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 7)
-    .fill(highlight)
+    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 6)
+    .fill(0xfff4dc)
     .rect(STANDARD_CENTER_X - 7, STANDARD_CENTER_Y - 7, 3, 2)
-    .fill(accented ? color : 0xfff4dc)
+    .fill(rimLight)
     .rect(STANDARD_CENTER_X - 9, STANDARD_CENTER_Y - 3, 2, 3)
-    .fill(accented ? color : 0xfff4dc)
+    .fill(rimLight)
     .moveTo(STANDARD_CENTER_X, STANDARD_CENTER_Y)
     .lineTo(indicatorX, indicatorY)
-    .stroke({ color, width: 2 })
+    .stroke({ color: 0x482d3b, width: 4 })
+    .moveTo(STANDARD_CENTER_X, STANDARD_CENTER_Y)
+    .lineTo(indicatorX, indicatorY)
+    .stroke({ color: accented ? color : 0xa4673f, width: 1 })
     .rect(STANDARD_CENTER_X - 1, STANDARD_CENTER_Y - 1, 2, 2)
     .fill(0x70428a);
 }
