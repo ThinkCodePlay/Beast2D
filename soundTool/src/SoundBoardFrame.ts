@@ -1,48 +1,52 @@
 import { Container } from 'pixi.js';
 import { BoardFrame as BoardFrameArtwork } from './BoardFrame';
-import { SoundBoardHeader } from './SoundBoardHeader';
 import { SoundBankPanel } from './SoundBankPanel';
+import { SoundBoardFooter } from './SoundBoardFooter';
+import { SoundBoardHeader } from './SoundBoardHeader';
+import { SoundBoardTabs } from './SoundBoardTabs';
 import { SoundCreationPanel } from './SoundCreationPanel';
 
-const FRAME_INSET = 8;
-const CONTENT_TOP = 32;
-const CONTENT_BOTTOM = 8;
-const HEADER_WIDTH_INSET = 16;
-const PANEL_GAP = 16;
-const BANK_PANEL_WIDTH = 96;
+const DISPLAY_WIDTH = 480;
+const DISPLAY_HEIGHT = 320;
+const OUTER_INSET = 16;
+const HEADER_TOP = 8;
+const TABS_TOP = 48;
+const CONTENT_TOP = 80;
+const CONTENT_HEIGHT = 192;
+const FOOTER_TOP = 296;
+const PANEL_GAP = 32;
+const CREATION_WIDTH = 288;
+const BANK_WIDTH = 128;
 
-/**
- * Self-contained sound board frame composition.
- * Owns the cabinet artwork, header, and content area for the two board sections.
- */
+/** Full sound-board composition at the Game Boy Advance 3:2 aspect ratio. */
 export class SoundBoardFrame extends Container {
   readonly header: SoundBoardHeader;
+  readonly tabs: SoundBoardTabs;
   readonly content: Container;
-  readonly contentWidth: number;
-  readonly contentHeight: number;
   readonly creationPanel: SoundCreationPanel;
   readonly bankPanel: SoundBankPanel;
+  readonly footer: SoundBoardFooter;
 
-  constructor(width = 320, height = 240) {
+  constructor() {
     super();
 
-    this.contentWidth = width - FRAME_INSET * 2;
-    this.contentHeight = height - CONTENT_TOP - CONTENT_BOTTOM;
+    const board = new BoardFrameArtwork(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    this.header = new SoundBoardHeader(DISPLAY_WIDTH - OUTER_INSET * 2);
+    this.header.position.set(OUTER_INSET, HEADER_TOP);
 
-    const frame = new BoardFrameArtwork(width, height);
-    this.header = new SoundBoardHeader(width - HEADER_WIDTH_INSET);
+    this.tabs = new SoundBoardTabs();
+    this.tabs.position.set(OUTER_INSET, TABS_TOP);
+
     this.content = new Container();
-    this.content.position.set(FRAME_INSET, CONTENT_TOP);
-
-    const panelWidth = this.contentWidth - PANEL_GAP;
-    const creationWidth = panelWidth - BANK_PANEL_WIDTH;
-    const bankWidth = BANK_PANEL_WIDTH;
-    this.creationPanel = new SoundCreationPanel(creationWidth, this.contentHeight);
-    this.bankPanel = new SoundBankPanel(bankWidth, this.contentHeight);
-    this.bankPanel.position.set(creationWidth + PANEL_GAP, 0);
+    this.content.position.set(OUTER_INSET, CONTENT_TOP);
+    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT);
+    this.bankPanel = new SoundBankPanel(BANK_WIDTH, CONTENT_HEIGHT);
+    this.bankPanel.position.x = CREATION_WIDTH + PANEL_GAP;
     this.content.addChild(this.creationPanel, this.bankPanel);
 
-    // Each section owns its own contents; the shell only sets their shared layout.
-    this.addChild(frame, this.header, this.content);
+    this.footer = new SoundBoardFooter(DISPLAY_WIDTH - OUTER_INSET * 2);
+    this.footer.position.set(OUTER_INSET, FOOTER_TOP);
+
+    this.addChild(board, this.header, this.tabs, this.content, this.footer);
   }
 }

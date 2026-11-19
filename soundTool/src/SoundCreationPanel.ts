@@ -1,91 +1,121 @@
 import { Container, Graphics, Text } from 'pixi.js';
+import { PixelButton } from './ui/PixelButton';
+import { PixelKnob } from './ui/PixelKnob';
+import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
+import { WaveformDisplay } from './ui/WaveformDisplay';
 
-const PANEL_FACE = 0x59316f;
-const TITLE_TEXT = 0xffeaff;
-const DIVIDER = 0x70428a;
+const BUTTON_GAP = 8;
+const PAD_STEP_X = 40;
+const PAD_STEP_Y = 40;
+const KNOB_STEP = 40;
+const TITLE_COLOR = 0xffeaff;
 
-/** Empty sound-creation panel with the pixel-beveled raised outer-frame treatment. */
+const PRESETS = [
+  { icon: '¢', tone: 'gold' },
+  { icon: '★', tone: 'gold' },
+  { icon: '♥', tone: 'pink' },
+  { icon: '◆', tone: 'violet' },
+  { icon: '!', tone: 'pink' },
+  { icon: '□', tone: 'gold' },
+  { icon: '⌁', tone: 'violet' },
+  { icon: '●', tone: 'violet' },
+  { icon: '✹', tone: 'pink' },
+  { icon: '✦', tone: 'gold' },
+  { icon: '♟', tone: 'gold' },
+  { icon: '☠', tone: 'gold' },
+] as const;
+
+const KNOBS = [
+  { label: 'VOL', value: 0.75, color: 0xff91c8 },
+  { label: 'PAN', value: 0.5, color: 0xffcf72 },
+  { label: 'DEC', value: 0.68, color: 0xffcf72 },
+  { label: 'RATE', value: 0.58, color: 0xffcf72 },
+  { label: 'PITCH', value: 0.62, color: 0x9ee18b },
+  { label: 'CUT', value: 0.54, color: 0xffcf72 },
+] as const;
+
+/** Left-side sound maker. Each visual control is an independent 32px component. */
 export class SoundCreationPanel extends Container {
   constructor(width: number, height: number) {
     super();
-    this.addChild(...createRaisedPanelFrame(width, height));
+    this.addChild(new RaisedPanelFrame(width, height));
     this.addChild(createTitle());
+    this.addChild(createTransport());
+    this.addChild(createPresetGrid());
+    const waveform = new WaveformDisplay(width - 32);
+    waveform.position.set(16, 144);
+    this.addChild(waveform);
+    this.addChild(createKnobRow());
   }
 }
 
-function createRaisedPanelFrame(width: number, height: number): Graphics[] {
-  const shadow = createChamferedFace(6, 8, width - 8, height - 8, 8, 0x140b20);
-  const cabinetSide = createChamferedFace(2, 3, width - 7, height - 7, 8, 0x2b1739)
-    .stroke({ color: 0x1b1027, width: 2 });
-  const topFace = createChamferedFace(0, 0, width - 6, height - 6, 8, 0x713f87)
-    .stroke({ color: 0xc276d7, width: 2 });
-  const panelFace = createChamferedFace(4, 4, width - 14, height - 14, 4, PANEL_FACE)
-    .stroke({ color: 0x9b60b7, width: 2 });
-
-  const bevel = new Graphics()
-    // Bright top and left edges catch the light, like the mockup's raised panels.
-    .moveTo(16, 2)
-    .lineTo(width - 24, 2)
-    .stroke({ color: 0xe3a1ef, width: 2 })
-    .moveTo(2, 16)
-    .lineTo(2, height - 24)
-    .stroke({ color: 0xe3a1ef, width: 2 })
-    .moveTo(16, 6)
-    .lineTo(width - 24, 6)
-    .stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
-    .moveTo(6, 16)
-    .lineTo(6, height - 24)
-    .stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
-    // Dark edges and the offset shadow sit on the lower-right side.
-    .moveTo(width - 8, 16)
-    .lineTo(width - 8, height - 16)
-    .stroke({ color: 0x2a1738, width: 2 })
-    .moveTo(16, height - 8)
-    .lineTo(width - 16, height - 8)
-    .stroke({ color: 0x2a1738, width: 2 })
-    // A pixel-stepped inner title rule keeps the heading separated from the blank panel.
-    .moveTo(8, 24)
-    .lineTo(width - 16, 24)
-    .stroke({ color: DIVIDER, width: 2 });
-
-  return [shadow, cabinetSide, topFace, panelFace, bevel];
-}
-
-function createChamferedFace(
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  corner: number,
-  color: number,
-): Graphics {
-  return new Graphics()
-    .moveTo(x + corner, y)
-    .lineTo(x + width - corner, y)
-    .lineTo(x + width - corner / 2, y + corner / 2)
-    .lineTo(x + width, y + corner)
-    .lineTo(x + width, y + height - corner)
-    .lineTo(x + width - corner / 2, y + height - corner / 2)
-    .lineTo(x + width - corner, y + height)
-    .lineTo(x + corner, y + height)
-    .lineTo(x + corner / 2, y + height - corner / 2)
-    .lineTo(x, y + height - corner)
-    .lineTo(x, y + corner)
-    .lineTo(x + corner / 2, y + corner / 2)
-    .closePath()
-    .fill(color);
-}
-
 function createTitle(): Text {
-  const label = new Text({
+  const title = new Text({
     text: 'SOUND CREATION',
-    style: {
-      fontFamily: 'monospace',
-      fontSize: 8,
-      fontWeight: 'bold',
-      fill: TITLE_TEXT,
-    },
+    style: { fontFamily: 'monospace', fontSize: 8, fontWeight: 'bold', fill: TITLE_COLOR },
   });
-  label.position.set(8, 8);
-  return label;
+  title.position.set(16, 4);
+  return title;
+}
+
+function createTransport(): Container {
+  const row = new Container();
+  row.position.set(16, 24);
+
+  const play = new PixelButton('▶', 'pink');
+  const stop = new PixelButton('■', 'gold');
+  const loop = new PixelButton('↻', 'violet');
+  const namePlate = createSoundName();
+  const volume = new PixelKnob('VOL', 0.75, 0xff91c8);
+
+  stop.position.x = 32 + BUTTON_GAP;
+  loop.position.x = 64 + BUTTON_GAP * 2;
+  namePlate.position.x = 96 + BUTTON_GAP * 3;
+  volume.position.x = 192 + BUTTON_GAP * 4;
+  row.addChild(play, stop, loop, namePlate, volume);
+  return row;
+}
+
+function createSoundName(): Container {
+  const plate = new Container();
+  const face = new Graphics()
+    .rect(0, 0, 96, 32)
+    .fill(0x21142f)
+    .rect(0, 0, 96, 4)
+    .fill(0xe3a1ef)
+    .rect(0, 28, 96, 4)
+    .fill(0x281635)
+    .rect(4, 4, 88, 24)
+    .stroke({ color: 0x9867b5, width: 2 });
+  const name = new Text({
+    text: 'coin_pickup',
+    style: { fontFamily: 'monospace', fontSize: 8, fontWeight: 'bold', fill: 0xffeaff },
+  });
+  name.position.set(8, 12);
+  plate.addChild(face, name);
+  return plate;
+}
+
+function createPresetGrid(): Container {
+  const grid = new Container();
+  const startX = 28;
+  PRESETS.forEach((preset, index) => {
+    const column = index % 6;
+    const row = Math.floor(index / 6);
+    const button = new PixelButton(preset.icon, preset.tone, index === 0);
+    button.position.set(startX + column * PAD_STEP_X, 64 + row * PAD_STEP_Y);
+    grid.addChild(button);
+  });
+  return grid;
+}
+
+function createKnobRow(): Container {
+  const row = new Container();
+  const startX = 28;
+  KNOBS.forEach((knob, index) => {
+    const control = new PixelKnob(knob.label, knob.value, knob.color);
+    control.position.set(startX + index * KNOB_STEP, 160);
+    row.addChild(control);
+  });
+  return row;
 }

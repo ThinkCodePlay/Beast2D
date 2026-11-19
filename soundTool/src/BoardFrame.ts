@@ -1,10 +1,9 @@
 import { Container, Graphics } from 'pixi.js';
 
-/** Raised pixel-art cabinet shell used to frame the sound board. */
+/** Raised pixel-art cabinet surrounding the full sound-board display. */
 export class BoardFrame extends Container {
-  constructor(width = 320, height = 240) {
+  constructor(width = 480, height = 320) {
     super();
-
     this.addChild(
       createDropShadow(width, height),
       createCabinetSide(width, height),
@@ -17,60 +16,60 @@ export class BoardFrame extends Container {
 
 function createDropShadow(width: number, height: number): Graphics {
   return new Graphics()
-    .roundRect(4, 5, width - 5, height - 5, 10)
+    .roundRect(8, 8, width - 8, height - 8, 16)
     .fill(0x140b20);
 }
 
 function createCabinetSide(width: number, height: number): Graphics {
   return new Graphics()
-    .roundRect(2, 3, width - 5, height - 5, 10)
+    .roundRect(4, 4, width - 8, height - 8, 16)
     .fill(0x2b1739)
-    .roundRect(2, 3, width - 5, height - 5, 10)
-    .stroke({ color: 0x1b1027, width: 1 });
+    .roundRect(4, 4, width - 8, height - 8, 16)
+    .stroke({ color: 0x1b1027, width: 2 });
 }
 
 function createTopFace(width: number, height: number): Graphics {
   return new Graphics()
-    .roundRect(0, 0, width - 5, height - 5, 10)
+    .roundRect(0, 0, width - 8, height - 8, 16)
     .fill(0x713f87)
-    .roundRect(1, 1, width - 7, height - 7, 9)
-    .stroke({ color: 0xc276d7, width: 1 })
-    .roundRect(3, 3, width - 11, height - 11, 7)
+    .roundRect(2, 2, width - 12, height - 12, 16)
+    .stroke({ color: 0xc276d7, width: 2 })
+    .roundRect(6, 6, width - 20, height - 20, 8)
     .fill(0x59316f)
-    .roundRect(4, 4, width - 13, height - 13, 6)
-    .stroke({ color: 0x9b60b7, width: 1 });
+    .roundRect(8, 8, width - 24, height - 24, 8)
+    .stroke({ color: 0x9b60b7, width: 2 });
 }
 
 function createBevel(width: number, height: number): Graphics {
   return new Graphics()
-    .moveTo(13, 6)
-    .lineTo(width - 18, 6)
-    .stroke({ color: 0xe3a1ef, width: 1 })
-    .moveTo(6, 13)
-    .lineTo(6, height - 18)
-    .stroke({ color: 0xe3a1ef, width: 1 })
-    .moveTo(width - 7, 15)
-    .lineTo(width - 7, height - 17)
-    .stroke({ color: 0x2a1738, width: 1 })
-    .moveTo(15, height - 7)
-    .lineTo(width - 17, height - 7)
-    .stroke({ color: 0x2a1738, width: 1 })
-    .moveTo(14, 8)
-    .lineTo(width - 19, 8)
-    .stroke({ color: 0xa867c3, width: 1, alpha: 0.8 })
-    .moveTo(8, 14)
-    .lineTo(8, height - 19)
-    .stroke({ color: 0xa867c3, width: 1, alpha: 0.8 });
+    .moveTo(24, 8)
+    .lineTo(width - 32, 8)
+    .stroke({ color: 0xe3a1ef, width: 2 })
+    .moveTo(8, 24)
+    .lineTo(8, height - 32)
+    .stroke({ color: 0xe3a1ef, width: 2 })
+    .moveTo(width - 8, 24)
+    .lineTo(width - 8, height - 24)
+    .stroke({ color: 0x2a1738, width: 2 })
+    .moveTo(24, height - 8)
+    .lineTo(width - 24, height - 8)
+    .stroke({ color: 0x2a1738, width: 2 })
+    .moveTo(24, 12)
+    .lineTo(width - 32, 12)
+    .stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
+    .moveTo(12, 24)
+    .lineTo(12, height - 32)
+    .stroke({ color: 0xa867c3, width: 2, alpha: 0.8 });
 }
 
 function createCornerPixels(width: number, height: number): Graphics {
   return new Graphics()
-    .rect(5, 5, 2, 2)
+    .rect(8, 8, 8, 8)
     .fill(0xffc2f4)
-    .rect(width - 10, 5, 2, 2)
+    .rect(width - 16, 8, 8, 8)
     .fill(0xffa7e8)
-    .rect(5, height - 10, 2, 2)
+    .rect(8, height - 16, 8, 8)
     .fill(0xcb82e5)
-    .rect(width - 10, height - 10, 2, 2)
+    .rect(width - 16, height - 16, 8, 8)
     .fill(0x291537);
 }
