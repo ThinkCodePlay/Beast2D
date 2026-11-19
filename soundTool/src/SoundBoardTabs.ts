@@ -93,7 +93,7 @@ function drawGamepad(color: number): Graphics {
 function createTabLabel(label: string, selected: boolean): Text {
   const text = new Text({
     text: label,
-    style: { fontFamily: 'monogram', fontSize: 11, fontWeight: 'bold', fill: selected ? 0x392044 : 0xd8b8e2 }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 12, fontWeight: 'bold', fill: selected ? 0x392044 : 0xd8b8e2 }, resolution: 3,
   });
   text.position.set(28, 10);
   return text;

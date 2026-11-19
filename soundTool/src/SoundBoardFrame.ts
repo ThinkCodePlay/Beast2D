@@ -1,5 +1,6 @@
-import { Container } from 'pixi.js';
+import { Container, type Texture } from 'pixi.js';
 import { BoardFrame as BoardFrameArtwork } from './BoardFrame';
+import type { PresetTextures } from './PresetPad';
 import { SoundBankPanel } from './SoundBankPanel';
 import { SoundBoardFooter } from './SoundBoardFooter';
 import { SoundBoardHeader } from './SoundBoardHeader';
@@ -12,7 +13,7 @@ const DISPLAY_HEIGHT = 1024 / 3;
 const OUTER_INSET = 16;
 const HEADER_TOP = 4;
 const TABS_TOP = 28;
-const CONTENT_TOP = 64;
+const CONTENT_TOP = 60;
 const CONTENT_HEIGHT = 200;
 const CONTROLS_TOP = 264;
 const FOOTER_TOP = 312;
@@ -30,11 +31,11 @@ export class SoundBoardFrame extends Container {
   readonly controls: SoundControlStrip;
   readonly footer: SoundBoardFooter;
 
-  constructor() {
+  constructor(presetTextures: PresetTextures, mascotTexture: Texture) {
     super();
     this.scale.set(3);
     const board = new BoardFrameArtwork(DISPLAY_WIDTH, DISPLAY_HEIGHT);
-    this.header = new SoundBoardHeader(DISPLAY_WIDTH - OUTER_INSET * 2);
+    this.header = new SoundBoardHeader(DISPLAY_WIDTH - OUTER_INSET * 2, mascotTexture);
     this.header.position.set(OUTER_INSET, HEADER_TOP);
 
     this.tabs = new SoundBoardTabs();
@@ -42,7 +43,7 @@ export class SoundBoardFrame extends Container {
 
     this.content = new Container();
     this.content.position.set(OUTER_INSET, CONTENT_TOP);
-    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT);
+    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures);
     this.bankPanel = new SoundBankPanel(BANK_WIDTH, CONTENT_HEIGHT);
     this.bankPanel.position.x = CREATION_WIDTH + PANEL_GAP;
     this.content.addChild(this.creationPanel, this.bankPanel);

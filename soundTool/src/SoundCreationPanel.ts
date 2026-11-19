@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { PresetPad, type PresetIcon } from './PresetPad';
+import { PresetPad, PRESET_ICONS, type PresetTextures } from './PresetPad';
 import { PixelButton } from './ui/PixelButton';
 import { PixelKnob } from './ui/PixelKnob';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
@@ -8,18 +8,14 @@ import { WaveformDisplay } from './ui/WaveformDisplay';
 const BUTTON_GAP = 8;
 const PAD_STEP_X = 52;
 const PAD_STEP_Y = 44;
-const PRESETS: PresetIcon[] = [
-  'coin', 'star', 'heart', 'gem', 'potion', 'chest',
-  'boot', 'bomb', 'burst', 'sparkle', 'bell', 'skull',
-];
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, presetTextures: PresetTextures) {
     super();
     this.addChild(new RaisedPanelFrame(width, height));
     this.addChild(createTransport());
-    this.addChild(createPresetGrid());
+    this.addChild(createPresetGrid(presetTextures));
     const waveform = new WaveformDisplay(width - 32);
     waveform.position.set(16, 140);
     this.addChild(waveform);
@@ -28,9 +24,9 @@ export class SoundCreationPanel extends Container {
 
 function createTransport(): Container {
   const row = new Container();
-  row.position.set(16, 16);
+  row.position.set(16, 8);
   const play = new PixelButton('▶', 'pink');
-  const stop = new PixelButton('■', 'dark');
+  const stop = new PixelButton('■', 'cream');
   const loop = new PixelButton('↻', 'green');
   const namePlate = createSoundName(96);
   const volume = new PixelKnob('VOL', 0.75, 0xff91c8, 'master');
@@ -59,13 +55,13 @@ function createSoundName(width: number): Container {
   return plate;
 }
 
-function createPresetGrid(): Container {
+function createPresetGrid(presetTextures: PresetTextures): Container {
   const grid = new Container();
-  PRESETS.forEach((icon, index) => {
+  PRESET_ICONS.forEach((icon, index) => {
     const column = index % 6;
     const row = Math.floor(index / 6);
-    const pad = new PresetPad(icon, index === 0);
-    pad.position.set(8 + column * PAD_STEP_X, 56 + row * PAD_STEP_Y);
+    const pad = new PresetPad(icon, presetTextures, index === 0);
+    pad.position.set(8 + column * PAD_STEP_X, 50 + row * PAD_STEP_Y);
     grid.addChild(pad);
   });
   return grid;
