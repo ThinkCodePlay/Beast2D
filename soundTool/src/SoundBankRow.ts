@@ -24,9 +24,7 @@ function drawRow(selected: boolean, width: number): Graphics {
     .rect(ROW_LEFT, 0, 16, BANK_ROW_HEIGHT).fill(edgeColor)
     .rect(ROW_LEFT, 0, width, BANK_ROW_HEIGHT)
     .stroke({ color: selected ? 0xf0c060 : 0x76508c, width: 1 })
-    .rect(ROW_LEFT, 1, 16, BANK_ROW_HEIGHT - 2)
-    .stroke({ color: divider, width: 1 })
-    .moveTo(NAME_LEFT - 2, 2).lineTo(NAME_LEFT - 2, BANK_ROW_HEIGHT - 2)
+    .moveTo(ROW_LEFT + 16, 0).lineTo(ROW_LEFT + 16, BANK_ROW_HEIGHT)
     .stroke({ color: divider, width: 1 })
     .moveTo(width - 32, 2).lineTo(width - 32, BANK_ROW_HEIGHT - 2)
     .stroke({ color: divider, width: 1 });

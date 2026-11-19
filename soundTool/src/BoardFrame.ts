@@ -1,16 +1,14 @@
 import { Container, Graphics } from 'pixi.js';
 
-const CORNER_STEP = 2;
+const CORNER_STEP = 4;
 
 /** Compact stepped cabinet frame with a narrow bevel around the board face. */
 export class BoardFrame extends Container {
   constructor(width = 512, height = 1024 / 3) {
     super();
     this.addChild(
-      drawSteppedFace(width, height, 0, 0x713f87)
-        .stroke({ color: 0xc276d7, width: 1 }),
-      drawSteppedFace(width, height, 3, 0x59316f)
-        .stroke({ color: 0x2a1738, width: 1 }),
+      drawSteppedFace(width, height, 0, 0x713f87),
+      new Graphics().rect(4, 4, width - 8, height - 8).fill(0x59316f),
       drawBevel(width, height),
       drawCornerPixels(width, height),
     );

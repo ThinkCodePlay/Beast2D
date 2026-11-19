@@ -4,7 +4,7 @@ type TabIcon = 'note' | 'gamepad' | 'folder' | 'gear';
 type TabTone = 'selected' | 'violet';
 
 const TAB_WIDTH = 75;
-const TAB_HEIGHT = 28;
+const TAB_HEIGHT = 32;
 const TAB_ITEMS: { label: string; icon: TabIcon; tone: TabTone }[] = [
   { label: 'SFX', icon: 'note', tone: 'selected' },
   { label: 'MUSIC', icon: 'gamepad', tone: 'violet' },

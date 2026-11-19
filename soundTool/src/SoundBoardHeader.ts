@@ -37,9 +37,9 @@ function createLogo(texture: Texture): Sprite {
 function createTitle(): Text {
   const title = new Text({
     text: 'beast2d sound board',
-    style: { fontFamily: 'monogram', fontSize: 21, fontWeight: 'bold', fill: TEXT_COLOR }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 19, fontWeight: 'bold', letterSpacing: 1, fill: TEXT_COLOR }, resolution: 3,
   });
-  title.position.set(44, 0);
+  title.position.set(46, -3);
   return title;
 }
 
@@ -73,9 +73,9 @@ function createLevelMeter(width: number): Graphics {
 function createClock(width: number): Text {
   const clock = new Text({
     text: 'SAT 14:20',
-    style: { fontFamily: 'monogram', fontSize: 10, fontWeight: 'bold', fill: TEXT_COLOR }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 15, fontWeight: 'bold', fill: TEXT_COLOR }, resolution: 3,
   });
-  clock.position.set(width - 86, 12);
+  clock.position.set(width - 88, 0);
   return clock;
 }
 

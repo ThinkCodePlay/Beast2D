@@ -8,9 +8,9 @@ export const PRESET_ICONS = [
 export type PresetIcon = typeof PRESET_ICONS[number];
 export type PresetTextures = Record<PresetIcon, Texture>;
 
-const PAD_WIDTH = 42;
+const PAD_WIDTH = 46;
 const PAD_HEIGHT = 38;
-const ICON_SIZE = 20;
+const ICON_SIZE = 24;
 const PAD_CORNER = 4;
 
 /** Pixel-art preset tile with a thin stepped bevel and separate sprite. */

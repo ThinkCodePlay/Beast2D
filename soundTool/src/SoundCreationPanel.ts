@@ -5,8 +5,8 @@ import { PixelKnob } from './ui/PixelKnob';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
 
-const BUTTON_GAP = 12;
-const PAD_STEP_X = 53;
+const BUTTON_GAP = 8;
+const PAD_STEP_X = 160 / 3; // 160 output pixels at the 3× stage scale.
 const PAD_STEP_Y = 43;
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
@@ -33,7 +33,7 @@ function createTransport(): Container {
   volume.scale.set(1.25);
   stop.position.x = 32 + BUTTON_GAP;
   loop.position.x = 64 + BUTTON_GAP * 2;
-  namePlate.position.x = 137;
+  namePlate.position.x = 117;
   volume.position.set(268, -8);
   row.addChild(play, stop, loop, namePlate, volume);
   return row;
@@ -61,7 +61,7 @@ function createPresetGrid(presetTextures: PresetTextures): Container {
     const column = index % 6;
     const row = Math.floor(index / 6);
     const pad = new PresetPad(icon, presetTextures, index === 0);
-    pad.position.set(7 + column * PAD_STEP_X, 54 + row * PAD_STEP_Y);
+    pad.position.set(3 + column * PAD_STEP_X, 54 + row * PAD_STEP_Y);
     grid.addChild(pad);
   });
   return grid;
