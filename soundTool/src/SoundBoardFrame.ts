@@ -1,4 +1,9 @@
 import { Container, Graphics } from 'pixi.js';
+import { SoundBoardHeader } from './SoundBoardHeader';
+
+const FRAME_INSET = 10;
+const CONTENT_TOP = 34;
+const CONTENT_BOTTOM = 10;
 
 /** A reusable pixel-style raised cabinet shell for the sound board. */
 export class SoundBoardFrame extends Container {
@@ -9,10 +14,10 @@ export class SoundBoardFrame extends Container {
   constructor(width = 320, height = 240) {
     super();
 
-    this.contentWidth = width - 20;
-    this.contentHeight = height - 20;
+    this.contentWidth = width - FRAME_INSET * 2;
+    this.contentHeight = height - CONTENT_TOP - CONTENT_BOTTOM;
     this.content = new Container();
-    this.content.position.set(10, 10);
+    this.content.position.set(FRAME_INSET, CONTENT_TOP);
 
     // Offset layers fall down and right, so the face reads as sitting above the page.
     const castShadow = new Graphics()
@@ -35,7 +40,7 @@ export class SoundBoardFrame extends Container {
       .roundRect(4, 4, width - 13, height - 13, 6)
       .stroke({ color: 0x9b60b7, width: 1 });
 
-    // Bright top/left bevel and dark bottom/right bevel make the rim pop outward.
+    // Bright top/left bevel and dark bottom/right bevel make the frame pop outward.
     const bevel = new Graphics()
       .moveTo(13, 6)
       .lineTo(width - 18, 6)
@@ -67,6 +72,8 @@ export class SoundBoardFrame extends Container {
       .rect(width - 10, height - 10, 2, 2)
       .fill(0x291537);
 
-    this.addChild(castShadow, cabinetSide, top, bevel, cornerPixels, this.content);
+    const header = new SoundBoardHeader(width - 16);
+
+    this.addChild(castShadow, cabinetSide, top, bevel, cornerPixels, header, this.content);
   }
 }
