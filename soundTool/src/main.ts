@@ -8,11 +8,12 @@ if (!mount) {
 
 const app = new Application();
 await app.init({
+  width: 320,
+  height: 240,
   backgroundColor: 0x24172f,
   antialias: false,
-  autoDensity: true,
-  resolution: Math.max(1, window.devicePixelRatio || 1),
-  resizeTo: window,
+  autoDensity: false,
+  resolution: 1,
 });
 
 mount.appendChild(app.canvas);
