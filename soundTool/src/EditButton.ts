@@ -36,7 +36,7 @@ function drawWaveformMark(): Graphics {
 function createLabel(): Text {
   const label = new Text({
     text: 'EDIT',
-    style: { fontFamily: 'monospace', fontSize: 7, fontWeight: 'bold', fill: 0xffcf72 },
+    style: { fontFamily: 'monogram', fontSize: 9, fontWeight: 'bold', fill: 0xffcf72 }, resolution: 3,
   });
   label.anchor.set(0.5, 0);
   label.position.set(EDIT_WIDTH / 2, 25);

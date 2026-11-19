@@ -6,7 +6,7 @@ export type PresetIcon =
 
 const TILE = 4;
 const PAD_SIZE = 40;
-const ICON_INSET = 4;
+const ICON_INSET = 6;
 const ICON_ART: Record<PresetIcon, string[]> = {
   coin: ['..ddd..', '.dgggd.', 'dgggggd', 'dggyygd', 'dggyygd', 'dgggggd', '.dgggd.'],
   star: ['...d...', '..dyd..', '.dyyd..', 'dyyyyyd', '..dyd..', '.d...d.', 'd.....d'],

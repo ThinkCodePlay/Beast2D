@@ -9,6 +9,8 @@ if (!mount) {
   throw new Error('Sound tool mount element #app was not found.');
 }
 
+await document.fonts.load('12px "monogram"');
+
 const app = new Application();
 await app.init({
   width: DISPLAY_WIDTH,

@@ -8,8 +8,9 @@ A standalone PixiJS 8 + TypeScript + Vite sound-board interface. The canvas is f
 - `SoundBoardFrame` places the cabinet frame, header, navigation tabs, editor and bank panels, shared control strip, and keyboard-help footer.
 - `SoundCreationPanel` contains transport controls, the named sound, preset pads, and waveform.
 - `SoundBankPanel` contains the twelve sound slots and scroll controls.
-- `SoundControlStrip` contains the six parameter knobs, the waveform edit button, and the empty bank bay.
+- `SoundControlStrip` contains the six parameter knobs and the waveform edit button.
 - `src/ui/` contains reusable pixel buttons, knobs, panel framing, and waveform drawing.
+- The local `public/ui/monogram.ttf` pixel font is loaded before the board is drawn; its CC0 license is included alongside it.
 
 ## Run
 

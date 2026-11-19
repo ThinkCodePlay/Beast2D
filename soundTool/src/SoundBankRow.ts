@@ -31,26 +31,29 @@ function drawRow(selected: boolean, width: number): Graphics {
 
 function createIndex(index: number, selected: boolean): Text {
   const label = createText(String(index + 1).padStart(2, '0'), selected ? 0x392044 : 0xb88acb);
-  label.position.set(ROW_LEFT, 3);
+  label.anchor.set(0, 0.5);
+  label.position.set(ROW_LEFT, BANK_ROW_HEIGHT / 2);
   return label;
 }
 
 function createName(name: string, selected: boolean): Text {
   const color = selected ? 0x392044 : name === 'empty' ? 0x8d6ba0 : 0xffeaff;
   const label = createText(name, color);
-  label.position.set(NAME_LEFT + 4, 3);
+  label.anchor.set(0, 0.5);
+  label.position.set(NAME_LEFT + 4, BANK_ROW_HEIGHT / 2);
   return label;
 }
 
 function createPreviewGlyph(width: number, selected: boolean): Text {
   const label = createText('▶', selected ? 0x392044 : 0xd889ed);
-  label.position.set(width - 16, 3);
+  label.anchor.set(0, 0.5);
+  label.position.set(width - 16, BANK_ROW_HEIGHT / 2);
   return label;
 }
 
 function createText(value: string, color: number): Text {
   return new Text({
     text: value,
-    style: { fontFamily: 'monospace', fontSize: 7, fontWeight: 'bold', fill: color },
+    style: { fontFamily: 'monogram', fontSize: 12, fontWeight: 'bold', fill: color }, resolution: 3,
   });
 }

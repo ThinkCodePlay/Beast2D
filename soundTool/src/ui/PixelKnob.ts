@@ -14,12 +14,12 @@ export class PixelKnob extends Container {
     super();
     if (variant === 'master') {
       this.addChild(createMasterFace(color, value));
-      this.addChild(createLabel(label, 30));
+      this.addChild(createLabel(label, 30, 10));
       return;
     }
     this.addChild(createKnobBase());
     this.addChild(createStandardFace(color, value));
-    this.addChild(createLabel(label, 22));
+    this.addChild(createLabel(label, 22, 12));
   }
 }
 
@@ -94,10 +94,10 @@ function angleForValue(value: number): number {
   return Math.PI * 0.75 + Math.max(0, Math.min(1, value)) * Math.PI * 1.5;
 }
 
-function createLabel(value: string, y: number): Text {
+function createLabel(value: string, y: number, fontSize: number): Text {
   const label = new Text({
     text: value,
-    style: { fontFamily: 'monospace', fontSize: 8, fontWeight: 'bold', fill: 0xffeaff },
+    style: { fontFamily: 'monogram', fontSize, fontWeight: 'bold', fill: 0xffeaff }, resolution: 3,
   });
   label.anchor.set(0.5, 0);
   label.position.set(CONTROL_SIZE / 2, y);

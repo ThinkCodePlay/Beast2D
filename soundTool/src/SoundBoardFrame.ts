@@ -11,10 +11,10 @@ const DISPLAY_WIDTH = 512;
 const DISPLAY_HEIGHT = 1024 / 3;
 const OUTER_INSET = 16;
 const HEADER_TOP = 4;
-const TABS_TOP = 32;
+const TABS_TOP = 28;
 const CONTENT_TOP = 64;
-const CONTENT_HEIGHT = 208;
-const CONTROLS_TOP = 272;
+const CONTENT_HEIGHT = 200;
+const CONTROLS_TOP = 264;
 const FOOTER_TOP = 312;
 const PANEL_GAP = 8;
 const CREATION_WIDTH = 320;
@@ -47,7 +47,7 @@ export class SoundBoardFrame extends Container {
     this.bankPanel.position.x = CREATION_WIDTH + PANEL_GAP;
     this.content.addChild(this.creationPanel, this.bankPanel);
 
-    this.controls = new SoundControlStrip(DISPLAY_WIDTH - OUTER_INSET * 2, 40);
+    this.controls = new SoundControlStrip(DISPLAY_WIDTH - OUTER_INSET * 2, 48);
     this.controls.position.set(OUTER_INSET, CONTROLS_TOP);
     this.footer = new SoundBoardFooter(DISPLAY_WIDTH - OUTER_INSET * 2);
     this.footer.position.set(OUTER_INSET, FOOTER_TOP);

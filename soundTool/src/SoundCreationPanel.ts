@@ -7,7 +7,7 @@ import { WaveformDisplay } from './ui/WaveformDisplay';
 
 const BUTTON_GAP = 8;
 const PAD_STEP_X = 52;
-const PAD_STEP_Y = 40;
+const PAD_STEP_Y = 44;
 const PRESETS: PresetIcon[] = [
   'coin', 'star', 'heart', 'gem', 'potion', 'chest',
   'boot', 'bomb', 'burst', 'sparkle', 'bell', 'skull',
@@ -18,22 +18,12 @@ export class SoundCreationPanel extends Container {
   constructor(width: number, height: number) {
     super();
     this.addChild(new RaisedPanelFrame(width, height));
-    this.addChild(createTitle());
     this.addChild(createTransport());
     this.addChild(createPresetGrid());
     const waveform = new WaveformDisplay(width - 32);
-    waveform.position.set(16, 136);
+    waveform.position.set(16, 140);
     this.addChild(waveform);
   }
-}
-
-function createTitle(): Text {
-  const title = new Text({
-    text: 'SOUND CREATION',
-    style: { fontFamily: 'monospace', fontSize: 8, fontWeight: 'bold', fill: 0xffeaff },
-  });
-  title.position.set(16, 4);
-  return title;
 }
 
 function createTransport(): Container {
@@ -62,7 +52,7 @@ function createSoundName(width: number): Container {
     .rect(4, 4, width - 8, 24).stroke({ color: 0x9867b5, width: 2 });
   const name = new Text({
     text: 'coin_pickup',
-    style: { fontFamily: 'monospace', fontSize: 8, fontWeight: 'bold', fill: 0xffeaff },
+    style: { fontFamily: 'monogram', fontSize: 12, fontWeight: 'bold', fill: 0xffeaff }, resolution: 3,
   });
   name.position.set(8, 12);
   plate.addChild(face, name);

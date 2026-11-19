@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container } from 'pixi.js';
 import { EditButton } from './EditButton';
 import { PixelKnob } from './ui/PixelKnob';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
@@ -12,7 +12,7 @@ const KNOBS = [
   { label: 'CUT', value: 0.54, color: 0xffcf72 },
 ] as const;
 
-/** Shared bottom strip with six dials, a combined Edit button, and bank bay. */
+/** Shared bottom strip with six 32px dials and the waveform edit control. */
 export class SoundControlStrip extends Container {
   constructor(width: number, height: number) {
     super();
@@ -23,14 +23,7 @@ export class SoundControlStrip extends Container {
       this.addChild(control);
     });
     const edit = new EditButton();
-    edit.position.set(280, 0);
+    edit.position.set(280, 4);
     this.addChild(edit);
-    this.addChild(createEmptyBankBay(width));
   }
-}
-
-function createEmptyBankBay(width: number): Graphics {
-  return new Graphics()
-    .rect(352, 4, width - 368, 24).fill(0x39214c)
-    .rect(356, 8, width - 376, 16).stroke({ color: 0x70428a, width: 2 });
 }

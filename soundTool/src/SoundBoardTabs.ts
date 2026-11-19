@@ -3,8 +3,8 @@ import { Container, Graphics, Text } from 'pixi.js';
 type TabIcon = 'note' | 'gamepad' | 'folder' | 'gear';
 type TabTone = 'selected' | 'violet';
 
-const TAB_WIDTH = 80;
-const TAB_HEIGHT = 32;
+const TAB_WIDTH = 72;
+const TAB_HEIGHT = 28;
 const TAB_ITEMS: { label: string; icon: TabIcon; tone: TabTone }[] = [
   { label: 'SFX', icon: 'note', tone: 'selected' },
   { label: 'MUSIC', icon: 'gamepad', tone: 'violet' },
@@ -44,20 +44,19 @@ function drawTabFace(tone: TabTone): Graphics {
     .rect(4, 2, TAB_WIDTH - 8, 2).fill(0xe3a1ef)
     .rect(2, 4, 2, TAB_HEIGHT - 8).fill(0xe3a1ef)
     .rect(TAB_WIDTH - 2, 4, 2, TAB_HEIGHT - 8).fill(edge)
-    .rect(4, TAB_HEIGHT - 2, TAB_WIDTH - 8, 2).fill(edge)
-    .rect(36, 28, 40, 4).fill(selected ? 0xffcf72 : fill);
+    .rect(4, TAB_HEIGHT - 2, TAB_WIDTH - 8, 2).fill(edge);
 }
 
 function drawTabIcon(icon: TabIcon, selected: boolean): Graphics | Text {
   const color = selected ? 0x392044 : 0xd8b8e2;
   if (icon === 'note') {
-    const note = new Text({
+    const glyph = new Text({
       text: '♫',
-      style: { fontFamily: 'monospace', fontSize: 14, fontWeight: 'bold', fill: color },
+      style: { fontFamily: 'monogram', fontSize: 16, fontWeight: 'bold', fill: color }, resolution: 3,
     });
-    note.anchor.set(0.5);
-    note.position.set(16, 16);
-    return note;
+    glyph.anchor.set(0.5);
+    glyph.position.set(14, 16);
+    return glyph;
   }
   if (icon === 'gamepad') {
     return drawGamepad(color);
@@ -71,7 +70,7 @@ function drawTabIcon(icon: TabIcon, selected: boolean): Graphics | Text {
   }
   const gear = new Text({
     text: '⚙',
-    style: { fontFamily: 'monospace', fontSize: 15, fontWeight: 'bold', fill: color },
+    style: { fontFamily: 'monogram', fontSize: 16, fontWeight: 'bold', fill: color }, resolution: 3,
   });
   gear.anchor.set(0.5);
   gear.position.set(16, 16);
@@ -80,25 +79,22 @@ function drawTabIcon(icon: TabIcon, selected: boolean): Graphics | Text {
 
 function drawGamepad(color: number): Graphics {
   return new Graphics()
-    .rect(8, 9, 16, 3).fill(0x392044)
-    .rect(4, 12, 24, 9).fill(0x392044)
-    .rect(8, 21, 16, 3).fill(0x392044)
-    .rect(8, 11, 16, 3).fill(color)
-    .rect(6, 13, 20, 7).fill(color)
-    .rect(8, 20, 16, 2).fill(color)
-    .rect(9, 14, 3, 3).fill(0x392044)
-    .rect(8, 15, 5, 1).fill(0x392044)
-    .rect(20, 14, 2, 2).fill(0x392044)
-    .rect(23, 16, 2, 2).fill(0x392044)
-    .rect(7, 9, 4, 2).fill(color)
-    .rect(21, 9, 4, 2).fill(color);
+    .rect(6, 14, 10, 4).fill(color)
+    .rect(6, 18, 18, 9).fill(color)
+    .rect(8, 27, 14, 2).fill(0x392044)
+    .rect(10, 19, 3, 3).fill(0x392044)
+    .rect(9, 20, 5, 1).fill(0x392044)
+    .rect(19, 19, 2, 2).fill(0x392044)
+    .rect(22, 21, 2, 2).fill(0x392044)
+    .rect(7, 12, 4, 2).fill(color)
+    .rect(20, 12, 4, 2).fill(color);
 }
 
 function createTabLabel(label: string, selected: boolean): Text {
   const text = new Text({
     text: label,
-    style: { fontFamily: 'monospace', fontSize: 7, fontWeight: 'bold', fill: selected ? 0x392044 : 0xd8b8e2 },
+    style: { fontFamily: 'monogram', fontSize: 11, fontWeight: 'bold', fill: selected ? 0x392044 : 0xd8b8e2 }, resolution: 3,
   });
-  text.position.set(32, 12);
+  text.position.set(28, 10);
   return text;
 }

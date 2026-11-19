@@ -48,7 +48,7 @@ function createButtonFace(color: number, tone: ButtonTone, selected: boolean): G
 function createIcon(icon: string, color: number): Text {
   const label = new Text({
     text: icon,
-    style: { fontFamily: 'monospace', fontSize: 16, fontWeight: 'bold', fill: color },
+    style: { fontFamily: 'monogram', fontSize: 20, fontWeight: 'bold', fill: color }, resolution: 3,
   });
   label.anchor.set(0.5);
   label.position.set(BUTTON_SIZE / 2, BUTTON_SIZE / 2 - 2);
