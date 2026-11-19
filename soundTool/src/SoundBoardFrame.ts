@@ -1,5 +1,5 @@
 import { Container } from 'pixi.js';
-import { BoardFrame } from './BoardFrame';
+import { BoardFrame as BoardFrameArtwork } from './BoardFrame';
 import { SoundBoardHeader } from './SoundBoardHeader';
 import { SoundBankPanel } from './SoundBankPanel';
 import { SoundCreationPanel } from './SoundCreationPanel';
@@ -12,10 +12,10 @@ const PANEL_GAP = 4;
 const CREATION_WIDTH_RATIO = 0.75;
 
 /**
- * Self-contained sound board shell.
- * Owns the decorative frame, header, and the content slot for board controls.
+ * Self-contained sound board frame composition.
+ * Owns the cabinet artwork, header, and content area for the two board sections.
  */
-export class SoundBoardShell extends Container {
+export class SoundBoardFrame extends Container {
   readonly header: SoundBoardHeader;
   readonly content: Container;
   readonly contentWidth: number;
@@ -29,7 +29,7 @@ export class SoundBoardShell extends Container {
     this.contentWidth = width - FRAME_INSET * 2;
     this.contentHeight = height - CONTENT_TOP - CONTENT_BOTTOM;
 
-    const frame = new BoardFrame(width, height);
+    const frame = new BoardFrameArtwork(width, height);
     this.header = new SoundBoardHeader(width - HEADER_WIDTH_INSET);
     this.content = new Container();
     this.content.position.set(FRAME_INSET, CONTENT_TOP);

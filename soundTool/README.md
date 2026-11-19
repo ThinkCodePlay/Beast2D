@@ -4,12 +4,12 @@ A standalone PixiJS 8 + TypeScript + Vite canvas starter with a fixed 320 × 240
 
 ## Structure
 
-- `SoundBoardShell` is the self-contained board shell. It owns the decorative frame, header, and an empty content slot for board controls.
+- `SoundBoardFrame` is the self-contained board composition. It owns the decorative frame, header, and an empty content slot for board controls.
 - `SoundBoardHeader` owns the title bar and icon.
-- `BoardFrame` draws the reusable raised cabinet shell behind those pieces.
-- `main.ts` only initializes PixiJS and mounts the shell.
+- `BoardFrame` draws the reusable raised cabinet artwork behind those pieces.
+- `main.ts` only initializes PixiJS and mounts the board frame.
 
-Add future controls to `shell.content`; the shell handles its placement and keeps them independent from the surrounding engine.
+Add future controls to `frame.content`; the frame handles their placement and keeps them independent from the surrounding engine.
 
 ## Run
 
