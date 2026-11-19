@@ -16,8 +16,8 @@ export class SoundCreationPanel extends Container {
     this.addChild(new RaisedPanelFrame(width, height));
     this.addChild(createTransport());
     this.addChild(createPresetGrid(presetTextures));
-    const waveform = new WaveformDisplay(width - 32);
-    waveform.position.set(16, 140);
+    const waveform = new WaveformDisplay(width - 8);
+    waveform.position.set(4, 136);
     this.addChild(waveform);
   }
 }
@@ -29,7 +29,7 @@ function createTransport(): Container {
   const stop = new PixelButton('■', 'cream');
   const loop = new PixelButton('↻', 'green');
   const namePlate = createSoundName(96);
-  const volume = new PixelKnob('VOL', 0.75, 0xff91c8, 'master');
+  const volume = new PixelKnob('VOL', 0.5, 0xff91c8, 'master');
   volume.scale.set(1.25);
   stop.position.x = 32 + BUTTON_GAP;
   loop.position.x = 64 + BUTTON_GAP * 2;

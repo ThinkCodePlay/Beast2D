@@ -1,8 +1,8 @@
 import { Container, Graphics } from 'pixi.js';
 
 const DISPLAY_HEIGHT = 60;
-const BAR_WIDTH = 4;
-const BAR_STEP = 8;
+const BAR_WIDTH = 8;
+const BAR_STEP = 10;
 // A decaying pickup sound: strong opening hit, quick fall, then a short tail.
 const BAR_HEIGHTS = [
   40, 52, 46, 40, 34, 31, 28, 30, 26, 24, 28, 22, 20, 24, 18, 21,

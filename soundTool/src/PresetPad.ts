@@ -26,11 +26,12 @@ export class PresetPad extends Container {
 }
 
 function drawPadFace(selected: boolean): Graphics {
-  const face = selected ? 0xe95186 : 0xf6c355;
-  const side = selected ? 0x9e345f : 0xb86538;
+  const face = 0xf6c355;
+  const border = selected ? 0xe95186 : 0x432649;
+  const side = selected ? 0xb94368 : 0xb86538;
   return new Graphics()
     .rect(4, 4, PAD_WIDTH - 4, PAD_HEIGHT - 4).fill(0x241431)
-    .rect(0, 0, PAD_WIDTH - 4, PAD_HEIGHT - 4).fill(0x432649)
+    .rect(0, 0, PAD_WIDTH - 4, PAD_HEIGHT - 4).fill(border)
     .rect(2, 2, PAD_WIDTH - 8, PAD_HEIGHT - 8).fill(face)
     .rect(4, 4, PAD_WIDTH - 12, PAD_HEIGHT - 12).fill(face)
     .rect(4, 3, PAD_WIDTH - 12, 2).fill(selected ? 0xffa6bf : 0xffefb5)
