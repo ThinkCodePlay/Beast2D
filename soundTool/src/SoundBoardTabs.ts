@@ -3,7 +3,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 type TabIcon = 'note' | 'gamepad' | 'folder' | 'gear';
 type TabTone = 'selected' | 'violet';
 
-const TAB_WIDTH = 75;
+const TAB_WIDTH = 70;
 const TAB_HEIGHT = 32;
 const TAB_ITEMS: { label: string; icon: TabIcon; tone: TabTone }[] = [
   { label: 'SFX', icon: 'note', tone: 'selected' },

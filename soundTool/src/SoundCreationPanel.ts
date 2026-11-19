@@ -5,9 +5,9 @@ import { PixelKnob } from './ui/PixelKnob';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
 
-const BUTTON_GAP = 8;
 const PAD_STEP_X = 160 / 3; // 160 output pixels at the 3× stage scale.
 const PAD_STEP_Y = 43;
+const TRANSPORT_POSITIONS = { stop: 44, loop: 96, name: 142, volume: 290 } as const;
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
@@ -28,13 +28,13 @@ function createTransport(): Container {
   const play = new PixelButton('▶', 'pink');
   const stop = new PixelButton('■', 'cream');
   const loop = new PixelButton('↻', 'green');
-  const namePlate = createSoundName(96);
+  const namePlate = createSoundName(118);
   const volume = new PixelKnob('VOL', 0.5, 0xff91c8, 'master');
   volume.scale.set(1.25);
-  stop.position.x = 32 + BUTTON_GAP;
-  loop.position.x = 64 + BUTTON_GAP * 2;
-  namePlate.position.x = 117;
-  volume.position.set(268, -8);
+  stop.position.x = TRANSPORT_POSITIONS.stop;
+  loop.position.x = TRANSPORT_POSITIONS.loop;
+  namePlate.position.x = TRANSPORT_POSITIONS.name;
+  volume.position.set(TRANSPORT_POSITIONS.volume, -8);
   row.addChild(play, stop, loop, namePlate, volume);
   return row;
 }
