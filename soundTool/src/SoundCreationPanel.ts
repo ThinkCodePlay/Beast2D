@@ -4,52 +4,76 @@ const PANEL_FACE = 0x59316f;
 const TITLE_TEXT = 0xffeaff;
 const DIVIDER = 0x70428a;
 
-/** Empty sound-creation panel with the same raised edge as the outer frame. */
+/** Empty sound-creation panel with the pixel-beveled raised outer-frame treatment. */
 export class SoundCreationPanel extends Container {
   constructor(width: number, height: number) {
     super();
-    this.addChild(createRaisedPanelFrame(width, height));
+    this.addChild(...createRaisedPanelFrame(width, height));
     this.addChild(createTitle());
   }
 }
 
-function createRaisedPanelFrame(width: number, height: number): Graphics {
-  return new Graphics()
-    .roundRect(4, 4, width - 4, height - 4, 8)
-    .fill(0x140b20)
-    .roundRect(2, 2, width - 4, height - 4, 8)
-    .fill(0x2b1739)
-    .roundRect(2, 2, width - 4, height - 4, 8)
-    .stroke({ color: 0x1b1027, width: 2 })
-    .roundRect(0, 0, width - 4, height - 4, 8)
-    .fill(0x713f87)
-    .roundRect(2, 2, width - 8, height - 8, 8)
-    .stroke({ color: 0xc276d7, width: 2 })
-    .roundRect(4, 4, width - 12, height - 12, 4)
-    .fill(PANEL_FACE)
-    .roundRect(6, 6, width - 16, height - 16, 4)
-    .stroke({ color: 0x9b60b7, width: 2 })
-    .moveTo(16, 8)
-    .lineTo(width - 24, 8)
+function createRaisedPanelFrame(width: number, height: number): Graphics[] {
+  const shadow = createChamferedFace(6, 8, width - 8, height - 8, 8, 0x140b20);
+  const cabinetSide = createChamferedFace(2, 3, width - 7, height - 7, 8, 0x2b1739)
+    .stroke({ color: 0x1b1027, width: 2 });
+  const topFace = createChamferedFace(0, 0, width - 6, height - 6, 8, 0x713f87)
+    .stroke({ color: 0xc276d7, width: 2 });
+  const panelFace = createChamferedFace(4, 4, width - 14, height - 14, 4, PANEL_FACE)
+    .stroke({ color: 0x9b60b7, width: 2 });
+
+  const bevel = new Graphics()
+    // Bright top and left edges catch the light, like the mockup's raised panels.
+    .moveTo(16, 2)
+    .lineTo(width - 24, 2)
     .stroke({ color: 0xe3a1ef, width: 2 })
-    .moveTo(8, 16)
-    .lineTo(8, height - 24)
+    .moveTo(2, 16)
+    .lineTo(2, height - 24)
     .stroke({ color: 0xe3a1ef, width: 2 })
+    .moveTo(16, 6)
+    .lineTo(width - 24, 6)
+    .stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
+    .moveTo(6, 16)
+    .lineTo(6, height - 24)
+    .stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
+    // Dark edges and the offset shadow sit on the lower-right side.
     .moveTo(width - 8, 16)
     .lineTo(width - 8, height - 16)
     .stroke({ color: 0x2a1738, width: 2 })
     .moveTo(16, height - 8)
     .lineTo(width - 16, height - 8)
     .stroke({ color: 0x2a1738, width: 2 })
-    .moveTo(16, 12)
-    .lineTo(width - 24, 12)
-    .stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
-    .moveTo(12, 16)
-    .lineTo(12, height - 24)
-    .stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
-    .moveTo(2, 24)
-    .lineTo(width - 8, 24)
+    // A pixel-stepped inner title rule keeps the heading separated from the blank panel.
+    .moveTo(8, 24)
+    .lineTo(width - 16, 24)
     .stroke({ color: DIVIDER, width: 2 });
+
+  return [shadow, cabinetSide, topFace, panelFace, bevel];
+}
+
+function createChamferedFace(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  corner: number,
+  color: number,
+): Graphics {
+  return new Graphics()
+    .moveTo(x + corner, y)
+    .lineTo(x + width - corner, y)
+    .lineTo(x + width - corner / 2, y + corner / 2)
+    .lineTo(x + width, y + corner)
+    .lineTo(x + width, y + height - corner)
+    .lineTo(x + width - corner / 2, y + height - corner / 2)
+    .lineTo(x + width - corner, y + height)
+    .lineTo(x + corner, y + height)
+    .lineTo(x + corner / 2, y + height - corner / 2)
+    .lineTo(x, y + height - corner)
+    .lineTo(x, y + corner)
+    .lineTo(x + corner / 2, y + corner / 2)
+    .closePath()
+    .fill(color);
 }
 
 function createTitle(): Text {
