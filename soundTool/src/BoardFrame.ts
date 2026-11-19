@@ -1,14 +1,14 @@
 import { Container, Graphics } from 'pixi.js';
 
-const CORNER_STEP = 8;
+const CORNER_STEP = 4;
 
 /** Stepped pixel-art cabinet with a layered bevel and offset shadow. */
 export class BoardFrame extends Container {
   constructor(width = 512, height = 1024 / 3) {
     super();
     this.addChild(
-      drawSteppedFace(width, height, 8, 8, 0x140b20),
-      drawSteppedFace(width, height, 4, 4, 0x2b1739).stroke({ color: 0x1b1027, width: 2 }),
+      drawSteppedFace(width, height, 4, 4, 0x140b20),
+      drawSteppedFace(width, height, 2, 2, 0x2b1739).stroke({ color: 0x1b1027, width: 2 }),
       drawSteppedFace(width, height, 0, 0, 0x713f87).stroke({ color: 0xc276d7, width: 2 }),
       drawInnerFace(width, height),
       drawBevel(width, height),
@@ -55,12 +55,12 @@ function drawInnerFace(width: number, height: number): Graphics {
 
 function drawBevel(width: number, height: number): Graphics {
   return new Graphics()
-    .moveTo(24, 8).lineTo(width - 32, 8).stroke({ color: 0xe3a1ef, width: 2 })
-    .moveTo(8, 24).lineTo(8, height - 32).stroke({ color: 0xe3a1ef, width: 2 })
-    .moveTo(width - 8, 24).lineTo(width - 8, height - 24).stroke({ color: 0x2a1738, width: 2 })
-    .moveTo(24, height - 8).lineTo(width - 24, height - 8).stroke({ color: 0x2a1738, width: 2 })
-    .moveTo(24, 12).lineTo(width - 32, 12).stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
-    .moveTo(12, 24).lineTo(12, height - 32).stroke({ color: 0xa867c3, width: 2, alpha: 0.8 });
+    .moveTo(12, 4).lineTo(width - 16, 4).stroke({ color: 0xe3a1ef, width: 2 })
+    .moveTo(4, 12).lineTo(4, height - 16).stroke({ color: 0xe3a1ef, width: 2 })
+    .moveTo(width - 4, 12).lineTo(width - 4, height - 12).stroke({ color: 0x2a1738, width: 2 })
+    .moveTo(12, height - 4).lineTo(width - 12, height - 4).stroke({ color: 0x2a1738, width: 2 })
+    .moveTo(12, 6).lineTo(width - 16, 6).stroke({ color: 0xa867c3, width: 2, alpha: 0.8 })
+    .moveTo(6, 12).lineTo(6, height - 16).stroke({ color: 0xa867c3, width: 2, alpha: 0.8 });
 }
 
 function drawCornerPixels(width: number, height: number): Graphics {

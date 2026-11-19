@@ -25,32 +25,32 @@ export class PixelKnob extends Container {
 
 function createKnobBase(): Graphics {
   return new Graphics()
-    .rect(2, 2, 28, 28)
+    .rect(2, 2, CONTROL_SIZE - 2, CONTROL_SIZE - 2)
     .fill(0x140b20)
-    .rect(0, 0, 28, 28)
+    .rect(0, 0, CONTROL_SIZE, CONTROL_SIZE)
     .fill(0x604077)
-    .rect(2, 2, 24, 2)
+    .rect(2, 2, CONTROL_SIZE - 8, 2)
     .fill(0xd697e5)
-    .rect(2, 2, 2, 20)
+    .rect(2, 2, 2, CONTROL_SIZE - 12)
     .fill(0xb77bcf)
-    .rect(26, 4, 2, 20)
+    .rect(CONTROL_SIZE - 2, 4, 2, CONTROL_SIZE - 12)
     .fill(0x36203f)
-    .rect(4, 26, 20, 2)
+    .rect(4, CONTROL_SIZE - 2, CONTROL_SIZE - 8, 2)
     .fill(0x36203f);
 }
 
 function createStandardFace(color: number, value: number): Graphics {
   const angle = angleForValue(value);
-  const indicatorX = STANDARD_CENTER_X + Math.round(Math.cos(angle) * 5);
-  const indicatorY = STANDARD_CENTER_Y + Math.round(Math.sin(angle) * 5);
+  const indicatorX = STANDARD_CENTER_X + Math.round(Math.cos(angle) * 6);
+  const indicatorY = STANDARD_CENTER_Y + Math.round(Math.sin(angle) * 6);
   return new Graphics()
-    .circle(STANDARD_CENTER_X + 2, STANDARD_CENTER_Y + 2, 9)
+    .circle(STANDARD_CENTER_X + 2, STANDARD_CENTER_Y + 2, 10)
     .fill(0x140b20)
-    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 9)
+    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 10)
     .fill(0x321b47)
-    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 7)
+    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 8)
     .fill(0xeee1d0)
-    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 5)
+    .circle(STANDARD_CENTER_X, STANDARD_CENTER_Y, 6)
     .fill(0xfff4dc)
     .moveTo(STANDARD_CENTER_X, STANDARD_CENTER_Y)
     .lineTo(indicatorX, indicatorY)

@@ -5,6 +5,8 @@ export type PresetIcon =
   | 'boot' | 'bomb' | 'burst' | 'sparkle' | 'bell' | 'skull';
 
 const TILE = 4;
+const PAD_SIZE = 40;
+const ICON_INSET = 4;
 const ICON_ART: Record<PresetIcon, string[]> = {
   coin: ['..ddd..', '.dgggd.', 'dgggggd', 'dggyygd', 'dggyygd', 'dgggggd', '.dgggd.'],
   star: ['...d...', '..dyd..', '.dyyd..', 'dyyyyyd', '..dyd..', '.d...d.', 'd.....d'],
@@ -34,23 +36,23 @@ export class PresetPad extends Container {
 }
 
 function drawPadFace(selected: boolean): Graphics {
-  const border = selected ? 0xf06b9d : 0x4b2a50;
-  const face = selected ? 0xf1bd5e : 0xe4aa54;
+  const frameColor = selected ? 0xf06b9d : 0x4b2a50;
+  const faceColor = selected ? 0xf1bd5e : 0xe4aa54;
   return new Graphics()
-    .rect(4, 4, 28, 28).fill(0x140b20)
-    .rect(0, 0, 28, 28).fill(border)
-    .rect(2, 2, 24, 24).fill(face)
-    .rect(4, 3, 20, 2).fill(0xffe6c2)
-    .rect(3, 4, 2, 18).fill(0xffe6c2)
-    .rect(25, 4, 2, 20).fill(selected ? 0xb94378 : 0xa66c3f)
-    .rect(4, 24, 20, 2).fill(0x9a5b3c)
-    .rect(22, 22, 4, 4).fill(selected ? 0xfff2bd : 0x36203f);
+    .rect(4, 4, PAD_SIZE - 4, PAD_SIZE - 4).fill(0x140b20)
+    .rect(0, 0, PAD_SIZE - 4, PAD_SIZE - 4).fill(frameColor)
+    .rect(2, 2, PAD_SIZE - 8, PAD_SIZE - 8).fill(faceColor)
+    .rect(4, 3, PAD_SIZE - 12, 2).fill(0xffe6c2)
+    .rect(3, 4, 2, PAD_SIZE - 16).fill(0xffe6c2)
+    .rect(PAD_SIZE - 10, 4, 2, PAD_SIZE - 16).fill(selected ? 0xb94378 : 0xa66c3f)
+    .rect(4, PAD_SIZE - 10, PAD_SIZE - 12, 2).fill(0x9a5b3c)
+    .rect(PAD_SIZE - 12, PAD_SIZE - 12, 4, 4).fill(selected ? 0xfff2bd : 0x36203f);
 }
 
 function drawIcon(icon: PresetIcon): Graphics {
   const graphic = new Graphics();
   ICON_ART[icon].forEach((row, y) => [...row].forEach((pixel, x) => {
-    if (pixel !== '.') graphic.rect(2 + x * TILE, 2 + y * TILE, TILE, TILE).fill(COLORS[pixel]);
+    if (pixel !== '.') graphic.rect(ICON_INSET + x * TILE, ICON_INSET + y * TILE, TILE, TILE).fill(COLORS[pixel]);
   }));
   return graphic;
 }
