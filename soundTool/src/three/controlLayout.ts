@@ -96,7 +96,7 @@ export const STRIP_KNOBS = KNOBS.map((knob, index) => {
 /** The header's RUN badge. */
 export const RUN_BUTTON: ControlRect = {
   x: HEADER_INSET + (BOARD_WIDTH - HEADER_INSET * 2) - RUN_RIGHT_INSET,
-  y: HEADER_TOP,
+  y: HEADER_TOP - 1.5,
   width: RUN_WIDTH,
   height: RUN_HEIGHT,
 };

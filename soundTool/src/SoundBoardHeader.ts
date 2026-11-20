@@ -21,7 +21,7 @@ export class SoundBoardHeader extends Container {
     this.addChild(createClock(width));
     if (controls === '2d') {
       const run = new RunButton();
-      run.position.set(width - RUN_RIGHT_INSET, 0);
+      run.position.set(width - RUN_RIGHT_INSET, -1.5);
       this.addChild(run);
     }
   }
@@ -66,7 +66,7 @@ function createSpeaker(width: number): Container {
   const waves = new Graphics()
     .arc(9, 10, 3.5, -0.9, 0.9).stroke({ color: 0x8fe28b, width: 1.5 })
     .arc(9, 10, 6, -0.9, 0.9).stroke({ color: 0x8fe28b, width: 1.5 });
-  speaker.position.x = width - 186;
+  speaker.position.set(width - 186, 0.5);
   speaker.addChild(icon, waves);
   return speaker;
 }
@@ -77,11 +77,11 @@ const METER_UNLIT = 0x5c3590;
 
 function createLevelMeter(width: number): Graphics {
   const meter = new Graphics()
-    .roundRect(width - 158, 8.67, 64, 12.67, 2).fill(0x281635)
-    .roundRect(width - 157, 9.67, 62, 10.67, 1).stroke({ color: 0x79468f, width: 1 });
+    .roundRect(width - 158, 11 / 3, 64, 12.67, 2).fill(0x281635)
+    .roundRect(width - 157, 14 / 3, 62, 10.67, 1).stroke({ color: 0x79468f, width: 1 });
   for (let index = 0; index < METER_BAR_COUNT; index += 1) {
     const color = index < METER_LIT_COLORS.length ? METER_LIT_COLORS[index] : METER_UNLIT;
-    meter.rect(width - 154 + index * 5.67, 11, 4.33, 9.33).fill(color);
+    meter.rect(width - 154 + index * 5.67, 6, 4.33, 9.33).fill(color);
   }
   return meter;
 }
@@ -91,7 +91,7 @@ function createClock(width: number): Text {
     text: 'SAT 14:20',
     style: { fontFamily: 'monogram', fontSize: 15, fontWeight: 'bold', fill: TEXT_COLOR }, resolution: 3,
   });
-  clock.position.set(width - 88, 0);
+  clock.position.set(width - 88, 1);
   return clock;
 }
 
