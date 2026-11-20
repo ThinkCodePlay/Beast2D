@@ -11,10 +11,14 @@ const KNOBS = [
   { label: 'CUT', value: 0.72, color: 0xffcf72 },
 ] as const;
 
-const KNOB_PITCH = 48.4;
-const KNOB_TILE_WIDTH = 44;
+// Tiles use the waveform selector's grid: same left edge, pitch and width,
+// so every dial column lines up with the waveform button above it.
+const KNOB_GRID_LEFT = 8.3;
+const KNOB_STEP_X = 160 / 3;
+const KNOB_TILE_WIDTH = 45;
 const KNOB_TILE_HEIGHT = 44;
 const KNOB_TILE_TOP = 1;
+const KNOB_SIZE = 32;
 
 /** Bottom strip with the six 32px dials, as wide as the creation panel above it. */
 export class SoundControlStrip extends Container {
@@ -22,10 +26,10 @@ export class SoundControlStrip extends Container {
     super();
     this.addChild(drawStripFrame(width, height));
     KNOBS.forEach((knob, index) => {
-      const x = 7.5 + index * KNOB_PITCH;
-      this.addChild(createKnobTile(x));
+      const tileLeft = KNOB_GRID_LEFT + index * KNOB_STEP_X;
+      this.addChild(createKnobTile(tileLeft));
       const control = new PixelKnob(knob.label, knob.value, knob.color);
-      control.position.set(x + 4, 9);
+      control.position.set(tileLeft + (KNOB_TILE_WIDTH - KNOB_SIZE) / 2, 9);
       this.addChild(control);
     });
   }
@@ -45,8 +49,7 @@ function drawStripFrame(width: number, height: number): Graphics {
   return frame;
 }
 
-function createKnobTile(x: number): Graphics {
-  const left = x - 1.5;
+function createKnobTile(left: number): Graphics {
   const top = KNOB_TILE_TOP;
   const width = KNOB_TILE_WIDTH;
   const height = KNOB_TILE_HEIGHT;
