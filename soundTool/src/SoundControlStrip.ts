@@ -1,5 +1,4 @@
 import { Container, Graphics } from 'pixi.js';
-import { EditButton } from './EditButton';
 import { PixelKnob } from './ui/PixelKnob';
 import { drawGradientFace } from './ui/GradientFace';
 
@@ -16,9 +15,8 @@ const KNOB_PITCH = 48.4;
 const KNOB_TILE_WIDTH = 44;
 const KNOB_TILE_HEIGHT = 44;
 const KNOB_TILE_TOP = 1;
-const EDIT_GAP = 14;
 
-/** Shared bottom strip with six 32px dials and the waveform edit control. */
+/** Bottom strip with the six 32px dials, as wide as the creation panel above it. */
 export class SoundControlStrip extends Container {
   constructor(width: number, height: number) {
     super();
@@ -30,15 +28,10 @@ export class SoundControlStrip extends Container {
       control.position.set(x + 4, 9);
       this.addChild(control);
     });
-    const edit = new EditButton();
-    edit.position.set(3.5 + (KNOBS.length - 1) * KNOB_PITCH + KNOB_TILE_WIDTH + EDIT_GAP, 32 / 3);
-    this.addChild(edit);
   }
 }
 
-const DARK_PANEL_LEFT = 369;
-
-/** Dark recessed strip: light tiles sit on a navy bed with bright edge lines. */
+/** Recessed strip: light tiles sit on a navy bed with bright edge lines. */
 function drawStripFrame(width: number, height: number): Graphics {
   const frame = new Graphics();
   frame
@@ -49,11 +42,6 @@ function drawStripFrame(width: number, height: number): Graphics {
     .rect(1, 2.5, 1, height - 5).fill(0x8a67a3)
     .rect(width - 2, 2.5, 1, height - 5).fill(0x8a67a3)
     .rect(1, height - 9, width - 2, 6.5).fill(0x3a1c52);
-  frame
-    .rect(DARK_PANEL_LEFT - 1, 3, width - DARK_PANEL_LEFT - 1, height - 6).fill(0x24152e)
-    .rect(DARK_PANEL_LEFT, 4, width - DARK_PANEL_LEFT - 3, height - 8).fill(0x3e254f)
-    .rect(DARK_PANEL_LEFT, 4, width - DARK_PANEL_LEFT - 3, 1).fill(0x593664)
-    .rect(DARK_PANEL_LEFT, 4, 1, height - 8).fill(0x593664);
   return frame;
 }
 

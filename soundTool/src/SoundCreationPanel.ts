@@ -3,6 +3,7 @@ import { PresetPad, type PresetIcon, type PresetTextures } from './PresetPad';
 import { PixelButton } from './ui/PixelButton';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
+import { WaveformButton, WAVEFORM_TYPES } from './WaveformButton';
 
 const PAD_GRID_LEFT = 8.3;
 const PAD_STEP_X = 160 / 3; // 160 output pixels at the 3× stage scale.
@@ -14,6 +15,8 @@ const LCD_GAP = 16 / 3;
 const LCD_RIGHT_INSET = 8;
 const WAVEFORM_TOP_GAP = 11 / 3;
 const WAVEFORM_BOTTOM_INSET = 5;
+const SELECTOR_HEIGHT = 30;
+const SELECTOR_TOP_GAP = 4;
 
 // The kept presets: the most-used game sound types, one pad per type, matching
 // the sound bank (coin, power-up, jump, explosion, hit, enemy death).
@@ -27,9 +30,11 @@ export class SoundCreationPanel extends Container {
     this.addChild(createTransport(width));
     this.addChild(createPresetGrid(presetTextures));
     const waveformTop = PAD_ROW_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
-    const waveform = new WaveformDisplay(width - 11, height - WAVEFORM_BOTTOM_INSET - waveformTop);
+    const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;
+    const waveform = new WaveformDisplay(width - 11, selectorTop - SELECTOR_TOP_GAP - waveformTop);
     waveform.position.set(8, waveformTop);
     this.addChild(waveform);
+    this.addChild(createWaveformSelector(selectorTop));
   }
 }
 
@@ -76,4 +81,16 @@ function createPresetGrid(presetTextures: PresetTextures): Container {
     grid.addChild(pad);
   });
   return grid;
+}
+
+// Waveform choice sits under the display, one button per preset column.
+function createWaveformSelector(top: number): Container {
+  const row = new Container();
+  row.position.set(PAD_GRID_LEFT, top);
+  WAVEFORM_TYPES.forEach((type, index) => {
+    const button = new WaveformButton(type, index === 0);
+    button.position.x = index * PAD_STEP_X;
+    row.addChild(button);
+  });
+  return row;
 }
