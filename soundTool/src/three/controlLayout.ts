@@ -74,8 +74,9 @@ export const STRIP_KNOBS = KNOBS.map((knob, index) => {
   return {
     ...knob,
     cx: tileLeft + KNOB_TILE_INSET + KNOB_CENTER.x,
-    cy: CONTROLS_TOP + KNOB_TOP + KNOB_CENTER.y,
-    radius: 13,
+    // Raised toward the dial top so the 3D rotor body clears the flat label.
+    cy: CONTROLS_TOP + KNOB_TOP + KNOB_CENTER.y - 3,
+    radius: 11,
   };
 });
 

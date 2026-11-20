@@ -68,19 +68,16 @@ export class KnobCap extends Container {
 
 function drawTickRing(color: number): Graphics {
   const ring = new Graphics();
-  for (let i = 0; i < 7; i += 1) {
-    const angle = Math.PI * (3 / 4 + (i * 5) / 12); // 135° .. 405°
-    const dx = Math.cos(angle);
-    const dy = Math.sin(angle);
+  for (let tick = 0; tick <= 6; tick += 1) {
+    const angle = Math.PI * 0.75 + (tick / 6) * Math.PI * 1.5;
+    const outerX = CENTER_X + Math.round(Math.cos(angle) * TICK_RADIUS_X);
+    const outerY = CENTER_Y + Math.round(Math.sin(angle) * TICK_RADIUS_Y);
+    const innerX = CENTER_X + Math.round(Math.cos(angle) * (TICK_RADIUS_X - TICK_LENGTH));
+    const innerY = CENTER_Y + Math.round(Math.sin(angle) * (TICK_RADIUS_Y - TICK_LENGTH));
     ring
-      .moveTo(CENTER_X + dx * TICK_RADIUS_X, CENTER_Y + dy * TICK_RADIUS_Y)
-      .lineTo(
-        CENTER_X + dx * (TICK_RADIUS_X + TICK_LENGTH),
-        CENTER_Y + dy * (TICK_RADIUS_Y + TICK_LENGTH),
-      )
-      .stroke({ width: 1.2, color: 0x140b20 })
-      .stroke({ width: 1.2, color })
-      .stroke({ width: 1.2, color: 0xfff8e8, alpha: 0.4 });
+      .moveTo(innerX + 1, innerY + 1).lineTo(outerX + 1, outerY + 1).stroke({ color: 0x291537, width: 3 })
+      .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0x3b223d, width: 3 })
+      .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color, width: 1 });
   }
   return ring;
 }
