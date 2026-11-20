@@ -1,5 +1,4 @@
 import { Container, Graphics, Sprite, Text, type Texture } from 'pixi.js';
-import { PixelButton } from './ui/PixelButton';
 
 const HEADER_HEIGHT = 24;
 const TEXT_COLOR = 0xffeaff;
@@ -9,6 +8,7 @@ export class SoundBoardHeader extends Container {
   constructor(width: number, mascotTexture: Texture) {
     super();
     this.addChild(drawHeader(width));
+    this.addChild(drawAppIcon());
     this.addChild(createLogo(mascotTexture));
     this.addChild(createTitle());
     this.addChild(createSpeaker(width));
@@ -26,47 +26,54 @@ function drawHeader(width: number): Graphics {
     .rect(4, 4, width - 8, HEADER_HEIGHT - 8).stroke({ color: 0x79468f, width: 1 });
 }
 
+function drawAppIcon(): Graphics {
+  return new Graphics()
+    .roundRect(4, 2.3, 5.3, 6.3, 1.2).fill(0xf3819b)
+    .roundRect(5.2, 3.4, 2, 2, 0.7).fill(0xfdb9ce);
+}
+
 function createLogo(texture: Texture): Sprite {
   const logo = new Sprite(texture);
   logo.width = 24;
-  logo.height = 26;
-  logo.position.set(13, 0);
+  logo.height = 27;
+  logo.position.set(14, -2.7);
   return logo;
 }
 
 function createTitle(): Text {
   const title = new Text({
     text: 'beast2d sound board',
-    style: { fontFamily: 'monogram', fontSize: 19, fontWeight: 'bold', letterSpacing: 1, fill: TEXT_COLOR }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 19, fontWeight: 'bold', letterSpacing: 1, fill: TEXT_COLOR, stroke: { color: 0x2a1440, width: 1 } }, resolution: 3,
   });
-  title.position.set(46, -3);
+  title.position.set(47, -3);
   return title;
 }
 
 function createSpeaker(width: number): Container {
   const speaker = new Container();
-  const icon = new Text({
-    text: '◖',
-    style: { fontFamily: 'monogram', fontSize: 18, fontWeight: 'bold', fill: 0x8fe28b }, resolution: 3,
-  });
-  icon.position.set(0, 4);
+  const icon = new Graphics()
+    .rect(0, 7, 3, 6).fill(0x8fe28b)
+    .poly([3, 7, 8, 3, 8, 17, 3, 13]).fill(0x8fe28b);
   const waves = new Graphics()
-    .arc(10, 12, 8, -0.8, 0.8).stroke({ color: 0x8fe28b, width: 2 })
-    .arc(10, 12, 12, -0.8, 0.8).stroke({ color: 0x8fe28b, width: 2 });
-  speaker.position.x = width - 198;
+    .arc(9, 10, 3.5, -0.9, 0.9).stroke({ color: 0x8fe28b, width: 1.5 })
+    .arc(9, 10, 6, -0.9, 0.9).stroke({ color: 0x8fe28b, width: 1.5 });
+  speaker.position.x = width - 186;
   speaker.addChild(icon, waves);
   return speaker;
 }
 
+const METER_LIT_COLORS = [0xf490c6, 0xfa8cd3, 0xdc6fec, 0xb574f4, 0xaa72fb, 0xa564f6] as const;
+const METER_BAR_COUNT = 10;
+const METER_UNLIT = 0x5c3590;
+
 function createLevelMeter(width: number): Graphics {
-  const levels = [6, 10, 12, 12, 12, 12, 10, 6];
   const meter = new Graphics()
-    .rect(width - 166, 4, 64, 16).fill(0x281635)
-    .rect(width - 164, 6, 60, 12).stroke({ color: 0x79468f, width: 2 });
-  levels.forEach((height, index) => {
-    meter.rect(width - 158 + index * 8, 18 - height, 4, height)
-      .fill(index < 5 ? 0xff91c8 : 0x513366);
-  });
+    .roundRect(width - 158, 8.67, 64, 12.67, 2).fill(0x281635)
+    .roundRect(width - 157, 9.67, 62, 10.67, 1).stroke({ color: 0x79468f, width: 1 });
+  for (let index = 0; index < METER_BAR_COUNT; index += 1) {
+    const color = index < METER_LIT_COLORS.length ? METER_LIT_COLORS[index] : METER_UNLIT;
+    meter.rect(width - 154 + index * 5.67, 11, 4.33, 9.33).fill(color);
+  }
   return meter;
 }
 
@@ -79,8 +86,18 @@ function createClock(width: number): Text {
   return clock;
 }
 
-function createRunButton(width: number): PixelButton {
-  const button = new PixelButton('RUN', 'pink');
-  button.position.set(width - 32, 0);
-  return button;
+function createRunButton(width: number): Container {
+  const badge = new Container();
+  badge.addChild(new Graphics()
+    .poly([3, 3, 27, 3, 30, 6, 30, 18, 27, 21, 3, 21, 0, 18, 0, 6]).fill(0x24152e)
+    .poly([4, 4, 26, 4, 29, 7, 29, 17, 26, 20, 4, 20, 1, 17, 1, 7]).fill(0xe85a8c)
+    .rect(4, 5, 22, 4).fill(0xff9ebb));
+  const label = new Text({
+    text: 'RUN',
+    style: { fontFamily: 'monogram', fontSize: 13, fontWeight: 'bold', fill: 0x8e2b4a }, resolution: 3,
+  });
+  label.position.set(7, 5);
+  badge.addChild(label);
+  badge.position.set(width - 34, 0);
+  return badge;
 }

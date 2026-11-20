@@ -5,9 +5,9 @@ const BANK_ITEMS = [
   'jump', 'coin', 'hit', 'laser', 'boom_big', 'power_up',
   'enemy_die', 'select', 'empty', 'empty', 'empty', 'empty',
 ] as const;
-const BANK_ROW_TOP = 28;
-const SCROLL_BUTTON_SIZE = 16;
-const SCROLL_INSET = 4;
+const BANK_ROW_TOP = 109 / 3;
+const SCROLL_BUTTON_SIZE = 15;
+const SCROLL_INSET = 2;
 
 /** Shallow inset sound-bank area with a fine board-colored boundary. */
 export class SoundBankPanel extends Container {
@@ -23,20 +23,24 @@ export class SoundBankPanel extends Container {
 
 function drawFlatBoundary(width: number, height: number): Graphics {
   return new Graphics()
-    .rect(0, 0, width, height).fill(0x40264f)
-    .rect(0, 0, width, 1).fill(0x9b60b7)
-    .rect(0, 0, 1, height).fill(0x9b60b7)
-    .rect(1, height - 1, width - 1, 1).fill(0x301b42)
-    .rect(width - 1, 1, 1, height - 2).fill(0x301b42)
-    .rect(2, 25, width - 4, 1).fill(0x56316b);
+    .rect(0, 0, width, height).fill(0x2b153c)
+    .rect(0, 0, width, 1).fill(0x76508c)
+    .rect(0, 0, 1, height).fill(0x76508c)
+    .rect(width - 1, 1, 1, height - 2).fill(0x2a1738)
+    .rect(1, height - 1, width - 1, 1).fill(0x2a1738)
+    .rect(1, 1, 1, 1).fill(0xd88ce7)
+    .rect(width - 2, height - 2, 1, 1).fill(0x20132b)
+    .rect(3, 16, width - 6, 13).fill(0x472b5c)
+    .rect(3, 16, width - 6, 1).fill(0x5c3a73)
+    .rect(1, 33, width - 2, 1).fill(0x56316b);
 }
 
 function createTitle(): Text {
   const title = new Text({
     text: 'SOUND BANK',
-    style: { fontFamily: 'monogram', fontSize: 16, fontWeight: 'bold', fill: 0xffeaff }, resolution: 3,
+    style: { fontFamily: 'monogram', fontSize: 18, fontWeight: 'bold', fill: 0xffeaff, stroke: { color: 0x2a1440, width: 1 } }, resolution: 3,
   });
-  title.position.set(4, 3);
+  title.position.set(6, -2);
   return title;
 }
 
@@ -45,7 +49,7 @@ function createSubtitle(): Text {
     text: 'RUN → GAME',
     style: { fontFamily: 'monogram', fontSize: 13, fill: 0xb88acb }, resolution: 3,
   });
-  subtitle.position.set(4, 17);
+  subtitle.position.set(6, 17);
   return subtitle;
 }
 
@@ -54,7 +58,7 @@ function createRows(width: number): Container {
   rows.position.set(0, BANK_ROW_TOP);
   BANK_ITEMS.forEach((name, index) => {
     const row = new SoundBankRow(index, name, name === 'laser', width - 24);
-    row.position.y = index * BANK_ROW_HEIGHT;
+    row.position.y = index * BANK_ROW_HEIGHT + (index === 3 ? 2 / 3 : 0);
     rows.addChild(row);
   });
   return rows;
@@ -64,19 +68,19 @@ function createScrollbar(width: number, height: number): Container {
   const x = width - SCROLL_BUTTON_SIZE - SCROLL_INSET;
   const y = BANK_ROW_TOP;
   const trackHeight = height - y - SCROLL_INSET;
-  const thumbHeight = trackHeight - SCROLL_BUTTON_SIZE * 2 - 10;
+  const thumbHeight = trackHeight - SCROLL_BUTTON_SIZE * 2 - 4;
   const scrollbar = new Container();
+  // Reference scrollbar: one wide light-lavender track with a darker inset thumb.
   scrollbar.addChild(new Graphics()
     .rect(x, y + SCROLL_BUTTON_SIZE, SCROLL_BUTTON_SIZE, trackHeight - SCROLL_BUTTON_SIZE * 2)
-    .fill(0x251531)
-    .rect(x + 2, y + SCROLL_BUTTON_SIZE + 2, 2, trackHeight - SCROLL_BUTTON_SIZE * 2 - 4)
-    .fill(0x906aa4)
-    .rect(x + SCROLL_BUTTON_SIZE - 4, y + SCROLL_BUTTON_SIZE + 2, 2, trackHeight - SCROLL_BUTTON_SIZE * 2 - 4)
     .fill(0x1b1027)
-    .rect(x + 2, y + SCROLL_BUTTON_SIZE + 5, SCROLL_BUTTON_SIZE - 4, thumbHeight)
+    .rect(x + 1, y + SCROLL_BUTTON_SIZE + 1, SCROLL_BUTTON_SIZE - 2, trackHeight - SCROLL_BUTTON_SIZE * 2 - 2)
     .fill(0xa581ba)
-    .rect(x + 2, y + SCROLL_BUTTON_SIZE + 5, 2, thumbHeight).fill(0xd4bedc)
-    .rect(x + SCROLL_BUTTON_SIZE - 4, y + SCROLL_BUTTON_SIZE + 5, 2, thumbHeight).fill(0x704584));
+    .rect(x + 2, y + SCROLL_BUTTON_SIZE + 2, 2, trackHeight - SCROLL_BUTTON_SIZE * 2 - 4)
+    .fill(0xd4bedc)
+    .rect(x + 4, y + SCROLL_BUTTON_SIZE + 2, SCROLL_BUTTON_SIZE - 8, thumbHeight)
+    .fill(0x8a63a0)
+    .rect(x + 4, y + SCROLL_BUTTON_SIZE + 2, SCROLL_BUTTON_SIZE - 8, 1).fill(0xb18cc4));
   scrollbar.addChild(createArrowButton(x, y, true));
   scrollbar.addChild(createArrowButton(x, height - SCROLL_BUTTON_SIZE - SCROLL_INSET, false));
   return scrollbar;
@@ -85,17 +89,17 @@ function createScrollbar(width: number, height: number): Container {
 function createArrowButton(x: number, y: number, up: boolean): Container {
   const button = new Container();
   button.addChild(new Graphics()
-    .rect(x + 2, y + 2, 12, 12).fill(0x301b42)
-    .rect(x, y, 12, 12).fill(0x9c7caf)
-    .rect(x + 2, y + 2, 8, 2).fill(0xd5bedf)
-    .rect(x + 2, y + 2, 2, 6).fill(0xd5bedf)
-    .rect(x + 10, y + 2, 2, 10).fill(0x1b1027));
-  const glyph = new Text({
-    text: up ? '▲' : '▼',
-    style: { fontFamily: 'monogram', fontSize: 8, fill: 0xfff1f8 }, resolution: 3,
-  });
-  glyph.anchor.set(0.5);
-  glyph.position.set(x + 6, y + 6);
+    .rect(x + 1, y + 1, 14, 14).fill(0x301b42)
+    .rect(x, y, 14, 14).fill(0xc7b3d9)
+    .rect(x + 1, y + 1, 12, 2).fill(0xe8dcf2)
+    .rect(x + 1, y + 1, 2, 12).fill(0xe8dcf2)
+    .rect(x + 11, y + 2, 2, 11).fill(0x8a63a0));
+  const glyph = new Graphics();
+  if (up) {
+    glyph.poly([x + 7, y + 4, x + 11, y + 10, x + 3, y + 10]).fill(0x281638);
+  } else {
+    glyph.poly([x + 3, y + 4, x + 11, y + 4, x + 7, y + 10]).fill(0x281638);
+  }
   button.addChild(glyph);
   return button;
 }

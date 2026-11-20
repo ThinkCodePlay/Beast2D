@@ -5,12 +5,12 @@ const PANEL_INSET = 3;
 
 /** Thin stepped panel inset with restrained top-left light and lower-right shade. */
 export class RaisedPanelFrame extends Container {
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, panelColor = 0x59316f) {
     super();
     this.addChild(
       drawSteppedFace(width, height, 0, 0x4a2c5e)
         .stroke({ color: 0x9b60b7, width: 1 }),
-      drawSteppedFace(width, height, PANEL_INSET, 0x59316f)
+      drawSteppedFace(width, height, PANEL_INSET, panelColor)
         .stroke({ color: 0x342043, width: 1 }),
       drawBevel(width, height),
     );

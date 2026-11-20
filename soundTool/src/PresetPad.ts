@@ -1,4 +1,5 @@
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
+import { chamferPoints, drawGradientFace } from './ui/GradientFace';
 
 export const PRESET_ICONS = [
   'coin', 'star', 'heart', 'gem', 'potion', 'chest',
@@ -8,10 +9,9 @@ export const PRESET_ICONS = [
 export type PresetIcon = typeof PRESET_ICONS[number];
 export type PresetTextures = Record<PresetIcon, Texture>;
 
-const PAD_WIDTH = 46;
-const PAD_HEIGHT = 38;
-const ICON_SIZE = 24;
-const PAD_CORNER = 4;
+const PAD_WIDTH = 45;
+const PAD_HEIGHT = 36;
+const ICON_SIZE = 30;
 
 /** Pixel-art preset tile with a stepped rim, crisp highlights, and a sprite face. */
 export class PresetPad extends Container {
@@ -27,53 +27,24 @@ export class PresetPad extends Container {
 }
 
 function drawPadFace(selected: boolean): Graphics {
-  const face = new Graphics();
-  const edge = selected ? 0x291537 : 0x24152e;
-  const rim = selected ? 0xe95186 : 0x8f4b35;
-  const topLight = selected ? 0xffbed5 : 0xffdf8a;
-  const faceColor = selected ? 0xf3ad58 : 0xf2b94c;
-  const shadow = selected ? 0x5d284d : 0x311a36;
-
-  drawChamfer(face, 2, 3, PAD_WIDTH, PAD_HEIGHT, PAD_CORNER, shadow);
-  drawChamfer(face, 0, 0, PAD_WIDTH, PAD_HEIGHT, PAD_CORNER, edge);
-  drawChamfer(face, 2, 2, PAD_WIDTH - 4, PAD_HEIGHT - 4, PAD_CORNER - 1, rim);
-  drawChamfer(face, 4, 4, PAD_WIDTH - 8, PAD_HEIGHT - 8, 3, faceColor);
-  drawChamfer(face, 5, 5, PAD_WIDTH - 12, PAD_HEIGHT - 12, 2, selected ? 0xffcf72 : 0xf8ca5e);
-  face
-    .rect(9, 5, PAD_WIDTH - 18, 2).fill(topLight)
-    .rect(5, 9, 2, PAD_HEIGHT - 18).fill(topLight)
-    .rect(PAD_WIDTH - 7, 9, 2, PAD_HEIGHT - 18).fill(selected ? 0xc34c72 : 0xb56537)
-    .rect(9, PAD_HEIGHT - 7, PAD_WIDTH - 18, 2).fill(selected ? 0x713452 : 0xa64e34)
-    .rect(7, PAD_HEIGHT - 4, 3, 2).fill(edge)
-    .rect(PAD_WIDTH - 10, PAD_HEIGHT - 4, 3, 2).fill(edge);
-  return face;
-}
-
-function drawChamfer(graphic: Graphics, x: number, y: number, width: number, height: number, cut: number, color: number): void {
-  const step = Math.min(2, Math.floor(cut / 2));
-  const right = x + width;
-  const bottom = y + height;
-  graphic
-    .moveTo(x + cut, y)
-    .lineTo(right - cut, y)
-    .lineTo(right - cut, y + step)
-    .lineTo(right - step, y + step)
-    .lineTo(right - step, y + cut)
-    .lineTo(right, y + cut)
-    .lineTo(right, bottom - cut)
-    .lineTo(right - step, bottom - cut)
-    .lineTo(right - step, bottom - step)
-    .lineTo(right - cut, bottom - step)
-    .lineTo(right - cut, bottom)
-    .lineTo(x + cut, bottom)
-    .lineTo(x + cut, bottom - step)
-    .lineTo(x + step, bottom - step)
-    .lineTo(x + step, bottom - cut)
-    .lineTo(x, bottom - cut)
-    .lineTo(x, y + cut)
-    .lineTo(x + step, y + cut)
-    .lineTo(x + step, y + step)
-    .lineTo(x + cut, y + step)
-    .closePath()
-    .fill(color);
+  const faceColor = selected ? 0xfb87aa : 0xfdcc55;
+  const topLight = selected ? 0xffe4ec : 0xfaf6ea;
+  const bottomShade = selected ? 0xe0607f : 0xe87d50;
+  const bottomEdge = selected ? 0xa93a5e : 0xd96a48;
+  const pad = new Graphics();
+  if (selected) {
+    // Prominent multi-line pink selection perimeter from the reference.
+    pad
+      .poly(chamferPoints(-3, -3, PAD_WIDTH + 6, PAD_HEIGHT + 6, 5)).fill(0xff9ec2)
+      .poly(chamferPoints(-1.5, -1.5, PAD_WIDTH + 3, PAD_HEIGHT + 3, 4)).fill(0xe95186);
+  }
+  // Continuous face with a fine bevel perimeter, like the reference surface.
+  drawGradientFace(pad, 0, 0, PAD_WIDTH, PAD_HEIGHT, 4, {
+    edge: 0x24152e,
+    top: topLight,
+    mid: faceColor,
+    bottom: bottomShade,
+  }, 0.68, 4);
+  pad.rect(4, PAD_HEIGHT - 3.5, PAD_WIDTH - 8, 1).fill(bottomEdge);
+  return pad;
 }

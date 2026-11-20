@@ -21,6 +21,12 @@ const presetTextures = Object.fromEntries(await Promise.all(PRESET_ICONS.map(asy
   return [icon, texture];
 }))) as PresetTextures;
 
+const tabIconTextures = Object.fromEntries(await Promise.all(['gamepad', 'folder', 'gear'].map(async (icon) => {
+  const texture = await Assets.load<Texture>(`/art/tabs/${icon}.png`);
+  texture.source.scaleMode = 'nearest';
+  return [icon, texture];
+})));
+
 const app = new Application();
 await app.init({
   width: DISPLAY_WIDTH,
@@ -31,5 +37,5 @@ await app.init({
   resolution: 1,
 });
 
-app.stage.addChild(new SoundBoardFrame(presetTextures, mascotTexture));
+app.stage.addChild(new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures));
 mount.appendChild(app.canvas);
