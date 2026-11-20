@@ -1,5 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { drawGradientFace } from './GradientFace';
+import { makePressable } from './Pressable';
 
 export type ButtonTone = 'pink' | 'gold' | 'violet' | 'purple' | 'dark' | 'green' | 'cream';
 
@@ -53,6 +54,7 @@ export class PixelButton extends Container {
     } else {
       this.addChild(createTextIcon(icon, colors.text, width, height));
     }
+    makePressable(this);
   }
 }
 

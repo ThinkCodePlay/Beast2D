@@ -1,4 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
+import { trackDrag } from './Pressable';
+import { angleForValue, clampValue, valueTowardPoint } from './knobTurn';
 
 const CONTROL_SIZE = 32;
 const CENTER_X = 16;
@@ -22,19 +24,29 @@ const TICK_RADIUS_X = 18;
 const TICK_RADIUS_Y = 17;
 const TICK_LENGTH = 3;
 
+/** Sweep start for the needle; the tick ring keeps the 2D board's orientation. */
+const NEEDLE_START_ANGLE = Math.PI * 0.25;
+const TICK_START_ANGLE = Math.PI * 0.75;
+
 /** Center of a knob's disk inside its 32×32 tile. */
 export const KNOB_CENTER: { x: number; y: number } = { x: CENTER_X, y: CENTER_Y };
 
 /**
  * 32×32 stepped dial: a tick ring, a label, and a layered pixel-disk cap with
  * a value needle. The strip accents VOL and PITCH by tinting their ticks and
- * faces instead of crescents.
+ * faces instead of crescents. Drag the dial with mouse or touch and the
+ * needle turns to point at the pointer, clamped to the dial's sweep.
  */
 export class PixelKnob extends Container {
   constructor(label: string, value: number, color: number) {
     super();
     this.addChild(new KnobMarkings(label, color));
-    this.addChild(new KnobCap(value, color));
+    const cap = new KnobCap(value, color);
+    this.addChild(cap);
+    trackDrag(this, (event) => {
+      const point = this.toLocal(event.global);
+      cap.setValue(valueTowardPoint(CENTER_X, CENTER_Y, point.x, point.y, NEEDLE_START_ANGLE));
+    });
   }
 }
 
@@ -53,23 +65,42 @@ export class KnobMarkings extends Container {
 
 /** The rotating part of a dial: layered pixel disks with a value needle. */
 export class KnobCap extends Container {
+  private value = 0;
+  private readonly center: { x: number; y: number };
+  private readonly needle: Graphics;
+
   constructor(value: number, color: number, center = KNOB_CENTER) {
     super();
+    this.center = center;
     const cap = new Graphics();
     drawPixelDisk(cap, center.x + 2, center.y + 3, 14, 0x140b20, 1.08, 0.95);
     drawPixelDisk(cap, center.x, center.y, 14, 0x321b47, 1.08, 0.95);
     drawPixelDisk(cap, center.x, center.y, 12, 0x604077, 1.08, 0.95);
     drawPixelDisk(cap, center.x, center.y, 10, color in ACCENT_FACE ? ACCENT_FACE[color] : CREAM_FACE, 1.08, 0.95);
     drawPixelDisk(cap, center.x - 1, center.y - 1, 8, CREAM_LIGHT, 1.08, 0.95);
-    drawNeedle(cap, center.x, center.y, value, 8, 0x3a2030, 2);
     this.addChild(cap);
+    this.needle = new Graphics();
+    this.addChild(this.needle);
+    this.setValue(value);
+  }
+
+  /** The current 0..1 dial value. */
+  getValue(): number {
+    return this.value;
+  }
+
+  /** Point the needle at a 0..1 value. */
+  setValue(value: number): void {
+    this.value = clampValue(value);
+    this.needle.clear();
+    drawNeedle(this.needle, this.center.x, this.center.y, this.value, 8, 0x3a2030, 2);
   }
 }
 
 function drawTickRing(color: number): Graphics {
   const ring = new Graphics();
   for (let tick = 0; tick <= 6; tick += 1) {
-    const angle = Math.PI * 0.75 + (tick / 6) * Math.PI * 1.5;
+    const angle = angleForValue(tick / 6, TICK_START_ANGLE);
     const outerX = CENTER_X + Math.round(Math.cos(angle) * TICK_RADIUS_X);
     const outerY = CENTER_Y + Math.round(Math.sin(angle) * TICK_RADIUS_Y);
     const innerX = CENTER_X + Math.round(Math.cos(angle) * (TICK_RADIUS_X - TICK_LENGTH));
@@ -91,13 +122,11 @@ function drawNeedle(
   color: number,
   width: number,
 ): void {
-  const angle = ((135 + value * 270 - 90) * Math.PI) / 180;
-  const needle = new Graphics()
-    .moveTo(0, 0)
-    .lineTo(Math.cos(angle) * length, Math.sin(angle) * length)
+  const angle = angleForValue(value, NEEDLE_START_ANGLE);
+  face
+    .moveTo(centerX, centerY)
+    .lineTo(centerX + Math.cos(angle) * length, centerY + Math.sin(angle) * length)
     .stroke({ width, color, cap: 'round' });
-  needle.position.set(centerX, centerY);
-  face.addChild(needle);
 }
 
 function drawPixelDisk(

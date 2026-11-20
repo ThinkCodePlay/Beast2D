@@ -16,7 +16,12 @@ export interface Button3DOptions {
   renderer: Renderer;
 }
 
-/** A board button: a lit 3D body carrying its flat 2D artwork on the front. */
+const MIN_PRESS_SINK = 2;
+
+/**
+ * A board button: a lit 3D body carrying its flat 2D artwork on the front.
+ * Pressing it (mouse, touch or pen) sinks it into the board until release.
+ */
 export class Button3D extends Container3D {
   constructor(options: Button3DOptions) {
     super();
@@ -44,5 +49,27 @@ export class Button3D extends Container3D {
     facePlane.position.z = depth + 0.2;
 
     this.addChild(body, facePlane);
+
+    // Pressed state: the whole button sinks toward the board while held.
+    const sink = Math.max(MIN_PRESS_SINK, depth * 0.5);
+    let pressed = false;
+    let restZ = 0;
+    const setPressed = (next: boolean): void => {
+      if (pressed === next) return;
+      pressed = next;
+      if (pressed) {
+        restZ = this.position.z;
+        this.position.z = restZ - sink;
+      } else {
+        this.position.z = restZ;
+      }
+    };
+
+    this.eventMode = 'static';
+    this.cursor = 'pointer';
+    this.on('pointerdown', () => setPressed(true));
+    this.on('pointerup', () => setPressed(false));
+    this.on('pointerupoutside', () => setPressed(false));
+    this.on('pointercancel', () => setPressed(false));
   }
 }

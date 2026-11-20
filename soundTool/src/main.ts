@@ -51,6 +51,16 @@ const view3d = new View3D({
   shadowQuality: 'high',
   toneMapping: 'none',
 });
-view3d.root.addChild(new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures));
+// The view stays hit-testable across the whole canvas so dial drags keep
+// tracking wherever the pointer goes (see bindPointer in SoundBoardScene3D).
+view3d.eventMode = 'static';
+const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures);
+scene.bindPointer(view3d);
+view3d.root.addChild(scene);
 app.stage.addChild(view3d);
 mount.appendChild(app.canvas);
+
+// Readiness marker for automated checks: set after the first rendered frame.
+app.ticker.addOnce(() => {
+  (window as unknown as { __soundReady: boolean }).__soundReady = true;
+});

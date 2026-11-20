@@ -1,5 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
 import { chamferPoints, drawGradientFace } from './ui/GradientFace';
+import { makePressable } from './ui/Pressable';
 
 export const WAVEFORM_TYPES = ['sine', 'square', 'saw', 'triangle', 'noise', 'pulse'] as const;
 export type WaveformType = typeof WAVEFORM_TYPES[number];
@@ -18,6 +19,7 @@ export class WaveformButton extends Container {
     const icon = drawWaveformIcon(type);
     icon.position.set((width - ICON_WIDTH) / 2, (height - ICON_HEIGHT) / 2);
     this.addChild(icon);
+    makePressable(this);
   }
 }
 

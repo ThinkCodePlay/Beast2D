@@ -1,4 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
+import { makePressable } from './ui/Pressable';
 import type { ControlMode } from './controls';
 import { SoundBankRow, BANK_ROW_HEIGHT } from './SoundBankRow';
 
@@ -111,5 +112,6 @@ export class ScrollArrowButton extends Container {
       glyph.poly([3, 4, 11, 4, 7, 10]).fill(0x281638);
     }
     this.addChild(glyph);
+    makePressable(this, { pressDepth: 1 });
   }
 }
