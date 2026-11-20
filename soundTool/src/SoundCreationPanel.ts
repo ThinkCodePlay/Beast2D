@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { PresetPad, type PresetIcon, type PresetTextures } from './PresetPad';
-import { PixelButton, BUTTON_SIZE as TRANSPORT_BUTTON_SIZE } from './ui/PixelButton';
+import { PixelButton } from './ui/PixelButton';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
 
@@ -19,8 +19,6 @@ const WAVEFORM_BOTTOM_INSET = 5;
 // the sound bank (coin, power-up, jump, explosion, hit, enemy death).
 const KEPT_PRESETS: readonly PresetIcon[] = ['coin', 'star', 'boot', 'bomb', 'burst', 'skull'];
 
-const padColumnCenterX = (index: number): number => PAD_GRID_LEFT + PAD_WIDTH / 2 + index * PAD_STEP_X;
-
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
   constructor(width: number, height: number, presetTextures: PresetTextures) {
@@ -38,17 +36,17 @@ export class SoundCreationPanel extends Container {
 function createTransport(panelWidth: number): Container {
   const row = new Container();
   row.position.y = TRANSPORT_ROW_TOP;
-  const play = new PixelButton('▶', 'pink');
-  const stop = new PixelButton('■', 'cream');
-  const loop = new PixelButton('↻', 'green');
-  // Each transport button centers on its preset-pad column: one shared grid.
+  // Transport buttons match the preset pads exactly: same size, same columns.
+  const play = new PixelButton('▶', 'pink', false, PAD_WIDTH, PAD_HEIGHT);
+  const stop = new PixelButton('■', 'cream', false, PAD_WIDTH, PAD_HEIGHT);
+  const loop = new PixelButton('↻', 'green', false, PAD_WIDTH, PAD_HEIGHT);
   [play, stop, loop].forEach((button, index) => {
-    button.position.set(padColumnCenterX(index) - TRANSPORT_BUTTON_SIZE / 2, 1.5);
+    button.position.x = PAD_GRID_LEFT + index * PAD_STEP_X;
   });
   // The sound-name LCD takes the rest of the row, up to the panel's right inset.
-  const lcdLeft = padColumnCenterX(2) + TRANSPORT_BUTTON_SIZE / 2 + LCD_GAP;
+  const lcdLeft = PAD_GRID_LEFT + 2 * PAD_STEP_X + PAD_WIDTH + LCD_GAP;
   const namePlate = createSoundName(panelWidth - LCD_RIGHT_INSET - lcdLeft);
-  namePlate.position.x = lcdLeft;
+  namePlate.position.set(lcdLeft, 2);
   row.addChild(play, stop, loop, namePlate);
   return row;
 }
