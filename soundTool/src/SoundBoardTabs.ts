@@ -1,5 +1,6 @@
 import { Container, Graphics, Sprite, Text, type Texture } from 'pixi.js';
 import { drawGradientFace } from './ui/GradientFace';
+import { makePressable } from './ui/Pressable';
 
 type TabIcon = 'note' | 'gamepad' | 'folder' | 'gear';
 export type TabIconTextures = Partial<Record<TabIcon, Texture>>;
@@ -37,6 +38,7 @@ class SoundBoardTab extends Container {
     this.addChild(drawTabFace(tone, width));
     this.addChild(drawTabIcon(icon, face, iconLeft, iconTexture));
     this.addChild(createTabLabel(label, iconLeft + 28));
+    makePressable(this);
   }
 }
 

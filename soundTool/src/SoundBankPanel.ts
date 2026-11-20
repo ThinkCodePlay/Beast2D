@@ -1,5 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { SoundBankRow, BANK_ROW_HEIGHT } from './SoundBankRow';
+import { makePressable } from './ui/Pressable';
 
 const BANK_ITEMS = [
   'jump', 'coin', 'hit', 'laser', 'boom_big', 'power_up',
@@ -82,25 +83,32 @@ function createScrollbar(width: number, height: number): Container {
     .rect(x + 4, y + SCROLL_BUTTON_SIZE + 2, SCROLL_BUTTON_SIZE - 8, thumbHeight)
     .fill(0x8a63a0)
     .rect(x + 4, y + SCROLL_BUTTON_SIZE + 2, SCROLL_BUTTON_SIZE - 8, 1).fill(0xb18cc4));
-  scrollbar.addChild(createArrowButton(x, y, true));
-  scrollbar.addChild(createArrowButton(x, height - SCROLL_BUTTON_SIZE - SCROLL_INSET, false));
+  const up = new ScrollArrowButton(true);
+  up.position.set(x, y);
+  const down = new ScrollArrowButton(false);
+  down.position.set(x, height - SCROLL_BUTTON_SIZE - SCROLL_INSET);
+  scrollbar.addChild(up);
+  scrollbar.addChild(down);
   return scrollbar;
 }
 
-function createArrowButton(x: number, y: number, up: boolean): Container {
-  const button = new Container();
-  button.addChild(new Graphics()
-    .rect(x + 1, y + 1, 14, 14).fill(0x301b42)
-    .rect(x, y, 14, 14).fill(0xc7b3d9)
-    .rect(x + 1, y + 1, 12, 2).fill(0xe8dcf2)
-    .rect(x + 1, y + 1, 2, 12).fill(0xe8dcf2)
-    .rect(x + 11, y + 2, 2, 11).fill(0x8a63a0));
-  const glyph = new Graphics();
-  if (up) {
-    glyph.poly([x + 7, y + 4, x + 11, y + 10, x + 3, y + 10]).fill(0x281638);
-  } else {
-    glyph.poly([x + 3, y + 4, x + 11, y + 4, x + 7, y + 10]).fill(0x281638);
+/** Small square bank-scroll button with a chunky arrow glyph. */
+export class ScrollArrowButton extends Container {
+  constructor(up: boolean) {
+    super();
+    this.addChild(new Graphics()
+      .rect(1, 1, 14, 14).fill(0x301b42)
+      .rect(0, 0, 14, 14).fill(0xc7b3d9)
+      .rect(1, 1, 12, 2).fill(0xe8dcf2)
+      .rect(1, 1, 2, 12).fill(0xe8dcf2)
+      .rect(11, 2, 2, 11).fill(0x8a63a0));
+    const glyph = new Graphics();
+    if (up) {
+      glyph.poly([7, 4, 11, 10, 3, 10]).fill(0x281638);
+    } else {
+      glyph.poly([3, 4, 11, 4, 7, 10]).fill(0x281638);
+    }
+    this.addChild(glyph);
+    makePressable(this, { pressDepth: 1 });
   }
-  button.addChild(glyph);
-  return button;
 }

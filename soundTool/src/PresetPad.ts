@@ -1,5 +1,6 @@
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import { chamferPoints, drawGradientFace } from './ui/GradientFace';
+import { makePressable } from './ui/Pressable';
 
 export const PRESET_ICONS = [
   'coin', 'star', 'heart', 'gem', 'potion', 'chest',
@@ -23,6 +24,7 @@ export class PresetPad extends Container {
     sprite.height = ICON_SIZE;
     sprite.position.set((PAD_WIDTH - ICON_SIZE) / 2, (PAD_HEIGHT - ICON_SIZE) / 2);
     this.addChild(sprite);
+    makePressable(this);
   }
 }
 

@@ -1,4 +1,4 @@
-import { Assets, Application, type Texture } from 'pixi.js';
+import { Assets, Application, Rectangle, type Texture } from 'pixi.js';
 import { PRESET_ICONS, type PresetTextures } from './PresetPad';
 import { SoundBoardFrame } from './SoundBoardFrame';
 
@@ -36,6 +36,11 @@ await app.init({
   autoDensity: false,
   resolution: 1,
 });
+
+// The stage stays hit-testable across the whole canvas so knob drags keep
+// tracking wherever the pointer goes (see trackDrag in ui/Pressable).
+app.stage.eventMode = 'static';
+app.stage.hitArea = new Rectangle(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 app.stage.addChild(new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures));
 mount.appendChild(app.canvas);

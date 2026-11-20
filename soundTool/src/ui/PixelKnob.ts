@@ -1,4 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
+import { trackDrag } from './Pressable';
+import { angleForValue, clampValue, valueTowardPoint } from './knobTurn';
 
 const CONTROL_SIZE = 32;
 const CENTER_X = 16;
@@ -7,6 +9,9 @@ const TICK_RADIUS_X = 18;
 const TICK_RADIUS_Y = 17;
 const TICK_LENGTH = 3;
 const TICK_CREAM = 0xfff4dc;
+
+/** Sweep start: minimum sits down-left, maximum down-right, dead zone at the bottom. */
+const NEEDLE_START_ANGLE = Math.PI * 0.75;
 
 const PIXEL_DISK = [
   [-3, -9], [3, -9], [6, -8], [8, -6], [9, -3], [9, 3], [8, 6],
@@ -21,16 +26,49 @@ const ACCENT_FACE: Record<number, number> = {
 const CREAM_FACE = 0xfdf0d4;
 const CREAM_LIGHT = 0xfff8e8;
 
-/** 32×32 stepped dial with a tick ring and a layered pixel disk. */
+/**
+ * 32×32 stepped dial with a tick ring and a layered pixel disk. Drag it with
+ * mouse or touch and the needle turns to point at the pointer, clamped to the
+ * dial's sweep.
+ */
 export class PixelKnob extends Container {
+  private value: number;
+  private readonly needle: Graphics;
+
   constructor(label: string, value: number, color: number) {
     super();
-    this.addChild(createDialFace(color, value, label === 'VOL' || label === 'PITCH'));
+    this.value = clampValue(value);
+    this.addChild(createDialFace(color, label === 'VOL' || label === 'PITCH'));
+    this.needle = new Graphics();
+    this.addChild(this.needle);
     this.addChild(createLabel(label));
+    this.drawNeedle();
+    trackDrag(this, (event) => {
+      const point = this.toLocal(event.global);
+      this.setValue(valueTowardPoint(CENTER_X, CENTER_Y, point.x, point.y, NEEDLE_START_ANGLE));
+    });
+  }
+
+  /** The current 0..1 dial value. */
+  getValue(): number {
+    return this.value;
+  }
+
+  /** Point the needle at a 0..1 value. */
+  setValue(value: number): void {
+    const next = clampValue(value);
+    if (next === this.value) return;
+    this.value = next;
+    this.drawNeedle();
+  }
+
+  private drawNeedle(): void {
+    this.needle.clear();
+    drawNeedle(this.needle, CENTER_X, CENTER_Y, this.value, 8, 0x3a2030, 2);
   }
 }
 
-function createDialFace(color: number, value: number, accented: boolean): Graphics {
+function createDialFace(color: number, accented: boolean): Graphics {
   const face = new Graphics();
   drawTickRing(face, accented ? color : TICK_CREAM);
   drawPixelDisk(face, CENTER_X + 2, CENTER_Y + 3, 14, 0x140b20, 1.08, 0.95);
@@ -38,13 +76,12 @@ function createDialFace(color: number, value: number, accented: boolean): Graphi
   drawPixelDisk(face, CENTER_X, CENTER_Y, 12, 0x604077, 1.08, 0.95);
   drawPixelDisk(face, CENTER_X, CENTER_Y, 10, accented ? ACCENT_FACE[color] ?? color : CREAM_FACE, 1.08, 0.95);
   drawPixelDisk(face, CENTER_X - 1, CENTER_Y - 1, 8, CREAM_LIGHT, 1.08, 0.95);
-  drawNeedle(face, CENTER_X, CENTER_Y, value, 8, 0x3a2030, 2);
   return face;
 }
 
 function drawTickRing(face: Graphics, color: number): void {
   for (let tick = 0; tick <= 6; tick += 1) {
-    const angle = Math.PI * 0.75 + (tick / 6) * Math.PI * 1.5;
+    const angle = angleForValue(tick / 6, NEEDLE_START_ANGLE);
     const outerX = CENTER_X + Math.round(Math.cos(angle) * TICK_RADIUS_X);
     const outerY = CENTER_Y + Math.round(Math.sin(angle) * TICK_RADIUS_Y);
     const innerX = CENTER_X + Math.round(Math.cos(angle) * (TICK_RADIUS_X - TICK_LENGTH));
@@ -73,17 +110,13 @@ function drawPixelDisk(
 }
 
 function drawNeedle(graphic: Graphics, centerX: number, centerY: number, value: number, length: number, color: number, width = 3): void {
-  const angle = angleForValue(value);
+  const angle = angleForValue(value, NEEDLE_START_ANGLE);
   const endX = centerX + Math.round(Math.cos(angle) * length);
   const endY = centerY + Math.round(Math.sin(angle) * length);
   graphic
     .moveTo(centerX, centerY)
     .lineTo(endX, endY)
     .stroke({ color, width, cap: 'round' });
-}
-
-function angleForValue(value: number): number {
-  return Math.PI * 0.75 + Math.max(0, Math.min(1, value)) * Math.PI * 1.5;
 }
 
 function createLabel(value: string): Text {
