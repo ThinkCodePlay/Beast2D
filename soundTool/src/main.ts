@@ -40,7 +40,7 @@ await app.init({
   resolution: 1,
 });
 
-const camera = new Camera3D({ fov: 32, near: 1, far: 4000 });
+const camera = new Camera3D({ fov: 32, near: 200, far: 1500 });
 camera.position.set(0, 58, 645);
 camera.lookAt({ x: 0, y: 0, z: 0 });
 

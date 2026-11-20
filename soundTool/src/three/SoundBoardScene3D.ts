@@ -80,7 +80,7 @@ function createCabinet(
     material: new Material3D({ baseColorTexture: faceTexture, roughness: 0.9 }),
     castShadow: false,
   });
-  face.position.z = 0.05;
+  face.position.z = 0.5;
 
   cabinet.addChild(body, face);
   return cabinet;

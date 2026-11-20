@@ -39,7 +39,7 @@ export class Knob3D extends Container3D {
       castShadow: false,
       receiveShadow: false,
     });
-    capPlane.position.z = depth + 0.05;
+    capPlane.position.z = depth + 0.2;
 
     this.addChild(rotor, capPlane);
   }

@@ -41,7 +41,7 @@ export class Button3D extends Container3D {
       castShadow: false,
       receiveShadow: false,
     });
-    facePlane.position.z = depth + 0.05;
+    facePlane.position.z = depth + 0.2;
 
     this.addChild(body, facePlane);
   }
