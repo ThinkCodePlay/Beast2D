@@ -13,8 +13,9 @@ const KNOBS = [
 ] as const;
 
 const KNOB_PITCH = 48.4;
-const KNOB_TILE_WIDTH = 40;
-const KNOB_TILE_HEIGHT = 42;
+const KNOB_TILE_WIDTH = 44;
+const KNOB_TILE_HEIGHT = 44;
+const KNOB_TILE_TOP = 1;
 const EDIT_GAP = 14;
 
 /** Shared bottom strip with six 32px dials and the waveform edit control. */
@@ -57,10 +58,10 @@ function drawStripFrame(width: number, height: number): Graphics {
 }
 
 function createKnobTile(x: number): Graphics {
-  const left = x;
-  const top = 22 / 3;
+  const left = x - 1.5;
+  const top = KNOB_TILE_TOP;
   const width = KNOB_TILE_WIDTH;
-  const height = KNOB_TILE_HEIGHT - 2.5;
+  const height = KNOB_TILE_HEIGHT;
   const tile = new Graphics();
   drawGradientFace(tile, left, top, width, height, 3,
     { edge: 0x24152e, top: 0xa580b8, mid: 0x8b68a2, bottom: 0x6d4899 }, 0.78, 1.5);

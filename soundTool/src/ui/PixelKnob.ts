@@ -3,6 +3,10 @@ import { Container, Graphics, Text } from 'pixi.js';
 const CONTROL_SIZE = 32;
 const CENTER_X = 16;
 const CENTER_Y = 12.2;
+const TICK_RADIUS_X = 18;
+const TICK_RADIUS_Y = 17;
+const TICK_LENGTH = 3;
+const TICK_CREAM = 0xfff4dc;
 
 const PIXEL_DISK = [
   [-3, -9], [3, -9], [6, -8], [8, -6], [9, -3], [9, 3], [8, 6],
@@ -28,7 +32,7 @@ export class PixelKnob extends Container {
 
 function createDialFace(color: number, value: number, accented: boolean): Graphics {
   const face = new Graphics();
-  drawTickRing(face);
+  drawTickRing(face, accented ? color : TICK_CREAM);
   drawPixelDisk(face, CENTER_X + 2, CENTER_Y + 3, 14, 0x140b20, 1.08, 0.95);
   drawPixelDisk(face, CENTER_X, CENTER_Y, 14, 0x321b47, 1.08, 0.95);
   drawPixelDisk(face, CENTER_X, CENTER_Y, 12, 0x604077, 1.08, 0.95);
@@ -38,17 +42,17 @@ function createDialFace(color: number, value: number, accented: boolean): Graphi
   return face;
 }
 
-function drawTickRing(face: Graphics): void {
+function drawTickRing(face: Graphics, color: number): void {
   for (let tick = 0; tick <= 6; tick += 1) {
     const angle = Math.PI * 0.75 + (tick / 6) * Math.PI * 1.5;
-    const outerX = CENTER_X + Math.round(Math.cos(angle) * 18);
-    const outerY = CENTER_Y + Math.round(Math.sin(angle) * 17);
-    const innerX = CENTER_X + Math.round(Math.cos(angle) * 15);
-    const innerY = CENTER_Y + Math.round(Math.sin(angle) * 15);
+    const outerX = CENTER_X + Math.round(Math.cos(angle) * TICK_RADIUS_X);
+    const outerY = CENTER_Y + Math.round(Math.sin(angle) * TICK_RADIUS_Y);
+    const innerX = CENTER_X + Math.round(Math.cos(angle) * (TICK_RADIUS_X - TICK_LENGTH));
+    const innerY = CENTER_Y + Math.round(Math.sin(angle) * (TICK_RADIUS_Y - TICK_LENGTH));
     face
       .moveTo(innerX + 1, innerY + 1).lineTo(outerX + 1, outerY + 1).stroke({ color: 0x291537, width: 3 })
       .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0x3b223d, width: 3 })
-      .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0xfff4dc, width: 1 });
+      .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color, width: 1 });
   }
 }
 
