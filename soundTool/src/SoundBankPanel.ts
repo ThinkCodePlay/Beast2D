@@ -4,6 +4,7 @@ import { SoundBankRow, BANK_ROW_HEIGHT } from './SoundBankRow';
 const BANK_ITEMS = [
   'jump', 'coin', 'hit', 'laser', 'boom_big', 'power_up',
   'enemy_die', 'select', 'empty', 'empty', 'empty', 'empty',
+  'empty', 'empty', 'empty', 'empty',
 ] as const;
 const BANK_ROW_TOP = 109 / 3;
 const SCROLL_BUTTON_SIZE = 15;
