@@ -38,33 +38,51 @@ function crescentPoints(cx: number, cy: number, rOut: number, rIn: number, a0: n
   return pts;
 }
 
-/** Fixed 32×32 rounded pixel-art button for transport and other controls. */
+/**
+ * Rounded pixel-art button for transport and other controls. Defaults to a
+ * fixed 32×32 box with a 28×28 face; pass width/height for a full-size face
+ * that matches the preset pads.
+ */
 export class PixelButton extends Container {
-  constructor(icon: string, tone: ButtonTone = 'purple', selected = false) {
+  constructor(icon: string, tone: ButtonTone = 'purple', selected = false, width = BUTTON_SIZE, height = BUTTON_SIZE) {
     super();
     const colors = BUTTON_TONES[tone];
-    this.addChild(createButtonFace(colors, selected));
+    this.addChild(createButtonFace(colors, selected, width, height));
     if (icon === '▶' || icon === '■' || icon === '↻') {
-      this.addChild(createTransportIcon(icon));
+      this.addChild(createTransportIcon(icon, width, height));
     } else {
-      this.addChild(createTextIcon(icon, colors.text));
+      this.addChild(createTextIcon(icon, colors.text, width, height));
     }
   }
 }
 
-function createButtonFace(colors: (typeof BUTTON_TONES)[ButtonTone], selected: boolean): Graphics {
+function createButtonFace(colors: (typeof BUTTON_TONES)[ButtonTone], selected: boolean, width: number, height: number): Graphics {
   const face = new Graphics();
-  drawGradientFace(face, 0, 0, FACE_SIZE, FACE_SIZE, CORNER_RADIUS, {
-    edge: 0x432851,
+  const customSize = width !== BUTTON_SIZE || height !== BUTTON_SIZE;
+  // Pad-sized buttons share the preset pads' edge tone and bevel profile.
+  drawGradientFace(face, 0, 0, customSize ? width : FACE_SIZE, customSize ? height : FACE_SIZE, CORNER_RADIUS, {
+    edge: customSize ? 0x24152e : 0x432851,
     top: selected ? 0xfff0bd : colors.top,
     mid: colors.mid,
     bottom: colors.bottom,
-  }, 0.6, 4);
+  }, customSize ? 0.68 : 0.6, 4);
+  if (customSize) {
+    face.rect(4, height - 3.5, width - 8, 1).fill(mix(colors.bottom, 0x24152e, 0.4));
+  }
   return face;
 }
 
-function createTransportIcon(icon: string): Graphics {
+function mix(a: number, b: number, t: number): number {
+  const ar = (a >> 16) & 255, ag = (a >> 8) & 255, ab = a & 255;
+  const br = (b >> 16) & 255, bg = (b >> 8) & 255, bb = b & 255;
+  const r = Math.round(ar + (br - ar) * t), g = Math.round(ag + (bg - ag) * t), bl = Math.round(ab + (bb - ab) * t);
+  return (r << 16) | (g << 8) | bl;
+}
+
+function createTransportIcon(icon: string, width: number, height: number): Graphics {
   const graphic = new Graphics();
+  const customSize = width !== BUTTON_SIZE || height !== BUTTON_SIZE;
+  let contentScale = 1;
   if (icon === '▶') {
     graphic
       .poly([5, 3, 22, 13, 22, 16, 5, 26]).fill(0x281735)
@@ -74,7 +92,12 @@ function createTransportIcon(icon: string): Graphics {
       .rect(5, 4, 3, 15).fill(0xfff0a1)
       .rect(8, 6, 2, 3).fill(0xfff0a1);
   } else if (icon === '■') {
-    graphic.rect(8, 8, 12, 12).fill(0x321b47);
+    // Stop square sized to match the play triangle's visual weight.
+    graphic
+      .rect(5, 5, 18, 18).fill(0x281735)
+      .rect(6, 6, 16, 16).fill(0x39204f)
+      .rect(6, 6, 16, 2).fill(0x54327a);
+    contentScale = 1.05;
   } else {
     // Reference loop icon: two stacked curved arrows, each a crescent band that
     // ends in a small block head (top arrow points right, bottom is its 180-degree
@@ -82,8 +105,8 @@ function createTransportIcon(icon: string): Graphics {
     const cx = 14;
     const cyTop = 11.4;
     const cyMid = 14.2; // vertical center of the 28x28 icon, matching the reference gap
-    const topDark = crescentPoints(cx, cyTop, 7.6, 2.9, 180, 360);
-    const topCream = crescentPoints(cx, cyTop, 6.6, 3.9, 185, 355);
+    const topDark = crescentPoints(cx, cyTop, 8.4, 2.3, 180, 360);
+    const topCream = crescentPoints(cx, cyTop, 7.3, 3.4, 185, 355);
     const topHeadDark = [20.2, 8.0, 22.6, 8.8, 24.2, 11.4, 22.6, 14, 20.2, 14.8];
     const topHeadCream = [20.9, 9.3, 22.3, 9.9, 23.1, 11.4, 22.3, 12.9, 20.9, 13.5];
     const rotate180 = (pts: number[]): number[] =>
@@ -97,20 +120,22 @@ function createTransportIcon(icon: string): Graphics {
       .poly(topHeadCream).fill(0xfff4dc)
       .poly(rotate180(topCream)).fill(0xfff4dc)
       .poly(rotate180(topHeadCream)).fill(0xfff4dc);
+    contentScale = 1.12;
   }
-  const iconScale = 0.9;
+  // Icons are drawn in a 28×28 box: fill the default face, or the pad-size one.
+  const iconScale = (customSize ? 30 / FACE_SIZE : 0.9) * contentScale;
   graphic.scale.set(iconScale);
-  graphic.position.set((BUTTON_SIZE - FACE_SIZE * iconScale) / 2, (BUTTON_SIZE - FACE_SIZE * iconScale) / 2);
+  graphic.position.set((width - FACE_SIZE * iconScale) / 2, (height - FACE_SIZE * iconScale) / 2);
   return graphic;
 }
 
-function createTextIcon(icon: string, color: number): Text {
+function createTextIcon(icon: string, color: number, width: number, height: number): Text {
   const isRun = icon === 'RUN';
   const label = new Text({
     text: icon,
     style: { fontFamily: 'monogram', fontSize: isRun ? 12 : 18, fontWeight: 'bold', fill: color }, resolution: 3,
   });
   label.anchor.set(0.5);
-  label.position.set(BUTTON_SIZE / 2, BUTTON_SIZE / 2 - (isRun ? 2 : 3));
+  label.position.set(width / 2, height / 2 - (isRun ? 2 : 3));
   return label;
 }

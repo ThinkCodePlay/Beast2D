@@ -1,10 +1,8 @@
 import { Container, Graphics, Text } from 'pixi.js';
 
 const CONTROL_SIZE = 32;
-const STANDARD_CENTER_X = 16;
-const STANDARD_CENTER_Y = 12.2;
-const MASTER_CENTER_X = 16;
-const MASTER_CENTER_Y = 16;
+const CENTER_X = 16;
+const CENTER_Y = 12.2;
 
 const PIXEL_DISK = [
   [-3, -9], [3, -9], [6, -8], [8, -6], [9, -3], [9, 3], [8, 6],
@@ -12,116 +10,97 @@ const PIXEL_DISK = [
   [-8, -6], [-6, -8],
 ] as const;
 
-const CRESCENT_COLORS: Record<number, number> = {
+const ACCENT_FACE: Record<number, number> = {
   0xff91c8: 0xf9749c, // VOL filled pink face (reference strip dial)
   0x9ee18b: 0xd2d76a, // PITCH filled green face (reference strip dial)
 };
 const CREAM_FACE = 0xfdf0d4;
 const CREAM_LIGHT = 0xfff8e8;
+const TICK_CREAM = 0xfff4dc;
 
-export type KnobVariant = 'standard' | 'master';
+const TICK_RADIUS_X = 18;
+const TICK_RADIUS_Y = 17;
+const TICK_LENGTH = 3;
 
-/** Center of a knob's disk inside its 32×32 tile, per variant. */
-export function knobCenter(variant: KnobVariant): { x: number; y: number } {
-  return variant === 'master'
-    ? { x: MASTER_CENTER_X, y: MASTER_CENTER_Y }
-    : { x: STANDARD_CENTER_X, y: STANDARD_CENTER_Y };
-}
+/** Center of a knob's disk inside its 32×32 tile. */
+export const KNOB_CENTER: { x: number; y: number } = { x: CENTER_X, y: CENTER_Y };
 
-/** 32×32 stepped dial, with a tick-marked master-volume face option. */
+/**
+ * 32×32 stepped dial: a tick ring, a label, and a layered pixel-disk cap with
+ * a value needle. The strip accents VOL and PITCH by tinting their ticks and
+ * faces instead of crescents.
+ */
 export class PixelKnob extends Container {
-  constructor(label: string, value: number, color: number, variant: KnobVariant = 'standard') {
+  constructor(label: string, value: number, color: number) {
     super();
-    this.addChild(new KnobMarkings(label, color, variant));
-    this.addChild(new KnobCap(value, color, variant, knobCenter(variant)));
+    this.addChild(new KnobMarkings(label, color));
+    this.addChild(new KnobCap(value, color));
   }
 }
 
 /**
- * The flat board artwork around a dial: tick marks, accent pixels and the
- * label. Stays on the board face when the cap becomes a 3D rotor.
+ * The flat board artwork around a dial: tick marks and the label. Stays on
+ * the board face when the cap becomes a 3D rotor.
  */
 export class KnobMarkings extends Container {
-  constructor(label: string, color: number, variant: KnobVariant = 'standard') {
+  constructor(label: string, color: number) {
     super();
-    const accented = variant === 'standard' && (label === 'VOL' || label === 'PITCH');
-    if (variant === 'master') {
-      this.addChild(drawMasterTicks());
-      this.addChild(createLabel(label, 26, 11));
-      return;
-    }
-    this.addChild(drawTickDots(accented ? color : 0xd8c8e8));
-    if (accented) this.addChild(drawAccentPixels(color));
+    const accented = label === 'VOL' || label === 'PITCH';
+    this.addChild(drawTickRing(accented ? color : TICK_CREAM));
     this.addChild(createLabel(label, 22.5, 12));
   }
 }
 
 /** The rotating part of a dial: layered pixel disks with a value needle. */
 export class KnobCap extends Container {
-  constructor(value: number, color: number, variant: KnobVariant = 'standard', center = knobCenter(variant)) {
+  constructor(value: number, color: number, center = KNOB_CENTER) {
     super();
-    const accented = variant === 'standard' && (color in CRESCENT_COLORS);
     const cap = new Graphics();
-    if (variant === 'master') {
-      drawPixelDisk(cap, center.x + 2, center.y + 3, 14, 0x140b20);
-      drawPixelDisk(cap, center.x, center.y, 14, 0x321b47);
-      drawPixelDisk(cap, center.x, center.y, 12, 0x604077);
-      drawPixelDisk(cap, center.x, center.y, 10, CREAM_FACE);
-      drawPixelDisk(cap, center.x - 1, center.y - 1, 8, CREAM_LIGHT);
-      drawNeedle(cap, center.x, center.y, value, 8, 0x3a2030, 2);
-    } else {
-      drawPixelDisk(cap, center.x + 1.4, center.y + 2, 14, 0x140b20, 1.08, 0.95);
-      drawPixelDisk(cap, center.x, center.y, 13.7, 0x321b47, 1.08, 0.95);
-      // Accented strip dials have a fully colored face in the reference; the rest are cream.
-      drawPixelDisk(cap, center.x, center.y, 12.4, accented ? CRESCENT_COLORS[color] : CREAM_FACE, 1.08, 0.95);
-      drawPixelDisk(cap, center.x - 2, center.y - 2.5, 8.2, CREAM_LIGHT, 1.08, 0.95);
-      drawNeedle(cap, center.x, center.y, value, 6.5, 0x3a2030, 2.5);
-      cap.rect(center.x - 1, center.y - 1, 2, 2).fill(0x3a2030);
-    }
+    drawPixelDisk(cap, center.x + 2, center.y + 3, 14, 0x140b20, 1.08, 0.95);
+    drawPixelDisk(cap, center.x, center.y, 14, 0x321b47, 1.08, 0.95);
+    drawPixelDisk(cap, center.x, center.y, 12, 0x604077, 1.08, 0.95);
+    drawPixelDisk(cap, center.x, center.y, 10, color in ACCENT_FACE ? ACCENT_FACE[color] : CREAM_FACE, 1.08, 0.95);
+    drawPixelDisk(cap, center.x - 1, center.y - 1, 8, CREAM_LIGHT, 1.08, 0.95);
+    drawNeedle(cap, center.x, center.y, value, 8, 0x3a2030, 2);
     this.addChild(cap);
   }
 }
 
-function drawTickDots(color: number): Graphics {
-  const face = new Graphics();
-  for (let tick = 0; tick < 7; tick += 1) {
-    const angle = Math.PI * (0.75 + tick * 0.25);
-    const x = STANDARD_CENTER_X + Math.round(Math.cos(angle) * 18);
-    const y = STANDARD_CENTER_Y + Math.round(Math.sin(angle) * 16.5);
-    face.rect(x, y, 1.5, 1.5).fill(color);
+function drawTickRing(color: number): Graphics {
+  const ring = new Graphics();
+  for (let i = 0; i < 7; i += 1) {
+    const angle = Math.PI * (3 / 4 + (i * 5) / 12); // 135° .. 405°
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    ring
+      .moveTo(CENTER_X + dx * TICK_RADIUS_X, CENTER_Y + dy * TICK_RADIUS_Y)
+      .lineTo(
+        CENTER_X + dx * (TICK_RADIUS_X + TICK_LENGTH),
+        CENTER_Y + dy * (TICK_RADIUS_Y + TICK_LENGTH),
+      )
+      .stroke({ width: 1.2, color: 0x140b20 })
+      .stroke({ width: 1.2, color })
+      .stroke({ width: 1.2, color: 0xfff8e8, alpha: 0.4 });
   }
-  return face;
+  return ring;
 }
 
-function drawAccentPixels(color: number): Graphics {
-  const face = new Graphics();
-  const centerX = STANDARD_CENTER_X;
-  const centerY = STANDARD_CENTER_Y;
-  [
-    [centerX - 14, centerY - 4],
-    [centerX - 15, centerY + 2],
-    [centerX - 13, centerY + 7],
-    [centerX - 9, centerY + 11],
-    [centerX + 11, centerY + 10],
-    [centerX + 14, centerY + 5],
-  ].forEach(([x, y]) => face.rect(x, y, 1, 1).fill(color));
-  return face;
-}
-
-function drawMasterTicks(): Graphics {
-  const face = new Graphics();
-  for (let tick = 0; tick <= 6; tick += 1) {
-    const angle = Math.PI * 0.75 + (tick / 6) * Math.PI * 1.5;
-    const outerX = MASTER_CENTER_X + Math.round(Math.cos(angle) * 18);
-    const outerY = MASTER_CENTER_Y + Math.round(Math.sin(angle) * 17);
-    const innerX = MASTER_CENTER_X + Math.round(Math.cos(angle) * 15);
-    const innerY = MASTER_CENTER_Y + Math.round(Math.sin(angle) * 15);
-    face
-      .moveTo(innerX + 1, innerY + 1).lineTo(outerX + 1, outerY + 1).stroke({ color: 0x291537, width: 3 })
-      .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0x3b223d, width: 3 })
-      .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0xfff4dc, width: 1 });
-  }
-  return face;
+function drawNeedle(
+  face: Graphics,
+  centerX: number,
+  centerY: number,
+  value: number,
+  length: number,
+  color: number,
+  width: number,
+): void {
+  const angle = ((135 + value * 270 - 90) * Math.PI) / 180;
+  const needle = new Graphics()
+    .moveTo(0, 0)
+    .lineTo(Math.cos(angle) * length, Math.sin(angle) * length)
+    .stroke({ width, color, cap: 'round' });
+  needle.position.set(centerX, centerY);
+  face.addChild(needle);
 }
 
 function drawPixelDisk(
@@ -140,26 +119,20 @@ function drawPixelDisk(
   graphic.poly(points).fill(color);
 }
 
-function drawNeedle(graphic: Graphics, centerX: number, centerY: number, value: number, length: number, color: number, width = 3): void {
-  const angle = angleForValue(value);
-  const endX = centerX + Math.round(Math.cos(angle) * length);
-  const endY = centerY + Math.round(Math.sin(angle) * length);
-  graphic
-    .moveTo(centerX, centerY)
-    .lineTo(endX, endY)
-    .stroke({ color, width, cap: 'round' });
-}
-
-function angleForValue(value: number): number {
-  return Math.PI * 0.75 + Math.max(0, Math.min(1, value)) * Math.PI * 1.5;
-}
-
-function createLabel(value: string, y: number, fontSize: number): Text {
+function createLabel(text: string, y: number, size: number): Text {
   const label = new Text({
-    text: value,
-    style: { fontFamily: 'monogram', fontSize, fontWeight: 'bold', fill: 0xffeaff, stroke: { color: 0x2a1440, width: 1 } }, resolution: 3,
+    text,
+    style: {
+      fontFamily: '"Press Start 2P"',
+      fontSize: size,
+      fill: 0xfdeed1,
+      stroke: { color: 0x2a1235, width: 2, join: 'round' },
+    },
   });
   label.anchor.set(0.5, 0);
-  label.position.set(CONTROL_SIZE / 2, y);
+  label.position.set(16, y);
   return label;
 }
+
+// Static tile reference for future dial layouts.
+void CONTROL_SIZE;

@@ -1,61 +1,57 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import type { ControlMode } from './controls';
-import { PresetPad, PRESET_ICONS, type PresetTextures } from './PresetPad';
+import { PAD_HEIGHT, PAD_WIDTH, PresetPad, type PresetIcon, type PresetTextures } from './PresetPad';
 import { PixelButton } from './ui/PixelButton';
-import { PixelKnob, KnobMarkings } from './ui/PixelKnob';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
 
 export const PAD_STEP_X = 160 / 3; // 160 output pixels at the 3× stage scale.
-export const PAD_STEP_Y = 46;
 export const PAD_GRID_LEFT = 8.3;
 export const PAD_GRID_TOP = 54;
 export const TRANSPORT_LEFT = 8.3;
 export const TRANSPORT_TOP = 12;
-export const TRANSPORT_SCALE = 1.15;
-export const MASTER_KNOB_SCALE = 1.25;
-export const TRANSPORT_POSITIONS = { stop: 43.7, loop: 93.7, name: 135.7, volume: 269.7 } as const;
+const LCD_GAP = 16 / 3;
+const LCD_RIGHT_INSET = 8;
+const WAVEFORM_TOP_GAP = 11 / 3;
+const WAVEFORM_BOTTOM_INSET = 5;
+
+// The kept presets: the most-used game sound types, one pad per type, matching
+// the sound bank (coin, power-up, jump, explosion, hit, enemy death).
+export const KEPT_PRESETS: readonly PresetIcon[] = ['coin', 'star', 'boot', 'bomb', 'burst', 'skull'];
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
   constructor(width: number, height: number, presetTextures: PresetTextures, controls: ControlMode = '2d') {
     super();
     this.addChild(new RaisedPanelFrame(width, height, 0x83609a));
-    this.addChild(createTransport(controls));
+    this.addChild(createTransport(width, controls));
     if (controls === '2d') this.addChild(createPresetGrid(presetTextures));
-    const waveform = new WaveformDisplay(width - 11);
-    waveform.position.set(8, 139.7);
+    // The waveform fills the freed space between the pads and the panel bottom.
+    const waveformTop = PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
+    const waveform = new WaveformDisplay(width - 11, height - WAVEFORM_BOTTOM_INSET - waveformTop);
+    waveform.position.set(8, waveformTop);
     this.addChild(waveform);
   }
 }
 
-function createTransport(controls: ControlMode): Container {
+function createTransport(panelWidth: number, controls: ControlMode): Container {
   const row = new Container();
   row.position.set(TRANSPORT_LEFT, TRANSPORT_TOP);
-  const namePlate = createSoundName(118);
-  namePlate.position.x = TRANSPORT_POSITIONS.name;
-  row.addChild(namePlate);
+  // Transport buttons match the preset pads exactly: same size, same columns.
   if (controls === '2d') {
-    const play = new PixelButton('▶', 'pink');
-    const stop = new PixelButton('■', 'cream');
-    const loop = new PixelButton('↻', 'green');
-    play.scale.set(TRANSPORT_SCALE);
-    stop.scale.set(TRANSPORT_SCALE);
-    loop.scale.set(TRANSPORT_SCALE);
-    play.position.y = 1.5;
-    stop.position.set(TRANSPORT_POSITIONS.stop, 1.5);
-    loop.position.set(TRANSPORT_POSITIONS.loop, 1.5);
-    const volume = new PixelKnob('VOL', 0.5, 0xff91c8, 'master');
-    volume.scale.set(MASTER_KNOB_SCALE);
-    volume.position.set(TRANSPORT_POSITIONS.volume, -8);
-    row.addChild(play, stop, loop, volume);
-  } else {
-    // The 3D scene places the master rotor; only its board markings stay flat.
-    const markings = new KnobMarkings('VOL', 0xff91c8, 'master');
-    markings.scale.set(MASTER_KNOB_SCALE);
-    markings.position.set(TRANSPORT_POSITIONS.volume, -8);
-    row.addChild(markings);
+    const play = new PixelButton('▶', 'pink', false, PAD_WIDTH, PAD_HEIGHT);
+    const stop = new PixelButton('■', 'cream', false, PAD_WIDTH, PAD_HEIGHT);
+    const loop = new PixelButton('↻', 'green', false, PAD_WIDTH, PAD_HEIGHT);
+    [play, stop, loop].forEach((button, index) => {
+      button.position.x = index * PAD_STEP_X;
+    });
+    row.addChild(play, stop, loop);
   }
+  // The sound-name LCD takes the rest of the row, up to the panel's right inset.
+  const lcdLeft = 2 * PAD_STEP_X + PAD_WIDTH + LCD_GAP;
+  const namePlate = createSoundName(panelWidth - TRANSPORT_LEFT - LCD_RIGHT_INSET - lcdLeft);
+  namePlate.position.set(lcdLeft, 2);
+  row.addChild(namePlate);
   return row;
 }
 
@@ -77,11 +73,10 @@ function createSoundName(width: number): Container {
 
 function createPresetGrid(presetTextures: PresetTextures): Container {
   const grid = new Container();
-  PRESET_ICONS.forEach((icon, index) => {
-    const column = index % 6;
-    const row = Math.floor(index / 6);
+  grid.position.set(PAD_GRID_LEFT, PAD_GRID_TOP);
+  KEPT_PRESETS.forEach((icon, index) => {
     const pad = new PresetPad(icon, presetTextures, index === 0);
-    pad.position.set(8.3 + column * PAD_STEP_X, 54 + row * PAD_STEP_Y);
+    pad.position.x = index * PAD_STEP_X;
     grid.addChild(pad);
   });
   return grid;

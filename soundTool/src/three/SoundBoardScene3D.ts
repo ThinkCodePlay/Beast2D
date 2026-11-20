@@ -10,7 +10,7 @@ import {
 import type { Renderer, Texture } from 'pixi.js';
 import { EditButton } from '../EditButton';
 import { PixelButton, BUTTON_TONES } from '../ui/PixelButton';
-import { KnobCap, type KnobVariant } from '../ui/PixelKnob';
+import { KnobCap } from '../ui/PixelKnob';
 import { PresetPad, type PresetTextures } from '../PresetPad';
 import { RunButton } from '../RunButton';
 import { ScrollArrowButton } from '../SoundBankPanel';
@@ -21,7 +21,6 @@ import { Knob3D } from './Knob3D';
 import { BOARD_WIDTH, BOARD_HEIGHT, CABINET_DEPTH, boardToWorld } from './boardSpace';
 import {
   EDIT_BUTTON,
-  MASTER_KNOB,
   PRESET_PADS,
   RUN_BUTTON,
   SCROLL_ARROWS,
@@ -91,7 +90,7 @@ function createControls(renderer: Renderer, presetTextures: PresetTextures): Con
 
   TRANSPORT_BUTTONS.forEach(({ icon, tone, ...rect }) => {
     controls.push(place(new Button3D({
-      face: new PixelButton(icon, tone),
+      face: new PixelButton(icon, tone, false, rect.width, rect.height),
       ...rect,
       bodyColor: BUTTON_TONES[tone].bottom,
       renderer,
@@ -133,8 +132,7 @@ function createControls(renderer: Renderer, presetTextures: PresetTextures): Con
     }), rect));
   });
 
-  controls.push(createKnob(renderer, MASTER_KNOB, 'master'));
-  STRIP_KNOBS.forEach((knob) => controls.push(createKnob(renderer, knob, 'standard')));
+  STRIP_KNOBS.forEach((knob) => controls.push(createKnob(renderer, knob)));
 
   return controls;
 }
@@ -142,10 +140,9 @@ function createControls(renderer: Renderer, presetTextures: PresetTextures): Con
 function createKnob(
   renderer: Renderer,
   knob: { cx: number; cy: number; value: number; color: number; radius: number },
-  variant: KnobVariant,
 ): Knob3D {
   const rotor = new Knob3D({
-    cap: new KnobCap(knob.value, knob.color, variant, { x: 16, y: 16 }),
+    cap: new KnobCap(knob.value, knob.color, { x: 16, y: 16 }),
     radius: knob.radius,
     depth: 7,
     renderer,

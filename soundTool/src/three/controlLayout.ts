@@ -11,19 +11,15 @@ import {
 import { RUN_RIGHT_INSET } from '../SoundBoardHeader';
 import { RUN_WIDTH, RUN_HEIGHT } from '../RunButton';
 import {
-  MASTER_KNOB_SCALE,
+  KEPT_PRESETS,
   PAD_GRID_LEFT,
   PAD_GRID_TOP,
   PAD_STEP_X,
-  PAD_STEP_Y,
   TRANSPORT_LEFT,
-  TRANSPORT_POSITIONS,
-  TRANSPORT_SCALE,
   TRANSPORT_TOP,
 } from '../SoundCreationPanel';
-import { PAD_WIDTH, PAD_HEIGHT, PRESET_ICONS } from '../PresetPad';
-import { BUTTON_SIZE } from '../ui/PixelButton';
-import { knobCenter } from '../ui/PixelKnob';
+import { PAD_WIDTH, PAD_HEIGHT, type PresetIcon } from '../PresetPad';
+import { KNOB_CENTER } from '../ui/PixelKnob';
 import {
   EDIT_POSITION,
   KNOB_FIRST_LEFT,
@@ -43,67 +39,42 @@ export interface ControlRect {
   height: number;
 }
 
-function centered(rect: ControlRect): { cx: number; cy: number } {
-  return { cx: rect.x + rect.width / 2, cy: rect.y + rect.height / 2 };
-}
-
-const TRANSPORT_BUTTON = BUTTON_SIZE * TRANSPORT_SCALE;
-
-/** Play / stop / loop buttons across the creation panel's transport row. */
+/** Play / stop / loop buttons across the creation panel's transport row,
+ * each matching a preset pad exactly: same size, same column. */
 const TRANSPORT_SPECS = [
-  { icon: '▶', tone: 'pink', offset: 0 },
-  { icon: '■', tone: 'cream', offset: TRANSPORT_POSITIONS.stop },
-  { icon: '↻', tone: 'green', offset: TRANSPORT_POSITIONS.loop },
+  { icon: '▶', tone: 'pink' },
+  { icon: '■', tone: 'cream' },
+  { icon: '↻', tone: 'green' },
 ] as const;
 
 export const TRANSPORT_BUTTONS: (ControlRect & { icon: '▶' | '■' | '↻'; tone: 'pink' | 'cream' | 'green' })[] =
-  TRANSPORT_SPECS.map(({ icon, tone, offset }) => ({
+  TRANSPORT_SPECS.map(({ icon, tone }, index) => ({
   icon,
   tone,
-  x: CONTENT_INSET + TRANSPORT_LEFT + offset,
-  y: CONTENT_TOP + TRANSPORT_TOP + 1.5,
-  width: TRANSPORT_BUTTON,
-  height: TRANSPORT_BUTTON,
+  x: CONTENT_INSET + TRANSPORT_LEFT + index * PAD_STEP_X,
+  y: CONTENT_TOP + TRANSPORT_TOP,
+  width: PAD_WIDTH,
+  height: PAD_HEIGHT,
 }));
 
-/** Twelve preset pads in their 6×2 grid. */
-export const PRESET_PADS: (ControlRect & { icon: (typeof PRESET_ICONS)[number]; selected: boolean })[] =
-  PRESET_ICONS.map((icon, index) => ({
+/** The kept preset pads in their single row. */
+export const PRESET_PADS: (ControlRect & { icon: PresetIcon; selected: boolean })[] =
+  KEPT_PRESETS.map((icon, index) => ({
     icon,
     selected: index === 0,
-    x: CONTENT_INSET + PAD_GRID_LEFT + (index % 6) * PAD_STEP_X,
-    y: CONTENT_TOP + PAD_GRID_TOP + Math.floor(index / 6) * PAD_STEP_Y,
+    x: CONTENT_INSET + PAD_GRID_LEFT + index * PAD_STEP_X,
+    y: CONTENT_TOP + PAD_GRID_TOP,
     width: PAD_WIDTH,
     height: PAD_HEIGHT,
   }));
-
-const MASTER_CENTER = knobCenter('master');
-const MASTER_SCALE = MASTER_KNOB_SCALE;
-
-/** Center and radius of the master volume rotor. */
-export const MASTER_KNOB = (() => {
-  const { cx, cy } = centered({
-    x: CONTENT_INSET + TRANSPORT_LEFT + TRANSPORT_POSITIONS.volume,
-    y: CONTENT_TOP + TRANSPORT_TOP - 8,
-    width: 0,
-    height: 0,
-  });
-  return {
-    cx: cx + MASTER_CENTER.x * MASTER_SCALE,
-    cy: cy + MASTER_CENTER.y * MASTER_SCALE,
-    value: 0.5,
-    color: 0xff91c8,
-    radius: 14 * MASTER_SCALE,
-  };
-})();
 
 /** Centers and values of the six strip dials. */
 export const STRIP_KNOBS = KNOBS.map((knob, index) => {
   const tileLeft = CONTROLS_INSET + KNOB_FIRST_LEFT + index * KNOB_PITCH;
   return {
     ...knob,
-    cx: tileLeft + KNOB_TILE_INSET + knobCenter('standard').x,
-    cy: CONTROLS_TOP + KNOB_TOP + knobCenter('standard').y,
+    cx: tileLeft + KNOB_TILE_INSET + KNOB_CENTER.x,
+    cy: CONTROLS_TOP + KNOB_TOP + KNOB_CENTER.y,
     radius: 13,
   };
 });

@@ -17,8 +17,8 @@ export const KNOB_PITCH = 48.4;
 export const KNOB_FIRST_LEFT = 7.5;
 export const KNOB_TILE_INSET = 4;
 export const KNOB_TOP = 9;
-export const KNOB_TILE_WIDTH = 40;
-const KNOB_TILE_HEIGHT = 42;
+export const KNOB_TILE_WIDTH = 44;
+const KNOB_TILE_HEIGHT = 44;
 const EDIT_GAP = 14;
 
 /** Design position of the edit control inside the strip. */
@@ -72,10 +72,11 @@ function drawStripFrame(width: number, height: number): Graphics {
 }
 
 function createKnobTile(x: number): Graphics {
-  const left = x;
-  const top = 22 / 3;
+  // The tile holds the whole dial face, tick ring included.
+  const left = x - 1.5;
+  const top = 1;
   const width = KNOB_TILE_WIDTH;
-  const height = KNOB_TILE_HEIGHT - 2.5;
+  const height = KNOB_TILE_HEIGHT;
   const tile = new Graphics();
   drawGradientFace(tile, left, top, width, height, 3,
     { edge: 0x24152e, top: 0xa580b8, mid: 0x8b68a2, bottom: 0x6d4899 }, 0.78, 1.5);
