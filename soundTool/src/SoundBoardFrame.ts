@@ -1,5 +1,6 @@
 import { Container, type Texture } from 'pixi.js';
 import { BoardFrame as BoardFrameArtwork } from './BoardFrame';
+import type { ControlMode } from './controls';
 import type { PresetTextures } from './PresetPad';
 import { SoundBankPanel } from './SoundBankPanel';
 import { SoundBoardFooter } from './SoundBoardFooter';
@@ -8,24 +9,28 @@ import { SoundBoardTabs, type TabIconTextures } from './SoundBoardTabs';
 import { SoundControlStrip } from './SoundControlStrip';
 import { SoundCreationPanel } from './SoundCreationPanel';
 
-const DISPLAY_WIDTH = 512;
-const DISPLAY_HEIGHT = 1024 / 3;
-const CONTENT_INSET = 7;
+export const BOARD_WIDTH = 512;
+export const BOARD_HEIGHT = 1024 / 3;
+export const CONTENT_INSET = 7;
 const TABS_INSET = 8;
-const CONTROLS_INSET = 7;
+export const CONTROLS_INSET = 7;
 const FOOTER_INSET = 4;
-const HEADER_INSET = 4;
-const HEADER_TOP = 4;
+export const HEADER_INSET = 4;
+export const HEADER_TOP = 4;
 const TABS_TOP = 28;
-const CONTENT_TOP = 56;
+export const CONTENT_TOP = 56;
 const CONTENT_HEIGHT = 204;
-const CONTROLS_TOP = 256;
+export const CONTROLS_TOP = 256;
 const FOOTER_TOP = 315;
-const BANK_LEFT = 346; // Absolute design x so the bank stays put next to the 330-wide creation panel.
+export const BANK_LEFT = 346; // Absolute design x so the bank stays put next to the 330-wide creation panel.
 const CREATION_WIDTH = 330;
 const BANK_WIDTH = 159;
 
-/** 3:2 sound-board design rendered on the requested 1536×1024 canvas. */
+/**
+ * 3:2 sound-board design rendered on the requested 1536×1024 canvas.
+ * In '3d' control mode the buttons and dials are left out for the 3D scene to
+ * place as meshes, and the frame stays at design scale for texture capture.
+ */
 export class SoundBoardFrame extends Container {
   readonly header: SoundBoardHeader;
   readonly tabs: SoundBoardTabs;
@@ -35,11 +40,11 @@ export class SoundBoardFrame extends Container {
   readonly controls: SoundControlStrip;
   readonly footer: SoundBoardFooter;
 
-  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures = {}) {
+  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures = {}, controls: ControlMode = '2d') {
     super();
-    this.scale.set(3);
-    const board = new BoardFrameArtwork(DISPLAY_WIDTH, DISPLAY_HEIGHT);
-    this.header = new SoundBoardHeader(DISPLAY_WIDTH - HEADER_INSET * 2, mascotTexture);
+    if (controls === '2d') this.scale.set(3);
+    const board = new BoardFrameArtwork(BOARD_WIDTH, BOARD_HEIGHT);
+    this.header = new SoundBoardHeader(BOARD_WIDTH - HEADER_INSET * 2, mascotTexture, controls);
     this.header.position.set(HEADER_INSET, HEADER_TOP);
 
     this.tabs = new SoundBoardTabs(tabIconTextures);
@@ -47,14 +52,14 @@ export class SoundBoardFrame extends Container {
 
     this.content = new Container();
     this.content.position.set(CONTENT_INSET, CONTENT_TOP);
-    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures);
-    this.bankPanel = new SoundBankPanel(BANK_WIDTH, CONTENT_HEIGHT);
+    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures, controls);
+    this.bankPanel = new SoundBankPanel(BANK_WIDTH, CONTENT_HEIGHT, controls);
     this.bankPanel.position.x = BANK_LEFT - CONTENT_INSET;
     this.content.addChild(this.creationPanel, this.bankPanel);
 
-    this.controls = new SoundControlStrip(DISPLAY_WIDTH - CONTROLS_INSET * 2, 157 / 3);
+    this.controls = new SoundControlStrip(BOARD_WIDTH - CONTROLS_INSET * 2, 157 / 3, controls);
     this.controls.position.set(CONTROLS_INSET, CONTROLS_TOP);
-    this.footer = new SoundBoardFooter(DISPLAY_WIDTH - FOOTER_INSET * 2);
+    this.footer = new SoundBoardFooter(BOARD_WIDTH - FOOTER_INSET * 2);
     this.footer.position.set(FOOTER_INSET, FOOTER_TOP);
 
     this.addChild(board, this.header, this.content, this.tabs, this.controls, this.footer);

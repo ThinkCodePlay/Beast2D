@@ -1,11 +1,16 @@
 import { Container, Graphics, Sprite, Text, type Texture } from 'pixi.js';
+import { RunButton } from './RunButton';
+import type { ControlMode } from './controls';
 
 const HEADER_HEIGHT = 24;
 const TEXT_COLOR = 0xffeaff;
 
+/** Where the RUN badge sits, measured from the header's right edge. */
+export const RUN_RIGHT_INSET = 34;
+
 /** Title/status strip with separate logo, sound meter, clock, and RUN control. */
 export class SoundBoardHeader extends Container {
-  constructor(width: number, mascotTexture: Texture) {
+  constructor(width: number, mascotTexture: Texture, controls: ControlMode = '2d') {
     super();
     this.addChild(drawHeader(width));
     this.addChild(drawAppIcon());
@@ -14,7 +19,11 @@ export class SoundBoardHeader extends Container {
     this.addChild(createSpeaker(width));
     this.addChild(createLevelMeter(width));
     this.addChild(createClock(width));
-    this.addChild(createRunButton(width));
+    if (controls === '2d') {
+      const run = new RunButton();
+      run.position.set(width - RUN_RIGHT_INSET, 0);
+      this.addChild(run);
+    }
   }
 }
 
@@ -86,18 +95,3 @@ function createClock(width: number): Text {
   return clock;
 }
 
-function createRunButton(width: number): Container {
-  const badge = new Container();
-  badge.addChild(new Graphics()
-    .poly([3, 3, 27, 3, 30, 6, 30, 18, 27, 21, 3, 21, 0, 18, 0, 6]).fill(0x24152e)
-    .poly([4, 4, 26, 4, 29, 7, 29, 17, 26, 20, 4, 20, 1, 17, 1, 7]).fill(0xe85a8c)
-    .rect(4, 5, 22, 4).fill(0xff9ebb));
-  const label = new Text({
-    text: 'RUN',
-    style: { fontFamily: 'monogram', fontSize: 13, fontWeight: 'bold', fill: 0x8e2b4a }, resolution: 3,
-  });
-  label.position.set(7, 5);
-  badge.addChild(label);
-  badge.position.set(width - 34, 0);
-  return badge;
-}

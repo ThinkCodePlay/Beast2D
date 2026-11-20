@@ -3,11 +3,11 @@ import { drawGradientFace } from './GradientFace';
 
 export type ButtonTone = 'pink' | 'gold' | 'violet' | 'purple' | 'dark' | 'green' | 'cream';
 
-const BUTTON_SIZE = 32;
+export const BUTTON_SIZE = 32;
 const FACE_SIZE = 28;
 const CORNER_RADIUS = 4;
 
-const toneColors: Record<ButtonTone, { top: number; mid: number; bottom: number; text: number }> = {
+export const BUTTON_TONES: Record<ButtonTone, { top: number; mid: number; bottom: number; text: number }> = {
   pink: { top: 0xfff0f4, mid: 0xfe7da4, bottom: 0xd8598a, text: 0xfff1f8 },
   gold: { top: 0xfff2cc, mid: 0xfcc358, bottom: 0xe8a83c, text: 0x392044 },
   violet: { top: 0xd8b8ec, mid: 0x9a6cc8, bottom: 0x7a53a8, text: 0xfff1f8 },
@@ -42,7 +42,7 @@ function crescentPoints(cx: number, cy: number, rOut: number, rIn: number, a0: n
 export class PixelButton extends Container {
   constructor(icon: string, tone: ButtonTone = 'purple', selected = false) {
     super();
-    const colors = toneColors[tone];
+    const colors = BUTTON_TONES[tone];
     this.addChild(createButtonFace(colors, selected));
     if (icon === '▶' || icon === '■' || icon === '↻') {
       this.addChild(createTransportIcon(icon));
@@ -52,7 +52,7 @@ export class PixelButton extends Container {
   }
 }
 
-function createButtonFace(colors: (typeof toneColors)[ButtonTone], selected: boolean): Graphics {
+function createButtonFace(colors: (typeof BUTTON_TONES)[ButtonTone], selected: boolean): Graphics {
   const face = new Graphics();
   drawGradientFace(face, 0, 0, FACE_SIZE, FACE_SIZE, CORNER_RADIUS, {
     edge: 0x432851,

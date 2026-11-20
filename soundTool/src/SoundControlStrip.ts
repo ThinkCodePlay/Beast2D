@@ -1,9 +1,10 @@
 import { Container, Graphics } from 'pixi.js';
+import type { ControlMode } from './controls';
 import { EditButton } from './EditButton';
-import { PixelKnob } from './ui/PixelKnob';
+import { PixelKnob, KnobMarkings } from './ui/PixelKnob';
 import { drawGradientFace } from './ui/GradientFace';
 
-const KNOBS = [
+export const KNOBS = [
   { label: 'VOL', value: 0.6, color: 0xff91c8 },
   { label: 'PAN', value: 0.63, color: 0xffcf72 },
   { label: 'DECAY', value: 0.72, color: 0xffcf72 },
@@ -12,26 +13,40 @@ const KNOBS = [
   { label: 'CUT', value: 0.72, color: 0xffcf72 },
 ] as const;
 
-const KNOB_PITCH = 48.4;
-const KNOB_TILE_WIDTH = 40;
+export const KNOB_PITCH = 48.4;
+export const KNOB_FIRST_LEFT = 7.5;
+export const KNOB_TILE_INSET = 4;
+export const KNOB_TOP = 9;
+export const KNOB_TILE_WIDTH = 40;
 const KNOB_TILE_HEIGHT = 42;
 const EDIT_GAP = 14;
 
+/** Design position of the edit control inside the strip. */
+export const EDIT_POSITION = {
+  x: 3.5 + (KNOBS.length - 1) * KNOB_PITCH + KNOB_TILE_WIDTH + EDIT_GAP,
+  y: 32 / 3,
+} as const;
+
 /** Shared bottom strip with six 32px dials and the waveform edit control. */
 export class SoundControlStrip extends Container {
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, controls: ControlMode = '2d') {
     super();
     this.addChild(drawStripFrame(width, height));
     KNOBS.forEach((knob, index) => {
-      const x = 7.5 + index * KNOB_PITCH;
+      const x = KNOB_FIRST_LEFT + index * KNOB_PITCH;
       this.addChild(createKnobTile(x));
-      const control = new PixelKnob(knob.label, knob.value, knob.color);
-      control.position.set(x + 4, 9);
+      // In 3D mode the dial caps become rotors; their board markings stay flat.
+      const control = controls === '2d'
+        ? new PixelKnob(knob.label, knob.value, knob.color)
+        : new KnobMarkings(knob.label, knob.color);
+      control.position.set(x + KNOB_TILE_INSET, KNOB_TOP);
       this.addChild(control);
     });
-    const edit = new EditButton();
-    edit.position.set(3.5 + (KNOBS.length - 1) * KNOB_PITCH + KNOB_TILE_WIDTH + EDIT_GAP, 32 / 3);
-    this.addChild(edit);
+    if (controls === '2d') {
+      const edit = new EditButton();
+      edit.position.set(EDIT_POSITION.x, EDIT_POSITION.y);
+      this.addChild(edit);
+    }
   }
 }
 

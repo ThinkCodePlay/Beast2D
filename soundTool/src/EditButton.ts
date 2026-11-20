@@ -1,8 +1,8 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { chamferPoints } from './ui/GradientFace';
 
-const EDIT_WIDTH = 62;
-const EDIT_HEIGHT = 42;
+export const EDIT_WIDTH = 62;
+export const EDIT_HEIGHT = 42;
 
 /** Wide stepped waveform-edit button with a beveled face and built-in label. */
 export class EditButton extends Container {

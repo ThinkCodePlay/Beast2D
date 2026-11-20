@@ -19,48 +19,82 @@ const CRESCENT_COLORS: Record<number, number> = {
 const CREAM_FACE = 0xfdf0d4;
 const CREAM_LIGHT = 0xfff8e8;
 
-type KnobVariant = 'standard' | 'master';
+export type KnobVariant = 'standard' | 'master';
+
+/** Center of a knob's disk inside its 32×32 tile, per variant. */
+export function knobCenter(variant: KnobVariant): { x: number; y: number } {
+  return variant === 'master'
+    ? { x: MASTER_CENTER_X, y: MASTER_CENTER_Y }
+    : { x: STANDARD_CENTER_X, y: STANDARD_CENTER_Y };
+}
 
 /** 32×32 stepped dial, with a tick-marked master-volume face option. */
 export class PixelKnob extends Container {
   constructor(label: string, value: number, color: number, variant: KnobVariant = 'standard') {
     super();
+    this.addChild(new KnobMarkings(label, color, variant));
+    this.addChild(new KnobCap(value, color, variant, knobCenter(variant)));
+  }
+}
+
+/**
+ * The flat board artwork around a dial: tick marks, accent pixels and the
+ * label. Stays on the board face when the cap becomes a 3D rotor.
+ */
+export class KnobMarkings extends Container {
+  constructor(label: string, color: number, variant: KnobVariant = 'standard') {
+    super();
+    const accented = variant === 'standard' && (label === 'VOL' || label === 'PITCH');
     if (variant === 'master') {
-      this.addChild(createMasterFace(value));
+      this.addChild(drawMasterTicks());
       this.addChild(createLabel(label, 26, 11));
       return;
     }
-    this.addChild(createStandardFace(color, value, label === 'VOL' || label === 'PITCH'));
+    this.addChild(drawTickDots(accented ? color : 0xd8c8e8));
+    if (accented) this.addChild(drawAccentPixels(color));
     this.addChild(createLabel(label, 22.5, 12));
   }
 }
 
-function createStandardFace(color: number, value: number, accented: boolean): Graphics {
-  const face = new Graphics();
-  const cx = STANDARD_CENTER_X;
-  const cy = STANDARD_CENTER_Y;
-  drawTickDots(face, accented ? color : 0xd8c8e8);
-  drawPixelDisk(face, cx + 1.4, cy + 2, 14, 0x140b20, 1.08, 0.95);
-  drawPixelDisk(face, cx, cy, 13.7, 0x321b47, 1.08, 0.95);
-  // Accented strip dials have a fully colored face in the reference; the rest are cream.
-  drawPixelDisk(face, cx, cy, 12.4, accented ? CRESCENT_COLORS[color] ?? color : CREAM_FACE, 1.08, 0.95);
-  drawPixelDisk(face, cx - 2, cy - 2.5, 8.2, CREAM_LIGHT, 1.08, 0.95);
-  drawNeedle(face, cx, cy, value, 6.5, 0x3a2030, 2.5);
-  face.rect(cx - 1, cy - 1, 2, 2).fill(0x3a2030);
-  if (accented) drawAccentPixels(face, color);
-  return face;
+/** The rotating part of a dial: layered pixel disks with a value needle. */
+export class KnobCap extends Container {
+  constructor(value: number, color: number, variant: KnobVariant = 'standard', center = knobCenter(variant)) {
+    super();
+    const accented = variant === 'standard' && (color in CRESCENT_COLORS);
+    const cap = new Graphics();
+    if (variant === 'master') {
+      drawPixelDisk(cap, center.x + 2, center.y + 3, 14, 0x140b20);
+      drawPixelDisk(cap, center.x, center.y, 14, 0x321b47);
+      drawPixelDisk(cap, center.x, center.y, 12, 0x604077);
+      drawPixelDisk(cap, center.x, center.y, 10, CREAM_FACE);
+      drawPixelDisk(cap, center.x - 1, center.y - 1, 8, CREAM_LIGHT);
+      drawNeedle(cap, center.x, center.y, value, 8, 0x3a2030, 2);
+    } else {
+      drawPixelDisk(cap, center.x + 1.4, center.y + 2, 14, 0x140b20, 1.08, 0.95);
+      drawPixelDisk(cap, center.x, center.y, 13.7, 0x321b47, 1.08, 0.95);
+      // Accented strip dials have a fully colored face in the reference; the rest are cream.
+      drawPixelDisk(cap, center.x, center.y, 12.4, accented ? CRESCENT_COLORS[color] : CREAM_FACE, 1.08, 0.95);
+      drawPixelDisk(cap, center.x - 2, center.y - 2.5, 8.2, CREAM_LIGHT, 1.08, 0.95);
+      drawNeedle(cap, center.x, center.y, value, 6.5, 0x3a2030, 2.5);
+      cap.rect(center.x - 1, center.y - 1, 2, 2).fill(0x3a2030);
+    }
+    this.addChild(cap);
+  }
 }
 
-function drawTickDots(face: Graphics, color: number): void {
+function drawTickDots(color: number): Graphics {
+  const face = new Graphics();
   for (let tick = 0; tick < 7; tick += 1) {
     const angle = Math.PI * (0.75 + tick * 0.25);
     const x = STANDARD_CENTER_X + Math.round(Math.cos(angle) * 18);
     const y = STANDARD_CENTER_Y + Math.round(Math.sin(angle) * 16.5);
     face.rect(x, y, 1.5, 1.5).fill(color);
   }
+  return face;
 }
 
-function drawAccentPixels(face: Graphics, color: number): void {
+function drawAccentPixels(color: number): Graphics {
+  const face = new Graphics();
   const centerX = STANDARD_CENTER_X;
   const centerY = STANDARD_CENTER_Y;
   [
@@ -71,9 +105,10 @@ function drawAccentPixels(face: Graphics, color: number): void {
     [centerX + 11, centerY + 10],
     [centerX + 14, centerY + 5],
   ].forEach(([x, y]) => face.rect(x, y, 1, 1).fill(color));
+  return face;
 }
 
-function createMasterFace(value: number): Graphics {
+function drawMasterTicks(): Graphics {
   const face = new Graphics();
   for (let tick = 0; tick <= 6; tick += 1) {
     const angle = Math.PI * 0.75 + (tick / 6) * Math.PI * 1.5;
@@ -86,12 +121,6 @@ function createMasterFace(value: number): Graphics {
       .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0x3b223d, width: 3 })
       .moveTo(innerX, innerY).lineTo(outerX, outerY).stroke({ color: 0xfff4dc, width: 1 });
   }
-  drawPixelDisk(face, MASTER_CENTER_X + 2, MASTER_CENTER_Y + 3, 14, 0x140b20);
-  drawPixelDisk(face, MASTER_CENTER_X, MASTER_CENTER_Y, 14, 0x321b47);
-  drawPixelDisk(face, MASTER_CENTER_X, MASTER_CENTER_Y, 12, 0x604077);
-  drawPixelDisk(face, MASTER_CENTER_X, MASTER_CENTER_Y, 10, 0xfdf0d4);
-  drawPixelDisk(face, MASTER_CENTER_X - 1, MASTER_CENTER_Y - 1, 8, 0xfff8e8);
-  drawNeedle(face, MASTER_CENTER_X, MASTER_CENTER_Y, value, 8, 0x3a2030, 2);
   return face;
 }
 
