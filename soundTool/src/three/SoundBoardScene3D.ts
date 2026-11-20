@@ -8,7 +8,7 @@ import {
   PlaneGeometry,
 } from '@pixi/3d';
 import type { Renderer, Texture } from 'pixi.js';
-import { EditButton } from '../EditButton';
+import { WaveformButton } from '../WaveformButton';
 import { PixelButton, BUTTON_TONES } from '../ui/PixelButton';
 import { KnobCap } from '../ui/PixelKnob';
 import { PresetPad, type PresetTextures } from '../PresetPad';
@@ -20,12 +20,12 @@ import { Button3D } from './Button3D';
 import { Knob3D } from './Knob3D';
 import { BOARD_WIDTH, BOARD_HEIGHT, CABINET_DEPTH, boardToWorld } from './boardSpace';
 import {
-  EDIT_BUTTON,
   PRESET_PADS,
   RUN_BUTTON,
   SCROLL_ARROWS,
   STRIP_KNOBS,
   TRANSPORT_BUTTONS,
+  WAVEFORM_BUTTONS,
   type ControlRect,
 } from './controlLayout';
 
@@ -107,12 +107,15 @@ function createControls(renderer: Renderer, presetTextures: PresetTextures): Con
     }), rect));
   });
 
-  controls.push(place(new Button3D({
-    face: new EditButton(),
-    ...EDIT_BUTTON,
-    bodyColor: 0x8b68a2,
-    renderer,
-  }), EDIT_BUTTON));
+  WAVEFORM_BUTTONS.forEach(({ type, selected, ...rect }) => {
+    controls.push(place(new Button3D({
+      face: new WaveformButton(type, selected),
+      ...rect,
+      facePadding: 3, // The selected button's selection ring spills 3px past its face.
+      bodyColor: 0x7a53a8,
+      renderer,
+    }), rect));
+  });
 
   controls.push(place(new Button3D({
     face: new RunButton(),

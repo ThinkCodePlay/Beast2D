@@ -1,6 +1,7 @@
 import {
   BANK_LEFT,
   BOARD_WIDTH,
+  CONTENT_HEIGHT,
   CONTENT_INSET,
   CONTENT_TOP,
   CONTROLS_INSET,
@@ -15,20 +16,21 @@ import {
   PAD_GRID_LEFT,
   PAD_GRID_TOP,
   PAD_STEP_X,
+  SELECTOR_HEIGHT,
   TRANSPORT_LEFT,
   TRANSPORT_TOP,
+  WAVEFORM_BOTTOM_INSET,
 } from '../SoundCreationPanel';
 import { PAD_WIDTH, PAD_HEIGHT, type PresetIcon } from '../PresetPad';
 import { KNOB_CENTER } from '../ui/PixelKnob';
 import {
-  EDIT_POSITION,
-  KNOB_FIRST_LEFT,
-  KNOB_PITCH,
+  KNOB_GRID_LEFT,
+  KNOB_STEP_X,
   KNOB_TILE_INSET,
   KNOB_TOP,
   KNOBS,
 } from '../SoundControlStrip';
-import { EDIT_WIDTH, EDIT_HEIGHT } from '../EditButton';
+import { WAVEFORM_TYPES, type WaveformType } from '../WaveformButton';
 import { SCROLL_BUTTON_SIZE, SCROLL_INSET, SCROLL_TRACK_TOP } from '../SoundBankPanel';
 
 /** A control's face rectangle in board-design coordinates (top-left origin). */
@@ -68,9 +70,20 @@ export const PRESET_PADS: (ControlRect & { icon: PresetIcon; selected: boolean }
     height: PAD_HEIGHT,
   }));
 
-/** Centers and values of the six strip dials. */
+/** The waveform selector row under the display, one button per preset column. */
+export const WAVEFORM_BUTTONS: (ControlRect & { type: WaveformType; selected: boolean })[] =
+  WAVEFORM_TYPES.map((type, index) => ({
+    type,
+    selected: index === 0,
+    x: CONTENT_INSET + PAD_GRID_LEFT + index * PAD_STEP_X,
+    y: CONTENT_TOP + CONTENT_HEIGHT - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT,
+    width: 45,
+    height: SELECTOR_HEIGHT,
+  }));
+
+/** Centers and values of the six strip dials, aligned to the selector columns. */
 export const STRIP_KNOBS = KNOBS.map((knob, index) => {
-  const tileLeft = CONTROLS_INSET + KNOB_FIRST_LEFT + index * KNOB_PITCH;
+  const tileLeft = CONTROLS_INSET + KNOB_GRID_LEFT + index * KNOB_STEP_X;
   return {
     ...knob,
     cx: tileLeft + KNOB_TILE_INSET + KNOB_CENTER.x,
@@ -79,14 +92,6 @@ export const STRIP_KNOBS = KNOBS.map((knob, index) => {
     radius: 11,
   };
 });
-
-/** The wide waveform-edit button at the strip's right end. */
-export const EDIT_BUTTON: ControlRect = {
-  x: CONTROLS_INSET + EDIT_POSITION.x,
-  y: CONTROLS_TOP + EDIT_POSITION.y,
-  width: EDIT_WIDTH,
-  height: EDIT_HEIGHT,
-};
 
 /** The header's RUN badge. */
 export const RUN_BUTTON: ControlRect = {
@@ -97,7 +102,8 @@ export const RUN_BUTTON: ControlRect = {
 };
 
 const BANK_WIDTH = 159;
-const BANK_HEIGHT = 204;
+// The bank runs full height: from the content top to the control strip's bottom.
+const BANK_HEIGHT = CONTROLS_TOP + 157 / 3 - CONTENT_TOP;
 
 /** The sound bank's two scroll-arrow buttons. */
 export const SCROLL_ARROWS: (ControlRect & { up: boolean })[] = [true, false].map((up) => ({

@@ -19,8 +19,9 @@ export const HEADER_INSET = 4;
 export const HEADER_TOP = 4;
 const TABS_TOP = 28;
 export const CONTENT_TOP = 56;
-const CONTENT_HEIGHT = 204;
+export const CONTENT_HEIGHT = 204;
 export const CONTROLS_TOP = 256;
+const CONTROLS_HEIGHT = 157 / 3;
 const FOOTER_TOP = 315;
 export const BANK_LEFT = 346; // Absolute design x so the bank stays put next to the 330-wide creation panel.
 const CREATION_WIDTH = 330;
@@ -53,11 +54,13 @@ export class SoundBoardFrame extends Container {
     this.content = new Container();
     this.content.position.set(CONTENT_INSET, CONTENT_TOP);
     this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures, controls);
-    this.bankPanel = new SoundBankPanel(BANK_WIDTH, CONTENT_HEIGHT, controls);
+    // The bank runs full height beside the creation panel and the control strip.
+    const bankHeight = CONTROLS_TOP + CONTROLS_HEIGHT - CONTENT_TOP;
+    this.bankPanel = new SoundBankPanel(BANK_WIDTH, bankHeight, controls);
     this.bankPanel.position.x = BANK_LEFT - CONTENT_INSET;
     this.content.addChild(this.creationPanel, this.bankPanel);
 
-    this.controls = new SoundControlStrip(BOARD_WIDTH - CONTROLS_INSET * 2, 157 / 3, controls);
+    this.controls = new SoundControlStrip(CREATION_WIDTH, CONTROLS_HEIGHT, controls);
     this.controls.position.set(CONTROLS_INSET, CONTROLS_TOP);
     this.footer = new SoundBoardFooter(BOARD_WIDTH - FOOTER_INSET * 2);
     this.footer.position.set(FOOTER_INSET, FOOTER_TOP);

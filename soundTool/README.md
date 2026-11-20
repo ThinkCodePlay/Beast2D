@@ -8,9 +8,9 @@ This branch renders the board with PixiJS 3D (`@pixi/3d`): the cabinet, buttons 
 
 - `src/main.ts` initializes PixiJS at the fixed canvas size, sets up the 3D view and camera, and mounts the board. Pass `?renderer=webgl` to force the WebGL2 backend.
 - `SoundBoardFrame` places the cabinet frame, header, navigation tabs, editor and bank panels, shared control strip, and keyboard-help footer.
-- `SoundCreationPanel` contains transport controls, the named sound, preset pads, and waveform.
-- `SoundBankPanel` contains the twelve sound slots and scroll controls.
-- `SoundControlStrip` contains the six parameter knobs and the waveform edit button.
+- `SoundCreationPanel` contains transport controls, the named sound, preset pads, the waveform display, and the waveform selector row.
+- `SoundBankPanel` contains the twelve sound slots and scroll controls; it runs the full height beside the creation panel and control strip.
+- `SoundControlStrip` contains the six parameter knobs, aligned to the waveform selector's columns.
 - `src/ui/` contains reusable pixel buttons, knobs, panel framing, and waveform drawing.
 - `src/three/` contains the 3D scene: `SoundBoardScene3D` composes the cabinet and controls, `Button3D` and `Knob3D` wrap each control's 2D face artwork in a 3D body, `controlLayout` derives every control's placement from the panels' layout constants, and `boardSpace` maps the design grid onto the 3D world.
 - Panels take a `ControlMode`: `'2d'` draws controls flat (the classic look), `'3d'` leaves them out so the 3D scene can place meshes there instead.
