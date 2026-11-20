@@ -3,7 +3,7 @@ import { drawGradientFace } from './GradientFace';
 
 export type ButtonTone = 'pink' | 'gold' | 'violet' | 'purple' | 'dark' | 'green' | 'cream';
 
-const BUTTON_SIZE = 32;
+export const BUTTON_SIZE = 32;
 const FACE_SIZE = 28;
 const CORNER_RADIUS = 4;
 
@@ -65,6 +65,7 @@ function createButtonFace(colors: (typeof toneColors)[ButtonTone], selected: boo
 
 function createTransportIcon(icon: string): Graphics {
   const graphic = new Graphics();
+  let contentScale = 1;
   if (icon === '▶') {
     graphic
       .poly([5, 3, 22, 13, 22, 16, 5, 26]).fill(0x281735)
@@ -74,7 +75,12 @@ function createTransportIcon(icon: string): Graphics {
       .rect(5, 4, 3, 15).fill(0xfff0a1)
       .rect(8, 6, 2, 3).fill(0xfff0a1);
   } else if (icon === '■') {
-    graphic.rect(8, 8, 12, 12).fill(0x321b47);
+    // Stop square sized to match the play triangle's visual weight.
+    graphic
+      .rect(5, 5, 18, 18).fill(0x281735)
+      .rect(6, 6, 16, 16).fill(0x39204f)
+      .rect(6, 6, 16, 2).fill(0x54327a);
+    contentScale = 1.05;
   } else {
     // Reference loop icon: two stacked curved arrows, each a crescent band that
     // ends in a small block head (top arrow points right, bottom is its 180-degree
@@ -82,8 +88,8 @@ function createTransportIcon(icon: string): Graphics {
     const cx = 14;
     const cyTop = 11.4;
     const cyMid = 14.2; // vertical center of the 28x28 icon, matching the reference gap
-    const topDark = crescentPoints(cx, cyTop, 7.6, 2.9, 180, 360);
-    const topCream = crescentPoints(cx, cyTop, 6.6, 3.9, 185, 355);
+    const topDark = crescentPoints(cx, cyTop, 8.4, 2.3, 180, 360);
+    const topCream = crescentPoints(cx, cyTop, 7.3, 3.4, 185, 355);
     const topHeadDark = [20.2, 8.0, 22.6, 8.8, 24.2, 11.4, 22.6, 14, 20.2, 14.8];
     const topHeadCream = [20.9, 9.3, 22.3, 9.9, 23.1, 11.4, 22.3, 12.9, 20.9, 13.5];
     const rotate180 = (pts: number[]): number[] =>
@@ -97,8 +103,9 @@ function createTransportIcon(icon: string): Graphics {
       .poly(topHeadCream).fill(0xfff4dc)
       .poly(rotate180(topCream)).fill(0xfff4dc)
       .poly(rotate180(topHeadCream)).fill(0xfff4dc);
+    contentScale = 1.12;
   }
-  const iconScale = 0.9;
+  const iconScale = 0.9 * contentScale;
   graphic.scale.set(iconScale);
   graphic.position.set((BUTTON_SIZE - FACE_SIZE * iconScale) / 2, (BUTTON_SIZE - FACE_SIZE * iconScale) / 2);
   return graphic;
