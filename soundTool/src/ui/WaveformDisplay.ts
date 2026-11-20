@@ -1,6 +1,8 @@
 import { Container, Graphics } from 'pixi.js';
 
 const BAR_COUNT = 32;
+const SECTION_COUNT = 8;
+const BARS_PER_SECTION = BAR_COUNT / SECTION_COUNT;
 const BAR_WIDTH = 8;
 const BAR_STEP = 9.5;
 const BAR_LEFT = 4;
@@ -34,13 +36,20 @@ function drawFrame(width: number, height: number): Graphics {
   const frame = new Graphics()
     .roundRect(0, 0, width, height, 2).fill(0x21132b)
     .roundRect(1, 1, width - 2, height - 2, 2).fill(0x3f2651);
-  for (let x = 12; x < width - 4; x += 27) {
-    frame.rect(x, 3, 1, height - 6).fill({ color: 0x76508c, alpha: 0.45 });
+  for (const x of sectionDividerPositions()) {
+    frame.rect(x, 3, 1, height - 6).fill({ color: 0x76508c, alpha: 0.6 });
   }
   frame
     .roundRect(1, 1, width - 2, 3, 2).fill({ color: 0x59366e, alpha: 0.8 })
     .rect(1, height - 2, width - 2, 1).fill(0x39214c);
   return frame;
+}
+
+/** Dividers between the eight sections, each section holding four bars. */
+function sectionDividerPositions(): number[] {
+  const halfGap = (BAR_STEP - BAR_WIDTH) / 2;
+  return Array.from({ length: SECTION_COUNT - 1 }, (_, index) =>
+    Math.round(BAR_LEFT + (index + 1) * BARS_PER_SECTION * BAR_STEP - halfGap));
 }
 
 function drawBars(height: number): Graphics {
