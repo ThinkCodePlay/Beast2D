@@ -1,11 +1,11 @@
 import { Container, Graphics } from 'pixi.js';
 
-const DISPLAY_HEIGHT = 59.3;
 const BAR_COUNT = 26;
 const BAR_WIDTH = 10;
 const BAR_STEP = 35 / 3;
 const BAR_LEFT = 4;
 const BASE_INSET = 2.7;
+const BAR_TOP_INSET = 8;
 const GOLD = 0xffd251;
 const ORANGE = 0xf3864d;
 // Reference pickup envelope: tall opening peak, uneven decay, short orange tail.
@@ -16,38 +16,40 @@ const BAR_HEIGHTS = [
 
 /** Waveform window with grid lines and a decaying gold-to-orange bar profile. */
 export class WaveformDisplay extends Container {
-  constructor(width: number) {
+  constructor(width: number, height: number) {
     super();
-    this.addChild(drawFrame(width));
-    this.addChild(drawBars());
+    this.addChild(drawFrame(width, height));
+    this.addChild(drawBars(height));
   }
 }
 
-function drawFrame(width: number): Graphics {
+function drawFrame(width: number, height: number): Graphics {
   const frame = new Graphics()
-    .roundRect(0, 0, width, DISPLAY_HEIGHT, 2).fill(0x21132b)
-    .roundRect(1, 1, width - 2, DISPLAY_HEIGHT - 2, 2).fill(0x3f2651);
+    .roundRect(0, 0, width, height, 2).fill(0x21132b)
+    .roundRect(1, 1, width - 2, height - 2, 2).fill(0x3f2651);
   for (let x = 12; x < width - 4; x += 27) {
-    frame.rect(x, 3, 1, DISPLAY_HEIGHT - 6).fill({ color: 0x76508c, alpha: 0.45 });
+    frame.rect(x, 3, 1, height - 6).fill({ color: 0x76508c, alpha: 0.45 });
   }
   frame
     .roundRect(1, 1, width - 2, 3, 2).fill({ color: 0x59366e, alpha: 0.8 })
-    .rect(1, DISPLAY_HEIGHT - 2, width - 2, 1).fill(0x39214c);
+    .rect(1, height - 2, width - 2, 1).fill(0x39214c);
   return frame;
 }
 
-function drawBars(): Graphics {
+function drawBars(height: number): Graphics {
+  // Scale the reference envelope so its peak fills the window at any height.
+  const scale = (height - BAR_TOP_INSET) / Math.max(...BAR_HEIGHTS);
   const bars = new Graphics();
   for (let index = 0; index < BAR_COUNT; index += 1) {
     const x = BAR_LEFT + index * BAR_STEP;
-    const height = Math.min(BAR_HEIGHTS[index], DISPLAY_HEIGHT - 8);
+    const barHeight = Math.min(BAR_HEIGHTS[index] * scale, height - BAR_TOP_INSET);
     const t = index / (BAR_COUNT - 1);
     const body = lerpColor(GOLD, ORANGE, t * 0.45);
     const base = lerpColor(GOLD, ORANGE, 0.4 + t * 0.6);
-    const baseHeight = Math.max(2, Math.round(height * 0.18));
-    const top = DISPLAY_HEIGHT - BASE_INSET - height;
-    bars.rect(x, top, BAR_WIDTH, height).fill(body);
-    bars.rect(x, DISPLAY_HEIGHT - BASE_INSET - baseHeight, BAR_WIDTH, baseHeight).fill(base);
+    const baseHeight = Math.max(2, Math.round(barHeight * 0.18));
+    const top = height - BASE_INSET - barHeight;
+    bars.rect(x, top, BAR_WIDTH, barHeight).fill(body);
+    bars.rect(x, height - BASE_INSET - baseHeight, BAR_WIDTH, baseHeight).fill(base);
     bars.rect(x, top, BAR_WIDTH, 1).fill(lerpColor(body, 0xffffff, 0.35));
   }
   return bars;

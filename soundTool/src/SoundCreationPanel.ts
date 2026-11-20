@@ -1,13 +1,20 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { PresetPad, PRESET_ICONS, type PresetTextures } from './PresetPad';
+import { PresetPad, type PresetIcon, type PresetTextures } from './PresetPad';
 import { PixelButton } from './ui/PixelButton';
 import { PixelKnob } from './ui/PixelKnob';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
 
 const PAD_STEP_X = 160 / 3; // 160 output pixels at the 3× stage scale.
-const PAD_STEP_Y = 46;
+const PAD_ROW_TOP = 54;
+const PAD_HEIGHT = 36;
+const WAVEFORM_TOP_GAP = 11 / 3;
+const WAVEFORM_BOTTOM_INSET = 5;
 const TRANSPORT_POSITIONS = { stop: 43.7, loop: 93.7, name: 135.7, volume: 269.7 } as const;
+
+// The kept presets: the most-used game sound types, one pad per type, matching
+// the sound bank (coin, power-up, jump, explosion, hit, enemy death).
+const KEPT_PRESETS: readonly PresetIcon[] = ['coin', 'star', 'boot', 'bomb', 'burst', 'skull'];
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
@@ -16,8 +23,9 @@ export class SoundCreationPanel extends Container {
     this.addChild(new RaisedPanelFrame(width, height, 0x83609a));
     this.addChild(createTransport());
     this.addChild(createPresetGrid(presetTextures));
-    const waveform = new WaveformDisplay(width - 11);
-    waveform.position.set(8, 139.7);
+    const waveformTop = PAD_ROW_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
+    const waveform = new WaveformDisplay(width - 11, height - WAVEFORM_BOTTOM_INSET - waveformTop);
+    waveform.position.set(8, waveformTop);
     this.addChild(waveform);
   }
 }
@@ -61,11 +69,10 @@ function createSoundName(width: number): Container {
 
 function createPresetGrid(presetTextures: PresetTextures): Container {
   const grid = new Container();
-  PRESET_ICONS.forEach((icon, index) => {
-    const column = index % 6;
-    const row = Math.floor(index / 6);
+  grid.position.set(8.3, PAD_ROW_TOP);
+  KEPT_PRESETS.forEach((icon, index) => {
     const pad = new PresetPad(icon, presetTextures, index === 0);
-    pad.position.set(8.3 + column * PAD_STEP_X, 54 + row * PAD_STEP_Y);
+    pad.position.x = index * PAD_STEP_X;
     grid.addChild(pad);
   });
   return grid;
