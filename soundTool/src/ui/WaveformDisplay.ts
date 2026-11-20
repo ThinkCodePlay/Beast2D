@@ -1,18 +1,25 @@
 import { Container, Graphics } from 'pixi.js';
 
-const BAR_COUNT = 26;
-const BAR_WIDTH = 10;
-const BAR_STEP = 35 / 3;
+const BAR_COUNT = 32;
+const BAR_WIDTH = 8;
+const BAR_STEP = 9.5;
 const BAR_LEFT = 4;
 const BASE_INSET = 2.7;
 const BAR_TOP_INSET = 8;
 const GOLD = 0xffd251;
 const ORANGE = 0xf3864d;
 // Reference pickup envelope: tall opening peak, uneven decay, short orange tail.
-const BAR_HEIGHTS = [
+const REFERENCE_HEIGHTS = [
   48, 52, 45, 40, 34, 37, 39, 35, 32, 34, 29, 26, 25,
   28, 25, 22, 19, 16, 13, 16, 13, 12, 14, 11, 9, 7,
 ];
+// Stretch the reference envelope to the step count, keeping its shape.
+const BAR_HEIGHTS = Array.from({ length: BAR_COUNT }, (_, index) => {
+  const position = index * (REFERENCE_HEIGHTS.length - 1) / (BAR_COUNT - 1);
+  const lower = Math.floor(position);
+  const upper = Math.min(lower + 1, REFERENCE_HEIGHTS.length - 1);
+  return REFERENCE_HEIGHTS[lower] + (REFERENCE_HEIGHTS[upper] - REFERENCE_HEIGHTS[lower]) * (position - lower);
+});
 
 /** Waveform window with grid lines and a decaying gold-to-orange bar profile. */
 export class WaveformDisplay extends Container {
