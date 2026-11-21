@@ -118,24 +118,22 @@ export class SoundBoardScene3D extends Container3D {
       }), rect));
     });
 
-    const waveformButtons = WAVEFORM_BUTTONS.map(({ type, ...rect }) => {
+    const waveformFaces = WAVEFORM_BUTTONS.map(({ type, ...rect }) => {
       const face = new WaveformButton(type, type === this.sequence.waveform);
       const button = new Button3D({
         face,
         ...rect,
         facePadding: 3, // The selected button's selection ring spills 3px past its face.
+        liveFace: true, // The ring moves when another waveform is chosen.
         bodyColor: 0x7a53a8,
         renderer,
       });
       button.on('pointertap', () => {
         this.sequence.waveform = type;
-        waveformButtons.forEach((other) => {
-          other.face.setSelected(other.face.type === type);
-          other.button.refreshFace();
-        });
+        waveformFaces.forEach(other => other.setSelected(other.type === type));
       });
       controls.push(place(button, rect));
-      return { face, button };
+      return face;
     });
 
     controls.push(place(new Button3D({
