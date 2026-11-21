@@ -113,6 +113,7 @@ export class SoundBoardScene3D extends Container3D {
       });
       if (icon === '▶') button.on('pointertap', this.transport.play);
       if (icon === '■') button.on('pointertap', this.transport.stop);
+      if (icon === '↻') button.on('pointertap', () => button.setLatched(this.transport.toggleLoop()));
       controls.push(place(button, rect));
     });
 

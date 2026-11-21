@@ -28,6 +28,11 @@ const RING_PARKED_DEPTH = 20;
 export class Button3D extends Container3D {
   private ringPlane?: Mesh3D;
   private ringDepth = 0;
+  private pressSink = 0;
+  private held = false;
+  private latched = false;
+  private shownPressed = false;
+  private restZ = 0;
 
   constructor(options: Button3DOptions) {
     super();
@@ -57,27 +62,34 @@ export class Button3D extends Container3D {
     this.addChild(body, facePlane);
     if (ring) this.addChild(this.createRingPlane(ring, faceSize, facePadding, depth, renderer));
 
-    // Pressed state: the whole button sinks toward the board while held.
-    const sink = Math.max(MIN_PRESS_SINK, depth * 0.5);
-    let pressed = false;
-    let restZ = 0;
-    const setPressed = (next: boolean): void => {
-      if (pressed === next) return;
-      pressed = next;
-      if (pressed) {
-        restZ = this.position.z;
-        this.position.z = restZ - sink;
-      } else {
-        this.position.z = restZ;
-      }
-    };
-
+    // Pressed state: the whole button sinks toward the board while held or latched.
+    this.pressSink = Math.max(MIN_PRESS_SINK, depth * 0.5);
     this.eventMode = 'static';
     this.cursor = 'pointer';
-    this.on('pointerdown', () => setPressed(true));
-    this.on('pointerup', () => setPressed(false));
-    this.on('pointerupoutside', () => setPressed(false));
-    this.on('pointercancel', () => setPressed(false));
+    this.on('pointerdown', () => { this.held = true; this.applyPressed(); });
+    const release = (): void => { this.held = false; this.applyPressed(); };
+    this.on('pointerup', release);
+    this.on('pointerupoutside', release);
+    this.on('pointercancel', release);
+  }
+
+  /** Hold or release the sunken look for latched toggles like the loop button. */
+  setLatched(latched: boolean): void {
+    this.latched = latched;
+    this.applyPressed();
+  }
+
+  /** Sunken while held or latched; springs back only when neither applies. */
+  private applyPressed(): void {
+    const next = this.held || this.latched;
+    if (this.shownPressed === next) return;
+    this.shownPressed = next;
+    if (next) {
+      this.restZ = this.position.z;
+      this.position.z = this.restZ - this.pressSink;
+    } else {
+      this.position.z = this.restZ;
+    }
   }
 
   /** Show or hide the selection ring. */

@@ -60,6 +60,7 @@ view3d.eventMode = 'static';
 // The composition root owns the data and player, not either rendering component.
 const sequence = createSoundSequence(defaultNotes());
 const player = new SoundPlayer();
+let looping = false;
 const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures, sequence, {
   play: () => {
     void player.play(sequence).catch(error => {
@@ -68,6 +69,11 @@ const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture,
     });
   },
   stop: () => player.stop(),
+  toggleLoop: () => {
+    looping = !looping;
+    player.setLoopEnabled(looping);
+    return looping;
+  },
   setMasterVolume: (value) => player.setMasterVolume(value),
   audition: (index) => {
     void player.audition(sequence, index).catch(error => {

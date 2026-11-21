@@ -318,3 +318,104 @@ test('pending Play and trailing audition use the latest live master value', asyn
   assert.equal(context.outputs.at(-2)!.gain.value, .9);
   player.stop();
 });
+
+const wait = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
+
+test('loop repeats the snapshot on exact audio-clock boundaries at every rate', async () => {
+  for (const rate of PLAYBACK_RATES) {
+    const { context, player } = setup();
+    const sequence = createSoundSequence();
+    sequence.rate = rate;
+    player.setLoopEnabled(true);
+    await player.play(sequence);
+    const pass = 32 * STEP_SECONDS / rate;
+    assert.equal(context.voices.length, 32, String(rate));
+    context.currentTime = 10.01 + pass - 0.2;
+    await wait(150);
+    assert.equal(context.voices.length, 64, String(rate));
+    assert.ok(Math.abs(context.voices[32].startTime - (10.01 + pass)) < 1e-10);
+    assert.ok(Math.abs(context.voices[63].stops[0] - (10.01 + 2 * pass)) < 1e-10);
+    context.currentTime = 10.01 + 2 * pass - 0.2;
+    await wait(150);
+    assert.equal(context.voices.length, 96, String(rate));
+    // Ended passes disconnect their nodes; a long loop stays bounded.
+    context.voices.slice(0, 32).forEach(voice => voice.end());
+    assert.ok(context.voices.slice(0, 32).every(voice => voice.disconnected));
+    assert.ok(!context.outputs[0].disconnected);
+    player.stop();
+  }
+});
+test('a looped pass keeps the Play snapshot and follows the live master gain', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  player.setLoopEnabled(true);
+  await player.play(sequence);
+  sequence.steps[0].note = 81;
+  sequence.rate = 4;
+  player.setMasterVolume(0.8);
+  assert.deepEqual(context.outputs[0].gain.points.at(-1), [0.8, 10.008]);
+  context.currentTime = 10.01 + 32 * STEP_SECONDS - 0.2;
+  await wait(150);
+  assert.equal(context.voices[32].frequency.value, noteFrequency(60));
+  assert.ok(Math.abs(context.voices[32].startTime - (10.01 + 32 * STEP_SECONDS)) < 1e-10);
+  player.stop();
+});
+test('turning loop off during play finishes the current pass, then releases', async () => {
+  const { context, player } = setup();
+  player.setLoopEnabled(true);
+  await player.play(createSoundSequence());
+  player.setLoopEnabled(false);
+  context.currentTime = 10.01 + 32 * STEP_SECONDS - 0.2;
+  await wait(150);
+  assert.equal(context.voices.length, 32);
+  context.currentTime = 10.01 + 32 * STEP_SECONDS;
+  context.voices.forEach(voice => voice.end());
+  assert.ok(context.outputs.every(output => output.disconnected));
+});
+test('turning loop on during a one-shot play repeats from the next boundary, armed once', async () => {
+  const { context, player } = setup();
+  await player.play(createSoundSequence());
+  player.setLoopEnabled(true);
+  player.setLoopEnabled(false);
+  player.setLoopEnabled(true);
+  context.currentTime = 10.01 + 32 * STEP_SECONDS - 0.2;
+  await wait(150);
+  assert.equal(context.voices.length, 64);
+  context.currentTime = 10.01 + 64 * STEP_SECONDS - 0.2;
+  await wait(150);
+  assert.equal(context.voices.length, 96);
+  player.stop();
+});
+test('Stop during a loop cancels the pending pass; a restart keeps a single chain', async () => {
+  const { context, player } = setup();
+  player.setLoopEnabled(true);
+  await player.play(createSoundSequence());
+  context.currentTime = 10.01 + 32 * STEP_SECONDS - 0.2;
+  await wait(150);
+  assert.equal(context.voices.length, 64);
+  player.stop();
+  context.currentTime = 20;
+  await wait(150);
+  assert.equal(context.voices.length, 64);
+  await player.play(createSoundSequence());
+  assert.equal(context.voices.length, 96);
+  context.currentTime = 20.01 + 32 * STEP_SECONDS - 0.2;
+  await wait(150);
+  assert.equal(context.voices.length, 128);
+  player.stop();
+});
+test('loop armed during a pending resume still obeys Stop', async () => {
+  const { context, player } = setup();
+  context.state = 'suspended';
+  let resume!: () => void;
+  context.resume = () => new Promise<void>(r => { resume = r; });
+  player.setLoopEnabled(true);
+  const pending = player.play(createSoundSequence());
+  player.stop();
+  context.state = 'running'; resume(); await pending;
+  assert.equal(context.voices.length, 0);
+  context.currentTime = 100;
+  await wait(150);
+  assert.equal(context.voices.length, 0);
+  player.setLoopEnabled(false);
+});

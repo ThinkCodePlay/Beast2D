@@ -7,16 +7,33 @@ const START_LEAD_SECONDS = 0.01;
 const STOP_FADE_SECONDS = 0.008;
 const PREVIEW_SECONDS = 0.1;
 const PREVIEW_INTERVAL_SECONDS = 0.05;
+/** The next loop pass is scheduled this far ahead of the pass boundary. */
+const LOOP_LOOKAHEAD_SECONDS = 0.25;
+/** The pass-boundary timer never sleeps longer than this, so toggles stay responsive. */
+const LOOP_TIMER_CAP_MS = 100;
+
+interface SequenceSnapshot {
+  waveform: WaveformType;
+  stepSeconds: number;
+  passSeconds: number;
+  steps: SoundStep[];
+}
 
 interface Playback {
   output: GainNode;
   voices: Set<AudioScheduledSourceNode>;
+  snapshot?: SequenceSnapshot;
+  /** Audio-clock time the next pass starts at, looping or not. */
+  nextPassStart?: number;
+  /** The single pending pass-boundary check. */
+  loopTimer?: ReturnType<typeof setTimeout>;
 }
 
 /** UI-free one-shot player. Each Play reads a snapshot, never the live editor. */
 export class SoundPlayer {
   private context?: AudioContext;
   private masterVolume = 0.25;
+  private loopEnabled = false;
   private playback?: Playback;
   private sequenceRequested = false;
   private preview?: Playback;
@@ -35,9 +52,11 @@ export class SoundPlayer {
     this.masterVolume = normalizedVolume(sequence.masterVolume);
     const request = this.request;
     this.sequenceRequested = true;
-    const snapshot = {
+    const stepSeconds = STEP_SECONDS / validRate(sequence.rate);
+    const snapshot: SequenceSnapshot = {
       waveform: WAVEFORM_TYPES.includes(sequence.waveform) ? sequence.waveform : 'sine',
-      stepSeconds: STEP_SECONDS / validRate(sequence.rate),
+      stepSeconds,
+      passSeconds: SEQUENCE_STEP_COUNT * stepSeconds,
       steps: sequence.steps.slice(0, SEQUENCE_STEP_COUNT).map(step => ({
         ...step,
         volume: Number.isFinite(step.volume) ? toStepVolume(step.volume) : 0,
@@ -60,23 +79,34 @@ export class SoundPlayer {
     const output = context.createGain();
     output.gain.value = this.masterVolume;
     output.connect(context.destination);
-    const playback: Playback = { output, voices: new Set() };
+    const playback: Playback = { output, voices: new Set(), snapshot };
     this.playback = playback;
     const start = context.currentTime + START_LEAD_SECONDS;
     try {
-      snapshot.steps.forEach((step, index) => {
-        if (!step.enabled || step.volume === 0) return;
-        const voice = scheduleVoice(context, output, step, snapshot.waveform, start + index * snapshot.stepSeconds, snapshot.stepSeconds);
-        playback.voices.add(voice);
-        voice.addEventListener('ended', () => {
-          playback.voices.delete(voice);
-          if (playback.voices.size === 0) this.release(playback);
-        }, { once: true });
-      });
-      if (playback.voices.size === 0) this.release(playback);
+      this.schedulePass(context, playback, start);
+      playback.nextPassStart = start + snapshot.passSeconds;
+      if (this.loopEnabled) this.armLoopTimer(playback, playback.nextPassStart);
+      if (playback.voices.size === 0 && !playback.loopTimer) this.release(playback);
     } catch (error) {
       this.stop();
       throw error;
+    }
+  }
+
+  /**
+   * Live loop latch. Read only at a pass boundary, never mid-pass: turning it
+   * off lets the current pass finish; turning it on repeats from the boundary.
+   */
+  setLoopEnabled(enabled: boolean): void {
+    this.loopEnabled = enabled;
+    const playback = this.playback;
+    if (!playback || playback.nextPassStart === undefined) return;
+    if (enabled) {
+      this.armLoopTimer(playback, playback.nextPassStart);
+    } else if (playback.loopTimer) {
+      clearTimeout(playback.loopTimer);
+      playback.loopTimer = undefined;
+      if (playback.voices.size === 0) this.release(playback);
     }
   }
 
@@ -157,15 +187,6 @@ export class SoundPlayer {
     this.preview = undefined;
   }
 
-  private fade(playback?: Playback): void {
-    const context = this.context;
-    if (!playback || !context) return;
-    const now = context.currentTime;
-    playback.output.gain.cancelAndHoldAtTime(now);
-    playback.output.gain.linearRampToValueAtTime(0, now + STOP_FADE_SECONDS);
-    for (const voice of playback.voices) voice.stop(now + STOP_FADE_SECONDS);
-  }
-
   /** Release the hardware context when the owning board is destroyed. */
   async dispose(): Promise<void> {
     if (this.disposed) return;
@@ -174,7 +195,64 @@ export class SoundPlayer {
     if (this.context && this.context.state !== 'closed') await this.context.close();
   }
 
+  /** Schedule one 32-step pass of the Play snapshot on the audio clock. */
+  private schedulePass(context: AudioContext, playback: Playback, start: number): void {
+    const snapshot = playback.snapshot;
+    if (!snapshot) return;
+    snapshot.steps.forEach((step, index) => {
+      if (!step.enabled || step.volume === 0) return;
+      const voice = scheduleVoice(context, playback.output, step, snapshot.waveform, start + index * snapshot.stepSeconds, snapshot.stepSeconds);
+      playback.voices.add(voice);
+      voice.addEventListener('ended', () => {
+        playback.voices.delete(voice);
+        if (playback.voices.size === 0 && !playback.loopTimer) this.release(playback);
+      }, { once: true });
+    });
+  }
+
+  /** Arm the single pass-boundary check; at the boundary the loop latch decides. */
+  private armLoopTimer(playback: Playback, nextPassStart: number): void {
+    const context = this.context;
+    if (!context || this.disposed || playback.loopTimer) return;
+    playback.nextPassStart = nextPassStart;
+    const waitMs = Math.max(0, (nextPassStart - LOOP_LOOKAHEAD_SECONDS - context.currentTime) * 1000);
+    playback.loopTimer = setTimeout(() => {
+      playback.loopTimer = undefined;
+      if (this.disposed || this.playback !== playback) return;
+      if (context.currentTime < nextPassStart - LOOP_LOOKAHEAD_SECONDS) {
+        this.armLoopTimer(playback, nextPassStart); // Woke early: keep waiting.
+        return;
+      }
+      if (!this.loopEnabled) { // Toggled off mid-pass: finish this pass, then end.
+        if (playback.voices.size === 0) this.release(playback);
+        return;
+      }
+      const passSeconds = playback.snapshot?.passSeconds;
+      if (passSeconds === undefined) return;
+      try {
+        this.schedulePass(context, playback, nextPassStart);
+      } catch {
+        this.stop();
+        return;
+      }
+      this.armLoopTimer(playback, nextPassStart + passSeconds);
+    }, Math.min(waitMs, LOOP_TIMER_CAP_MS));
+  }
+
+  private fade(playback?: Playback): void {
+    const context = this.context;
+    if (!playback || !context) return;
+    clearTimeout(playback.loopTimer);
+    playback.loopTimer = undefined;
+    const now = context.currentTime;
+    playback.output.gain.cancelAndHoldAtTime(now);
+    playback.output.gain.linearRampToValueAtTime(0, now + STOP_FADE_SECONDS);
+    for (const voice of playback.voices) voice.stop(now + STOP_FADE_SECONDS);
+  }
+
   private release(playback: Playback): void {
+    clearTimeout(playback.loopTimer);
+    playback.loopTimer = undefined;
     playback.output.disconnect();
     if (this.playback === playback) {
       this.playback = undefined;
