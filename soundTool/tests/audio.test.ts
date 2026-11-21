@@ -1,4 +1,15 @@
 import { PLAYBACK_RATES, rateFromDial, rateToDial, validRate } from '../src/audio/rate.js';
+import {
+  CUTOFF_MAX_HZ,
+  CUTOFF_MIN_HZ,
+  cutoffFromDial,
+  panFromDial,
+  pitchFromDial,
+  pitchToDial,
+  ringShareFromDial,
+  snapPanDial,
+  validPitch,
+} from '../src/audio/effects.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SoundPlayer } from '../src/audio/SoundPlayer.js';
@@ -17,6 +28,7 @@ class Param {
 class Node extends EventTarget {
   gain = new Param();
   frequency = new Param();
+  pan = new Param();
   type = '';
   buffer: unknown;
   loop = false;
@@ -37,8 +49,12 @@ class Context {
   destination = new Node();
   voices: Node[] = [];
   outputs: Node[] = [];
+  panners: Node[] = [];
+  filters: Node[] = [];
   resume = async (): Promise<void> => { this.state = 'running'; };
   createGain(): Node { const node = new Node(); this.outputs.push(node); return node; }
+  createStereoPanner(): Node { const node = new Node(); this.panners.push(node); return node; }
+  createBiquadFilter(): Node { const node = new Node(); this.filters.push(node); return node; }
   createOscillator(): Node { const node = new Node(); this.voices.push(node); return node; }
   sampleRate = 8000;
   createBufferSource(): Node { const node = new Node(); this.voices.push(node); return node; }
@@ -418,4 +434,94 @@ test('loop armed during a pending resume still obeys Stop', async () => {
   await wait(150);
   assert.equal(context.voices.length, 0);
   player.setLoopEnabled(false);
+});
+
+test('fresh sequence rests every dial at its neutral position', () => {
+  const sequence = createSoundSequence();
+  assert.equal(sequence.pan, 0.5);
+  assert.equal(sequence.decay, 1);
+  assert.equal(sequence.pitch, 0);
+  assert.equal(sequence.cut, 1);
+});
+
+test('dial mappings hit their neutral and extreme points exactly', () => {
+  assert.equal(snapPanDial(0.5), 0.5);
+  assert.equal(panFromDial(0), -1);
+  assert.equal(panFromDial(0.5), 0);
+  assert.equal(panFromDial(1), 1);
+  assert.equal(pitchFromDial(0.5), 0);
+  assert.equal(pitchFromDial(1), 12);
+  assert.equal(pitchFromDial(0), -12);
+  assert.equal(pitchToDial(0), 0.5);
+  assert.equal(pitchToDial(7), pitchToDial(pitchFromDial(pitchToDial(7))));
+  assert.equal(validPitch(NaN), 0);
+  assert.equal(validPitch(99), 12);
+  assert.equal(cutoffFromDial(1), CUTOFF_MAX_HZ);
+  assert.equal(cutoffFromDial(0), CUTOFF_MIN_HZ);
+  assert.equal(ringShareFromDial(1), 1);
+  assert.equal(ringShareFromDial(0.5), 0.53);
+});
+
+test('playback channel runs gain into low-pass filter into panner', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  sequence.pan = 1;
+  await player.play(sequence);
+  assert.equal(context.panners.length, 1);
+  assert.equal(context.filters.length, 1);
+  assert.equal(context.filters[0].type, 'lowpass');
+  assert.equal(context.filters[0].frequency.value, CUTOFF_MAX_HZ);
+  assert.equal(context.panners[0].pan.value, 1);
+});
+
+test('PAN and CUT turn live during playback and previews; alone they create no audio', async () => {
+  const { context, player } = setup();
+  player.setPan(0);
+  player.setCutoff(0);
+  assert.equal(context.panners.length, 0);
+  const sequence = createSoundSequence();
+  sequence.pan = 0;
+  sequence.cut = 0;
+  await player.play(sequence);
+  assert.equal(context.panners[0].pan.value, -1);
+  assert.equal(context.filters[0].frequency.value, CUTOFF_MIN_HZ);
+  player.setPan(1);
+  assert.equal(context.panners[0].pan.points.at(-1)?.[0], 1);
+  player.setCutoff(1);
+  assert.equal(context.filters[0].frequency.points.at(-1)?.[0], CUTOFF_MAX_HZ);
+  context.voices.forEach(voice => voice.end()); // End the pass so a preview can start.
+  sequence.pan = 1;
+  await player.audition(sequence, 0);
+  assert.equal(context.panners[1].pan.value, 1);
+});
+
+test('DECAY shortens the ring without touching step volumes; full decay is unchanged', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  sequence.decay = 0.5;
+  await player.play(sequence);
+  const envelope = context.outputs[1].gain;
+  const ring = STEP_SECONDS * 0.53;
+  assert.ok(envelope.points.some(([value, time]) => value === 0 && Math.abs(time - (10.01 + ring)) < 1e-10));
+  assert.ok(!envelope.points.some(([value, time]) => value === 1 && time > 10.01 + ring));
+});
+
+test('full DECAY keeps the legacy hold-and-release envelope', async () => {
+  const { context, player } = setup();
+  await player.play(createSoundSequence());
+  const envelope = context.outputs[1].gain;
+  assert.ok(envelope.points.some(([value, time]) => value === 1 && Math.abs(time - (10.01 + STEP_SECONDS - 0.003)) < 1e-10));
+});
+
+test('PITCH shifts playback and preview pitch without editing the drawn notes', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  sequence.pitch = 12;
+  await player.play(sequence);
+  assert.equal(context.voices[0].frequency.value, noteFrequency(72));
+  assert.equal(sequence.steps[0].note, 60);
+  context.voices.forEach(voice => voice.end()); // End the pass so a preview can start.
+  sequence.pitch = -12;
+  await player.audition(sequence, 0);
+  assert.equal(context.voices.at(-1)?.frequency.value, noteFrequency(48));
 });

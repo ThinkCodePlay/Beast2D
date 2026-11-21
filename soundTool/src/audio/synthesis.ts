@@ -58,7 +58,18 @@ function noiseBuffer(context: BaseAudioContext): AudioBuffer {
   return buffer;
 }
 
-function createSource(context: BaseAudioContext, waveform: WaveformType, note: number, when: number): AudioScheduledSourceNode {
+/** Per-voice shaping the four dials produce, applied without editing the step. */
+export interface VoiceTuning {
+  /** Share of the duration the note rings before fading out; 1 sustains the whole slot. */
+  decayShare: number;
+  /** Whole-sound semitone shift; the step's drawn note stays as it is. */
+  pitchShift: number;
+}
+
+/** Neutral shaping: full sustain at the drawn pitch. */
+export const NEUTRAL_TUNING: VoiceTuning = { decayShare: 1, pitchShift: 0 };
+
+function createSource(context: BaseAudioContext, waveform: WaveformType, note: number, when: number, pitchShift: number): AudioScheduledSourceNode {
   if (waveform === 'noise') {
     // Noise has no pitch: the step's note is ignored, its volume and timing still apply.
     const source = context.createBufferSource();
@@ -69,7 +80,7 @@ function createSource(context: BaseAudioContext, waveform: WaveformType, note: n
   const oscillator = context.createOscillator();
   if (waveform === 'pulse') oscillator.setPeriodicWave(pulseWave(context));
   else oscillator.type = OSCILLATOR_TYPES[waveform];
-  oscillator.frequency.setValueAtTime(noteFrequency(note), when);
+  oscillator.frequency.setValueAtTime(noteFrequency(note + pitchShift), when);
   return oscillator;
 }
 
@@ -81,15 +92,21 @@ export function scheduleVoice(
   waveform: WaveformType,
   when: number,
   duration = STEP_SECONDS,
+  tuning: VoiceTuning = NEUTRAL_TUNING,
 ): AudioScheduledSourceNode {
-  const source = createSource(context, waveform, step.note, when);
+  const source = createSource(context, waveform, step.note, when, tuning.pitchShift);
   const envelope = context.createGain();
-  const edge = Math.min(EDGE_SECONDS, duration / 4);
+  const share = Number.isFinite(tuning.decayShare) ? Math.max(0, Math.min(1, tuning.decayShare)) : 1;
+  const ring = Math.min(duration, Math.max(duration * share, EDGE_SECONDS * 2));
+  const edge = Math.min(EDGE_SECONDS, ring / 4);
   const volume = (toStepVolume(step.volume) / 7) * WAVEFORM_TRIM[waveform];
   envelope.gain.setValueAtTime(0, when);
   envelope.gain.linearRampToValueAtTime(volume, when + edge);
-  envelope.gain.setValueAtTime(volume, when + duration - edge);
-  envelope.gain.linearRampToValueAtTime(0, when + duration);
+  if (ring >= duration) {
+    // Full sustain: hold the level until the slot's own release edge.
+    envelope.gain.setValueAtTime(volume, when + duration - edge);
+  }
+  envelope.gain.linearRampToValueAtTime(0, when + ring);
   source.connect(envelope).connect(output);
   source.addEventListener('ended', () => {
     source.disconnect();

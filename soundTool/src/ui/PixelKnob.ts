@@ -38,7 +38,7 @@ export class PixelKnob extends Container {
   constructor(label: string, value: number, color: number, private readonly onChange?: (value: number) => void, private readonly snap: (value: number) => number = clampValue) {
     super();
     this.value = clampValue(value);
-    this.addChild(createDialFace(color, label === 'VOL' || label === 'PITCH', label === 'RATE' ? 4 : 6));
+    this.addChild(createDialFace(color, label === 'VOL' || label === 'PITCH', label === 'RATE' || label === 'PAN' ? 4 : 6));
     this.needle = new Graphics();
     this.addChild(this.needle);
     this.addChild(createLabel(label));
