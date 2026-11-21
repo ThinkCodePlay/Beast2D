@@ -6,7 +6,8 @@ import { SoundBoardFooter } from './SoundBoardFooter';
 import { SoundBoardHeader } from './SoundBoardHeader';
 import { SoundBoardTabs, type TabIconTextures } from './SoundBoardTabs';
 import { SoundControlStrip } from './SoundControlStrip';
-import { SoundCreationPanel } from './SoundCreationPanel';
+import { SoundCreationPanel, type TransportActions } from './SoundCreationPanel';
+import type { SoundSequence } from './audio/model';
 
 const DISPLAY_WIDTH = 512;
 const DISPLAY_HEIGHT = 1024 / 3;
@@ -37,7 +38,7 @@ export class SoundBoardFrame extends Container {
   readonly controls: SoundControlStrip;
   readonly footer: SoundBoardFooter;
 
-  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures = {}) {
+  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures, sequence: SoundSequence, transport: TransportActions) {
     super();
     this.scale.set(3);
     const board = new BoardFrameArtwork(DISPLAY_WIDTH, DISPLAY_HEIGHT);
@@ -49,7 +50,7 @@ export class SoundBoardFrame extends Container {
 
     this.content = new Container();
     this.content.position.set(CONTENT_INSET, CONTENT_TOP);
-    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures);
+    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures, sequence, transport);
     // The bank runs full height beside the creation panel and the control strip.
     const bankHeight = CONTROLS_TOP + CONTROLS_HEIGHT - CONTENT_TOP;
     this.bankPanel = new SoundBankPanel(BANK_WIDTH, bankHeight);

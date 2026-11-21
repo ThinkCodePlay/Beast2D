@@ -4,6 +4,12 @@ import { PixelButton } from './ui/PixelButton';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
 import { WaveformButton, WAVEFORM_TYPES } from './WaveformButton';
+import type { SoundSequence } from './audio/model';
+
+export interface TransportActions {
+  play(): void;
+  stop(): void;
+}
 
 const PAD_GRID_LEFT = 8.3;
 const PAD_STEP_X = 160 / 3; // 160 output pixels at the 3× stage scale.
@@ -24,27 +30,29 @@ const KEPT_PRESETS: readonly PresetIcon[] = ['coin', 'star', 'boot', 'bomb', 'bu
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
-  constructor(width: number, height: number, presetTextures: PresetTextures) {
+  constructor(width: number, height: number, presetTextures: PresetTextures, sequence: SoundSequence, transport: TransportActions) {
     super();
     this.addChild(new RaisedPanelFrame(width, height, 0x83609a));
-    this.addChild(createTransport(width));
+    this.addChild(createTransport(width, transport));
     this.addChild(createPresetGrid(presetTextures));
     const waveformTop = PAD_ROW_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
     const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;
-    const waveform = new WaveformDisplay(width - 11, selectorTop - SELECTOR_TOP_GAP - waveformTop);
+    const waveform = new WaveformDisplay(width - 11, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence);
     waveform.position.set(8, waveformTop);
     this.addChild(waveform);
     this.addChild(createWaveformSelector(selectorTop));
   }
 }
 
-function createTransport(panelWidth: number): Container {
+function createTransport(panelWidth: number, actions: TransportActions): Container {
   const row = new Container();
   row.position.y = TRANSPORT_ROW_TOP;
   // Transport buttons match the preset pads exactly: same size, same columns.
   const play = new PixelButton('▶', 'pink', false, PAD_WIDTH, PAD_HEIGHT);
   const stop = new PixelButton('■', 'cream', false, PAD_WIDTH, PAD_HEIGHT);
   const loop = new PixelButton('↻', 'green', false, PAD_WIDTH, PAD_HEIGHT);
+  play.on('pointertap', actions.play);
+  stop.on('pointertap', actions.stop);
   [play, stop, loop].forEach((button, index) => {
     button.position.x = PAD_GRID_LEFT + index * PAD_STEP_X;
   });

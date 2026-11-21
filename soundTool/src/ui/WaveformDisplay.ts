@@ -22,9 +22,9 @@ export class WaveformDisplay extends Container {
   private readonly volumeRow: StepVolumeRow;
   private readonly volumeRowTop: number;
 
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, sequence = createSoundSequence(defaultNotes())) {
     super();
-    this.sequence = createSoundSequence(defaultNotes());
+    this.sequence = sequence;
     const barsBottom = height - BASE_INSET - VOLUME_ROW_HEIGHT - VOLUME_ROW_GAP;
     this.volumeRowTop = height - BASE_INSET - VOLUME_ROW_HEIGHT;
     this.addChild(drawFrame(width, height, barsBottom));

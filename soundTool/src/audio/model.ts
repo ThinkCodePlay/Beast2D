@@ -22,6 +22,7 @@ export interface SoundStep {
 
 export interface SoundSequence {
   steps: SoundStep[];
+  /** Normalized output gain: 0 is muted, 1 is full gain. */
   masterVolume: number;
 }
 
@@ -38,12 +39,12 @@ export function toStepVolume(value: number): StepVolume {
   return Math.max(0, Math.min(7, Math.round(value))) as StepVolume;
 }
 
-/** A fresh sequence: every step enabled at full volume, master at full. */
+/** A fresh sequence: every step enabled at full volume, master at a quiet audition level. */
 export function createSoundSequence(notes?: NoteNumber[]): SoundSequence {
   const steps: SoundStep[] = Array.from({ length: SEQUENCE_STEP_COUNT }, (_, index) => ({
     note: notes?.[index] ?? NOTE_WINDOW_BASE,
     volume: 7,
     enabled: true,
   }));
-  return { steps, masterVolume: 7 };
+  return { steps, masterVolume: 0.25 };
 }

@@ -1,6 +1,9 @@
 import { Assets, Application, Rectangle, type Texture } from 'pixi.js';
 import { PRESET_ICONS, type PresetTextures } from './PresetPad';
 import { SoundBoardFrame } from './SoundBoardFrame';
+import { createSoundSequence } from './audio/model';
+import { SoundPlayer } from './audio/SoundPlayer';
+import { defaultNotes } from './ui/StepPitchGrid';
 
 const DISPLAY_WIDTH = 1536;
 const DISPLAY_HEIGHT = 1024;
@@ -42,5 +45,19 @@ await app.init({
 app.stage.eventMode = 'static';
 app.stage.hitArea = new Rectangle(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
-app.stage.addChild(new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures));
+// The composition root owns the data and player, not either rendering component.
+const sequence = createSoundSequence(defaultNotes());
+const player = new SoundPlayer();
+const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, {
+  play: () => {
+    void player.play(sequence).catch(error => {
+      console.error('Sound playback failed:', error);
+      window.alert('Sound could not start. Tap Play to try again.');
+    });
+  },
+  stop: () => player.stop(),
+});
+board.once('destroyed', () => { void player.dispose(); });
+window.addEventListener('pagehide', () => player.stop());
+app.stage.addChild(board);
 mount.appendChild(app.canvas);
