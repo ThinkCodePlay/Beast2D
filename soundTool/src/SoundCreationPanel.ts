@@ -11,6 +11,8 @@ export interface TransportActions {
   stop(): void;
   audition(index: number): void;
   setMasterVolume(value: number): void;
+  /** Flips the loop latch; returns the new state so the button can show it. */
+  toggleLoop(): boolean;
 }
 
 const PAD_GRID_LEFT = 8.3;
@@ -58,6 +60,7 @@ function createTransport(panelWidth: number, actions: TransportActions): Contain
   const loop = new PixelButton('↻', 'green', false, PAD_WIDTH, PAD_HEIGHT);
   play.on('pointertap', actions.play);
   stop.on('pointertap', actions.stop);
+  loop.on('pointertap', () => loop.setLatched(actions.toggleLoop()));
   [play, stop, loop].forEach((button, index) => {
     button.position.x = PAD_GRID_LEFT + index * PAD_STEP_X;
   });

@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { drawGradientFace } from './GradientFace';
-import { makePressable } from './Pressable';
+import { makePressable, type PressableHandle } from './Pressable';
 
 export type ButtonTone = 'pink' | 'gold' | 'violet' | 'purple' | 'dark' | 'green' | 'cream';
 
@@ -45,6 +45,8 @@ function crescentPoints(cx: number, cy: number, rOut: number, rIn: number, a0: n
  * that matches the preset pads.
  */
 export class PixelButton extends Container {
+  private readonly pressable: PressableHandle;
+
   constructor(icon: string, tone: ButtonTone = 'purple', selected = false, width = BUTTON_SIZE, height = BUTTON_SIZE) {
     super();
     const colors = toneColors[tone];
@@ -54,7 +56,12 @@ export class PixelButton extends Container {
     } else {
       this.addChild(createTextIcon(icon, colors.text, width, height));
     }
-    makePressable(this);
+    this.pressable = makePressable(this);
+  }
+
+  /** Hold or release the pressed look for latched toggles like the loop button. */
+  setLatched(latched: boolean): void {
+    this.pressable.setLatched(latched);
   }
 }
 
