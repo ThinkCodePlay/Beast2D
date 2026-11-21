@@ -36,8 +36,9 @@ class Node extends EventTarget {
   startTime = 0;
   stops: number[] = [];
   disconnected = false;
-  connect(node: Node): Node { return node; }
-  disconnect(): void { this.disconnected = true; }
+  connections: Node[] = [];
+  connect(node: Node): Node { this.connections.push(node); return node; }
+  disconnect(): void { this.disconnected = true; this.connections = []; }
   start(time: number): void { this.startTime = time; }
   stop(time: number): void { this.stops.push(time); }
   setPeriodicWave(wave: unknown): void { this.wave = wave; }
@@ -462,16 +463,36 @@ test('dial mappings hit their neutral and extreme points exactly', () => {
   assert.equal(ringShareFromDial(0.5), 0.53);
 });
 
-test('playback channel runs gain into low-pass filter into panner', async () => {
+test('fully open CUT bypasses the filter; below maximum the chain runs gain into filter into panner', async () => {
   const { context, player } = setup();
   const sequence = createSoundSequence();
   sequence.pan = 1;
   await player.play(sequence);
   assert.equal(context.panners.length, 1);
-  assert.equal(context.filters.length, 1);
-  assert.equal(context.filters[0].type, 'lowpass');
-  assert.equal(context.filters[0].frequency.value, CUTOFF_MAX_HZ);
   assert.equal(context.panners[0].pan.value, 1);
+  assert.equal(context.outputs[0].connections.length, 1);
+  assert.equal(context.outputs[0].connections[0], context.panners[0]);
+  assert.equal(context.filters[0].connections.length, 0);
+  player.stop();
+  sequence.cut = 0.5;
+  const channelIndex = context.outputs.length; // The channel gain is created first.
+  await player.play(sequence);
+  assert.equal(context.filters[1].type, 'lowpass');
+  assert.equal(context.filters[1].frequency.value, cutoffFromDial(0.5));
+  assert.equal(context.outputs[channelIndex].connections[0], context.filters[1]);
+  assert.equal(context.filters[1].connections[0], context.panners[1]);
+});
+
+test('CUT crossing the fully open point rewires the filter live', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  await player.play(sequence);
+  player.setCutoff(0.5);
+  assert.equal(context.outputs[0].connections[0], context.filters[0]);
+  assert.equal(context.filters[0].connections[0], context.panners[0]);
+  player.setCutoff(1);
+  assert.equal(context.outputs[0].connections[0], context.panners[0]);
+  assert.equal(context.filters[0].connections.length, 0);
 });
 
 test('PAN and CUT turn live during playback and previews; alone they create no audio', async () => {
@@ -481,14 +502,14 @@ test('PAN and CUT turn live during playback and previews; alone they create no a
   assert.equal(context.panners.length, 0);
   const sequence = createSoundSequence();
   sequence.pan = 0;
-  sequence.cut = 0;
+  sequence.cut = 0.5;
   await player.play(sequence);
   assert.equal(context.panners[0].pan.value, -1);
-  assert.equal(context.filters[0].frequency.value, CUTOFF_MIN_HZ);
+  assert.equal(context.filters[0].frequency.value, cutoffFromDial(0.5));
   player.setPan(1);
   assert.equal(context.panners[0].pan.points.at(-1)?.[0], 1);
-  player.setCutoff(1);
-  assert.equal(context.filters[0].frequency.points.at(-1)?.[0], CUTOFF_MAX_HZ);
+  player.setCutoff(0.8);
+  assert.equal(context.filters[0].frequency.points.at(-1)?.[0], cutoffFromDial(0.8));
   context.voices.forEach(voice => voice.end()); // End the pass so a preview can start.
   sequence.pan = 1;
   await player.audition(sequence, 0);

@@ -40,7 +40,7 @@ export function validPitch(pitch: number): number {
   return Math.max(-PITCH_RANGE_SEMITONES, Math.min(PITCH_RANGE_SEMITONES, Math.round(pitch)));
 }
 
-/** CUT sweeps the low-pass cutoff logarithmically; fully open keeps the raw sound. */
+/** CUT sweeps the low-pass cutoff logarithmically; the player bypasses the filter at 1. */
 export const CUTOFF_MIN_HZ = 120;
 export const CUTOFF_MAX_HZ = 16000;
 
