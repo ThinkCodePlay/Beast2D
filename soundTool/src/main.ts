@@ -33,8 +33,8 @@ const tabIconTextures = Object.fromEntries(await Promise.all(['gamepad', 'folder
 
 const app = new Application();
 await app.init({
-  // WebGPU where available, WebGL2 everywhere else; '?renderer=webgl' forces the fallback.
-  preference: new URLSearchParams(window.location.search).get('renderer') === 'webgl' ? 'webgl' : 'webgpu',
+  // WebGL is the default: it redraws the selection ring reliably. '?renderer=webgpu' opts in to WebGPU.
+  preference: new URLSearchParams(window.location.search).get('renderer') === 'webgpu' ? 'webgpu' : 'webgl',
   width: DISPLAY_WIDTH,
   height: DISPLAY_HEIGHT,
   backgroundColor: 0x24172f,
