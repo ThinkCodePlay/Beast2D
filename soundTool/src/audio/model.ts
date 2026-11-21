@@ -20,8 +20,14 @@ export interface SoundStep {
   enabled: boolean;
 }
 
+/** The six oscillator choices, in the order of the waveform buttons. */
+export const WAVEFORM_TYPES = ['sine', 'square', 'saw', 'triangle', 'noise', 'pulse'] as const;
+export type WaveformType = typeof WAVEFORM_TYPES[number];
+
 export interface SoundSequence {
   steps: SoundStep[];
+  /** One oscillator shape for all steps. */
+  waveform: WaveformType;
   /** Normalized output gain: 0 is muted, 1 is full gain. */
   masterVolume: number;
 }
@@ -46,5 +52,5 @@ export function createSoundSequence(notes?: NoteNumber[]): SoundSequence {
     volume: 7,
     enabled: true,
   }));
-  return { steps, masterVolume: 0.25 };
+  return { steps, waveform: 'sine', masterVolume: 0.25 };
 }

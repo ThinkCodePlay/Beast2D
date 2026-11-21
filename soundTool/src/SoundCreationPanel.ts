@@ -3,7 +3,7 @@ import { PresetPad, type PresetIcon, type PresetTextures } from './PresetPad';
 import { PixelButton } from './ui/PixelButton';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
-import { WaveformButton, WAVEFORM_TYPES } from './WaveformButton';
+import { WaveformSelector } from './WaveformSelector';
 import type { SoundSequence } from './audio/model';
 
 export interface TransportActions {
@@ -40,7 +40,9 @@ export class SoundCreationPanel extends Container {
     const waveform = new WaveformDisplay(width - 11, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence);
     waveform.position.set(8, waveformTop);
     this.addChild(waveform);
-    this.addChild(createWaveformSelector(selectorTop));
+    const selector = new WaveformSelector(sequence.waveform, PAD_STEP_X, (type) => { sequence.waveform = type; });
+    selector.position.set(PAD_GRID_LEFT, selectorTop);
+    this.addChild(selector);
   }
 }
 
@@ -89,16 +91,4 @@ function createPresetGrid(presetTextures: PresetTextures): Container {
     grid.addChild(pad);
   });
   return grid;
-}
-
-// Waveform choice sits under the display, one button per preset column.
-function createWaveformSelector(top: number): Container {
-  const row = new Container();
-  row.position.set(PAD_GRID_LEFT, top);
-  WAVEFORM_TYPES.forEach((type, index) => {
-    const button = new WaveformButton(type, index === 0);
-    button.position.x = index * PAD_STEP_X;
-    row.addChild(button);
-  });
-  return row;
 }

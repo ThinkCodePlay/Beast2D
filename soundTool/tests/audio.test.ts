@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SoundPlayer } from '../src/audio/SoundPlayer.js';
-import { createSoundSequence } from '../src/audio/model.js';
+import { createSoundSequence, WAVEFORM_TYPES } from '../src/audio/model.js';
 import { normalizedVolume, noteFrequency, STEP_SECONDS } from '../src/audio/synthesis.js';
 
 class Param {
@@ -15,6 +15,9 @@ class Node extends EventTarget {
   gain = new Param();
   frequency = new Param();
   type = '';
+  buffer: unknown;
+  loop = false;
+  wave: unknown;
   startTime = 0;
   stops: number[] = [];
   disconnected = false;
@@ -22,6 +25,7 @@ class Node extends EventTarget {
   disconnect(): void { this.disconnected = true; }
   start(time: number): void { this.startTime = time; }
   stop(time: number): void { this.stops.push(time); }
+  setPeriodicWave(wave: unknown): void { this.wave = wave; }
   end(): void { this.dispatchEvent(new Event('ended')); }
 }
 class Context {
@@ -33,6 +37,13 @@ class Context {
   resume = async (): Promise<void> => { this.state = 'running'; };
   createGain(): Node { const node = new Node(); this.outputs.push(node); return node; }
   createOscillator(): Node { const node = new Node(); this.voices.push(node); return node; }
+  sampleRate = 8000;
+  createBufferSource(): Node { const node = new Node(); this.voices.push(node); return node; }
+  createBuffer(_channels: number, length: number): { length: number; getChannelData(): Float32Array } {
+    const data = new Float32Array(length);
+    return { length, getChannelData: () => data };
+  }
+  createPeriodicWave(real: Float32Array, imag: Float32Array): { real: Float32Array; imag: Float32Array } { return { real, imag }; }
   async close(): Promise<void> { this.state = 'closed'; }
 }
 function setup(context = new Context()): { context: Context; player: SoundPlayer } {
@@ -101,4 +112,40 @@ test('rejected startup can be retried, and dispose is final and idempotent', asy
   const count = context.voices.length;
   await player.play(createSoundSequence());
   assert.equal(context.voices.length, count);
+});
+
+test('each waveform choice builds the right voice for every step', async () => {
+  const oscillatorTypes = { sine: 'sine', square: 'square', saw: 'sawtooth', triangle: 'triangle' } as const;
+  for (const waveform of WAVEFORM_TYPES) {
+    const { context, player } = setup();
+    const sequence = createSoundSequence();
+    sequence.waveform = waveform;
+    await player.play(sequence);
+    assert.equal(context.voices.length, 32, waveform);
+    const voice = context.voices[0];
+    if (waveform === 'noise') {
+      assert.ok(voice.buffer && voice.loop && voice.frequency.points.length === 0);
+    } else if (waveform === 'pulse') {
+      assert.ok(voice.wave);
+    } else {
+      assert.equal(voice.type, oscillatorTypes[waveform]);
+    }
+  }
+});
+test('Play snapshots the waveform; a later change applies on the next Play', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  sequence.waveform = 'square';
+  await player.play(sequence);
+  sequence.waveform = 'triangle';
+  assert.ok(context.voices.every(voice => voice.type === 'square'));
+  await player.play(sequence);
+  assert.equal(context.voices.at(-1)?.type, 'triangle');
+});
+test('an unknown waveform falls back to sine', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  (sequence as { waveform: string }).waveform = 'bogus';
+  await player.play(sequence);
+  assert.equal(context.voices[0].type, 'sine');
 });

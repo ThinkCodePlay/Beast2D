@@ -1,12 +1,12 @@
-import { SEQUENCE_STEP_COUNT, toStepVolume, type SoundSequence } from './model.js';
-import { normalizedVolume, scheduleSine, STEP_SECONDS } from './synthesis.js';
+import { SEQUENCE_STEP_COUNT, toStepVolume, WAVEFORM_TYPES, type SoundSequence } from './model.js';
+import { normalizedVolume, scheduleVoice, STEP_SECONDS } from './synthesis.js';
 
 const START_LEAD_SECONDS = 0.01;
 const STOP_FADE_SECONDS = 0.008;
 
 interface Playback {
   output: GainNode;
-  voices: Set<OscillatorNode>;
+  voices: Set<AudioScheduledSourceNode>;
 }
 
 /** UI-free one-shot player. Each Play reads a snapshot, never the live editor. */
@@ -24,6 +24,7 @@ export class SoundPlayer {
     this.stop();
     const request = this.request;
     const snapshot = {
+      waveform: WAVEFORM_TYPES.includes(sequence.waveform) ? sequence.waveform : 'sine',
       masterVolume: normalizedVolume(sequence.masterVolume),
       steps: sequence.steps.slice(0, SEQUENCE_STEP_COUNT).map(step => ({
         ...step,
@@ -45,7 +46,7 @@ export class SoundPlayer {
     try {
       snapshot.steps.forEach((step, index) => {
         if (!step.enabled || step.volume === 0) return;
-        const voice = scheduleSine(context, output, step, start + index * STEP_SECONDS);
+        const voice = scheduleVoice(context, output, step, snapshot.waveform, start + index * STEP_SECONDS);
         playback.voices.add(voice);
         voice.addEventListener('ended', () => {
           playback.voices.delete(voice);
