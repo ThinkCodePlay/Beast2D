@@ -38,7 +38,8 @@ export class SoundCreationPanel extends Container {
     this.addChild(createPresetGrid(presetTextures));
     const waveformTop = PAD_ROW_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
     const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;
-    const waveform = new WaveformDisplay(width - 11, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence, transport.audition);
+    // Pitch and volume edits both audition the edited step.
+    const waveform = new WaveformDisplay(width - 11, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence, transport.audition, transport.audition);
     waveform.position.set(8, waveformTop);
     this.addChild(waveform);
     const selector = new WaveformSelector(sequence.waveform, PAD_STEP_X, (type) => { sequence.waveform = type; });

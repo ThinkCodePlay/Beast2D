@@ -22,7 +22,13 @@ export class WaveformDisplay extends Container {
   private readonly volumeRow: StepVolumeRow;
   private readonly volumeRowTop: number;
 
-  constructor(width: number, height: number, sequence = createSoundSequence(defaultNotes()), onNoteChange?: (index: number) => void) {
+  constructor(
+    width: number,
+    height: number,
+    sequence = createSoundSequence(defaultNotes()),
+    onNoteChange?: (index: number) => void,
+    onVolumeChange?: (index: number) => void,
+  ) {
     super();
     this.sequence = sequence;
     const barsBottom = height - BASE_INSET - VOLUME_ROW_HEIGHT - VOLUME_ROW_GAP;
@@ -30,7 +36,7 @@ export class WaveformDisplay extends Container {
     this.addChild(drawFrame(width, height, barsBottom));
     this.pitchGrid = new StepPitchGrid(this.sequence, width, barsBottom, onNoteChange);
     this.addChild(this.pitchGrid);
-    this.volumeRow = new StepVolumeRow(this.sequence, width, VOLUME_ROW_HEIGHT);
+    this.volumeRow = new StepVolumeRow(this.sequence, width, VOLUME_ROW_HEIGHT, onVolumeChange);
     this.volumeRow.position.set(0, this.volumeRowTop);
     this.addChild(this.volumeRow);
   }

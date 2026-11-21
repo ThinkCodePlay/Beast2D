@@ -21,7 +21,12 @@ const BASE_INSET = 1;
 export class StepVolumeRow extends Container {
   private readonly bars = new Graphics();
 
-  constructor(private readonly sequence: SoundSequence, width: number, private readonly rowHeight: number) {
+  constructor(
+    private readonly sequence: SoundSequence,
+    width: number,
+    private readonly rowHeight: number,
+    private readonly onVolumeChange?: (index: number) => void,
+  ) {
     super();
     this.hitArea = new Rectangle(0, 0, width, rowHeight);
     this.addChild(this.bars);
@@ -43,6 +48,7 @@ export class StepVolumeRow extends Container {
     if (this.sequence.steps[step].volume === level) return false;
     this.sequence.steps[step].volume = level;
     this.redraw();
+    this.onVolumeChange?.(step);
     return true;
   }
 

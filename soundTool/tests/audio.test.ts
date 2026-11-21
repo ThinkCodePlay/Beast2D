@@ -167,6 +167,23 @@ test('audition uses the edited note, selected waveform and both volume levels fo
   context.voices[0].end();
   assert.ok(context.outputs.every(output => output.disconnected));
 });
+test('a volume edit re-previews at the new level, and zero silences the preview', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  await player.audition(sequence, 0);
+  context.currentTime = 10.1;
+  sequence.steps[0].volume = 2;
+  await player.audition(sequence, 0);
+  assert.equal(context.voices.length, 2);
+  assert.ok(context.outputs.some(output => output.gain.points.some(([value]) => value === 2 / 7)));
+  assert.ok(Math.abs((context.voices[0].stops.at(-1) ?? 0) - 10.108) < 1e-10);
+  context.currentTime = 10.2;
+  sequence.steps[0].volume = 0;
+  await player.audition(sequence, 0);
+  assert.equal(context.voices.length, 2);
+  assert.ok(Math.abs((context.voices[1].stops.at(-1) ?? 0) - 10.208) < 1e-10);
+  player.stop();
+});
 test('audition is bounded during floods and retains the final edit', async () => {
   const { context, player } = setup();
   const sequence = createSoundSequence();
