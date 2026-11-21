@@ -58,7 +58,7 @@ export class KnobMarkings extends Container {
   constructor(label: string, color: number) {
     super();
     const accented = label === 'VOL' || label === 'PITCH';
-    this.addChild(drawTickRing(accented ? color : TICK_CREAM));
+    this.addChild(drawTickRing(accented ? color : TICK_CREAM, label === 'RATE' ? 4 : 6));
     this.addChild(createLabel(label, 22.5, 12));
   }
 }
@@ -97,10 +97,10 @@ export class KnobCap extends Container {
   }
 }
 
-function drawTickRing(color: number): Graphics {
+function drawTickRing(color: number, intervals: number): Graphics {
   const ring = new Graphics();
-  for (let tick = 0; tick <= 6; tick += 1) {
-    const angle = angleForValue(tick / 6, TICK_START_ANGLE);
+  for (let tick = 0; tick <= intervals; tick += 1) {
+    const angle = angleForValue(tick / intervals, TICK_START_ANGLE);
     const outerX = CENTER_X + Math.round(Math.cos(angle) * TICK_RADIUS_X);
     const outerY = CENTER_Y + Math.round(Math.sin(angle) * TICK_RADIUS_Y);
     const innerX = CENTER_X + Math.round(Math.cos(angle) * (TICK_RADIUS_X - TICK_LENGTH));
