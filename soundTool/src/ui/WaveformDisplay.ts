@@ -18,16 +18,31 @@ const VOLUME_ROW_GAP = 3;
 export class WaveformDisplay extends Container {
   /** The sound both rows display and edit. In memory only, nothing persists it. */
   readonly sequence: SoundSequence;
+  private readonly pitchGrid: StepPitchGrid;
+  private readonly volumeRow: StepVolumeRow;
+  private readonly volumeRowTop: number;
 
   constructor(width: number, height: number) {
     super();
     this.sequence = createSoundSequence(defaultNotes());
     const barsBottom = height - BASE_INSET - VOLUME_ROW_HEIGHT - VOLUME_ROW_GAP;
+    this.volumeRowTop = height - BASE_INSET - VOLUME_ROW_HEIGHT;
     this.addChild(drawFrame(width, height, barsBottom));
-    this.addChild(new StepPitchGrid(this.sequence, width, barsBottom));
-    const volumeRow = new StepVolumeRow(this.sequence, width, VOLUME_ROW_HEIGHT);
-    volumeRow.position.set(0, height - BASE_INSET - VOLUME_ROW_HEIGHT);
-    this.addChild(volumeRow);
+    this.pitchGrid = new StepPitchGrid(this.sequence, width, barsBottom);
+    this.addChild(this.pitchGrid);
+    this.volumeRow = new StepVolumeRow(this.sequence, width, VOLUME_ROW_HEIGHT);
+    this.volumeRow.position.set(0, this.volumeRowTop);
+    this.addChild(this.volumeRow);
+  }
+
+  /**
+   * Edit the step under a display-local point, routing to the pitch grid or
+   * the volume row by zone. Returns true when a value changed. Used by the 3D
+   * scene, where the display has no pointer events of its own.
+   */
+  paintAt(x: number, y: number): boolean {
+    if (y >= this.volumeRowTop) return this.volumeRow.paintAt(x, y - this.volumeRowTop);
+    return this.pitchGrid.paintAt(x, y);
   }
 }
 

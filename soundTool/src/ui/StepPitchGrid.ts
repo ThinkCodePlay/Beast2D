@@ -51,15 +51,21 @@ export class StepPitchGrid extends Container {
 
   private paint(event: FederatedPointerEvent): void {
     const point = event.getLocalPosition(this);
-    const step = Math.round((point.x - STEP_LEFT - STEP_WIDTH / 2) / STEP_STEP);
-    if (step < 0 || step >= STEP_COUNT) return;
+    this.paintAt(point.x, point.y);
+  }
+
+  /** Paint the step under a local point. Returns true when a note changed. */
+  paintAt(x: number, y: number): boolean {
+    const step = Math.round((x - STEP_LEFT - STEP_WIDTH / 2) / STEP_STEP);
+    if (step < 0 || step >= STEP_COUNT) return false;
     const usable = this.areaBottom - TOP_INSET;
-    const t = (this.areaBottom - point.y) / usable;
+    const t = (this.areaBottom - y) / usable;
     const offset = Math.max(0, Math.min(NOTE_WINDOW - 1, Math.round(t * (NOTE_WINDOW - 1))));
     const note = NOTE_WINDOW_BASE + offset;
-    if (this.sequence.steps[step].note === note) return;
+    if (this.sequence.steps[step].note === note) return false;
     this.sequence.steps[step].note = note;
     this.redraw();
+    return true;
   }
 
   private redraw(): void {

@@ -31,13 +31,19 @@ export class StepVolumeRow extends Container {
 
   private paint(event: FederatedPointerEvent): void {
     const point = event.getLocalPosition(this);
-    const step = Math.round((point.x - STEP_LEFT - STEP_WIDTH / 2) / STEP_STEP);
-    if (step < 0 || step >= STEP_COUNT) return;
+    this.paintAt(point.x, point.y);
+  }
+
+  /** Paint the step under a local point. Returns true when a volume changed. */
+  paintAt(x: number, y: number): boolean {
+    const step = Math.round((x - STEP_LEFT - STEP_WIDTH / 2) / STEP_STEP);
+    if (step < 0 || step >= STEP_COUNT) return false;
     const band = this.rowHeight / (STEP_VOLUME_MAX + 1);
-    const level = toStepVolume(Math.floor((this.rowHeight - point.y) / band));
-    if (this.sequence.steps[step].volume === level) return;
+    const level = toStepVolume(Math.floor((this.rowHeight - y) / band));
+    if (this.sequence.steps[step].volume === level) return false;
     this.sequence.steps[step].volume = level;
     this.redraw();
+    return true;
   }
 
   private redraw(): void {
