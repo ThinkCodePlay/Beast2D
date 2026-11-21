@@ -1,5 +1,6 @@
 import { SEQUENCE_STEP_COUNT, toStepVolume, WAVEFORM_TYPES, type SoundSequence, type SoundStep, type WaveformType } from './model.js';
-import { normalizedVolume, scheduleVoice, STEP_SECONDS } from './synthesis.js';
+import { normalizedVolume, scheduleVoice, STEP_SECONDS, type VoiceTuning } from './synthesis.js';
+import { cutoffFromDial, panFromDial, ringShareFromDial, validPitch } from './effects.js';
 
 import { validRate } from './rate.js';
 
@@ -17,10 +18,17 @@ interface SequenceSnapshot {
   stepSeconds: number;
   passSeconds: number;
   steps: SoundStep[];
+  /** Per-note fade, read at Play like RATE; dials turned later apply to the next Play. */
+  decayShare: number;
+  /** Whole-sound semitone shift, snapshotted with the rest of the pass. */
+  pitchShift: number;
 }
 
 interface Playback {
+  /** Channel input: gain, then low-pass filter, then stereo panner, out. */
   output: GainNode;
+  filter: BiquadFilterNode;
+  panner: StereoPannerNode;
   voices: Set<AudioScheduledSourceNode>;
   snapshot?: SequenceSnapshot;
   /** Audio-clock time the next pass starts at, looping or not. */
@@ -33,6 +41,8 @@ interface Playback {
 export class SoundPlayer {
   private context?: AudioContext;
   private masterVolume = 0.25;
+  private panDial = 0.5;
+  private cutDial = 1;
   private loopEnabled = false;
   private playback?: Playback;
   private sequenceRequested = false;
@@ -50,6 +60,8 @@ export class SoundPlayer {
     if (this.disposed) return;
     this.stop();
     this.masterVolume = normalizedVolume(sequence.masterVolume);
+    this.panDial = normalizedVolume(sequence.pan);
+    this.cutDial = normalizedVolume(sequence.cut);
     const request = this.request;
     this.sequenceRequested = true;
     const stepSeconds = STEP_SECONDS / validRate(sequence.rate);
@@ -61,6 +73,8 @@ export class SoundPlayer {
         ...step,
         volume: Number.isFinite(step.volume) ? toStepVolume(step.volume) : 0,
       })),
+      decayShare: ringShareFromDial(sequence.decay),
+      pitchShift: validPitch(sequence.pitch),
     };
     const context = this.context ??= this.createContext();
     try {
@@ -76,10 +90,7 @@ export class SoundPlayer {
       throw new Error('Audio could not start. Tap Play to retry.');
     }
 
-    const output = context.createGain();
-    output.gain.value = this.masterVolume;
-    output.connect(context.destination);
-    const playback: Playback = { output, voices: new Set(), snapshot };
+    const playback: Playback = { ...this.createChannel(context), voices: new Set(), snapshot };
     this.playback = playback;
     const start = context.currentTime + START_LEAD_SECONDS;
     try {
@@ -117,7 +128,10 @@ export class SoundPlayer {
     if (!step) return;
     const snapshot = { ...step };
     const waveform = WAVEFORM_TYPES.includes(sequence.waveform) ? sequence.waveform : 'sine';
+    const tuning: VoiceTuning = { decayShare: ringShareFromDial(sequence.decay), pitchShift: validPitch(sequence.pitch) };
     this.masterVolume = normalizedVolume(sequence.masterVolume);
+    this.panDial = normalizedVolume(sequence.pan);
+    this.cutDial = normalizedVolume(sequence.cut);
     const request = ++this.previewRequest;
     clearTimeout(this.previewTimer);
     this.previewTimer = undefined;
@@ -134,24 +148,21 @@ export class SoundPlayer {
     const start = (): void => {
       this.previewTimer = undefined;
       if (this.disposed || this.sequenceRequested || request !== this.previewRequest) return;
-      this.startPreview(context, snapshot, waveform);
+      this.startPreview(context, snapshot, waveform, tuning);
     };
     const delay = this.lastPreviewAt + PREVIEW_INTERVAL_SECONDS - context.currentTime;
     if (delay > 0) this.previewTimer = setTimeout(start, delay * 1000);
     else start();
   }
 
-  private startPreview(context: AudioContext, step: SoundStep, waveform: WaveformType): void {
+  private startPreview(context: AudioContext, step: SoundStep, waveform: WaveformType, tuning: VoiceTuning): void {
     this.fade(this.preview);
     this.preview = undefined;
     this.lastPreviewAt = context.currentTime;
-    const output = context.createGain();
-    output.gain.value = this.masterVolume;
-    output.connect(context.destination);
-    const preview: Playback = { output, voices: new Set() };
+    const preview: Playback = { ...this.createChannel(context), voices: new Set() };
     this.preview = preview;
     try {
-      const voice = scheduleVoice(context, output, step, waveform, context.currentTime, PREVIEW_SECONDS);
+      const voice = scheduleVoice(context, preview.output, step, waveform, context.currentTime, PREVIEW_SECONDS, tuning);
       preview.voices.add(voice);
       voice.addEventListener('ended', () => this.release(preview), { once: true });
     } catch (error) {
@@ -170,6 +181,32 @@ export class SoundPlayer {
       const gain = sound.output.gain;
       gain.cancelAndHoldAtTime(now);
       gain.linearRampToValueAtTime(this.masterVolume, now + STOP_FADE_SECONDS);
+    }
+  }
+
+  /** Live stereo placement, shared by playback and edit previews, without changing steps. */
+  setPan(value: number): void {
+    this.panDial = normalizedVolume(value);
+    if (!this.context) return; // Turning PAN alone must not unlock/create audio.
+    const now = this.context.currentTime;
+    for (const sound of [this.playback, this.preview]) {
+      if (!sound) continue;
+      const pan = sound.panner.pan;
+      pan.cancelAndHoldAtTime(now);
+      pan.linearRampToValueAtTime(panFromDial(this.panDial), now + STOP_FADE_SECONDS);
+    }
+  }
+
+  /** Live filter brightness, shared by playback and edit previews, without changing steps. */
+  setCutoff(value: number): void {
+    this.cutDial = normalizedVolume(value);
+    if (!this.context) return; // Turning CUT alone must not unlock/create audio.
+    const now = this.context.currentTime;
+    for (const sound of [this.playback, this.preview]) {
+      if (!sound) continue;
+      const frequency = sound.filter.frequency;
+      frequency.cancelAndHoldAtTime(now);
+      frequency.linearRampToValueAtTime(cutoffFromDial(this.cutDial), now + STOP_FADE_SECONDS);
     }
   }
 
@@ -201,7 +238,10 @@ export class SoundPlayer {
     if (!snapshot) return;
     snapshot.steps.forEach((step, index) => {
       if (!step.enabled || step.volume === 0) return;
-      const voice = scheduleVoice(context, playback.output, step, snapshot.waveform, start + index * snapshot.stepSeconds, snapshot.stepSeconds);
+      const voice = scheduleVoice(context, playback.output, step, snapshot.waveform, start + index * snapshot.stepSeconds, snapshot.stepSeconds, {
+        decayShare: snapshot.decayShare,
+        pitchShift: snapshot.pitchShift,
+      });
       playback.voices.add(voice);
       voice.addEventListener('ended', () => {
         playback.voices.delete(voice);
@@ -250,10 +290,25 @@ export class SoundPlayer {
     for (const voice of playback.voices) voice.stop(now + STOP_FADE_SECONDS);
   }
 
+  /** Channel shared by playback and previews: gain into low-pass into panner. */
+  private createChannel(context: AudioContext): Pick<Playback, 'output' | 'filter' | 'panner'> {
+    const output = context.createGain();
+    output.gain.value = this.masterVolume;
+    const filter = context.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = cutoffFromDial(this.cutDial);
+    const panner = context.createStereoPanner();
+    panner.pan.value = panFromDial(this.panDial);
+    output.connect(filter).connect(panner).connect(context.destination);
+    return { output, filter, panner };
+  }
+
   private release(playback: Playback): void {
     clearTimeout(playback.loopTimer);
     playback.loopTimer = undefined;
     playback.output.disconnect();
+    playback.filter.disconnect();
+    playback.panner.disconnect();
     if (this.playback === playback) {
       this.playback = undefined;
       this.sequenceRequested = false;

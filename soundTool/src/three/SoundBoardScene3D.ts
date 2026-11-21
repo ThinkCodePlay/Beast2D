@@ -12,6 +12,7 @@ import type { FederatedPointerEvent, PointData, Renderer, Texture } from 'pixi.j
 import type { SoundSequence } from '../audio/model';
 import type { TransportActions } from '../TransportActions';
 import { rateFromDial, rateToDial, snapRateDial } from '../audio/rate';
+import { pitchFromDial, pitchToDial, snapPanDial, snapPitchDial } from '../audio/effects';
 import { valueTowardPoint } from '../ui/knobTurn';
 import { drawSelectionRing, WaveformButton } from '../WaveformButton';
 import { PixelButton, BUTTON_TONES } from '../ui/PixelButton';
@@ -77,12 +78,8 @@ export class SoundBoardScene3D extends Container3D {
         const worldY = ray.origin.y + t * ray.direction.y;
         const startAngle = label === 'RATE' || label === 'VOL' ? Math.PI * 0.75 : NEEDLE_START_ANGLE;
         const value = valueTowardPoint(cx, cy, worldX + BOARD_WIDTH / 2, BOARD_HEIGHT / 2 - worldY, startAngle);
-        rotor.setValue(label === 'RATE' ? snapRateDial(value) : value);
-        if (label === 'RATE') this.sequence.rate = rateFromDial(rotor.getValue());
-        if (label === 'VOL') {
-          this.sequence.masterVolume = rotor.getValue();
-          this.transport.setMasterVolume(rotor.getValue());
-        }
+        rotor.setValue(dialSnap(label)?.(value) ?? value);
+        this.applyDial(label, rotor.getValue());
       };
       rotor.on('pointerdown', (event) => {
         const move = (e: FederatedPointerEvent): void => turnToward(e.global);
@@ -99,6 +96,25 @@ export class SoundBoardScene3D extends Container3D {
         turnToward(event.global);
       });
     });
+  }
+
+  /** Write a rotor's turn into the sequence; live dials also reach the player. */
+  private applyDial(label: string, value: number): void {
+    if (label === 'VOL') {
+      this.sequence.masterVolume = value;
+      this.transport.setMasterVolume(value);
+    }
+    if (label === 'RATE') this.sequence.rate = rateFromDial(value);
+    if (label === 'PAN') {
+      this.sequence.pan = value;
+      this.transport.setPan(value);
+    }
+    if (label === 'DECAY') this.sequence.decay = value;
+    if (label === 'PITCH') this.sequence.pitch = pitchFromDial(value);
+    if (label === 'CUT') {
+      this.sequence.cut = value;
+      this.transport.setCutoff(value);
+    }
   }
 
   private createControls(renderer: Renderer, presetTextures: PresetTextures): Container3D[] {
@@ -164,7 +180,7 @@ export class SoundBoardScene3D extends Container3D {
     });
 
     STRIP_KNOBS.forEach((knob) => {
-      const value = knob.label === 'VOL' ? this.sequence.masterVolume : knob.label === 'RATE' ? rateToDial(this.sequence.rate) : knob.value;
+      const value = dialValue(knob.label, this.sequence);
       const rotor = createKnob(renderer, { ...knob, value });
       this.knobs.push({ rotor, cx: knob.cx, cy: knob.cy, label: knob.label });
       controls.push(rotor);
@@ -212,6 +228,24 @@ export class SoundBoardScene3D extends Container3D {
 
 /** Sweep start of the cap needle artwork: the 3D dial's minimum sits down-right. */
 const NEEDLE_START_ANGLE = Math.PI * 0.25;
+
+/** A rotor's resting position always reflects the sequence it edits. */
+function dialValue(label: string, sequence: SoundSequence): number {
+  if (label === 'VOL') return sequence.masterVolume;
+  if (label === 'RATE') return rateToDial(sequence.rate);
+  if (label === 'PAN') return sequence.pan;
+  if (label === 'DECAY') return sequence.decay;
+  if (label === 'PITCH') return pitchToDial(sequence.pitch);
+  return sequence.cut;
+}
+
+/** Stepped dials snap so their neutral and marked detents are exact. */
+function dialSnap(label: string): ((value: number) => number) | undefined {
+  if (label === 'RATE') return snapRateDial;
+  if (label === 'PAN') return snapPanDial;
+  if (label === 'PITCH') return snapPitchDial;
+  return undefined;
+}
 
 function createCabinet(
   renderer: Renderer,

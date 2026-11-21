@@ -6,10 +6,10 @@ import { drawGradientFace } from './ui/GradientFace';
 export const KNOBS = [
   { label: 'VOL', value: 0.25, color: 0xff91c8 },
   { label: 'RATE', value: 0.5, color: 0xffcf72 },
-  { label: 'PAN', value: 0.63, color: 0xffcf72 },
-  { label: 'DECAY', value: 0.72, color: 0xffcf72 },
-  { label: 'PITCH', value: 0.63, color: 0x9ee18b },
-  { label: 'CUT', value: 0.72, color: 0xffcf72 },
+  { label: 'PAN', value: 0.5, color: 0xffcf72 },
+  { label: 'DECAY', value: 1, color: 0xffcf72 },
+  { label: 'PITCH', value: 0.5, color: 0x9ee18b },
+  { label: 'CUT', value: 1, color: 0xffcf72 },
 ] as const;
 
 // Tiles use the waveform selector's grid: same left edge, pitch and width,

@@ -34,6 +34,14 @@ export interface SoundSequence {
   waveform: WaveformType;
   /** Normalized output gain: 0 is muted, 1 is full gain. */
   masterVolume: number;
+  /** Stereo placement dial: 0 is full left, 0.5 center, 1 full right. */
+  pan: number;
+  /** Note fade dial: 1 rings the whole step, lower values fade out sooner. */
+  decay: number;
+  /** Whole-sound shift in semitones: 0 sounds the drawn notes unchanged. */
+  pitch: number;
+  /** Low-pass filter dial: 1 is fully open, lower values darken the sound. */
+  cut: number;
 }
 
 export const SEQUENCE_STEP_COUNT = 32;
@@ -56,5 +64,6 @@ export function createSoundSequence(notes?: NoteNumber[]): SoundSequence {
     volume: 7,
     enabled: true,
   }));
-  return { steps, waveform: 'sine', masterVolume: 0.25, rate: 1 };
+  // Every dial rests at its neutral position, so a fresh board sounds raw.
+  return { steps, waveform: 'sine', masterVolume: 0.25, rate: 1, pan: 0.5, decay: 1, pitch: 0, cut: 1 };
 }
