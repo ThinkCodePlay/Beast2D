@@ -2,11 +2,14 @@ import { Container, Graphics } from 'pixi.js';
 import { PixelKnob } from './ui/PixelKnob';
 import { drawGradientFace } from './ui/GradientFace';
 
+import type { SoundSequence } from './audio/model';
+import { rateFromDial, rateToDial, snapRateDial } from './audio/rate';
+
 const KNOBS = [
-  { label: 'VOL', value: 0.6, color: 0xff91c8 },
+  { label: 'VOL', value: 0.25, color: 0xff91c8 },
+  { label: 'RATE', value: 0.5, color: 0xffcf72 },
   { label: 'PAN', value: 0.63, color: 0xffcf72 },
   { label: 'DECAY', value: 0.72, color: 0xffcf72 },
-  { label: 'RATE', value: 0.72, color: 0xffcf72 },
   { label: 'PITCH', value: 0.63, color: 0x9ee18b },
   { label: 'CUT', value: 0.72, color: 0xffcf72 },
 ] as const;
@@ -22,13 +25,17 @@ const KNOB_SIZE = 32;
 
 /** Bottom strip with the six 32px dials, as wide as the creation panel above it. */
 export class SoundControlStrip extends Container {
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, sequence: SoundSequence, setMasterVolume: (value: number) => void) {
     super();
     this.addChild(drawStripFrame(width, height));
     KNOBS.forEach((knob, index) => {
       const tileLeft = KNOB_GRID_LEFT + index * KNOB_STEP_X;
       this.addChild(createKnobTile(tileLeft));
-      const control = new PixelKnob(knob.label, knob.value, knob.color);
+      const value = knob.label === 'VOL' ? sequence.masterVolume : knob.label === 'RATE' ? rateToDial(sequence.rate) : knob.value;
+      const control = new PixelKnob(knob.label, value, knob.color, (next) => {
+        if (knob.label === 'VOL') { sequence.masterVolume = next; setMasterVolume(next); }
+        if (knob.label === 'RATE') sequence.rate = rateFromDial(next);
+      }, knob.label === 'RATE' ? snapRateDial : undefined);
       control.position.set(tileLeft + (KNOB_TILE_WIDTH - KNOB_SIZE) / 2, 9);
       this.addChild(control);
     });

@@ -1,6 +1,8 @@
 import { SEQUENCE_STEP_COUNT, toStepVolume, WAVEFORM_TYPES, type SoundSequence, type SoundStep, type WaveformType } from './model.js';
 import { normalizedVolume, scheduleVoice, STEP_SECONDS } from './synthesis.js';
 
+import { validRate } from './rate.js';
+
 const START_LEAD_SECONDS = 0.01;
 const STOP_FADE_SECONDS = 0.008;
 const PREVIEW_SECONDS = 0.1;
@@ -14,6 +16,7 @@ interface Playback {
 /** UI-free one-shot player. Each Play reads a snapshot, never the live editor. */
 export class SoundPlayer {
   private context?: AudioContext;
+  private masterVolume = 0.25;
   private playback?: Playback;
   private sequenceRequested = false;
   private preview?: Playback;
@@ -29,11 +32,12 @@ export class SoundPlayer {
   async play(sequence: SoundSequence): Promise<void> {
     if (this.disposed) return;
     this.stop();
+    this.masterVolume = normalizedVolume(sequence.masterVolume);
     const request = this.request;
     this.sequenceRequested = true;
     const snapshot = {
       waveform: WAVEFORM_TYPES.includes(sequence.waveform) ? sequence.waveform : 'sine',
-      masterVolume: normalizedVolume(sequence.masterVolume),
+      stepSeconds: STEP_SECONDS / validRate(sequence.rate),
       steps: sequence.steps.slice(0, SEQUENCE_STEP_COUNT).map(step => ({
         ...step,
         volume: Number.isFinite(step.volume) ? toStepVolume(step.volume) : 0,
@@ -54,7 +58,7 @@ export class SoundPlayer {
     }
 
     const output = context.createGain();
-    output.gain.value = snapshot.masterVolume;
+    output.gain.value = this.masterVolume;
     output.connect(context.destination);
     const playback: Playback = { output, voices: new Set() };
     this.playback = playback;
@@ -62,7 +66,7 @@ export class SoundPlayer {
     try {
       snapshot.steps.forEach((step, index) => {
         if (!step.enabled || step.volume === 0) return;
-        const voice = scheduleVoice(context, output, step, snapshot.waveform, start + index * STEP_SECONDS);
+        const voice = scheduleVoice(context, output, step, snapshot.waveform, start + index * snapshot.stepSeconds, snapshot.stepSeconds);
         playback.voices.add(voice);
         voice.addEventListener('ended', () => {
           playback.voices.delete(voice);
@@ -83,7 +87,7 @@ export class SoundPlayer {
     if (!step) return;
     const snapshot = { ...step };
     const waveform = WAVEFORM_TYPES.includes(sequence.waveform) ? sequence.waveform : 'sine';
-    const volume = normalizedVolume(sequence.masterVolume);
+    this.masterVolume = normalizedVolume(sequence.masterVolume);
     const request = ++this.previewRequest;
     clearTimeout(this.previewTimer);
     this.previewTimer = undefined;
@@ -92,7 +96,7 @@ export class SoundPlayer {
     if (context.state !== 'running') await context.resume();
     if (this.disposed || this.sequenceRequested || request !== this.previewRequest) return;
     if (context.state !== 'running') return;
-    if (!snapshot.enabled || !Number.isFinite(snapshot.volume) || snapshot.volume <= 0 || volume === 0) {
+    if (!snapshot.enabled || !Number.isFinite(snapshot.volume) || snapshot.volume <= 0 || this.masterVolume === 0) {
       this.fade(this.preview);
       this.preview = undefined;
       return;
@@ -100,19 +104,19 @@ export class SoundPlayer {
     const start = (): void => {
       this.previewTimer = undefined;
       if (this.disposed || this.sequenceRequested || request !== this.previewRequest) return;
-      this.startPreview(context, snapshot, waveform, volume);
+      this.startPreview(context, snapshot, waveform);
     };
     const delay = this.lastPreviewAt + PREVIEW_INTERVAL_SECONDS - context.currentTime;
     if (delay > 0) this.previewTimer = setTimeout(start, delay * 1000);
     else start();
   }
 
-  private startPreview(context: AudioContext, step: SoundStep, waveform: WaveformType, volume: number): void {
+  private startPreview(context: AudioContext, step: SoundStep, waveform: WaveformType): void {
     this.fade(this.preview);
     this.preview = undefined;
     this.lastPreviewAt = context.currentTime;
     const output = context.createGain();
-    output.gain.value = volume;
+    output.gain.value = this.masterVolume;
     output.connect(context.destination);
     const preview: Playback = { output, voices: new Set() };
     this.preview = preview;
@@ -123,6 +127,19 @@ export class SoundPlayer {
     } catch (error) {
       this.release(preview);
       throw error;
+    }
+  }
+
+  /** Live master gain, shared by playback and edit previews, without changing steps. */
+  setMasterVolume(value: number): void {
+    this.masterVolume = normalizedVolume(value);
+    if (!this.context) return; // Turning VOL alone must not unlock/create audio.
+    const now = this.context.currentTime;
+    for (const sound of [this.playback, this.preview]) {
+      if (!sound) continue;
+      const gain = sound.output.gain;
+      gain.cancelAndHoldAtTime(now);
+      gain.linearRampToValueAtTime(this.masterVolume, now + STOP_FADE_SECONDS);
     }
   }
 
@@ -144,8 +161,7 @@ export class SoundPlayer {
     const context = this.context;
     if (!playback || !context) return;
     const now = context.currentTime;
-    playback.output.gain.cancelScheduledValues(now);
-    playback.output.gain.setValueAtTime(playback.output.gain.value, now);
+    playback.output.gain.cancelAndHoldAtTime(now);
     playback.output.gain.linearRampToValueAtTime(0, now + STOP_FADE_SECONDS);
     for (const voice of playback.voices) voice.stop(now + STOP_FADE_SECONDS);
   }

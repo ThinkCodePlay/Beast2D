@@ -35,7 +35,7 @@ export class PixelKnob extends Container {
   private value: number;
   private readonly needle: Graphics;
 
-  constructor(label: string, value: number, color: number) {
+  constructor(label: string, value: number, color: number, private readonly onChange?: (value: number) => void, private readonly snap: (value: number) => number = clampValue) {
     super();
     this.value = clampValue(value);
     this.addChild(createDialFace(color, label === 'VOL' || label === 'PITCH'));
@@ -56,10 +56,11 @@ export class PixelKnob extends Container {
 
   /** Point the needle at a 0..1 value. */
   setValue(value: number): void {
-    const next = clampValue(value);
+    const next = this.snap(clampValue(value));
     if (next === this.value) return;
     this.value = next;
     this.drawNeedle();
+    this.onChange?.(next);
   }
 
   private drawNeedle(): void {

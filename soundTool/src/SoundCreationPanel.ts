@@ -10,6 +10,7 @@ export interface TransportActions {
   play(): void;
   stop(): void;
   audition(index: number): void;
+  setMasterVolume(value: number): void;
 }
 
 const PAD_GRID_LEFT = 8.3;

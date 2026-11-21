@@ -57,7 +57,7 @@ export class SoundBoardFrame extends Container {
     this.bankPanel.position.x = BANK_LEFT - CONTENT_INSET;
     this.content.addChild(this.creationPanel, this.bankPanel);
 
-    this.controls = new SoundControlStrip(CREATION_WIDTH, CONTROLS_HEIGHT);
+    this.controls = new SoundControlStrip(CREATION_WIDTH, CONTROLS_HEIGHT, sequence, transport.setMasterVolume);
     this.controls.position.set(CONTROLS_INSET, CONTROLS_TOP);
     this.footer = new SoundBoardFooter(DISPLAY_WIDTH - FOOTER_INSET * 2);
     this.footer.position.set(FOOTER_INSET, FOOTER_TOP);
