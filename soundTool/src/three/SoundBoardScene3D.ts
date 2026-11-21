@@ -12,7 +12,7 @@ import type { FederatedPointerEvent, PointData, Renderer, Texture } from 'pixi.j
 import type { SoundSequence } from '../audio/model';
 import type { TransportActions } from '../TransportActions';
 import { valueTowardPoint } from '../ui/knobTurn';
-import { WaveformButton } from '../WaveformButton';
+import { drawSelectionRing, WaveformButton } from '../WaveformButton';
 import { PixelButton, BUTTON_TONES } from '../ui/PixelButton';
 import { KnobCap } from '../ui/PixelKnob';
 import { PresetPad, type PresetTextures } from '../PresetPad';
@@ -119,23 +119,21 @@ export class SoundBoardScene3D extends Container3D {
     });
 
     const waveformButtons = WAVEFORM_BUTTONS.map(({ type, ...rect }) => {
-      const face = new WaveformButton(type, type === this.sequence.waveform);
       const button = new Button3D({
-        face,
+        face: new WaveformButton(type),
+        ring: drawSelectionRing(rect.width, rect.height),
         ...rect,
-        facePadding: 3, // The selected button's selection ring spills 3px past its face.
+        facePadding: 3, // The selection ring spills 3px past the face.
         bodyColor: 0x7a53a8,
         renderer,
       });
+      button.setSelected(type === this.sequence.waveform);
       button.on('pointertap', () => {
         this.sequence.waveform = type;
-        waveformButtons.forEach((other) => {
-          other.face.setSelected(other.face.type === type);
-          other.button.refreshFace();
-        });
+        waveformButtons.forEach(other => other.button.setSelected(other.type === type));
       });
       controls.push(place(button, rect));
-      return { face, button };
+      return { type, button };
     });
 
     controls.push(place(new Button3D({
