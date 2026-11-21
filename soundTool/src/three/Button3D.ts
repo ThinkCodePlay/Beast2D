@@ -13,8 +13,8 @@ export interface Button3DOptions {
   bodyColor: number;
   /** Transparent margin captured around the face artwork (e.g. a selection ring). */
   facePadding?: number;
-  /** Optional selection ring artwork, drawn once behind the face and shown with setSelected. */
-  ring?: Container;
+  /** Redraw the face every frame, for artwork that changes (e.g. a selection ring). */
+  liveFace?: boolean;
   renderer: Renderer;
 }
 
@@ -25,11 +25,9 @@ const MIN_PRESS_SINK = 2;
  * Pressing it (mouse, touch or pen) sinks it into the board until release.
  */
 export class Button3D extends Container3D {
-  private ringPlane?: Mesh3D;
-
   constructor(options: Button3DOptions) {
     super();
-    const { face, width, height, depth = 8, bodyColor, facePadding = 0, ring, renderer } = options;
+    const { face, width, height, depth = 8, bodyColor, facePadding = 0, liveFace = false, renderer } = options;
     const body = new Mesh3D({
       geometry: new CubeGeometry({ width, height, depth }),
       material: new Material3D({ baseColor: bodyColor, roughness: 0.6 }),
@@ -43,6 +41,7 @@ export class Button3D extends Container3D {
       transform: new Matrix().translate(facePadding, facePadding),
       resolution: 4,
       renderer,
+      autoUpdate: liveFace,
     });
     const facePlane = new Mesh3D({
       geometry: new PlaneGeometry(faceSize),
@@ -53,7 +52,6 @@ export class Button3D extends Container3D {
     facePlane.position.z = depth + 0.2;
 
     this.addChild(body, facePlane);
-    if (ring) this.addChild(this.createRingPlane(ring, faceSize, facePadding, depth, renderer));
 
     // Pressed state: the whole button sinks toward the board while held.
     const sink = Math.max(MIN_PRESS_SINK, depth * 0.5);
@@ -76,30 +74,5 @@ export class Button3D extends Container3D {
     this.on('pointerup', () => setPressed(false));
     this.on('pointerupoutside', () => setPressed(false));
     this.on('pointercancel', () => setPressed(false));
-  }
-
-  /** Show or hide the selection ring. */
-  setSelected(selected: boolean): void {
-    if (this.ringPlane) this.ringPlane.visible = selected;
-  }
-
-  private createRingPlane(ring: Container, size: { width: number; height: number }, padding: number, depth: number, renderer: Renderer): Mesh3D {
-    const texture = new ContainerTexture({
-      container: ring,
-      ...size,
-      transform: new Matrix().translate(padding, padding),
-      resolution: 4,
-      renderer,
-    });
-    const plane = new Mesh3D({
-      geometry: new PlaneGeometry(size),
-      material: new FlatMaterial({ baseColorTexture: texture, alphaMode: 'blend' }),
-      castShadow: false,
-      receiveShadow: false,
-    });
-    plane.position.z = depth + 0.1; // Just under the face, so only the ring's spill shows.
-    plane.visible = false;
-    this.ringPlane = plane;
-    return plane;
   }
 }
