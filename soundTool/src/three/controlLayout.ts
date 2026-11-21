@@ -35,7 +35,7 @@ import {
   KNOB_TOP,
   KNOBS,
 } from '../SoundControlStrip';
-import { WAVEFORM_TYPES, type WaveformType } from '../WaveformButton';
+import { WAVEFORM_TYPES, type WaveformType } from '../audio/model';
 import { SCROLL_BUTTON_SIZE, SCROLL_INSET, SCROLL_TRACK_TOP } from '../SoundBankPanel';
 
 /** A control's face rectangle in board-design coordinates (top-left origin). */

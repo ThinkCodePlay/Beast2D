@@ -2,6 +2,7 @@ import { Container, type Texture } from 'pixi.js';
 import { BoardFrame as BoardFrameArtwork } from './BoardFrame';
 import type { ControlMode } from './controls';
 import type { PresetTextures } from './PresetPad';
+import type { SoundSequence } from './audio/model';
 import { SoundBankPanel } from './SoundBankPanel';
 import { SoundBoardFooter } from './SoundBoardFooter';
 import { SoundBoardHeader } from './SoundBoardHeader';
@@ -41,7 +42,7 @@ export class SoundBoardFrame extends Container {
   readonly controls: SoundControlStrip;
   readonly footer: SoundBoardFooter;
 
-  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures = {}, controls: ControlMode = '2d') {
+  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures, sequence: SoundSequence, controls: ControlMode = '2d') {
     super();
     if (controls === '2d') this.scale.set(3);
     const board = new BoardFrameArtwork(BOARD_WIDTH, BOARD_HEIGHT);
@@ -53,7 +54,7 @@ export class SoundBoardFrame extends Container {
 
     this.content = new Container();
     this.content.position.set(CONTENT_INSET, CONTENT_TOP);
-    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures, controls);
+    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures, sequence, controls);
     // The bank runs full height beside the creation panel and the control strip.
     const bankHeight = CONTROLS_TOP + CONTROLS_HEIGHT - CONTENT_TOP;
     this.bankPanel = new SoundBankPanel(BANK_WIDTH, bankHeight, controls);

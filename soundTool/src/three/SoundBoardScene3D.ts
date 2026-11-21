@@ -9,6 +9,8 @@ import {
   View3D,
 } from '@pixi/3d';
 import type { FederatedPointerEvent, PointData, Renderer, Texture } from 'pixi.js';
+import type { SoundSequence } from '../audio/model';
+import type { TransportActions } from '../TransportActions';
 import { valueTowardPoint } from '../ui/knobTurn';
 import { WaveformButton } from '../WaveformButton';
 import { PixelButton, BUTTON_TONES } from '../ui/PixelButton';
@@ -49,9 +51,11 @@ export class SoundBoardScene3D extends Container3D {
     presetTextures: PresetTextures,
     mascotTexture: Texture,
     tabIconTextures: TabIconTextures,
+    private readonly sequence: SoundSequence,
+    private readonly transport: TransportActions,
   ) {
     super();
-    this.addChild(createCabinet(renderer, presetTextures, mascotTexture, tabIconTextures));
+    this.addChild(createCabinet(renderer, presetTextures, mascotTexture, tabIconTextures, sequence));
     this.addChild(...this.createControls(renderer, presetTextures));
     this.addChild(createKeyLight());
   }
@@ -93,12 +97,15 @@ export class SoundBoardScene3D extends Container3D {
     const controls: Container3D[] = [];
 
     TRANSPORT_BUTTONS.forEach(({ icon, tone, ...rect }) => {
-      controls.push(place(new Button3D({
+      const button = new Button3D({
         face: new PixelButton(icon, tone, false, rect.width, rect.height),
         ...rect,
         bodyColor: BUTTON_TONES[tone].bottom,
         renderer,
-      }), rect));
+      });
+      if (icon === '▶') button.on('pointertap', this.transport.play);
+      if (icon === '■') button.on('pointertap', this.transport.stop);
+      controls.push(place(button, rect));
     });
 
     PRESET_PADS.forEach(({ icon, selected, ...rect }) => {
@@ -111,14 +118,24 @@ export class SoundBoardScene3D extends Container3D {
       }), rect));
     });
 
-    WAVEFORM_BUTTONS.forEach(({ type, selected, ...rect }) => {
-      controls.push(place(new Button3D({
-        face: new WaveformButton(type, selected),
+    const waveformButtons = WAVEFORM_BUTTONS.map(({ type, ...rect }) => {
+      const face = new WaveformButton(type, type === this.sequence.waveform);
+      const button = new Button3D({
+        face,
         ...rect,
         facePadding: 3, // The selected button's selection ring spills 3px past its face.
         bodyColor: 0x7a53a8,
         renderer,
-      }), rect));
+      });
+      button.on('pointertap', () => {
+        this.sequence.waveform = type;
+        waveformButtons.forEach((other) => {
+          other.face.setSelected(other.face.type === type);
+          other.button.refreshFace();
+        });
+      });
+      controls.push(place(button, rect));
+      return { face, button };
     });
 
     controls.push(place(new Button3D({
@@ -145,7 +162,7 @@ export class SoundBoardScene3D extends Container3D {
       controls.push(rotor);
     });
 
-    this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer), WAVEFORM_DISPLAY);
+    this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer, this.sequence), WAVEFORM_DISPLAY);
     controls.push(this.waveform);
 
     return controls;
@@ -192,6 +209,7 @@ function createCabinet(
   presetTextures: PresetTextures,
   mascotTexture: Texture,
   tabIconTextures: TabIconTextures,
+  sequence: SoundSequence,
 ): Container3D {
   const cabinet = new Container3D();
 
@@ -203,7 +221,7 @@ function createCabinet(
 
   // Every flat surface of the board - frame art, header, tabs, panels,
   // waveform, bank rows, footer and dial markings - drawn onto the front.
-  const flatBoard = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, '3d');
+  const flatBoard = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, '3d');
   const faceTexture = new ContainerTexture({
     container: flatBoard,
     width: BOARD_WIDTH,

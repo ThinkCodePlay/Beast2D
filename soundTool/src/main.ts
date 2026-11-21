@@ -1,7 +1,10 @@
 import { Assets, Application, type Texture } from 'pixi.js';
 import { Camera3D, View3D } from '@pixi/3d';
 import { PRESET_ICONS, type PresetTextures } from './PresetPad';
+import { createSoundSequence } from './audio/model';
+import { SoundPlayer } from './audio/SoundPlayer';
 import { SoundBoardScene3D } from './three/SoundBoardScene3D';
+import { defaultNotes } from './ui/StepPitchGrid';
 
 const DISPLAY_WIDTH = 1536;
 const DISPLAY_HEIGHT = 1024;
@@ -54,7 +57,20 @@ const view3d = new View3D({
 // The view stays hit-testable across the whole canvas so dial drags keep
 // tracking wherever the pointer goes (see bindPointer in SoundBoardScene3D).
 view3d.eventMode = 'static';
-const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures);
+// The composition root owns the data and player, not either rendering component.
+const sequence = createSoundSequence(defaultNotes());
+const player = new SoundPlayer();
+const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures, sequence, {
+  play: () => {
+    void player.play(sequence).catch(error => {
+      console.error('Sound playback failed:', error);
+      window.alert('Sound could not start. Tap Play to try again.');
+    });
+  },
+  stop: () => player.stop(),
+});
+scene.once('destroyed', () => { void player.dispose(); });
+window.addEventListener('pagehide', () => player.stop());
 scene.bindPointer(view3d);
 view3d.root.addChild(scene);
 app.stage.addChild(view3d);

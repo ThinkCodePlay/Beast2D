@@ -1,9 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
 import { chamferPoints, drawGradientFace } from './ui/GradientFace';
+import type { WaveformType } from './audio/model';
 import { makePressable } from './ui/Pressable';
-
-export const WAVEFORM_TYPES = ['sine', 'square', 'saw', 'triangle', 'noise', 'pulse'] as const;
-export type WaveformType = typeof WAVEFORM_TYPES[number];
 
 export const WAVEFORM_BUTTON_WIDTH = 45;
 export const WAVEFORM_BUTTON_HEIGHT = 30;
@@ -13,18 +11,31 @@ const ICON_HEIGHT = 16;
 
 /** Purple waveform-choice button with a gold trace of its oscillator shape. */
 export class WaveformButton extends Container {
-  constructor(type: WaveformType, selected = false, width = WAVEFORM_BUTTON_WIDTH, height = WAVEFORM_BUTTON_HEIGHT) {
+  private face: Graphics;
+
+  constructor(
+    readonly type: WaveformType,
+    selected = false,
+    private readonly buttonWidth = WAVEFORM_BUTTON_WIDTH,
+    private readonly buttonHeight = WAVEFORM_BUTTON_HEIGHT,
+  ) {
     super();
-    this.addChild(drawButtonFace(selected, width, height));
+    this.face = drawButtonFace(selected, buttonWidth, buttonHeight);
+    this.addChild(this.face);
     const icon = drawWaveformIcon(type);
-    icon.position.set((width - ICON_WIDTH) / 2, (height - ICON_HEIGHT) / 2);
+    icon.position.set((buttonWidth - ICON_WIDTH) / 2, (buttonHeight - ICON_HEIGHT) / 2);
     this.addChild(icon);
     makePressable(this);
   }
+
+  /** Show or hide the pink selection ring. */
+  setSelected(selected: boolean): void {
+    this.face.clear();
+    drawButtonFace(selected, this.buttonWidth, this.buttonHeight, this.face);
+  }
 }
 
-function drawButtonFace(selected: boolean, width: number, height: number): Graphics {
-  const face = new Graphics();
+function drawButtonFace(selected: boolean, width: number, height: number, face = new Graphics()): Graphics {
   if (selected) {
     // Same pink selection perimeter as the preset pads.
     face

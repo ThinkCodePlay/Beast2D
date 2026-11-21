@@ -23,6 +23,8 @@ const MIN_PRESS_SINK = 2;
  * Pressing it (mouse, touch or pen) sinks it into the board until release.
  */
 export class Button3D extends Container3D {
+  private readonly faceTexture: ContainerTexture;
+
   constructor(options: Button3DOptions) {
     super();
     const { face, width, height, depth = 8, bodyColor, facePadding = 0, renderer } = options;
@@ -33,7 +35,7 @@ export class Button3D extends Container3D {
     body.position.z = depth / 2;
 
     const faceSize = { width: width + facePadding * 2, height: height + facePadding * 2 };
-    const faceTexture = new ContainerTexture({
+    this.faceTexture = new ContainerTexture({
       container: face,
       ...faceSize,
       transform: new Matrix().translate(facePadding, facePadding),
@@ -42,7 +44,7 @@ export class Button3D extends Container3D {
     });
     const facePlane = new Mesh3D({
       geometry: new PlaneGeometry(faceSize),
-      material: new FlatMaterial({ baseColorTexture: faceTexture, alphaMode: 'blend' }),
+      material: new FlatMaterial({ baseColorTexture: this.faceTexture, alphaMode: 'blend' }),
       castShadow: false,
       receiveShadow: false,
     });
@@ -71,5 +73,10 @@ export class Button3D extends Container3D {
     this.on('pointerup', () => setPressed(false));
     this.on('pointerupoutside', () => setPressed(false));
     this.on('pointercancel', () => setPressed(false));
+  }
+
+  /** Redraw the face artwork after it changed, e.g. a selection ring. */
+  refreshFace(): void {
+    this.faceTexture.render();
   }
 }

@@ -4,7 +4,8 @@ import { PAD_HEIGHT, PAD_WIDTH, PresetPad, type PresetIcon, type PresetTextures 
 import { PixelButton } from './ui/PixelButton';
 import { RaisedPanelFrame } from './ui/RaisedPanelFrame';
 import { WaveformDisplay } from './ui/WaveformDisplay';
-import { WaveformButton, WAVEFORM_TYPES } from './WaveformButton';
+import { WaveformSelector } from './WaveformSelector';
+import type { SoundSequence } from './audio/model';
 
 export const PAD_STEP_X = 160 / 3; // 160 output pixels at the 3× stage scale.
 export const PAD_GRID_LEFT = 8.3;
@@ -26,7 +27,7 @@ export const KEPT_PRESETS: readonly PresetIcon[] = ['coin', 'star', 'boot', 'bom
 
 /** Sound editor panel. The shared knobs and edit control live in its own strip. */
 export class SoundCreationPanel extends Container {
-  constructor(width: number, height: number, presetTextures: PresetTextures, controls: ControlMode = '2d') {
+  constructor(width: number, height: number, presetTextures: PresetTextures, sequence: SoundSequence, controls: ControlMode = '2d') {
     super();
     this.addChild(new RaisedPanelFrame(width, height, 0x83609a));
     this.addChild(createTransport(width, controls));
@@ -37,11 +38,15 @@ export class SoundCreationPanel extends Container {
     // three/WaveformDisplay3D.ts and WAVEFORM_DISPLAY in three/controlLayout.ts).
     if (controls === '2d') {
       const waveformTop = PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
-      const waveform = new WaveformDisplay(width - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET, selectorTop - SELECTOR_TOP_GAP - waveformTop);
+      const waveform = new WaveformDisplay(width - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence);
       waveform.position.set(WAVEFORM_LEFT_INSET, waveformTop);
       this.addChild(waveform);
     }
-    if (controls === '2d') this.addChild(createWaveformSelector(selectorTop));
+    if (controls === '2d') {
+      const selector = new WaveformSelector(sequence.waveform, PAD_STEP_X, (type) => { sequence.waveform = type; });
+      selector.position.set(PAD_GRID_LEFT, selectorTop);
+      this.addChild(selector);
+    }
   }
 }
 
@@ -91,16 +96,4 @@ function createPresetGrid(presetTextures: PresetTextures): Container {
     grid.addChild(pad);
   });
   return grid;
-}
-
-// Waveform choice sits under the display, one button per preset column.
-function createWaveformSelector(top: number): Container {
-  const row = new Container();
-  row.position.set(PAD_GRID_LEFT, top);
-  WAVEFORM_TYPES.forEach((type, index) => {
-    const button = new WaveformButton(type, index === 0);
-    button.position.x = index * PAD_STEP_X;
-    row.addChild(button);
-  });
-  return row;
 }

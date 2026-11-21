@@ -1,5 +1,6 @@
 import { Container3D, ContainerTexture, CubeGeometry, FlatMaterial, Material3D, Mesh3D, PlaneGeometry } from '@pixi/3d';
 import type { Renderer } from 'pixi.js';
+import type { SoundSequence } from '../audio/model';
 import { WaveformDisplay } from '../ui/WaveformDisplay';
 import type { ControlRect } from './controlLayout';
 
@@ -17,9 +18,9 @@ export class WaveformDisplay3D extends Container3D {
   /** The shared editable display, kept for drag painting. */
   readonly display: WaveformDisplay;
 
-  constructor(rect: ControlRect, renderer: Renderer) {
+  constructor(rect: ControlRect, renderer: Renderer, sequence: SoundSequence) {
     super();
-    this.display = new WaveformDisplay(rect.width, rect.height);
+    this.display = new WaveformDisplay(rect.width, rect.height, sequence);
 
     const body = new Mesh3D({
       geometry: new CubeGeometry({ width: rect.width, height: rect.height, depth: BODY_DEPTH }),
