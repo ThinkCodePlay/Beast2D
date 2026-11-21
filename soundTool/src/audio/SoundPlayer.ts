@@ -1,8 +1,10 @@
-import { SEQUENCE_STEP_COUNT, toStepVolume, WAVEFORM_TYPES, type SoundSequence } from './model.js';
+import { SEQUENCE_STEP_COUNT, toStepVolume, WAVEFORM_TYPES, type SoundSequence, type SoundStep, type WaveformType } from './model.js';
 import { normalizedVolume, scheduleVoice, STEP_SECONDS } from './synthesis.js';
 
 const START_LEAD_SECONDS = 0.01;
 const STOP_FADE_SECONDS = 0.008;
+const PREVIEW_SECONDS = 0.1;
+const PREVIEW_INTERVAL_SECONDS = 0.05;
 
 interface Playback {
   output: GainNode;
@@ -13,6 +15,11 @@ interface Playback {
 export class SoundPlayer {
   private context?: AudioContext;
   private playback?: Playback;
+  private sequenceRequested = false;
+  private preview?: Playback;
+  private previewTimer?: ReturnType<typeof setTimeout>;
+  private previewRequest = 0;
+  private lastPreviewAt = -Infinity;
   private request = 0;
   private disposed = false;
 
@@ -23,6 +30,7 @@ export class SoundPlayer {
     if (this.disposed) return;
     this.stop();
     const request = this.request;
+    this.sequenceRequested = true;
     const snapshot = {
       waveform: WAVEFORM_TYPES.includes(sequence.waveform) ? sequence.waveform : 'sine',
       masterVolume: normalizedVolume(sequence.masterVolume),
@@ -32,10 +40,18 @@ export class SoundPlayer {
       })),
     };
     const context = this.context ??= this.createContext();
-    if (context.state !== 'running') await context.resume();
+    try {
+      if (context.state !== 'running') await context.resume();
+    } catch (error) {
+      if (request === this.request) this.sequenceRequested = false;
+      throw error;
+    }
     // Stop or a newer Play may have arrived while permission was pending.
     if (this.disposed || request !== this.request) return;
-    if (context.state !== 'running') throw new Error('Audio could not start. Tap Play to retry.');
+    if (context.state !== 'running') {
+      this.sequenceRequested = false;
+      throw new Error('Audio could not start. Tap Play to retry.');
+    }
 
     const output = context.createGain();
     output.gain.value = snapshot.masterVolume;
@@ -60,13 +76,73 @@ export class SoundPlayer {
     }
   }
 
+  /** Short, monophonic edit preview. Sequence playback always takes priority. */
+  async audition(sequence: SoundSequence, index: number): Promise<void> {
+    if (this.disposed || this.sequenceRequested) return;
+    const step = sequence.steps[index];
+    if (!step) return;
+    const snapshot = { ...step };
+    const waveform = WAVEFORM_TYPES.includes(sequence.waveform) ? sequence.waveform : 'sine';
+    const volume = normalizedVolume(sequence.masterVolume);
+    const request = ++this.previewRequest;
+    clearTimeout(this.previewTimer);
+    this.previewTimer = undefined;
+    // Create/resume inside the pointer gesture, not inside the trailing timer.
+    const context = this.context ??= this.createContext();
+    if (context.state !== 'running') await context.resume();
+    if (this.disposed || this.sequenceRequested || request !== this.previewRequest) return;
+    if (context.state !== 'running') return;
+    if (!snapshot.enabled || !Number.isFinite(snapshot.volume) || snapshot.volume <= 0 || volume === 0) {
+      this.fade(this.preview);
+      this.preview = undefined;
+      return;
+    }
+    const start = (): void => {
+      this.previewTimer = undefined;
+      if (this.disposed || this.sequenceRequested || request !== this.previewRequest) return;
+      this.startPreview(context, snapshot, waveform, volume);
+    };
+    const delay = this.lastPreviewAt + PREVIEW_INTERVAL_SECONDS - context.currentTime;
+    if (delay > 0) this.previewTimer = setTimeout(start, delay * 1000);
+    else start();
+  }
+
+  private startPreview(context: AudioContext, step: SoundStep, waveform: WaveformType, volume: number): void {
+    this.fade(this.preview);
+    this.preview = undefined;
+    this.lastPreviewAt = context.currentTime;
+    const output = context.createGain();
+    output.gain.value = volume;
+    output.connect(context.destination);
+    const preview: Playback = { output, voices: new Set() };
+    this.preview = preview;
+    try {
+      const voice = scheduleVoice(context, output, step, waveform, context.currentTime, PREVIEW_SECONDS);
+      preview.voices.add(voice);
+      voice.addEventListener('ended', () => this.release(preview), { once: true });
+    } catch (error) {
+      this.release(preview);
+      throw error;
+    }
+  }
+
   /** Fade active sound and cancel even voices whose scheduled start is later. */
   stop(): void {
     this.request++;
-    const playback = this.playback;
+    this.sequenceRequested = false;
+    this.previewRequest++;
+    clearTimeout(this.previewTimer);
+    this.previewTimer = undefined;
+    this.lastPreviewAt = -Infinity;
+    this.fade(this.playback);
+    this.fade(this.preview);
+    this.playback = undefined;
+    this.preview = undefined;
+  }
+
+  private fade(playback?: Playback): void {
     const context = this.context;
     if (!playback || !context) return;
-    this.playback = undefined;
     const now = context.currentTime;
     playback.output.gain.cancelScheduledValues(now);
     playback.output.gain.setValueAtTime(playback.output.gain.value, now);
@@ -84,6 +160,10 @@ export class SoundPlayer {
 
   private release(playback: Playback): void {
     playback.output.disconnect();
-    if (this.playback === playback) this.playback = undefined;
+    if (this.playback === playback) {
+      this.playback = undefined;
+      this.sequenceRequested = false;
+    }
+    if (this.preview === playback) this.preview = undefined;
   }
 }

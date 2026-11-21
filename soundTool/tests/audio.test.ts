@@ -149,3 +149,96 @@ test('an unknown waveform falls back to sine', async () => {
   await player.play(sequence);
   assert.equal(context.voices[0].type, 'sine');
 });
+
+test('audition uses the edited note, selected waveform and both volume levels for 100 ms', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  sequence.waveform = 'triangle';
+  sequence.masterVolume = 0.4;
+  sequence.steps[3].note = 81;
+  sequence.steps[3].volume = 3;
+  await player.audition(sequence, 3);
+  assert.equal(context.voices.length, 1);
+  assert.equal(context.voices[0].frequency.value, 880);
+  assert.equal(context.voices[0].type, 'triangle');
+  assert.equal(context.voices[0].stops[0], 10.1);
+  assert.equal(context.outputs[0].gain.value, 0.4);
+  assert.ok(context.outputs[1].gain.points.some(([value]) => value === 3 / 7));
+  context.voices[0].end();
+  assert.ok(context.outputs.every(output => output.disconnected));
+});
+test('audition is bounded during floods and retains the final edit', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  await player.audition(sequence, 0);
+  for (let i = 0; i < 200; i++) {
+    sequence.steps[0].note = 60 + i % 24;
+    await player.audition(sequence, 0);
+  }
+  assert.equal(context.voices.length, 1);
+  await new Promise(resolve => setTimeout(resolve, 70));
+  assert.equal(context.voices.length, 2);
+  assert.equal(context.voices[1].frequency.value, noteFrequency(sequence.steps[0].note));
+  assert.equal(context.voices[0].stops.at(-1), 10.008);
+  player.stop();
+});
+test('muted/disabled steps and master mute cancel previews without making a voice', async () => {
+  for (const mute of ['step', 'enabled', 'master']) {
+    const { context, player } = setup();
+    const sequence = createSoundSequence();
+    await player.audition(sequence, 0);
+    if (mute === 'step') sequence.steps[0].volume = 0;
+    if (mute === 'enabled') sequence.steps[0].enabled = false;
+    if (mute === 'master') sequence.masterVolume = 0;
+    await player.audition(sequence, 0);
+    assert.equal(context.voices.length, 1);
+    assert.equal(context.voices[0].stops.at(-1), 10.008);
+    player.stop();
+  }
+});
+test('Stop and Play cancel trailing previews, and editing cannot interrupt a sequence snapshot', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  await player.audition(sequence, 0);
+  await player.audition(sequence, 1);
+  player.stop();
+  await new Promise(resolve => setTimeout(resolve, 70));
+  assert.equal(context.voices.length, 1);
+  await player.audition(sequence, 2);
+  await player.audition(sequence, 3);
+  await player.play(sequence);
+  const count = context.voices.length;
+  sequence.steps[0].note = 81;
+  await player.audition(sequence, 0);
+  await new Promise(resolve => setTimeout(resolve, 70));
+  assert.equal(context.voices.length, count);
+  assert.equal(context.voices[2].frequency.value, noteFrequency(60));
+  player.stop();
+});
+test('pending resume obeys Stop, newer edits, pending Play and disposal', async () => {
+  const { context, player } = setup();
+  const sequence = createSoundSequence();
+  context.state = 'suspended';
+  const resolves: (() => void)[] = [];
+  context.resume = () => new Promise<void>(resolve => resolves.push(resolve));
+  const first = player.audition(sequence, 0);
+  sequence.steps[1].note = 81;
+  const second = player.audition(sequence, 1);
+  context.state = 'running'; resolves.forEach(resolve => resolve());
+  await Promise.all([first, second]);
+  assert.equal(context.voices.length, 1);
+  assert.equal(context.voices[0].frequency.value, 880);
+  player.stop();
+  context.state = 'suspended';
+  const play = player.play(sequence);
+  await player.audition(sequence, 0);
+  assert.equal(resolves.length, 3);
+  player.stop();
+  context.state = 'running'; resolves[2](); await play;
+  assert.equal(context.voices.length, 1);
+  context.state = 'suspended';
+  const preview = player.audition(sequence, 0);
+  await player.dispose();
+  resolves[3](); await preview;
+  assert.equal(context.voices.length, 1);
+});

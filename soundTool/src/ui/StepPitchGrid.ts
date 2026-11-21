@@ -41,6 +41,7 @@ export class StepPitchGrid extends Container {
     private readonly sequence: SoundSequence,
     width: number,
     private readonly areaBottom: number,
+    private readonly onNoteChange?: (index: number) => void,
   ) {
     super();
     this.hitArea = new Rectangle(0, TOP_INSET, width, areaBottom - TOP_INSET);
@@ -65,6 +66,7 @@ export class StepPitchGrid extends Container {
     if (this.sequence.steps[step].note === note) return false;
     this.sequence.steps[step].note = note;
     this.redraw();
+    this.onNoteChange?.(step);
     return true;
   }
 

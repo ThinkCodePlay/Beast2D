@@ -160,7 +160,7 @@ export class SoundBoardScene3D extends Container3D {
       controls.push(rotor);
     });
 
-    this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer, this.sequence), WAVEFORM_DISPLAY);
+    this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer, this.sequence, this.transport.audition), WAVEFORM_DISPLAY);
     controls.push(this.waveform);
 
     return controls;

@@ -18,9 +18,9 @@ export class WaveformDisplay3D extends Container3D {
   /** The shared editable display, kept for drag painting. */
   readonly display: WaveformDisplay;
 
-  constructor(rect: ControlRect, renderer: Renderer, sequence: SoundSequence) {
+  constructor(rect: ControlRect, renderer: Renderer, sequence: SoundSequence, onNoteChange?: (index: number) => void) {
     super();
-    this.display = new WaveformDisplay(rect.width, rect.height, sequence);
+    this.display = new WaveformDisplay(rect.width, rect.height, sequence, onNoteChange);
 
     const body = new Mesh3D({
       geometry: new CubeGeometry({ width: rect.width, height: rect.height, depth: BODY_DEPTH }),
