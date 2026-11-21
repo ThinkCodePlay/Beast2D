@@ -38,7 +38,7 @@ export class PixelKnob extends Container {
   constructor(label: string, value: number, color: number, private readonly onChange?: (value: number) => void, private readonly snap: (value: number) => number = clampValue) {
     super();
     this.value = clampValue(value);
-    this.addChild(createDialFace(color, label === 'VOL' || label === 'PITCH'));
+    this.addChild(createDialFace(color, label === 'VOL' || label === 'PITCH', label === 'RATE' ? 4 : 6));
     this.needle = new Graphics();
     this.addChild(this.needle);
     this.addChild(createLabel(label));
@@ -69,9 +69,9 @@ export class PixelKnob extends Container {
   }
 }
 
-function createDialFace(color: number, accented: boolean): Graphics {
+function createDialFace(color: number, accented: boolean, intervals: number): Graphics {
   const face = new Graphics();
-  drawTickRing(face, accented ? color : TICK_CREAM);
+  drawTickRing(face, accented ? color : TICK_CREAM, intervals);
   drawPixelDisk(face, CENTER_X + 2, CENTER_Y + 3, 14, 0x140b20, 1.08, 0.95);
   drawPixelDisk(face, CENTER_X, CENTER_Y, 14, 0x321b47, 1.08, 0.95);
   drawPixelDisk(face, CENTER_X, CENTER_Y, 12, 0x604077, 1.08, 0.95);
@@ -80,9 +80,9 @@ function createDialFace(color: number, accented: boolean): Graphics {
   return face;
 }
 
-function drawTickRing(face: Graphics, color: number): void {
-  for (let tick = 0; tick <= 6; tick += 1) {
-    const angle = angleForValue(tick / 6, NEEDLE_START_ANGLE);
+function drawTickRing(face: Graphics, color: number, intervals: number): void {
+  for (let tick = 0; tick <= intervals; tick += 1) {
+    const angle = angleForValue(tick / intervals, NEEDLE_START_ANGLE);
     const outerX = CENTER_X + Math.round(Math.cos(angle) * TICK_RADIUS_X);
     const outerY = CENTER_Y + Math.round(Math.sin(angle) * TICK_RADIUS_Y);
     const innerX = CENTER_X + Math.round(Math.cos(angle) * (TICK_RADIUS_X - TICK_LENGTH));
