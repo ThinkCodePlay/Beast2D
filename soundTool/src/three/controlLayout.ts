@@ -6,6 +6,7 @@ import {
   CONTENT_TOP,
   CONTROLS_INSET,
   CONTROLS_TOP,
+  CREATION_WIDTH,
   HEADER_INSET,
   HEADER_TOP,
 } from '../SoundBoardFrame';
@@ -17,9 +18,13 @@ import {
   PAD_GRID_TOP,
   PAD_STEP_X,
   SELECTOR_HEIGHT,
+  SELECTOR_TOP_GAP,
   TRANSPORT_LEFT,
   TRANSPORT_TOP,
   WAVEFORM_BOTTOM_INSET,
+  WAVEFORM_LEFT_INSET,
+  WAVEFORM_RIGHT_INSET,
+  WAVEFORM_TOP_GAP,
 } from '../SoundCreationPanel';
 import { PAD_WIDTH, PAD_HEIGHT, type PresetIcon } from '../PresetPad';
 import { KNOB_CENTER } from '../ui/PixelKnob';
@@ -80,6 +85,17 @@ export const WAVEFORM_BUTTONS: (ControlRect & { type: WaveformType; selected: bo
     width: 45,
     height: SELECTOR_HEIGHT,
   }));
+
+/** The creation panel's waveform display, at its exact 2D position. In 3D the
+ * scene draws it here as a live editable mesh instead of flat panel artwork. */
+export const WAVEFORM_DISPLAY: ControlRect = {
+  x: CONTENT_INSET + WAVEFORM_LEFT_INSET,
+  y: CONTENT_TOP + PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP,
+  width: CREATION_WIDTH - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET,
+  height:
+    CONTENT_HEIGHT - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT - SELECTOR_TOP_GAP
+    - PAD_GRID_TOP - PAD_HEIGHT - WAVEFORM_TOP_GAP,
+};
 
 /** Centers and values of the six strip dials, aligned to the selector columns. */
 export const STRIP_KNOBS = KNOBS.map((knob, index) => {

@@ -1,38 +1,52 @@
 import { Container, Graphics } from 'pixi.js';
+import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from './stepGrid';
+import { StepPitchGrid, defaultNotes } from './StepPitchGrid';
+import { StepVolumeRow } from './StepVolumeRow';
+import { createSoundSequence, type SoundSequence } from '../audio/model';
 
-const BAR_COUNT = 32;
 const SECTION_COUNT = 8;
-const BARS_PER_SECTION = BAR_COUNT / SECTION_COUNT;
-const BAR_WIDTH = 8;
-const BAR_STEP = 9.5;
-const BAR_LEFT = 4;
+const STEPS_PER_SECTION = STEP_COUNT / SECTION_COUNT;
 const BASE_INSET = 2.7;
-const BAR_TOP_INSET = 8;
-const GOLD = 0xffd251;
-const ORANGE = 0xf3864d;
-// Reference pickup envelope: tall opening peak, uneven decay, short orange tail.
-const REFERENCE_HEIGHTS = [
-  48, 52, 45, 40, 34, 37, 39, 35, 32, 34, 29, 26, 25,
-  28, 25, 22, 19, 16, 13, 16, 13, 12, 14, 11, 9, 7,
-];
-// Stretch the reference envelope to the step count, keeping its shape.
-const BAR_HEIGHTS = Array.from({ length: BAR_COUNT }, (_, index) => {
-  const position = index * (REFERENCE_HEIGHTS.length - 1) / (BAR_COUNT - 1);
-  const lower = Math.floor(position);
-  const upper = Math.min(lower + 1, REFERENCE_HEIGHTS.length - 1);
-  return REFERENCE_HEIGHTS[lower] + (REFERENCE_HEIGHTS[upper] - REFERENCE_HEIGHTS[lower]) * (position - lower);
-});
+const VOLUME_ROW_HEIGHT = 16;
+const VOLUME_ROW_GAP = 3;
 
-/** Waveform window with grid lines and a decaying gold-to-orange bar profile. */
+/**
+ * Waveform window: the editable pitch steps on top, an editable blue per-step
+ * volume row below, both aligned to the same 32-step grid and both editing
+ * the shared sound sequence.
+ */
 export class WaveformDisplay extends Container {
+  /** The sound both rows display and edit. In memory only, nothing persists it. */
+  readonly sequence: SoundSequence;
+  private readonly pitchGrid: StepPitchGrid;
+  private readonly volumeRow: StepVolumeRow;
+  private readonly volumeRowTop: number;
+
   constructor(width: number, height: number) {
     super();
-    this.addChild(drawFrame(width, height));
-    this.addChild(drawBars(height));
+    this.sequence = createSoundSequence(defaultNotes());
+    const barsBottom = height - BASE_INSET - VOLUME_ROW_HEIGHT - VOLUME_ROW_GAP;
+    this.volumeRowTop = height - BASE_INSET - VOLUME_ROW_HEIGHT;
+    this.addChild(drawFrame(width, height, barsBottom));
+    this.pitchGrid = new StepPitchGrid(this.sequence, width, barsBottom);
+    this.addChild(this.pitchGrid);
+    this.volumeRow = new StepVolumeRow(this.sequence, width, VOLUME_ROW_HEIGHT);
+    this.volumeRow.position.set(0, this.volumeRowTop);
+    this.addChild(this.volumeRow);
+  }
+
+  /**
+   * Edit the step under a display-local point, routing to the pitch grid or
+   * the volume row by zone. Returns true when a value changed. Used by the 3D
+   * scene, where the display has no pointer events of its own.
+   */
+  paintAt(x: number, y: number): boolean {
+    if (y >= this.volumeRowTop) return this.volumeRow.paintAt(x, y - this.volumeRowTop);
+    return this.pitchGrid.paintAt(x, y);
   }
 }
 
-function drawFrame(width: number, height: number): Graphics {
+function drawFrame(width: number, height: number, barsBottom: number): Graphics {
   const frame = new Graphics()
     .roundRect(0, 0, width, height, 2).fill(0x21132b)
     .roundRect(1, 1, width - 2, height - 2, 2).fill(0x3f2651);
@@ -41,39 +55,16 @@ function drawFrame(width: number, height: number): Graphics {
   }
   frame
     .roundRect(1, 1, width - 2, 3, 2).fill({ color: 0x59366e, alpha: 0.8 })
-    .rect(1, height - 2, width - 2, 1).fill(0x39214c);
+    .rect(1, height - 2, width - 2, 1).fill(0x39214c)
+    // Separator between the pitch bars and the volume row.
+    .rect(3, Math.round(barsBottom + VOLUME_ROW_GAP / 2), width - 6, 1)
+    .fill({ color: 0x76508c, alpha: 0.6 });
   return frame;
 }
 
-/** Dividers between the eight sections, each section holding four bars. */
+/** Dividers between the eight sections, each section holding four steps. */
 function sectionDividerPositions(): number[] {
-  const halfGap = (BAR_STEP - BAR_WIDTH) / 2;
+  const halfGap = (STEP_STEP - STEP_WIDTH) / 2;
   return Array.from({ length: SECTION_COUNT - 1 }, (_, index) =>
-    Math.round(BAR_LEFT + (index + 1) * BARS_PER_SECTION * BAR_STEP - halfGap));
-}
-
-function drawBars(height: number): Graphics {
-  // Scale the reference envelope so its peak fills the window at any height.
-  const scale = (height - BAR_TOP_INSET) / Math.max(...BAR_HEIGHTS);
-  const bars = new Graphics();
-  for (let index = 0; index < BAR_COUNT; index += 1) {
-    const x = BAR_LEFT + index * BAR_STEP;
-    const barHeight = Math.min(BAR_HEIGHTS[index] * scale, height - BAR_TOP_INSET);
-    const t = index / (BAR_COUNT - 1);
-    const body = lerpColor(GOLD, ORANGE, t * 0.45);
-    const base = lerpColor(GOLD, ORANGE, 0.4 + t * 0.6);
-    const baseHeight = Math.max(2, Math.round(barHeight * 0.18));
-    const top = height - BASE_INSET - barHeight;
-    bars.rect(x, top, BAR_WIDTH, barHeight).fill(body);
-    bars.rect(x, height - BASE_INSET - baseHeight, BAR_WIDTH, baseHeight).fill(base);
-    bars.rect(x, top, BAR_WIDTH, 1).fill(lerpColor(body, 0xffffff, 0.35));
-  }
-  return bars;
-}
-
-function lerpColor(from: number, to: number, t: number): number {
-  const r = Math.round((from >> 16 & 255) + ((to >> 16 & 255) - (from >> 16 & 255)) * t);
-  const g = Math.round((from >> 8 & 255) + ((to >> 8 & 255) - (from >> 8 & 255)) * t);
-  const b = Math.round((from & 255) + ((to & 255) - (from & 255)) * t);
-  return r << 16 | g << 8 | b;
+    Math.round(STEP_LEFT + (index + 1) * STEPS_PER_SECTION * STEP_STEP - halfGap));
 }

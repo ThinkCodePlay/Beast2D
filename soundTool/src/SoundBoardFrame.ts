@@ -24,7 +24,7 @@ export const CONTROLS_TOP = 260; // 4px below the creation panel, so the dial ro
 const CONTROLS_HEIGHT = 157 / 3;
 const FOOTER_TOP = 315;
 export const BANK_LEFT = 346; // Absolute design x so the bank stays put next to the 330-wide creation panel.
-const CREATION_WIDTH = 330;
+export const CREATION_WIDTH = 330;
 const BANK_WIDTH = 159;
 
 /**

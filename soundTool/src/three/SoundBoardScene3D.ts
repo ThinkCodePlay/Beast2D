@@ -28,8 +28,10 @@ import {
   STRIP_KNOBS,
   TRANSPORT_BUTTONS,
   WAVEFORM_BUTTONS,
+  WAVEFORM_DISPLAY,
   type ControlRect,
 } from './controlLayout';
+import { WAVEFORM_FACE_Z, WaveformDisplay3D } from './WaveformDisplay3D';
 
 const FACE_RESOLUTION = 3; // Captures the 512-wide design at the canvas's 1536 pixels.
 
@@ -40,6 +42,7 @@ const FACE_RESOLUTION = 3; // Captures the 512-wide design at the canvas's 1536 
  */
 export class SoundBoardScene3D extends Container3D {
   private readonly knobs: { rotor: Knob3D; cx: number; cy: number }[] = [];
+  private waveform?: WaveformDisplay3D;
 
   constructor(
     renderer: Renderer,
@@ -56,8 +59,10 @@ export class SoundBoardScene3D extends Container3D {
   /**
    * Dial drags: a pressed rotor follows the pointer around its center until
    * release, tracked on the view so the drag survives leaving the dial.
+   * Waveform drags paint steps the same way, routed through the display.
    */
   bindPointer(view: View3D): void {
+    this.bindWaveformPaint(view);
     this.knobs.forEach(({ rotor, cx, cy }) => {
       const turnToward = (global: PointData): void => {
         const ray = view.screenToRay(global);
@@ -140,7 +145,42 @@ export class SoundBoardScene3D extends Container3D {
       controls.push(rotor);
     });
 
+    this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer), WAVEFORM_DISPLAY);
+    controls.push(this.waveform);
+
     return controls;
+  }
+
+  /**
+   * Waveform painting: a press on the display paints steps as the pointer
+   * moves, tracked on the view so the drag survives leaving the display. The
+   * pointer ray meets the display's face plane, then converts to display-local
+   * pixels for the shared paintAt.
+   */
+  private bindWaveformPaint(view: View3D): void {
+    const waveform = this.waveform;
+    if (!waveform) return;
+    const paintAt = (global: PointData): void => {
+      const ray = view.screenToRay(global);
+      const t = (WAVEFORM_FACE_Z - ray.origin.z) / ray.direction.z;
+      const x = ray.origin.x + t * ray.direction.x + BOARD_WIDTH / 2 - WAVEFORM_DISPLAY.x;
+      const y = BOARD_HEIGHT / 2 - (ray.origin.y + t * ray.direction.y) - WAVEFORM_DISPLAY.y;
+      waveform.display.paintAt(x, y);
+    };
+    waveform.on('pointerdown', (event) => {
+      const move = (e: FederatedPointerEvent): void => paintAt(e.global);
+      const end = (): void => {
+        view.off('pointermove', move);
+        view.off('pointerup', end);
+        view.off('pointerupoutside', end);
+        view.off('pointercancel', end);
+      };
+      view.on('pointermove', move);
+      view.on('pointerup', end);
+      view.on('pointerupoutside', end);
+      view.on('pointercancel', end);
+      paintAt(event.global);
+    });
   }
 }
 
