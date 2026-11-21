@@ -160,7 +160,8 @@ export class SoundBoardScene3D extends Container3D {
       controls.push(rotor);
     });
 
-    this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer, this.sequence, this.transport.audition), WAVEFORM_DISPLAY);
+    // Pitch and volume edits both audition the edited step.
+    this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer, this.sequence, this.transport.audition, this.transport.audition), WAVEFORM_DISPLAY);
     controls.push(this.waveform);
 
     return controls;
