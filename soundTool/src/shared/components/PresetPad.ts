@@ -1,6 +1,6 @@
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
-import { chamferPoints, drawGradientFace } from './ui/GradientFace';
-import { makePressable } from './ui/Pressable';
+import { chamferPoints, drawGradientFace } from '../ui/GradientFace';
+import { makePressable } from '../ui/Pressable';
 
 export const PRESET_ICONS = [
   'coin', 'star', 'heart', 'gem', 'potion', 'chest',
@@ -10,8 +10,8 @@ export const PRESET_ICONS = [
 export type PresetIcon = typeof PRESET_ICONS[number];
 export type PresetTextures = Record<PresetIcon, Texture>;
 
-const PAD_WIDTH = 45;
-const PAD_HEIGHT = 36;
+export const PAD_WIDTH = 45;
+export const PAD_HEIGHT = 36;
 const ICON_SIZE = 30;
 
 /** Pixel-art preset tile with a stepped rim, crisp highlights, and a sprite face. */

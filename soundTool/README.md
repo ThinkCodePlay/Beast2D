@@ -1,28 +1,45 @@
 # Beast2D Sound Tool
 
-A standalone PixiJS 8 + TypeScript + Vite sound-board interface. The canvas is fixed at 1536 × 1024, with the pixel-art controls composed on a 512 × 341⅓ design grid and rendered at 3× scale.
+Standalone sound-design board for Beast2D games, in two renderings of one
+shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
 
-## Structure
+## Layout
 
-- `src/main.ts` initializes PixiJS at the fixed canvas size and mounts the board.
-- `SoundBoardFrame` places the cabinet frame, header, navigation tabs, editor and bank panels, shared control strip, and keyboard-help footer.
-- `SoundCreationPanel` contains transport controls, the named sound, preset pads, the waveform display, and the waveform selector row.
-- `SoundBankPanel` contains the twelve sound slots and scroll controls; it runs the full height beside the creation panel and control strip.
-- `SoundControlStrip` contains the six parameter knobs.
-- `src/ui/` contains reusable pixel buttons, knobs, panel framing, and waveform drawing.
-- The local `public/ui/monogram.ttf` pixel font is loaded before the board is drawn; its CC0 license is included alongside it.
+- `index.html` + `src/2d/main.ts`: the 2D board. `3d.html` + `src/3d/main.ts`:
+  the same board as a 3D scene (cabinet, buttons and dials as meshes).
+- `src/shared/`: everything both renderings agree on, edited once:
+  - `audio/`: the sound model and playback engine, deliberately free of Pixi
+    (`model.ts` is plain data, `SoundPlayer.ts` is UI-free) so export and
+    engine integration can reuse it as-is.
+  - `dials.ts`: what each of the six dials means - resting value, snap, and
+    how a turn writes into the sequence (VOL/PAN/CUT live, RATE/DECAY/PITCH on
+    the next Play).
+  - `components/`: the board's panels and controls. Components take a
+    `controls` mode: `'2d'` draws and wires the controls, `'3d'` draws flat
+    artwork only so the 3D scene can place real meshes on top.
+  - `ui/`: reusable pixel buttons, knobs, panel framing, and waveform drawing.
+- `src/3d/three/`: the 3D renderer only - cabinet, button/rotor meshes, and
+  the control layout that maps board pixels to scene positions.
+- `tests/audio.test.ts`: the audio engine's behavior tests (scheduling,
+  lifecycle, loop boundaries, dial semantics), run against a mock Web Audio.
+- The local `public/ui/monogram.ttf` pixel font is loaded before the board is
+  drawn; its CC0 license is included alongside it.
+
+The sound bank has sixteen slots beside the creation panel and control strip.
 
 ## Run
 
 ```sh
 cd soundTool
 pnpm install
-pnpm dev
+pnpm dev        # 2D at /, 3D at /3d.html
 ```
 
 ## Verify a production build
 
 ```sh
-pnpm build
+pnpm build      # typecheck, then both renderers: dist/2d and dist/3d
 pnpm preview
 ```
+
+`pnpm test:audio` runs the audio test suite.

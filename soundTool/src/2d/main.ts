@@ -1,9 +1,9 @@
 import { Assets, Application, Rectangle, type Texture } from 'pixi.js';
-import { PRESET_ICONS, type PresetTextures } from './PresetPad';
-import { SoundBoardFrame } from './SoundBoardFrame';
-import { createSoundSequence } from './audio/model';
-import { SoundPlayer } from './audio/SoundPlayer';
-import { defaultNotes } from './ui/StepPitchGrid';
+import { PRESET_ICONS, type PresetTextures } from '../shared/components/PresetPad';
+import { SoundBoardFrame } from '../shared/components/SoundBoardFrame';
+import { createSoundSequence } from '../shared/audio/model';
+import { SoundPlayer } from '../shared/audio/SoundPlayer';
+import { defaultNotes } from '../shared/ui/StepPitchGrid';
 
 const DISPLAY_WIDTH = 1536;
 const DISPLAY_HEIGHT = 1024;
@@ -49,7 +49,7 @@ app.stage.hitArea = new Rectangle(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 const sequence = createSoundSequence(defaultNotes());
 const player = new SoundPlayer();
 let looping = false;
-const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, {
+const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, { transport: {
   play: () => {
     void player.play(sequence).catch(error => {
       console.error('Sound playback failed:', error);
@@ -70,7 +70,7 @@ const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures
       // A blocked browser gesture should not interrupt drawing or open repeated alerts.
       console.warn('Note preview could not start:', error);
     });
-  },
+  } },
 });
 board.once('destroyed', () => { void player.dispose(); });
 window.addEventListener('pagehide', () => player.stop());

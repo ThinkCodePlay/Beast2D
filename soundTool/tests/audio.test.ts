@@ -1,4 +1,4 @@
-import { PLAYBACK_RATES, rateFromDial, rateToDial, validRate } from '../src/audio/rate.js';
+import { PLAYBACK_RATES, rateFromDial, rateToDial, validRate } from '../src/shared/audio/rate.js';
 import {
   CUTOFF_MAX_HZ,
   CUTOFF_MIN_HZ,
@@ -9,12 +9,12 @@ import {
   ringShareFromDial,
   snapPanDial,
   validPitch,
-} from '../src/audio/effects.js';
+} from '../src/shared/audio/effects.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SoundPlayer } from '../src/audio/SoundPlayer.js';
-import { createSoundSequence, WAVEFORM_TYPES } from '../src/audio/model.js';
-import { normalizedVolume, noteFrequency, STEP_SECONDS } from '../src/audio/synthesis.js';
+import { SoundPlayer } from '../src/shared/audio/SoundPlayer.js';
+import { createSoundSequence, WAVEFORM_TYPES } from '../src/shared/audio/model.js';
+import { normalizedVolume, noteFrequency, STEP_SECONDS } from '../src/shared/audio/synthesis.js';
 
 class Param {
   value = 0;

@@ -1,6 +1,6 @@
 import { Container, Graphics, Sprite, Text, type Texture } from 'pixi.js';
-import { drawGradientFace } from './ui/GradientFace';
-import { makePressable } from './ui/Pressable';
+import { drawGradientFace } from '../ui/GradientFace';
+import { makePressable } from '../ui/Pressable';
 
 type TabIcon = 'note' | 'gamepad' | 'folder' | 'gear';
 export type TabIconTextures = Partial<Record<TabIcon, Texture>>;

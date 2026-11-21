@@ -1,6 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js';
+import { makePressable } from '../ui/Pressable';
+import type { ControlMode } from '../controls';
 import { SoundBankRow, BANK_ROW_HEIGHT } from './SoundBankRow';
-import { makePressable } from './ui/Pressable';
 
 const BANK_ITEMS = [
   'jump', 'coin', 'hit', 'laser', 'boom_big', 'power_up',
@@ -8,18 +9,19 @@ const BANK_ITEMS = [
   'empty', 'empty', 'empty', 'empty',
 ] as const;
 const BANK_ROW_TOP = 109 / 3;
-const SCROLL_BUTTON_SIZE = 15;
-const SCROLL_INSET = 2;
+export const SCROLL_BUTTON_SIZE = 15;
+export const SCROLL_INSET = 2;
+export const SCROLL_TRACK_TOP = BANK_ROW_TOP;
 
 /** Shallow inset sound-bank area with a fine board-colored boundary. */
 export class SoundBankPanel extends Container {
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, controls: ControlMode = '2d') {
     super();
     this.addChild(drawFlatBoundary(width, height));
     this.addChild(createTitle());
     this.addChild(createSubtitle());
     this.addChild(createRows(width));
-    this.addChild(createScrollbar(width, height));
+    this.addChild(createScrollbar(width, height, controls));
   }
 }
 
@@ -66,7 +68,7 @@ function createRows(width: number): Container {
   return rows;
 }
 
-function createScrollbar(width: number, height: number): Container {
+function createScrollbar(width: number, height: number, controls: ControlMode): Container {
   const x = width - SCROLL_BUTTON_SIZE - SCROLL_INSET;
   const y = BANK_ROW_TOP;
   const trackHeight = height - y - SCROLL_INSET;
@@ -83,12 +85,13 @@ function createScrollbar(width: number, height: number): Container {
     .rect(x + 4, y + SCROLL_BUTTON_SIZE + 2, SCROLL_BUTTON_SIZE - 8, thumbHeight)
     .fill(0x8a63a0)
     .rect(x + 4, y + SCROLL_BUTTON_SIZE + 2, SCROLL_BUTTON_SIZE - 8, 1).fill(0xb18cc4));
-  const up = new ScrollArrowButton(true);
-  up.position.set(x, y);
-  const down = new ScrollArrowButton(false);
-  down.position.set(x, height - SCROLL_BUTTON_SIZE - SCROLL_INSET);
-  scrollbar.addChild(up);
-  scrollbar.addChild(down);
+  if (controls === '2d') {
+    const up = new ScrollArrowButton(true);
+    up.position.set(x, y);
+    const down = new ScrollArrowButton(false);
+    down.position.set(x, height - SCROLL_BUTTON_SIZE - SCROLL_INSET);
+    scrollbar.addChild(up, down);
+  }
   return scrollbar;
 }
 

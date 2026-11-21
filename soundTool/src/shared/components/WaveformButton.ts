@@ -1,7 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
-import { chamferPoints, drawGradientFace } from './ui/GradientFace';
-import type { WaveformType } from './audio/model';
-import { makePressable } from './ui/Pressable';
+import { chamferPoints, drawGradientFace } from '../ui/GradientFace';
+import type { WaveformType } from '../audio/model';
+import { makePressable } from '../ui/Pressable';
 
 export const WAVEFORM_BUTTON_WIDTH = 45;
 export const WAVEFORM_BUTTON_HEIGHT = 30;
@@ -35,13 +35,15 @@ export class WaveformButton extends Container {
   }
 }
 
+/** Same pink selection perimeter as the preset pads, spilling 3px past the face. */
+export function drawSelectionRing(width: number, height: number, ring = new Graphics()): Graphics {
+  return ring
+    .poly(chamferPoints(-3, -3, width + 6, height + 6, 5)).fill(0xff9ec2)
+    .poly(chamferPoints(-1.5, -1.5, width + 3, height + 3, 4)).fill(0xe95186);
+}
+
 function drawButtonFace(selected: boolean, width: number, height: number, face = new Graphics()): Graphics {
-  if (selected) {
-    // Same pink selection perimeter as the preset pads.
-    face
-      .poly(chamferPoints(-3, -3, width + 6, height + 6, 5)).fill(0xff9ec2)
-      .poly(chamferPoints(-1.5, -1.5, width + 3, height + 3, 4)).fill(0xe95186);
-  }
+  if (selected) drawSelectionRing(width, height, face);
   drawGradientFace(face, 0, 0, width, height, 4, {
     edge: 0x24152e,
     top: 0xd8b8ec,

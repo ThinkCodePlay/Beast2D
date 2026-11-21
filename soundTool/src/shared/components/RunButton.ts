@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import { makePressable } from './ui/Pressable';
+import { makePressable } from '../ui/Pressable';
 
 export const RUN_WIDTH = 30;
 export const RUN_HEIGHT = 21;

@@ -1,5 +1,5 @@
 import { Container } from 'pixi.js';
-import { WAVEFORM_TYPES, type WaveformType } from './audio/model';
+import { WAVEFORM_TYPES, type WaveformType } from '../audio/model';
 import { WaveformButton } from './WaveformButton';
 
 /** Row of the six waveform buttons. Exactly one is selected, marked by its ring. */

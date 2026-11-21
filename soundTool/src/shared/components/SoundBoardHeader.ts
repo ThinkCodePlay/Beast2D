@@ -1,12 +1,16 @@
 import { Container, Graphics, Sprite, Text, type Texture } from 'pixi.js';
 import { RunButton } from './RunButton';
+import type { ControlMode } from '../controls';
 
 const HEADER_HEIGHT = 24;
 const TEXT_COLOR = 0xffeaff;
 
+/** Where the RUN badge sits, measured from the header's right edge. */
+export const RUN_RIGHT_INSET = 34;
+
 /** Title/status strip with separate logo, sound meter, clock, and RUN control. */
 export class SoundBoardHeader extends Container {
-  constructor(width: number, mascotTexture: Texture) {
+  constructor(width: number, mascotTexture: Texture, controls: ControlMode = '2d') {
     super();
     this.addChild(drawHeader(width));
     this.addChild(drawAppIcon());
@@ -15,9 +19,11 @@ export class SoundBoardHeader extends Container {
     this.addChild(createSpeaker(width));
     this.addChild(createLevelMeter(width));
     this.addChild(createClock(width));
-    const run = new RunButton();
-    run.position.set(width - 34, -1.5);
-    this.addChild(run);
+    if (controls === '2d') {
+      const run = new RunButton();
+      run.position.set(width - RUN_RIGHT_INSET, -1.5);
+      this.addChild(run);
+    }
   }
 }
 
@@ -88,3 +94,4 @@ function createClock(width: number): Text {
   clock.position.set(width - 88, 1);
   return clock;
 }
+
