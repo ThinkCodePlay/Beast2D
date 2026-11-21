@@ -40,7 +40,7 @@ export interface SoundSequence {
   decay: number;
   /** Whole-sound shift in semitones: 0 sounds the drawn notes unchanged. */
   pitch: number;
-  /** Low-pass filter dial: 1 is fully open, lower values darken the sound. */
+  /** Low-pass filter dial: 1 is fully open (bypassed), lower values darken the sound. */
   cut: number;
 }
 

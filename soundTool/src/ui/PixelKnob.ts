@@ -58,7 +58,7 @@ export class KnobMarkings extends Container {
   constructor(label: string, color: number) {
     super();
     const accented = label === 'VOL' || label === 'PITCH';
-    this.addChild(drawTickRing(accented ? color : TICK_CREAM, label === 'RATE' ? 4 : 6));
+    this.addChild(drawTickRing(accented ? color : TICK_CREAM, label === 'RATE' || label === 'PAN' ? 4 : 6));
     this.addChild(createLabel(label, 22.5, 12));
   }
 }

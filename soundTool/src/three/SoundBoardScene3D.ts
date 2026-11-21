@@ -76,8 +76,7 @@ export class SoundBoardScene3D extends Container3D {
         const t = -ray.origin.z / ray.direction.z;
         const worldX = ray.origin.x + t * ray.direction.x;
         const worldY = ray.origin.y + t * ray.direction.y;
-        const startAngle = label === 'RATE' || label === 'VOL' ? Math.PI * 0.75 : NEEDLE_START_ANGLE;
-        const value = valueTowardPoint(cx, cy, worldX + BOARD_WIDTH / 2, BOARD_HEIGHT / 2 - worldY, startAngle);
+        const value = valueTowardPoint(cx, cy, worldX + BOARD_WIDTH / 2, BOARD_HEIGHT / 2 - worldY, NEEDLE_START_ANGLE);
         rotor.setValue(dialSnap(label)?.(value) ?? value);
         this.applyDial(label, rotor.getValue());
       };
@@ -226,8 +225,8 @@ export class SoundBoardScene3D extends Container3D {
   }
 }
 
-/** Sweep start of the cap needle artwork: the 3D dial's minimum sits down-right. */
-const NEEDLE_START_ANGLE = Math.PI * 0.25;
+/** Sweep start of the cap needle artwork, matching the board's tick rings: minimum sits down-left. */
+const NEEDLE_START_ANGLE = Math.PI * 0.75;
 
 /** A rotor's resting position always reflects the sequence it edits. */
 function dialValue(label: string, sequence: SoundSequence): number {
@@ -288,7 +287,7 @@ function createKnob(
   knob: { label: string; cx: number; cy: number; value: number; color: number; radius: number },
 ): Knob3D {
   const rotor = new Knob3D({
-    cap: new KnobCap(knob.value, knob.color, { x: 16, y: 16 }, knob.label === 'RATE' || knob.label === 'VOL' ? Math.PI * 0.75 : NEEDLE_START_ANGLE),
+    cap: new KnobCap(knob.value, knob.color, { x: 16, y: 16 }, NEEDLE_START_ANGLE),
     value: knob.value,
     radius: knob.radius,
     depth: 7,

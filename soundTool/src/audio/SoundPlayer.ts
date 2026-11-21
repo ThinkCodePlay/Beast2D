@@ -199,11 +199,19 @@ export class SoundPlayer {
 
   /** Live filter brightness, shared by playback and edit previews, without changing steps. */
   setCutoff(value: number): void {
+    const wasOpen = this.cutDial >= 1;
     this.cutDial = normalizedVolume(value);
     if (!this.context) return; // Turning CUT alone must not unlock/create audio.
     const now = this.context.currentTime;
     for (const sound of [this.playback, this.preview]) {
       if (!sound) continue;
+      // Crossing the fully open point rewires the filter in or out of the chain.
+      if (wasOpen !== this.cutDial >= 1) {
+        sound.output.disconnect();
+        sound.filter.disconnect();
+        if (this.cutDial >= 1) sound.output.connect(sound.panner);
+        else sound.output.connect(sound.filter).connect(sound.panner);
+      }
       const frequency = sound.filter.frequency;
       frequency.cancelAndHoldAtTime(now);
       frequency.linearRampToValueAtTime(cutoffFromDial(this.cutDial), now + STOP_FADE_SECONDS);
@@ -299,7 +307,10 @@ export class SoundPlayer {
     filter.frequency.value = cutoffFromDial(this.cutDial);
     const panner = context.createStereoPanner();
     panner.pan.value = panFromDial(this.panDial);
-    output.connect(filter).connect(panner).connect(context.destination);
+    // Fully open CUT is a true bypass, so the default sounds exactly as before.
+    if (this.cutDial >= 1) output.connect(panner);
+    else output.connect(filter).connect(panner);
+    panner.connect(context.destination);
     return { output, filter, panner };
   }
 
