@@ -56,6 +56,12 @@ const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures
     });
   },
   stop: () => player.stop(),
+  audition: (index) => {
+    void player.audition(sequence, index).catch(error => {
+      // A blocked browser gesture should not interrupt drawing or open repeated alerts.
+      console.warn('Note preview could not start:', error);
+    });
+  },
 });
 board.once('destroyed', () => { void player.dispose(); });
 window.addEventListener('pagehide', () => player.stop());

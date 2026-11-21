@@ -9,6 +9,7 @@ import type { SoundSequence } from './audio/model';
 export interface TransportActions {
   play(): void;
   stop(): void;
+  audition(index: number): void;
 }
 
 const PAD_GRID_LEFT = 8.3;
@@ -37,7 +38,7 @@ export class SoundCreationPanel extends Container {
     this.addChild(createPresetGrid(presetTextures));
     const waveformTop = PAD_ROW_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
     const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;
-    const waveform = new WaveformDisplay(width - 11, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence);
+    const waveform = new WaveformDisplay(width - 11, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence, transport.audition);
     waveform.position.set(8, waveformTop);
     this.addChild(waveform);
     const selector = new WaveformSelector(sequence.waveform, PAD_STEP_X, (type) => { sequence.waveform = type; });
