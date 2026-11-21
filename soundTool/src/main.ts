@@ -68,6 +68,7 @@ const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture,
     });
   },
   stop: () => player.stop(),
+  setMasterVolume: (value) => player.setMasterVolume(value),
   audition: (index) => {
     void player.audition(sequence, index).catch(error => {
       // A blocked browser gesture should not interrupt drawing or open repeated alerts.

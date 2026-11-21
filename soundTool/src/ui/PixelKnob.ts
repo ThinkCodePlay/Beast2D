@@ -69,7 +69,7 @@ export class KnobCap extends Container {
   private readonly center: { x: number; y: number };
   private readonly needle: Graphics;
 
-  constructor(value: number, color: number, center = KNOB_CENTER) {
+  constructor(value: number, color: number, center = KNOB_CENTER, private readonly startAngle = NEEDLE_START_ANGLE) {
     super();
     this.center = center;
     const cap = new Graphics();
@@ -93,7 +93,7 @@ export class KnobCap extends Container {
   setValue(value: number): void {
     this.value = clampValue(value);
     this.needle.clear();
-    drawNeedle(this.needle, this.center.x, this.center.y, this.value, 8, 0x3a2030, 2);
+    drawNeedle(this.needle, this.center.x, this.center.y, this.value, 8, 0x3a2030, 2, this.startAngle);
   }
 }
 
@@ -121,8 +121,9 @@ function drawNeedle(
   length: number,
   color: number,
   width: number,
+  startAngle = NEEDLE_START_ANGLE,
 ): void {
-  const angle = angleForValue(value, NEEDLE_START_ANGLE);
+  const angle = angleForValue(value, startAngle);
   face
     .moveTo(centerX, centerY)
     .lineTo(centerX + Math.cos(angle) * length, centerY + Math.sin(angle) * length)

@@ -1,3 +1,4 @@
+import { PLAYBACK_RATES, rateFromDial, rateToDial, validRate } from '../src/audio/rate.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SoundPlayer } from '../src/audio/SoundPlayer.js';
@@ -9,6 +10,8 @@ class Param {
   points: [number, number][] = [];
   setValueAtTime(value: number, time: number): this { this.value = value; this.points.push([value, time]); return this; }
   linearRampToValueAtTime(value: number, time: number): this { return this.setValueAtTime(value, time); }
+  holds: number[] = [];
+  cancelAndHoldAtTime(time: number): void { this.holds.push(time); }
   cancelScheduledValues(): void {}
 }
 class Node extends EventTarget {
@@ -258,4 +261,60 @@ test('pending resume obeys Stop, newer edits, pending Play and disposal', async 
   await player.dispose();
   resolves[3](); await preview;
   assert.equal(context.voices.length, 1);
+});
+
+test('five rate positions are octave-spaced with 1x centered, valid endpoints and fallback', () => {
+  assert.deepEqual(PLAYBACK_RATES.map(rateToDial), [0, .25, .5, .75, 1]);
+  assert.deepEqual([0,.25,.5,.75,1].map(rateFromDial), PLAYBACK_RATES);
+  assert.equal(rateFromDial(.6), 1);
+  assert.equal(validRate(NaN), 1);
+  assert.equal(validRate(0), 1);
+  assert.equal(createSoundSequence().rate, 1);
+});
+test('all rates scale duration and slots, never frequency; changes wait for Play', async () => {
+  for (const rate of PLAYBACK_RATES) {
+    const {context, player} = setup();
+    const sequence = createSoundSequence(); sequence.rate = rate;
+    await player.play(sequence);
+    assert.ok(Math.abs(context.voices.at(-1)!.stops[0] - (10.01 + 32 * STEP_SECONDS / rate)) < 1e-10);
+    assert.equal(context.voices[1].startTime, 10.01 + STEP_SECONDS / rate);
+    assert.equal(context.voices[0].frequency.value, noteFrequency(60));
+    sequence.rate = 4;
+    assert.ok(Math.abs(context.voices[0].stops[0] - (10.01 + STEP_SECONDS / rate)) < 1e-10);
+    player.stop();
+    assert.ok(context.voices.every(voice => voice.stops.at(-1) === 10.008));
+  }
+});
+test('live master ramps playback and audition, does not edit step levels or create context', async () => {
+  for (const mode of ['play', 'audition'] as const) {
+    const {context, player} = setup(); const sequence = createSoundSequence();
+    const steps = structuredClone(sequence.steps);
+    if (mode === 'play') await player.play(sequence); else await player.audition(sequence, 0);
+    const output = context.outputs[0]; const count = context.voices.length;
+    player.setMasterVolume(.8);
+    assert.deepEqual(output.gain.points.at(-1), [.8,10.008]);
+    assert.deepEqual(output.gain.holds, [10]);
+    player.setMasterVolume(0);
+    assert.deepEqual(output.gain.points.at(-1), [0,10.008]);
+    assert.equal(context.voices.length, count);
+    assert.deepEqual(sequence.steps, steps);
+    player.stop(); player.setMasterVolume(1);
+    assert.deepEqual(output.gain.points.at(-1), [0,10.008]);
+  }
+  let creates = 0; const player = new SoundPlayer(() => { creates++; throw new Error(); });
+  player.setMasterVolume(1); assert.equal(creates, 0);
+});
+test('pending Play and trailing audition use the latest live master value', async () => {
+  const {context, player} = setup(); const sequence = createSoundSequence();
+  context.state = 'suspended'; let resume!: () => void;
+  context.resume = () => new Promise<void>(r => { resume = r; });
+  const pending = player.play(sequence); player.setMasterVolume(.6);
+  context.state = 'running'; resume(); await pending;
+  assert.equal(context.outputs[0].gain.value, .6);
+  player.stop(); await player.audition(sequence, 0); await player.audition(sequence, 0);
+  player.setMasterVolume(.9);
+  await new Promise(r => setTimeout(r, 70));
+  // Last output before the envelope is the coalesced preview's master.
+  assert.equal(context.outputs.at(-2)!.gain.value, .9);
+  player.stop();
 });

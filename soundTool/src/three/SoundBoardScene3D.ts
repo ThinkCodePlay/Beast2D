@@ -11,6 +11,7 @@ import {
 import type { FederatedPointerEvent, PointData, Renderer, Texture } from 'pixi.js';
 import type { SoundSequence } from '../audio/model';
 import type { TransportActions } from '../TransportActions';
+import { rateFromDial, rateToDial, snapRateDial } from '../audio/rate';
 import { valueTowardPoint } from '../ui/knobTurn';
 import { drawSelectionRing, WaveformButton } from '../WaveformButton';
 import { PixelButton, BUTTON_TONES } from '../ui/PixelButton';
@@ -43,7 +44,7 @@ const FACE_RESOLUTION = 3; // Captures the 512-wide design at the canvas's 1536 
  * 2D artwork.
  */
 export class SoundBoardScene3D extends Container3D {
-  private readonly knobs: { rotor: Knob3D; cx: number; cy: number }[] = [];
+  private readonly knobs: { rotor: Knob3D; cx: number; cy: number; label: string }[] = [];
   private waveform?: WaveformDisplay3D;
 
   constructor(
@@ -67,14 +68,21 @@ export class SoundBoardScene3D extends Container3D {
    */
   bindPointer(view: View3D): void {
     this.bindWaveformPaint(view);
-    this.knobs.forEach(({ rotor, cx, cy }) => {
+    this.knobs.forEach(({ rotor, cx, cy, label }) => {
       const turnToward = (global: PointData): void => {
         const ray = view.screenToRay(global);
         // Meet the pointer ray with the board plane (z = 0), then to board pixels.
         const t = -ray.origin.z / ray.direction.z;
         const worldX = ray.origin.x + t * ray.direction.x;
         const worldY = ray.origin.y + t * ray.direction.y;
-        rotor.setValue(valueTowardPoint(cx, cy, worldX + BOARD_WIDTH / 2, BOARD_HEIGHT / 2 - worldY, NEEDLE_START_ANGLE));
+        const startAngle = label === 'RATE' || label === 'VOL' ? Math.PI * 0.75 : NEEDLE_START_ANGLE;
+        const value = valueTowardPoint(cx, cy, worldX + BOARD_WIDTH / 2, BOARD_HEIGHT / 2 - worldY, startAngle);
+        rotor.setValue(label === 'RATE' ? snapRateDial(value) : value);
+        if (label === 'RATE') this.sequence.rate = rateFromDial(rotor.getValue());
+        if (label === 'VOL') {
+          this.sequence.masterVolume = rotor.getValue();
+          this.transport.setMasterVolume(rotor.getValue());
+        }
       };
       rotor.on('pointerdown', (event) => {
         const move = (e: FederatedPointerEvent): void => turnToward(e.global);
@@ -155,8 +163,9 @@ export class SoundBoardScene3D extends Container3D {
     });
 
     STRIP_KNOBS.forEach((knob) => {
-      const rotor = createKnob(renderer, knob);
-      this.knobs.push({ rotor, cx: knob.cx, cy: knob.cy });
+      const value = knob.label === 'VOL' ? this.sequence.masterVolume : knob.label === 'RATE' ? rateToDial(this.sequence.rate) : knob.value;
+      const rotor = createKnob(renderer, { ...knob, value });
+      this.knobs.push({ rotor, cx: knob.cx, cy: knob.cy, label: knob.label });
       controls.push(rotor);
     });
 
@@ -241,10 +250,10 @@ function createCabinet(
 
 function createKnob(
   renderer: Renderer,
-  knob: { cx: number; cy: number; value: number; color: number; radius: number },
+  knob: { label: string; cx: number; cy: number; value: number; color: number; radius: number },
 ): Knob3D {
   const rotor = new Knob3D({
-    cap: new KnobCap(knob.value, knob.color, { x: 16, y: 16 }),
+    cap: new KnobCap(knob.value, knob.color, { x: 16, y: 16 }, knob.label === 'RATE' || knob.label === 'VOL' ? Math.PI * 0.75 : NEEDLE_START_ANGLE),
     value: knob.value,
     radius: knob.radius,
     depth: 7,

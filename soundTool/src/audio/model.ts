@@ -1,3 +1,5 @@
+import type { PlaybackRate } from './rate.js';
+
 /**
  * Sound data model. Kept free of Pixi so the same values drive the display
  * today and the audio engine and export later. Interface shapes and names are
@@ -25,6 +27,8 @@ export const WAVEFORM_TYPES = ['sine', 'square', 'saw', 'triangle', 'noise', 'pu
 export type WaveformType = typeof WAVEFORM_TYPES[number];
 
 export interface SoundSequence {
+  /** Playback speed; read at Play, independent of note pitch. */
+  rate: PlaybackRate;
   steps: SoundStep[];
   /** One oscillator shape for all steps. */
   waveform: WaveformType;
@@ -52,5 +56,5 @@ export function createSoundSequence(notes?: NoteNumber[]): SoundSequence {
     volume: 7,
     enabled: true,
   }));
-  return { steps, waveform: 'sine', masterVolume: 0.25 };
+  return { steps, waveform: 'sine', masterVolume: 0.25, rate: 1 };
 }

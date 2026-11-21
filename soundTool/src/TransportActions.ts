@@ -3,4 +3,5 @@ export interface TransportActions {
   play(): void;
   stop(): void;
   audition(index: number): void;
+  setMasterVolume(value: number): void;
 }
