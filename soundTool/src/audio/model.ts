@@ -1,0 +1,49 @@
+/**
+ * Sound data model. Kept free of Pixi so the same values drive the display
+ * today and the audio engine and export later. Interface shapes and names are
+ * exactly as specified by the project owner.
+ */
+
+/** Step volume: the eight tracker levels. Still a plain number at runtime. */
+export type StepVolume = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+/**
+ * A note as a standard MIDI note number: a whole semitone, 60 is middle C.
+ * Validate against NOTE_RANGE when loading or editing; the type alone does
+ * not check values at runtime. A rest is `enabled: false`, not a note value.
+ */
+export type NoteNumber = number;
+
+export interface SoundStep {
+  note: NoteNumber;
+  volume: StepVolume; // 0 - 7
+  enabled: boolean;
+}
+
+export interface SoundSequence {
+  steps: SoundStep[];
+  masterVolume: number;
+}
+
+export const SEQUENCE_STEP_COUNT = 32;
+/** Accepted note values: the full MIDI semitone range. */
+export const NOTE_RANGE = { min: 0, max: 127 } as const;
+/** Displayed window: two octaves, the top bar position is the highest note. */
+export const NOTE_WINDOW = 24;
+/** Lowest note shown in the window: C4, middle C. */
+export const NOTE_WINDOW_BASE = 60;
+
+/** Clamp and round an incoming value to a valid step volume. */
+export function toStepVolume(value: number): StepVolume {
+  return Math.max(0, Math.min(7, Math.round(value))) as StepVolume;
+}
+
+/** A fresh sequence: every step enabled at full volume, master at full. */
+export function createSoundSequence(notes?: NoteNumber[]): SoundSequence {
+  const steps: SoundStep[] = Array.from({ length: SEQUENCE_STEP_COUNT }, (_, index) => ({
+    note: notes?.[index] ?? NOTE_WINDOW_BASE,
+    volume: 7,
+    enabled: true,
+  }));
+  return { steps, masterVolume: 7 };
+}

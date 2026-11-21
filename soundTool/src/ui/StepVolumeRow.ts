@@ -1,6 +1,7 @@
 import { Container, Graphics, Rectangle, type FederatedPointerEvent } from 'pixi.js';
 import { trackDrag } from './Pressable';
-import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from './WaveformDisplay';
+import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from './stepGrid';
+import { toStepVolume, type SoundSequence } from '../audio/model';
 
 /** Highest volume a step can hold; the row shows STEP_VOLUME_MAX + 1 levels. */
 export const STEP_VOLUME_MAX = 7;
@@ -14,14 +15,13 @@ const BASE_INSET = 1;
 /**
  * Per-step volume row under the pitch bars: 32 blue columns sharing the pitch
  * grid. Press or drag across the row to paint a level into every column the
- * pointer crosses, like a tracker. Mouse, touch and pen all work the same.
+ * pointer crosses, like a tracker. Reads and writes the shared SoundSequence.
+ * Mouse, touch and pen all work the same.
  */
 export class StepVolumeRow extends Container {
-  /** Volume per step, 0..STEP_VOLUME_MAX. Starts full, the tracker default. */
-  readonly volumes: number[] = new Array(STEP_COUNT).fill(STEP_VOLUME_MAX);
   private readonly bars = new Graphics();
 
-  constructor(width: number, private readonly rowHeight: number) {
+  constructor(private readonly sequence: SoundSequence, width: number, private readonly rowHeight: number) {
     super();
     this.hitArea = new Rectangle(0, 0, width, rowHeight);
     this.addChild(this.bars);
@@ -34,10 +34,9 @@ export class StepVolumeRow extends Container {
     const step = Math.round((point.x - STEP_LEFT - STEP_WIDTH / 2) / STEP_STEP);
     if (step < 0 || step >= STEP_COUNT) return;
     const band = this.rowHeight / (STEP_VOLUME_MAX + 1);
-    const level = Math.max(0, Math.min(STEP_VOLUME_MAX,
-      Math.floor((this.rowHeight - point.y) / band)));
-    if (this.volumes[step] === level) return;
-    this.volumes[step] = level;
+    const level = toStepVolume(Math.floor((this.rowHeight - point.y) / band));
+    if (this.sequence.steps[step].volume === level) return;
+    this.sequence.steps[step].volume = level;
     this.redraw();
   }
 
@@ -48,7 +47,7 @@ export class StepVolumeRow extends Container {
       const x = STEP_LEFT + step * STEP_STEP;
       // A dim slot line keeps silent steps visible against the frame.
       this.bars.rect(x, floor - 1, STEP_WIDTH, 1).fill(SLOT);
-      const barHeight = this.volumes[step] * (this.rowHeight - 2) / STEP_VOLUME_MAX;
+      const barHeight = this.sequence.steps[step].volume * (this.rowHeight - 2) / STEP_VOLUME_MAX;
       if (barHeight <= 0) continue;
       const top = floor - barHeight;
       const baseHeight = Math.max(1, Math.round(barHeight * 0.18));
