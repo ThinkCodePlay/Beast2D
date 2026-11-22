@@ -8,15 +8,24 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && vite build && vite build --config vite.config.3d.ts",
     "preview": "vite preview",
-    "test:audio": "tsc -p tsconfig.audio-tests.json && node --test .audio-tests/tests/*.test.js"
+    "test:audio": "tsc -p tsconfig.audio-tests.json && node --test .audio-tests/tests/*.test.js",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
-    "pixi.js": "^8.23.0",
-    "@pixi/3d": "^0.1.0"
+    "@pixi/3d": "^0.1.0",
+    "pixi.js": "^8.23.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.0.0",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "prettier": "^3.10.1",
     "typescript": "~5.9.3",
+    "typescript-eslint": "^8.73.0",
     "vite": "^7.2.4"
   }
 }

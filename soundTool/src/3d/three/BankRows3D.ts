@@ -1,8 +1,14 @@
-import { Container3D, ContainerTexture, FlatMaterial, Mesh3D, PlaneGeometry } from '@pixi/3d';
-import type { Renderer } from 'pixi.js';
-import type { SoundBank } from '../../shared/bank';
-import { BankRows } from '../../shared/components/BankRows';
-import type { ControlRect } from './controlLayout';
+import {
+  Container3D,
+  ContainerTexture,
+  FlatMaterial,
+  Mesh3D,
+  PlaneGeometry,
+} from "@pixi/3d";
+import type { Renderer } from "pixi.js";
+import type { SoundBank } from "../../shared/bank";
+import { BankRows } from "../../shared/components/BankRows";
+import type { ControlRect } from "./controlLayout";
 
 /** World z of the overlay face: just above the cabinet's front face. */
 const OVERLAY_FACE_Z = 0.7;
@@ -29,14 +35,17 @@ export class BankRows3D extends Container3D {
     });
     const face = new Mesh3D({
       geometry: new PlaneGeometry({ width: rect.width, height: rect.height }),
-      material: new FlatMaterial({ baseColorTexture: faceTexture, alphaMode: 'blend' }),
+      material: new FlatMaterial({
+        baseColorTexture: faceTexture,
+        alphaMode: "blend",
+      }),
       castShadow: false,
       receiveShadow: false,
     });
     face.position.z = OVERLAY_FACE_Z;
     this.addChild(face);
-    this.eventMode = 'static';
-    this.cursor = 'pointer';
+    this.eventMode = "static";
+    this.cursor = "pointer";
     bank.onChange(() => faceTexture.render());
   }
 }

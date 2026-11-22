@@ -1,4 +1,9 @@
-import { NOTE_RANGE, toStepVolume, type SoundStep, type WaveformType } from './model.js';
+import {
+  NOTE_RANGE,
+  toStepVolume,
+  type SoundStep,
+  type WaveformType,
+} from "./model.js";
 
 /** First audition uses the previously discussed SPD 16, about 133 ms/step. */
 export const STEP_SECONDS = 0.133;
@@ -6,7 +11,10 @@ const EDGE_SECONDS = 0.003;
 
 export function noteFrequency(note: number): number {
   const valid = Number.isFinite(note) ? note : 60;
-  const semitone = Math.max(NOTE_RANGE.min, Math.min(NOTE_RANGE.max, Math.round(valid)));
+  const semitone = Math.max(
+    NOTE_RANGE.min,
+    Math.min(NOTE_RANGE.max, Math.round(valid)),
+  );
   return 440 * 2 ** ((semitone - 69) / 12);
 }
 
@@ -16,9 +24,19 @@ export function normalizedVolume(value: number): number {
 
 /** Level trim so the six shapes sound about equally loud (measured RMS, sine is the reference). */
 const WAVEFORM_TRIM: Record<WaveformType, number> = {
-  sine: 1, triangle: 1, square: 0.5, saw: 0.8, pulse: 0.9, noise: 0.6,
+  sine: 1,
+  triangle: 1,
+  square: 0.5,
+  saw: 0.8,
+  pulse: 0.9,
+  noise: 0.6,
 };
-const OSCILLATOR_TYPES = { sine: 'sine', square: 'square', saw: 'sawtooth', triangle: 'triangle' } as const;
+const OSCILLATOR_TYPES = {
+  sine: "sine",
+  square: "square",
+  saw: "sawtooth",
+  triangle: "triangle",
+} as const;
 const PULSE_DUTY = 0.25;
 const PULSE_HARMONICS = 64;
 const NOISE_SECONDS = 1;
@@ -46,7 +64,11 @@ function pulseWave(context: BaseAudioContext): PeriodicWave {
 function noiseBuffer(context: BaseAudioContext): AudioBuffer {
   let buffer = noiseBuffers.get(context);
   if (!buffer) {
-    buffer = context.createBuffer(1, Math.round(context.sampleRate * NOISE_SECONDS), context.sampleRate);
+    buffer = context.createBuffer(
+      1,
+      Math.round(context.sampleRate * NOISE_SECONDS),
+      context.sampleRate,
+    );
     const samples = buffer.getChannelData(0);
     let seed = 1;
     for (let i = 0; i < samples.length; i++) {
@@ -69,8 +91,14 @@ export interface VoiceTuning {
 /** Neutral shaping: full sustain at the drawn pitch. */
 export const NEUTRAL_TUNING: VoiceTuning = { decayShare: 1, pitchShift: 0 };
 
-function createSource(context: BaseAudioContext, waveform: WaveformType, note: number, when: number, pitchShift: number): AudioScheduledSourceNode {
-  if (waveform === 'noise') {
+function createSource(
+  context: BaseAudioContext,
+  waveform: WaveformType,
+  note: number,
+  when: number,
+  pitchShift: number,
+): AudioScheduledSourceNode {
+  if (waveform === "noise") {
     // Noise has no pitch: the step's note is ignored, its volume and timing still apply.
     const source = context.createBufferSource();
     source.buffer = noiseBuffer(context);
@@ -78,7 +106,7 @@ function createSource(context: BaseAudioContext, waveform: WaveformType, note: n
     return source;
   }
   const oscillator = context.createOscillator();
-  if (waveform === 'pulse') oscillator.setPeriodicWave(pulseWave(context));
+  if (waveform === "pulse") oscillator.setPeriodicWave(pulseWave(context));
   else oscillator.type = OSCILLATOR_TYPES[waveform];
   oscillator.frequency.setValueAtTime(noteFrequency(note + pitchShift), when);
   return oscillator;
@@ -94,9 +122,17 @@ export function scheduleVoice(
   duration = STEP_SECONDS,
   tuning: VoiceTuning = NEUTRAL_TUNING,
 ): AudioScheduledSourceNode {
-  const source = createSource(context, waveform, step.note, when, tuning.pitchShift);
+  const source = createSource(
+    context,
+    waveform,
+    step.note,
+    when,
+    tuning.pitchShift,
+  );
   const envelope = context.createGain();
-  const share = Number.isFinite(tuning.decayShare) ? Math.max(0, Math.min(1, tuning.decayShare)) : 1;
+  const share = Number.isFinite(tuning.decayShare)
+    ? Math.max(0, Math.min(1, tuning.decayShare))
+    : 1;
   const ring = Math.min(duration, Math.max(duration * share, EDGE_SECONDS * 2));
   const edge = Math.min(EDGE_SECONDS, ring / 4);
   const volume = (toStepVolume(step.volume) / 7) * WAVEFORM_TRIM[waveform];
@@ -108,10 +144,14 @@ export function scheduleVoice(
   }
   envelope.gain.linearRampToValueAtTime(0, when + ring);
   source.connect(envelope).connect(output);
-  source.addEventListener('ended', () => {
-    source.disconnect();
-    envelope.disconnect();
-  }, { once: true });
+  source.addEventListener(
+    "ended",
+    () => {
+      source.disconnect();
+      envelope.disconnect();
+    },
+    { once: true },
+  );
   source.start(when);
   source.stop(when + duration);
   return source;

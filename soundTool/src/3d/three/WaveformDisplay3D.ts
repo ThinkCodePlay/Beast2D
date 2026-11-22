@@ -1,8 +1,16 @@
-import { Container3D, ContainerTexture, CubeGeometry, FlatMaterial, Material3D, Mesh3D, PlaneGeometry } from '@pixi/3d';
-import type { Renderer } from 'pixi.js';
-import type { SoundSequence } from '../../shared/audio/model';
-import { WaveformDisplay } from '../../shared/ui/WaveformDisplay';
-import type { ControlRect } from './controlLayout';
+import {
+  Container3D,
+  ContainerTexture,
+  CubeGeometry,
+  FlatMaterial,
+  Material3D,
+  Mesh3D,
+  PlaneGeometry,
+} from "@pixi/3d";
+import type { Renderer } from "pixi.js";
+import type { SoundSequence } from "../../shared/audio/model";
+import { WaveformDisplay } from "../../shared/ui/WaveformDisplay";
+import type { ControlRect } from "./controlLayout";
 
 const BODY_DEPTH = 2;
 /** World z of the display's face: the body top plus its small air gap. */
@@ -26,10 +34,20 @@ export class WaveformDisplay3D extends Container3D {
     onVolumeChange?: (index: number) => void,
   ) {
     super();
-    this.display = new WaveformDisplay(rect.width, rect.height, sequence, onNoteChange, onVolumeChange);
+    this.display = new WaveformDisplay(
+      rect.width,
+      rect.height,
+      sequence,
+      onNoteChange,
+      onVolumeChange,
+    );
 
     const body = new Mesh3D({
-      geometry: new CubeGeometry({ width: rect.width, height: rect.height, depth: BODY_DEPTH }),
+      geometry: new CubeGeometry({
+        width: rect.width,
+        height: rect.height,
+        depth: BODY_DEPTH,
+      }),
       material: new Material3D({ baseColor: 0x21132b, roughness: 0.9 }),
     });
     body.position.z = BODY_DEPTH / 2;
@@ -44,14 +62,17 @@ export class WaveformDisplay3D extends Container3D {
     });
     const face = new Mesh3D({
       geometry: new PlaneGeometry({ width: rect.width, height: rect.height }),
-      material: new FlatMaterial({ baseColorTexture: faceTexture, alphaMode: 'blend' }),
+      material: new FlatMaterial({
+        baseColorTexture: faceTexture,
+        alphaMode: "blend",
+      }),
       castShadow: false,
       receiveShadow: false,
     });
     face.position.z = WAVEFORM_FACE_Z;
 
     this.addChild(body, face);
-    this.eventMode = 'static';
-    this.cursor = 'pointer';
+    this.eventMode = "static";
+    this.cursor = "pointer";
   }
 }

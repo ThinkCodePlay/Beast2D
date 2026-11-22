@@ -1,15 +1,21 @@
-import { Container } from 'pixi.js';
-import type { ControlMode } from '../controls';
-import type { TransportActions } from '../transport';
-import type { SoundBank } from '../bank';
-import { PAD_HEIGHT, PAD_WIDTH, PresetPad, type PresetIcon, type PresetTextures } from './PresetPad';
-import { applyPreset, isPresetKey, type PresetKey } from '../presets';
-import { PixelButton } from '../ui/PixelButton';
-import { RaisedPanelFrame } from '../ui/RaisedPanelFrame';
-import { SoundNameLcd } from './SoundNameLcd';
-import { WaveformDisplay } from '../ui/WaveformDisplay';
-import { WaveformSelector } from './WaveformSelector';
-import type { SoundSequence } from '../audio/model';
+import { Container } from "pixi.js";
+import type { ControlMode } from "../controls";
+import type { TransportActions } from "../transport";
+import type { SoundBank } from "../bank";
+import {
+  PAD_HEIGHT,
+  PAD_WIDTH,
+  PresetPad,
+  type PresetIcon,
+  type PresetTextures,
+} from "./PresetPad";
+import { applyPreset, isPresetKey, type PresetKey } from "../presets";
+import { PixelButton } from "../ui/PixelButton";
+import { RaisedPanelFrame } from "../ui/RaisedPanelFrame";
+import { SoundNameLcd } from "./SoundNameLcd";
+import { WaveformDisplay } from "../ui/WaveformDisplay";
+import { WaveformSelector } from "./WaveformSelector";
+import type { SoundSequence } from "../audio/model";
 
 /**
  * Sound editor panel: transport row and name LCD on top, preset pads, the
@@ -37,7 +43,14 @@ export const SELECTOR_TOP_GAP = 4;
 
 // The kept presets: the most-used game sound types, one pad per type, matching
 // the sound bank (coin, power-up, jump, explosion, hit, enemy death).
-export const KEPT_PRESETS: readonly PresetIcon[] = ['coin', 'star', 'boot', 'bomb', 'burst', 'skull'];
+export const KEPT_PRESETS: readonly PresetIcon[] = [
+  "coin",
+  "star",
+  "boot",
+  "bomb",
+  "burst",
+  "skull",
+];
 
 export interface SoundCreationPanelOptions {
   /** Transport and live-dial callbacks; required in '2d' mode, unused in '3d'. */
@@ -52,29 +65,53 @@ export class SoundCreationPanel extends Container {
   private waveform?: WaveformDisplay;
   private selector?: WaveformSelector;
 
-  constructor(width: number, height: number, presetTextures: PresetTextures, sequence: SoundSequence, options: SoundCreationPanelOptions = {}) {
+  constructor(
+    width: number,
+    height: number,
+    presetTextures: PresetTextures,
+    sequence: SoundSequence,
+    options: SoundCreationPanelOptions = {},
+  ) {
     super();
-    const controls = options.controls ?? '2d';
+    const controls = options.controls ?? "2d";
     this.addChild(new RaisedPanelFrame(width, height, 0x83609a));
-    this.addChild(createTransport(width, controls, options.transport, options.bank));
-    if (controls === '2d') {
-      if (!options.transport) throw new Error('SoundCreationPanel 2D mode needs transport actions.');
+    this.addChild(
+      createTransport(width, controls, options.transport, options.bank),
+    );
+    if (controls === "2d") {
+      if (!options.transport)
+        throw new Error("SoundCreationPanel 2D mode needs transport actions.");
       const transport = options.transport;
       const bank = options.bank;
-      if (!bank) throw new Error('SoundCreationPanel 2D mode needs the sound bank.');
-      this.addChild(createPresetGrid(presetTextures, (key) => {
-        // A pad tap loads its preset into the selected bank slot (Undo
-        // restores what was there) and plays it once, even while Loop is on.
-        applyPreset(bank, key);
-        transport.playOnce();
-      }));
+      if (!bank)
+        throw new Error("SoundCreationPanel 2D mode needs the sound bank.");
+      this.addChild(
+        createPresetGrid(presetTextures, (key) => {
+          // A pad tap loads its preset into the selected bank slot (Undo
+          // restores what was there) and plays it once, even while Loop is on.
+          applyPreset(bank, key);
+          transport.playOnce();
+        }),
+      );
       const waveformTop = PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
       const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;
       // Pitch and volume edits both audition the edited step.
-      this.waveform = new WaveformDisplay(width - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence, transport.audition, transport.audition);
+      this.waveform = new WaveformDisplay(
+        width - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET,
+        selectorTop - SELECTOR_TOP_GAP - waveformTop,
+        sequence,
+        transport.audition,
+        transport.audition,
+      );
       this.waveform.position.set(WAVEFORM_LEFT_INSET, waveformTop);
       this.addChild(this.waveform);
-      this.selector = new WaveformSelector(sequence.waveform, PAD_STEP_X, (type) => { sequence.waveform = type; });
+      this.selector = new WaveformSelector(
+        sequence.waveform,
+        PAD_STEP_X,
+        (type) => {
+          sequence.waveform = type;
+        },
+      );
       this.selector.position.set(PAD_GRID_LEFT, selectorTop);
       this.addChild(this.selector);
     }
@@ -87,39 +124,53 @@ export class SoundCreationPanel extends Container {
   }
 }
 
-function createTransport(panelWidth: number, controls: ControlMode, transport?: TransportActions, bank?: SoundBank): Container {
+function createTransport(
+  panelWidth: number,
+  controls: ControlMode,
+  transport?: TransportActions,
+  bank?: SoundBank,
+): Container {
   const row = new Container();
   row.position.set(TRANSPORT_LEFT, TRANSPORT_TOP);
   // Transport buttons match the preset pads exactly: same size, same columns.
-  if (controls === '2d') {
-    if (!transport) throw new Error('SoundCreationPanel 2D mode needs transport actions.');
-    if (!bank) throw new Error('SoundCreationPanel 2D mode needs the sound bank.');
-    const play = new PixelButton('▶', 'pink', false, PAD_WIDTH, PAD_HEIGHT);
-    const stop = new PixelButton('■', 'cream', false, PAD_WIDTH, PAD_HEIGHT);
-    const loop = new PixelButton('↻', 'green', false, PAD_WIDTH, PAD_HEIGHT);
-    play.on('pointertap', transport.play);
-    stop.on('pointertap', transport.stop);
-    loop.on('pointertap', () => loop.setLatched(transport.toggleLoop()));
+  if (controls === "2d") {
+    if (!transport)
+      throw new Error("SoundCreationPanel 2D mode needs transport actions.");
+    if (!bank)
+      throw new Error("SoundCreationPanel 2D mode needs the sound bank.");
+    const play = new PixelButton("▶", "pink", false, PAD_WIDTH, PAD_HEIGHT);
+    const stop = new PixelButton("■", "cream", false, PAD_WIDTH, PAD_HEIGHT);
+    const loop = new PixelButton("↻", "green", false, PAD_WIDTH, PAD_HEIGHT);
+    play.on("pointertap", transport.play);
+    stop.on("pointertap", transport.stop);
+    loop.on("pointertap", () => loop.setLatched(transport.toggleLoop()));
     loop.setLatched(transport.isLooping()); // A restored snapshot may have the latch on.
     [play, stop, loop].forEach((button, index) => {
       button.position.x = index * PAD_STEP_X;
     });
     row.addChild(play, stop, loop);
     // The sound-name LCD takes the rest of the row, up to the right inset.
-    const lcd = new SoundNameLcd(panelWidth - TRANSPORT_LEFT - LCD_RIGHT_INSET - LCD_LEFT, bank);
+    const lcd = new SoundNameLcd(
+      panelWidth - TRANSPORT_LEFT - LCD_RIGHT_INSET - LCD_LEFT,
+      bank,
+    );
     lcd.position.set(LCD_LEFT, 2);
     row.addChild(lcd);
   }
   return row;
 }
 
-function createPresetGrid(presetTextures: PresetTextures, onPreset?: (key: PresetKey) => void): Container {
+function createPresetGrid(
+  presetTextures: PresetTextures,
+  onPreset?: (key: PresetKey) => void,
+): Container {
   const grid = new Container();
   grid.position.set(PAD_GRID_LEFT, PAD_GRID_TOP);
   KEPT_PRESETS.forEach((icon, index) => {
     const pad = new PresetPad(icon, presetTextures, index === 0);
     pad.position.x = index * PAD_STEP_X;
-    if (onPreset && isPresetKey(icon)) pad.on('pointertap', () => onPreset(icon));
+    if (onPreset && isPresetKey(icon))
+      pad.on("pointertap", () => onPreset(icon));
     grid.addChild(pad);
   });
   return grid;

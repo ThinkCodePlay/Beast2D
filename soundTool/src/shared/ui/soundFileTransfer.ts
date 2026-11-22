@@ -1,6 +1,6 @@
-import type { SoundBank } from '../bank';
-import type { SoundSequence } from '../audio/model';
-import { parseSoundFile, serializeSound, soundFileName } from '../soundFile';
+import type { SoundBank } from "../bank";
+import type { SoundSequence } from "../audio/model";
+import { parseSoundFile, serializeSound, soundFileName } from "../soundFile";
 
 /**
  * The DOM side of the bank's import/export buttons: downloads and file
@@ -27,10 +27,16 @@ export interface SoundTransfer {
  * reads the live sequence, not the slot's stored copy: while a slot is
  * selected its edits live in the sequence and only copy back on switch.
  */
-export function createSoundTransfer(bank: SoundBank, liveSequence: SoundSequence): SoundTransfer {
+export function createSoundTransfer(
+  bank: SoundBank,
+  liveSequence: SoundSequence,
+): SoundTransfer {
   return {
     exportSelected(): void {
-      downloadTextFile(soundFileName(bank.selectedName), serializeSound(bank.selectedName, liveSequence));
+      downloadTextFile(
+        soundFileName(bank.selectedName),
+        serializeSound(bank.selectedName, liveSequence),
+      );
     },
     importSelected(): void {
       void importIntoSelected(bank);
@@ -46,21 +52,26 @@ async function importIntoSelected(bank: SoundBank): Promise<void> {
   try {
     parsed = parseSoundFile(await file.text());
   } catch (error) {
-    window.alert(`Could not import: ${error instanceof Error ? error.message : 'not a valid sound file.'}`);
+    window.alert(
+      `Could not import: ${error instanceof Error ? error.message : "not a valid sound file."}`,
+    );
     return;
   }
   const incoming = parsed.name || bank.selectedName;
-  const message = incoming === bank.selectedName
-    ? `Replace the sound in "${bank.selectedName}"? This cannot be undone.`
-    : `Replace "${bank.selectedName}" with "${incoming}"? This cannot be undone.`;
+  const message =
+    incoming === bank.selectedName
+      ? `Replace the sound in "${bank.selectedName}"? This cannot be undone.`
+      : `Replace "${bank.selectedName}" with "${incoming}"? This cannot be undone.`;
   if (!window.confirm(message)) return;
   bank.replaceSelected(parsed.sound, parsed.name);
 }
 
 /** Download text as a file through a temporary anchor. */
 function downloadTextFile(filename: string, text: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
-  const anchor = document.createElement('a');
+  const url = URL.createObjectURL(
+    new Blob([text], { type: "application/json" }),
+  );
+  const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;
   anchor.click();
@@ -70,11 +81,11 @@ function downloadTextFile(filename: string, text: string): void {
 /** Open the file picker for one JSON file; resolves null when cancelled. */
 function pickJsonFile(): Promise<File | null> {
   return new Promise((resolve) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/json,.json';
-    input.addEventListener('change', () => resolve(input.files?.[0] ?? null));
-    input.addEventListener('cancel', () => resolve(null));
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json,.json";
+    input.addEventListener("change", () => resolve(input.files?.[0] ?? null));
+    input.addEventListener("cancel", () => resolve(null));
     input.click();
   });
 }

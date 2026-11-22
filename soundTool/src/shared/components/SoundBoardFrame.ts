@@ -1,17 +1,17 @@
-import { Container, type Texture } from 'pixi.js';
-import { BoardFrame as BoardFrameArtwork } from './BoardFrame';
-import type { ControlMode } from '../controls';
-import type { SoundBank } from '../bank';
-import type { SoundTransfer } from '../ui/soundFileTransfer';
-import type { TransportActions } from '../transport';
-import type { PresetTextures } from './PresetPad';
-import type { SoundSequence } from '../audio/model';
-import { SoundBankPanel } from './SoundBankPanel';
-import { SoundBoardFooter } from './SoundBoardFooter';
-import { SoundBoardHeader } from './SoundBoardHeader';
-import { SoundBoardTabs, type TabIconTextures } from './SoundBoardTabs';
-import { SoundControlStrip } from './SoundControlStrip';
-import { SoundCreationPanel } from './SoundCreationPanel';
+import { Container, type Texture } from "pixi.js";
+import { BoardFrame as BoardFrameArtwork } from "./BoardFrame";
+import type { ControlMode } from "../controls";
+import type { SoundBank } from "../bank";
+import type { SoundTransfer } from "../ui/soundFileTransfer";
+import type { TransportActions } from "../transport";
+import type { PresetTextures } from "./PresetPad";
+import type { SoundSequence } from "../audio/model";
+import { SoundBankPanel } from "./SoundBankPanel";
+import { SoundBoardFooter } from "./SoundBoardFooter";
+import { SoundBoardHeader } from "./SoundBoardHeader";
+import { SoundBoardTabs, type TabIconTextures } from "./SoundBoardTabs";
+import { SoundControlStrip } from "./SoundControlStrip";
+import { SoundCreationPanel } from "./SoundCreationPanel";
 
 /**
  * 3:2 sound-board design rendered on the requested 1536×1024 canvas: header,
@@ -59,12 +59,22 @@ export class SoundBoardFrame extends Container {
   readonly controls: SoundControlStrip;
   readonly footer: SoundBoardFooter;
 
-  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures, private readonly sequence: SoundSequence, options: SoundBoardFrameOptions = {}) {
+  constructor(
+    presetTextures: PresetTextures,
+    mascotTexture: Texture,
+    tabIconTextures: TabIconTextures,
+    private readonly sequence: SoundSequence,
+    options: SoundBoardFrameOptions = {},
+  ) {
     super();
-    const controls = options.controls ?? '2d';
-    if (controls === '2d') this.scale.set(3);
+    const controls = options.controls ?? "2d";
+    if (controls === "2d") this.scale.set(3);
     const board = new BoardFrameArtwork(BOARD_WIDTH, BOARD_HEIGHT);
-    this.header = new SoundBoardHeader(BOARD_WIDTH - HEADER_INSET * 2, mascotTexture, controls);
+    this.header = new SoundBoardHeader(
+      BOARD_WIDTH - HEADER_INSET * 2,
+      mascotTexture,
+      controls,
+    );
     this.header.position.set(HEADER_INSET, HEADER_TOP);
 
     this.tabs = new SoundBoardTabs(tabIconTextures);
@@ -72,19 +82,43 @@ export class SoundBoardFrame extends Container {
 
     this.content = new Container();
     this.content.position.set(CONTENT_INSET, CONTENT_TOP);
-    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures, sequence, { transport: options.transport, bank: options.bank, controls });
+    this.creationPanel = new SoundCreationPanel(
+      CREATION_WIDTH,
+      CONTENT_HEIGHT,
+      presetTextures,
+      sequence,
+      { transport: options.transport, bank: options.bank, controls },
+    );
     // The bank runs full height beside the creation panel and the control strip.
     const bankHeight = CONTROLS_TOP + CONTROLS_HEIGHT - CONTENT_TOP;
-    this.bankPanel = new SoundBankPanel(BANK_WIDTH, bankHeight, options.bank, controls, options.io);
+    this.bankPanel = new SoundBankPanel(
+      BANK_WIDTH,
+      bankHeight,
+      options.bank,
+      controls,
+      options.io,
+    );
     this.bankPanel.position.x = BANK_LEFT - CONTENT_INSET;
     this.content.addChild(this.creationPanel, this.bankPanel);
 
-    this.controls = new SoundControlStrip(CREATION_WIDTH, CONTROLS_HEIGHT, sequence, { dials: options.transport, controls });
+    this.controls = new SoundControlStrip(
+      CREATION_WIDTH,
+      CONTROLS_HEIGHT,
+      sequence,
+      { dials: options.transport, controls },
+    );
     this.controls.position.set(CONTROLS_INSET, CONTROLS_TOP);
     this.footer = new SoundBoardFooter(BOARD_WIDTH - FOOTER_INSET * 2);
     this.footer.position.set(FOOTER_INSET, FOOTER_TOP);
 
-    this.addChild(board, this.header, this.content, this.tabs, this.controls, this.footer);
+    this.addChild(
+      board,
+      this.header,
+      this.content,
+      this.tabs,
+      this.controls,
+      this.footer,
+    );
   }
 
   /** Re-read the sequence in every caching view after a bank slot switch. */

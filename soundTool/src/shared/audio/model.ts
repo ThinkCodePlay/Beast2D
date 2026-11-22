@@ -1,4 +1,4 @@
-import type { PlaybackRate } from './rate.js';
+import type { PlaybackRate } from "./rate.js";
 
 /**
  * Sound data model. Kept free of Pixi so the same values drive the display
@@ -23,8 +23,15 @@ export interface SoundStep {
 }
 
 /** The six oscillator choices, in the order of the waveform buttons. */
-export const WAVEFORM_TYPES = ['sine', 'square', 'saw', 'triangle', 'noise', 'pulse'] as const;
-export type WaveformType = typeof WAVEFORM_TYPES[number];
+export const WAVEFORM_TYPES = [
+  "sine",
+  "square",
+  "saw",
+  "triangle",
+  "noise",
+  "pulse",
+] as const;
+export type WaveformType = (typeof WAVEFORM_TYPES)[number];
 
 export interface SoundSequence {
   /** Playback speed; read at Play, independent of note pitch. */
@@ -58,7 +65,10 @@ export const NOTE_WINDOW_BASE = 60;
  * of the editor's one live sequence. Both sequences have SEQUENCE_STEP_COUNT
  * steps.
  */
-export function copySoundSequence(from: SoundSequence, to: SoundSequence): void {
+export function copySoundSequence(
+  from: SoundSequence,
+  to: SoundSequence,
+): void {
   to.rate = from.rate;
   to.waveform = from.waveform;
   to.masterVolume = from.masterVolume;
@@ -80,11 +90,23 @@ export function toStepVolume(value: number): StepVolume {
 
 /** A fresh sequence: every step enabled at full volume, master at a quiet audition level. */
 export function createSoundSequence(notes?: NoteNumber[]): SoundSequence {
-  const steps: SoundStep[] = Array.from({ length: SEQUENCE_STEP_COUNT }, (_, index) => ({
-    note: notes?.[index] ?? NOTE_WINDOW_BASE,
-    volume: 7,
-    enabled: true,
-  }));
+  const steps: SoundStep[] = Array.from(
+    { length: SEQUENCE_STEP_COUNT },
+    (_, index) => ({
+      note: notes?.[index] ?? NOTE_WINDOW_BASE,
+      volume: 7,
+      enabled: true,
+    }),
+  );
   // Every dial rests at its neutral position, so a fresh board sounds raw.
-  return { steps, waveform: 'sine', masterVolume: 0.25, rate: 1, pan: 0.5, decay: 1, pitch: 0, cut: 1 };
+  return {
+    steps,
+    waveform: "sine",
+    masterVolume: 0.25,
+    rate: 1,
+    pan: 0.5,
+    decay: 1,
+    pitch: 0,
+    cut: 1,
+  };
 }

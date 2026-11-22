@@ -1,5 +1,10 @@
-import type { SoundBank } from '../bank';
-import { BANK_STORAGE_KEY, CORRUPT_BACKUP_PREFIX, parseBankSnapshot, serializeBank } from '../bankStorage';
+import type { SoundBank } from "../bank";
+import {
+  BANK_STORAGE_KEY,
+  CORRUPT_BACKUP_PREFIX,
+  parseBankSnapshot,
+  serializeBank,
+} from "../bankStorage";
 
 /**
  * The bank's localStorage persistence, wired by each renderer's composition
@@ -24,7 +29,10 @@ type Alert = (message: string) => void;
  * (false when there is nothing usable to restore). A corrupt snapshot is
  * preserved aside and reported; the board keeps its fresh state.
  */
-export function restoreBankSnapshot(bank: SoundBank, alert: Alert = message => window.alert(message)): boolean {
+export function restoreBankSnapshot(
+  bank: SoundBank,
+  alert: Alert = (message) => window.alert(message),
+): boolean {
   let raw: string | null;
   try {
     raw = window.localStorage.getItem(BANK_STORAGE_KEY);
@@ -39,15 +47,20 @@ export function restoreBankSnapshot(bank: SoundBank, alert: Alert = message => w
   } catch (error) {
     let backupKept = false;
     try {
-      window.localStorage.setItem(`${CORRUPT_BACKUP_PREFIX}${new Date().toISOString()}`, raw);
+      window.localStorage.setItem(
+        `${CORRUPT_BACKUP_PREFIX}${new Date().toISOString()}`,
+        raw,
+      );
       backupKept = true;
     } catch {
       // The backup copy failed too; the main key stays untouched as the last resort.
     }
-    const reason = error instanceof Error ? ` (${error.message})` : '';
-    alert(backupKept
-      ? `The saved sound bank could not be restored${reason}. A backup copy of the saved data was kept in this browser, and the board started fresh.`
-      : `The saved sound bank could not be restored${reason}, and a backup copy could not be written either; the saved data was left untouched and the board started fresh.`);
+    const reason = error instanceof Error ? ` (${error.message})` : "";
+    alert(
+      backupKept
+        ? `The saved sound bank could not be restored${reason}. A backup copy of the saved data was kept in this browser, and the board started fresh.`
+        : `The saved sound bank could not be restored${reason}, and a backup copy could not be written either; the saved data was left untouched and the board started fresh.`,
+    );
     return false;
   }
 }
@@ -56,7 +69,11 @@ export function restoreBankSnapshot(bank: SoundBank, alert: Alert = message => w
  * Save the bank every few seconds and when the page hides. Writes only when
  * the snapshot changed; a storage failure alerts once per session.
  */
-export function startBankAutosave(bank: SoundBank, isLooping: () => boolean, alert: Alert = message => window.alert(message)): void {
+export function startBankAutosave(
+  bank: SoundBank,
+  isLooping: () => boolean,
+  alert: Alert = (message) => window.alert(message),
+): void {
   let lastSaved: string | null = null;
   let failureAlerted = false;
   const save = (): void => {
@@ -73,10 +90,12 @@ export function startBankAutosave(bank: SoundBank, isLooping: () => boolean, ale
     } catch {
       if (!failureAlerted) {
         failureAlerted = true;
-        alert('The sound bank could not be saved in this browser; your changes will be lost when the page closes.');
+        alert(
+          "The sound bank could not be saved in this browser; your changes will be lost when the page closes.",
+        );
       }
     }
   };
   window.setInterval(save, 3000);
-  window.addEventListener('pagehide', save);
+  window.addEventListener("pagehide", save);
 }

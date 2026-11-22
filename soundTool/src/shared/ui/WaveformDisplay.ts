@@ -1,8 +1,8 @@
-import { Container, Graphics } from 'pixi.js';
-import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from './stepGrid';
-import { StepPitchGrid, defaultNotes } from './StepPitchGrid';
-import { StepVolumeRow } from './StepVolumeRow';
-import { createSoundSequence, type SoundSequence } from '../audio/model';
+import { Container, Graphics } from "pixi.js";
+import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from "./stepGrid";
+import { StepPitchGrid, defaultNotes } from "./StepPitchGrid";
+import { StepVolumeRow } from "./StepVolumeRow";
+import { createSoundSequence, type SoundSequence } from "../audio/model";
 
 const SECTION_COUNT = 8;
 const STEPS_PER_SECTION = STEP_COUNT / SECTION_COUNT;
@@ -34,9 +34,19 @@ export class WaveformDisplay extends Container {
     const barsBottom = height - BASE_INSET - VOLUME_ROW_HEIGHT - VOLUME_ROW_GAP;
     this.volumeRowTop = height - BASE_INSET - VOLUME_ROW_HEIGHT;
     this.addChild(drawFrame(width, height, barsBottom));
-    this.pitchGrid = new StepPitchGrid(this.sequence, width, barsBottom, onNoteChange);
+    this.pitchGrid = new StepPitchGrid(
+      this.sequence,
+      width,
+      barsBottom,
+      onNoteChange,
+    );
     this.addChild(this.pitchGrid);
-    this.volumeRow = new StepVolumeRow(this.sequence, width, VOLUME_ROW_HEIGHT, onVolumeChange);
+    this.volumeRow = new StepVolumeRow(
+      this.sequence,
+      width,
+      VOLUME_ROW_HEIGHT,
+      onVolumeChange,
+    );
     this.volumeRow.position.set(0, this.volumeRowTop);
     this.addChild(this.volumeRow);
   }
@@ -53,21 +63,30 @@ export class WaveformDisplay extends Container {
    * scene, where the display has no pointer events of its own.
    */
   paintAt(x: number, y: number): boolean {
-    if (y >= this.volumeRowTop) return this.volumeRow.paintAt(x, y - this.volumeRowTop);
+    if (y >= this.volumeRowTop)
+      return this.volumeRow.paintAt(x, y - this.volumeRowTop);
     return this.pitchGrid.paintAt(x, y);
   }
 }
 
-function drawFrame(width: number, height: number, barsBottom: number): Graphics {
+function drawFrame(
+  width: number,
+  height: number,
+  barsBottom: number,
+): Graphics {
   const frame = new Graphics()
-    .roundRect(0, 0, width, height, 2).fill(0x21132b)
-    .roundRect(1, 1, width - 2, height - 2, 2).fill(0x3f2651);
+    .roundRect(0, 0, width, height, 2)
+    .fill(0x21132b)
+    .roundRect(1, 1, width - 2, height - 2, 2)
+    .fill(0x3f2651);
   for (const x of sectionDividerPositions()) {
     frame.rect(x, 3, 1, height - 6).fill({ color: 0x76508c, alpha: 0.6 });
   }
   frame
-    .roundRect(1, 1, width - 2, 3, 2).fill({ color: 0x59366e, alpha: 0.8 })
-    .rect(1, height - 2, width - 2, 1).fill(0x39214c)
+    .roundRect(1, 1, width - 2, 3, 2)
+    .fill({ color: 0x59366e, alpha: 0.8 })
+    .rect(1, height - 2, width - 2, 1)
+    .fill(0x39214c)
     // Separator between the pitch bars and the volume row.
     .rect(3, Math.round(barsBottom + VOLUME_ROW_GAP / 2), width - 6, 1)
     .fill({ color: 0x76508c, alpha: 0.6 });
@@ -78,5 +97,8 @@ function drawFrame(width: number, height: number, barsBottom: number): Graphics 
 function sectionDividerPositions(): number[] {
   const halfGap = (STEP_STEP - STEP_WIDTH) / 2;
   return Array.from({ length: SECTION_COUNT - 1 }, (_, index) =>
-    Math.round(STEP_LEFT + (index + 1) * STEPS_PER_SECTION * STEP_STEP - halfGap));
+    Math.round(
+      STEP_LEFT + (index + 1) * STEPS_PER_SECTION * STEP_STEP - halfGap,
+    ),
+  );
 }

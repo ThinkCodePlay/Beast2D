@@ -94,3 +94,20 @@ pnpm preview
 ```
 
 `pnpm test:audio` runs the audio test suite.
+
+## Code checks
+
+Tooling is local to `soundTool/`; these commands do not format the engine at
+the repository root. ESLint checks source, tests and configuration. Prettier
+uses double quotes and skips generated builds, compiled tests and the pnpm
+lockfile. The existing Node test runner is unchanged.
+
+```sh
+pnpm typecheck
+pnpm lint
+pnpm format:check
+pnpm test:audio
+pnpm build
+```
+
+Use `pnpm format` to format the sound tool before committing.

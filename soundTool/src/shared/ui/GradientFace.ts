@@ -1,10 +1,30 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from "pixi.js";
 
 /** Chamfered-octagon outline points shared by every cut-corner face. */
-export function chamferPoints(x: number, y: number, w: number, h: number, c: number): number[] {
+export function chamferPoints(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  c: number,
+): number[] {
   return [
-    x + c, y, x + w - c, y, x + w, y + c, x + w, y + h - c,
-    x + w - c, y + h, x + c, y + h, x, y + h - c, x, y + c,
+    x + c,
+    y,
+    x + w - c,
+    y,
+    x + w,
+    y + c,
+    x + w,
+    y + h - c,
+    x + w - c,
+    y + h,
+    x + c,
+    y + h,
+    x,
+    y + h - c,
+    x,
+    y + c,
   ];
 }
 
@@ -16,9 +36,15 @@ export interface FaceTones {
 }
 
 function mix(a: number, b: number, t: number): number {
-  const ar = (a >> 16) & 255, ag = (a >> 8) & 255, ab = a & 255;
-  const br = (b >> 16) & 255, bg = (b >> 8) & 255, bb = b & 255;
-  const r = Math.round(ar + (br - ar) * t), g = Math.round(ag + (bg - ag) * t), bl = Math.round(ab + (bb - ab) * t);
+  const ar = (a >> 16) & 255,
+    ag = (a >> 8) & 255,
+    ab = a & 255;
+  const br = (b >> 16) & 255,
+    bg = (b >> 8) & 255,
+    bb = b & 255;
+  const r = Math.round(ar + (br - ar) * t),
+    g = Math.round(ag + (bg - ag) * t),
+    bl = Math.round(ab + (bb - ab) * t);
   return (r << 16) | (g << 8) | bl;
 }
 
@@ -39,7 +65,10 @@ export function drawGradientFace(
   chamfer = 0,
 ): void {
   const cut = chamfer > 0 ? chamfer : radius;
-  const ix = x + 2, iy = y + 2, iw = width - 4, ih = height - 4;
+  const ix = x + 2,
+    iy = y + 2,
+    iw = width - 4,
+    ih = height - 4;
   const corner = Math.max(1, cut - 1);
   if (chamfer > 0) {
     graphic.poly(chamferPoints(x, y, width, height, chamfer)).fill(tones.edge);
@@ -58,11 +87,16 @@ export function drawGradientFace(
     const distTop = r;
     const distBottom = rows - 1 - r;
     const inset = Math.max(0, corner - Math.min(distTop, distBottom, corner));
-    graphic.rect(ix + inset, rowY, iw - inset * 2, rowH).fill(mix(tones.mid, tones.bottom, t));
+    graphic
+      .rect(ix + inset, rowY, iw - inset * 2, rowH)
+      .fill(mix(tones.mid, tones.bottom, t));
   }
   // Thin bright light hugging the top edge, following the corner cut.
   graphic
-    .rect(ix + corner, iy, iw - corner * 2, 1).fill(tones.top)
-    .rect(ix + corner - 1, iy + 1, iw - corner * 2 + 2, 1).fill(tones.top)
-    .rect(ix, iy + corner, 1, Math.max(2, height / 3)).fill(tones.top);
+    .rect(ix + corner, iy, iw - corner * 2, 1)
+    .fill(tones.top)
+    .rect(ix + corner - 1, iy + 1, iw - corner * 2 + 2, 1)
+    .fill(tones.top)
+    .rect(ix, iy + corner, 1, Math.max(2, height / 3))
+    .fill(tones.top);
 }

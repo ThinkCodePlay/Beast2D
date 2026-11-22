@@ -7,28 +7,50 @@ import {
   Mesh3D,
   PlaneGeometry,
   View3D,
-} from '@pixi/3d';
-import type { FederatedPointerEvent, FederatedWheelEvent, PointData, Renderer, Texture } from 'pixi.js';
-import type { SoundSequence, WaveformType } from '../../shared/audio/model';
-import { MAX_NAME_LENGTH, type SoundBank } from '../../shared/bank';
-import type { SoundTransfer } from '../../shared/ui/soundFileTransfer';
-import { canvasRectToCss, openNameEditor } from '../../shared/ui/nameEditor';
-import type { TransportActions } from '../../shared/transport';
-import { applyDial, dialSnap, dialValue, type KnobLabel } from '../../shared/dials';
-import { valueTowardPoint } from '../../shared/ui/knobTurn';
-import { drawSelectionRing, WaveformButton } from '../../shared/components/WaveformButton';
-import { PixelButton, BUTTON_TONES } from '../../shared/ui/PixelButton';
-import { KnobCap } from '../../shared/ui/PixelKnob';
-import { PresetPad, type PresetTextures } from '../../shared/components/PresetPad';
-import { RunButton } from '../../shared/components/RunButton';
-import { ScrollArrowButton } from '../../shared/components/SoundBankPanel';
-import { BankStripButton } from '../../shared/components/BankStripButton';
-import { applyPreset, isPresetKey } from '../../shared/presets';
-import { SoundBoardFrame } from '../../shared/components/SoundBoardFrame';
-import type { TabIconTextures } from '../../shared/components/SoundBoardTabs';
-import { Button3D } from './Button3D';
-import { Knob3D } from './Knob3D';
-import { BOARD_WIDTH, BOARD_HEIGHT, CABINET_DEPTH, boardToWorld } from './boardSpace';
+} from "@pixi/3d";
+import type {
+  FederatedPointerEvent,
+  FederatedWheelEvent,
+  PointData,
+  Renderer,
+  Texture,
+} from "pixi.js";
+import type { SoundSequence, WaveformType } from "../../shared/audio/model";
+import { MAX_NAME_LENGTH, type SoundBank } from "../../shared/bank";
+import type { SoundTransfer } from "../../shared/ui/soundFileTransfer";
+import { canvasRectToCss, openNameEditor } from "../../shared/ui/nameEditor";
+import type { TransportActions } from "../../shared/transport";
+import {
+  applyDial,
+  dialSnap,
+  dialValue,
+  type KnobLabel,
+} from "../../shared/dials";
+import { valueTowardPoint } from "../../shared/ui/knobTurn";
+import {
+  drawSelectionRing,
+  WaveformButton,
+} from "../../shared/components/WaveformButton";
+import { PixelButton, BUTTON_TONES } from "../../shared/ui/PixelButton";
+import { KnobCap } from "../../shared/ui/PixelKnob";
+import {
+  PresetPad,
+  type PresetTextures,
+} from "../../shared/components/PresetPad";
+import { RunButton } from "../../shared/components/RunButton";
+import { ScrollArrowButton } from "../../shared/components/SoundBankPanel";
+import { BankStripButton } from "../../shared/components/BankStripButton";
+import { applyPreset, isPresetKey } from "../../shared/presets";
+import { SoundBoardFrame } from "../../shared/components/SoundBoardFrame";
+import type { TabIconTextures } from "../../shared/components/SoundBoardTabs";
+import { Button3D } from "./Button3D";
+import { Knob3D } from "./Knob3D";
+import {
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  CABINET_DEPTH,
+  boardToWorld,
+} from "./boardSpace";
 import {
   BANK_STRIP_BUTTONS,
   BANK_ROWS_AREA,
@@ -42,11 +64,11 @@ import {
   WAVEFORM_BUTTONS,
   WAVEFORM_DISPLAY,
   type ControlRect,
-} from './controlLayout';
-import { BankRows3D } from './BankRows3D';
-import { ScrollbarThumb3D } from './ScrollbarThumb3D';
-import { LcdDisplay3D } from './LcdDisplay3D';
-import { WAVEFORM_FACE_Z, WaveformDisplay3D } from './WaveformDisplay3D';
+} from "./controlLayout";
+import { BankRows3D } from "./BankRows3D";
+import { ScrollbarThumb3D } from "./ScrollbarThumb3D";
+import { LcdDisplay3D } from "./LcdDisplay3D";
+import { WAVEFORM_FACE_Z, WaveformDisplay3D } from "./WaveformDisplay3D";
 
 const FACE_RESOLUTION = 3; // Captures the 512-wide design at the canvas's 1536 pixels.
 /** World z of the flat live overlays (LCD, bank rows), just above the cabinet face. */
@@ -58,7 +80,12 @@ const OVERLAY_WORLD_Z = 0.7;
  * 2D artwork.
  */
 export class SoundBoardScene3D extends Container3D {
-  private readonly knobs: { rotor: Knob3D; cx: number; cy: number; label: KnobLabel }[] = [];
+  private readonly knobs: {
+    rotor: Knob3D;
+    cx: number;
+    cy: number;
+    label: KnobLabel;
+  }[] = [];
   private waveformButtons: { type: WaveformType; button: Button3D }[] = [];
   private waveform?: WaveformDisplay3D;
   private bankRows?: BankRows3D;
@@ -76,7 +103,15 @@ export class SoundBoardScene3D extends Container3D {
     private readonly io: SoundTransfer,
   ) {
     super();
-    this.addChild(createCabinet(renderer, presetTextures, mascotTexture, tabIconTextures, sequence));
+    this.addChild(
+      createCabinet(
+        renderer,
+        presetTextures,
+        mascotTexture,
+        tabIconTextures,
+        sequence,
+      ),
+    );
     this.addChild(...this.createControls(renderer, presetTextures));
     this.addChild(createKeyLight());
     bank.onChange(() => this.refreshFromSequence());
@@ -88,8 +123,12 @@ export class SoundBoardScene3D extends Container3D {
    * dials re-apply to the player so what you hear matches the slot.
    */
   private refreshFromSequence(): void {
-    this.knobs.forEach(({ rotor, label }) => rotor.setValue(dialValue(label, this.sequence)));
-    this.waveformButtons.forEach(({ type, button }) => button.setSelected(type === this.sequence.waveform));
+    this.knobs.forEach(({ rotor, label }) =>
+      rotor.setValue(dialValue(label, this.sequence)),
+    );
+    this.waveformButtons.forEach(({ type, button }) =>
+      button.setSelected(type === this.sequence.waveform),
+    );
     this.waveform?.display.refresh();
     this.transport.setMasterVolume(this.sequence.masterVolume);
     this.transport.setPan(this.sequence.pan);
@@ -106,43 +145,50 @@ export class SoundBoardScene3D extends Container3D {
     // Bank rows: a tap selects the tapped slot (empty slots ignore it) or
     // adds a slot on the "+ new" row. The mouse wheel steps the row window,
     // like the 2D rows.
-    this.bankRows?.on('pointertap', (event) => {
+    this.bankRows?.on("pointertap", (event) => {
       const { y } = this.boardPoint(view, event.global);
       this.bankRows!.rows.tapAt(y - BANK_ROWS_AREA.y);
     });
-    this.bankRows?.on('wheel', (event: FederatedWheelEvent) => {
-      this.bank.setScrollOffset(this.bank.scrollOffset + Math.sign(event.deltaY));
+    this.bankRows?.on("wheel", (event: FederatedWheelEvent) => {
+      this.bank.setScrollOffset(
+        this.bank.scrollOffset + Math.sign(event.deltaY),
+      );
     });
     // Scrollbar thumb: a press on the thumb drags it to scroll, tracked on
     // the view so the drag survives leaving the track. The bare track and
     // the arrow buttons keep their 2D behavior (nothing / step).
-    this.scrollThumb?.on('pointerdown', (event) => {
-      const grabOffset = this.scrollThumb!.grabOffsetAt(this.boardPoint(view, event.global).y - SCROLL_THUMB_AREA.y);
+    this.scrollThumb?.on("pointerdown", (event) => {
+      const grabOffset = this.scrollThumb!.grabOffsetAt(
+        this.boardPoint(view, event.global).y - SCROLL_THUMB_AREA.y,
+      );
       if (grabOffset === null) return;
       const move = (e: FederatedPointerEvent): void => {
-        this.scrollThumb!.dragTo(this.boardPoint(view, e.global).y - SCROLL_THUMB_AREA.y, grabOffset);
+        this.scrollThumb!.dragTo(
+          this.boardPoint(view, e.global).y - SCROLL_THUMB_AREA.y,
+          grabOffset,
+        );
       };
       const end = (): void => {
-        view.off('pointermove', move);
-        view.off('pointerup', end);
-        view.off('pointerupoutside', end);
-        view.off('pointercancel', end);
+        view.off("pointermove", move);
+        view.off("pointerup", end);
+        view.off("pointerupoutside", end);
+        view.off("pointercancel", end);
       };
-      view.on('pointermove', move);
-      view.on('pointerup', end);
-      view.on('pointerupoutside', end);
-      view.on('pointercancel', end);
+      view.on("pointermove", move);
+      view.on("pointerup", end);
+      view.on("pointerupoutside", end);
+      view.on("pointercancel", end);
     });
     // LCD: a tap opens the name editor over the LCD's on-screen rectangle.
-    this.lcd?.on('pointertap', () => {
-      const canvas = document.querySelector('canvas');
+    this.lcd?.on("pointertap", () => {
+      const canvas = document.querySelector("canvas");
       if (!canvas) return;
       const rect = this.screenRect(view, LCD_DISPLAY);
       if (!rect) return;
       openNameEditor(canvasRectToCss(canvas, rect), {
         value: this.bank.selectedName,
         maxLength: MAX_NAME_LENGTH,
-        onCommit: name => this.bank.rename(name),
+        onCommit: (name) => this.bank.rename(name),
       });
     });
     this.knobs.forEach(({ rotor, cx, cy, label }) => {
@@ -152,22 +198,28 @@ export class SoundBoardScene3D extends Container3D {
         const t = -ray.origin.z / ray.direction.z;
         const worldX = ray.origin.x + t * ray.direction.x;
         const worldY = ray.origin.y + t * ray.direction.y;
-        const value = valueTowardPoint(cx, cy, worldX + BOARD_WIDTH / 2, BOARD_HEIGHT / 2 - worldY, NEEDLE_START_ANGLE);
+        const value = valueTowardPoint(
+          cx,
+          cy,
+          worldX + BOARD_WIDTH / 2,
+          BOARD_HEIGHT / 2 - worldY,
+          NEEDLE_START_ANGLE,
+        );
         rotor.setValue(dialSnap(label)?.(value) ?? value);
         this.applyDial(label, rotor.getValue());
       };
-      rotor.on('pointerdown', (event) => {
+      rotor.on("pointerdown", (event) => {
         const move = (e: FederatedPointerEvent): void => turnToward(e.global);
         const end = (): void => {
-          view.off('pointermove', move);
-          view.off('pointerup', end);
-          view.off('pointerupoutside', end);
-          view.off('pointercancel', end);
+          view.off("pointermove", move);
+          view.off("pointerup", end);
+          view.off("pointerupoutside", end);
+          view.off("pointercancel", end);
         };
-        view.on('pointermove', move);
-        view.on('pointerup', end);
-        view.on('pointerupoutside', end);
-        view.on('pointercancel', end);
+        view.on("pointermove", move);
+        view.on("pointerup", end);
+        view.on("pointerupoutside", end);
+        view.on("pointercancel", end);
         turnToward(event.global);
       });
     });
@@ -179,7 +231,10 @@ export class SoundBoardScene3D extends Container3D {
   }
 
   /** Meet the pointer ray with the board plane (z = 0), in board-design pixels. */
-  private boardPoint(view: View3D, global: PointData): { x: number; y: number } {
+  private boardPoint(
+    view: View3D,
+    global: PointData,
+  ): { x: number; y: number } {
     const ray = view.screenToRay(global);
     const t = -ray.origin.z / ray.direction.z;
     return {
@@ -189,22 +244,33 @@ export class SoundBoardScene3D extends Container3D {
   }
 
   /** A board-design rectangle's bounds in pixi screen space, or null behind the camera. */
-  private screenRect(view: View3D, rect: ControlRect): { x: number; y: number; width: number; height: number } | null {
+  private screenRect(
+    view: View3D,
+    rect: ControlRect,
+  ): { x: number; y: number; width: number; height: number } | null {
     const corners = [
       boardToWorld(rect.x, rect.y),
       boardToWorld(rect.x + rect.width, rect.y),
       boardToWorld(rect.x, rect.y + rect.height),
       boardToWorld(rect.x + rect.width, rect.y + rect.height),
     ].map(({ x, y }) => view.worldToScreen({ x, y, z: OVERLAY_WORLD_Z }));
-    if (corners.some(corner => corner === null)) return null;
-    const xs = corners.map(corner => corner!.x);
-    const ys = corners.map(corner => corner!.y);
+    if (corners.some((corner) => corner === null)) return null;
+    const xs = corners.map((corner) => corner!.x);
+    const ys = corners.map((corner) => corner!.y);
     const left = Math.min(...xs);
     const top = Math.min(...ys);
-    return { x: left, y: top, width: Math.max(...xs) - left, height: Math.max(...ys) - top };
+    return {
+      x: left,
+      y: top,
+      width: Math.max(...xs) - left,
+      height: Math.max(...ys) - top,
+    };
   }
 
-  private createControls(renderer: Renderer, presetTextures: PresetTextures): Container3D[] {
+  private createControls(
+    renderer: Renderer,
+    presetTextures: PresetTextures,
+  ): Container3D[] {
     const controls: Container3D[] = [];
 
     TRANSPORT_BUTTONS.forEach(({ icon, tone, ...rect }) => {
@@ -214,9 +280,12 @@ export class SoundBoardScene3D extends Container3D {
         bodyColor: BUTTON_TONES[tone].bottom,
         renderer,
       });
-      if (icon === '▶') button.on('pointertap', this.transport.play);
-      if (icon === '■') button.on('pointertap', this.transport.stop);
-      if (icon === '↻') button.on('pointertap', () => button.setLatched(this.transport.toggleLoop()));
+      if (icon === "▶") button.on("pointertap", this.transport.play);
+      if (icon === "■") button.on("pointertap", this.transport.stop);
+      if (icon === "↻")
+        button.on("pointertap", () =>
+          button.setLatched(this.transport.toggleLoop()),
+        );
       controls.push(place(button, rect));
     });
 
@@ -230,10 +299,11 @@ export class SoundBoardScene3D extends Container3D {
       });
       // A pad tap loads its preset into the selected bank slot (Undo restores
       // what was there) and plays it once, even while Loop is on.
-      if (isPresetKey(icon)) button.on('pointertap', () => {
-        applyPreset(this.bank, icon);
-        this.transport.playOnce();
-      });
+      if (isPresetKey(icon))
+        button.on("pointertap", () => {
+          applyPreset(this.bank, icon);
+          this.transport.playOnce();
+        });
       controls.push(place(button, rect));
     });
 
@@ -247,22 +317,29 @@ export class SoundBoardScene3D extends Container3D {
         renderer,
       });
       button.setSelected(type === this.sequence.waveform);
-      button.on('pointertap', () => {
+      button.on("pointertap", () => {
         this.sequence.waveform = type;
-        waveformButtons.forEach(other => other.button.setSelected(other.type === type));
+        waveformButtons.forEach((other) =>
+          other.button.setSelected(other.type === type),
+        );
       });
       controls.push(place(button, rect));
       return { type, button };
     });
     const waveformButtons = this.waveformButtons;
 
-    controls.push(place(new Button3D({
-      face: new RunButton(),
-      ...RUN_BUTTON,
-      depth: 6,
-      bodyColor: 0x8e2b4a,
-      renderer,
-    }), RUN_BUTTON));
+    controls.push(
+      place(
+        new Button3D({
+          face: new RunButton(),
+          ...RUN_BUTTON,
+          depth: 6,
+          bodyColor: 0x8e2b4a,
+          renderer,
+        }),
+        RUN_BUTTON,
+      ),
+    );
 
     BANK_STRIP_BUTTONS.forEach(({ action, ...rect }) => {
       const button = new Button3D({
@@ -272,13 +349,16 @@ export class SoundBoardScene3D extends Container3D {
         bodyColor: 0x8a63a0,
         renderer,
       });
-      if (action === 'undo') {
+      if (action === "undo") {
         // Dimmed while the bank has nothing to restore, like the 2D strip.
         button.setEnabled(this.bank.canUndo);
         this.bank.onChange(() => button.setEnabled(this.bank.canUndo));
-        button.on('pointertap', () => this.bank.undoLast());
+        button.on("pointertap", () => this.bank.undoLast());
       } else {
-        button.on('pointertap', action === 'import' ? this.io.importSelected : this.io.exportSelected);
+        button.on(
+          "pointertap",
+          action === "import" ? this.io.importSelected : this.io.exportSelected,
+        );
       }
       controls.push(place(button, rect));
     });
@@ -291,7 +371,9 @@ export class SoundBoardScene3D extends Container3D {
         bodyColor: 0x8a63a0,
         renderer,
       });
-      button.on('pointertap', () => this.bank.setScrollOffset(this.bank.scrollOffset + (up ? -1 : 1)));
+      button.on("pointertap", () =>
+        this.bank.setScrollOffset(this.bank.scrollOffset + (up ? -1 : 1)),
+      );
       controls.push(place(button, rect));
     });
 
@@ -303,16 +385,34 @@ export class SoundBoardScene3D extends Container3D {
     });
 
     // Pitch and volume edits both audition the edited step.
-    this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer, this.sequence, this.transport.audition, this.transport.audition), WAVEFORM_DISPLAY);
+    this.waveform = place(
+      new WaveformDisplay3D(
+        WAVEFORM_DISPLAY,
+        renderer,
+        this.sequence,
+        this.transport.audition,
+        this.transport.audition,
+      ),
+      WAVEFORM_DISPLAY,
+    );
     controls.push(this.waveform);
 
     // Live flat overlays: the name LCD and the selectable bank rows, left out
     // of the cabinet's baked face artwork so they can change with the bank.
-    this.lcd = place(new LcdDisplay3D(LCD_DISPLAY, renderer, this.bank), LCD_DISPLAY);
+    this.lcd = place(
+      new LcdDisplay3D(LCD_DISPLAY, renderer, this.bank),
+      LCD_DISPLAY,
+    );
     controls.push(this.lcd);
-    this.bankRows = place(new BankRows3D(BANK_ROWS_AREA, renderer, this.bank), BANK_ROWS_AREA);
+    this.bankRows = place(
+      new BankRows3D(BANK_ROWS_AREA, renderer, this.bank),
+      BANK_ROWS_AREA,
+    );
     controls.push(this.bankRows);
-    this.scrollThumb = place(new ScrollbarThumb3D(SCROLL_THUMB_AREA, renderer, this.bank), SCROLL_THUMB_AREA);
+    this.scrollThumb = place(
+      new ScrollbarThumb3D(SCROLL_THUMB_AREA, renderer, this.bank),
+      SCROLL_THUMB_AREA,
+    );
     controls.push(this.scrollThumb);
 
     return controls;
@@ -330,22 +430,29 @@ export class SoundBoardScene3D extends Container3D {
     const paintAt = (global: PointData): void => {
       const ray = view.screenToRay(global);
       const t = (WAVEFORM_FACE_Z - ray.origin.z) / ray.direction.z;
-      const x = ray.origin.x + t * ray.direction.x + BOARD_WIDTH / 2 - WAVEFORM_DISPLAY.x;
-      const y = BOARD_HEIGHT / 2 - (ray.origin.y + t * ray.direction.y) - WAVEFORM_DISPLAY.y;
+      const x =
+        ray.origin.x +
+        t * ray.direction.x +
+        BOARD_WIDTH / 2 -
+        WAVEFORM_DISPLAY.x;
+      const y =
+        BOARD_HEIGHT / 2 -
+        (ray.origin.y + t * ray.direction.y) -
+        WAVEFORM_DISPLAY.y;
       waveform.display.paintAt(x, y);
     };
-    waveform.on('pointerdown', (event) => {
+    waveform.on("pointerdown", (event) => {
       const move = (e: FederatedPointerEvent): void => paintAt(e.global);
       const end = (): void => {
-        view.off('pointermove', move);
-        view.off('pointerup', end);
-        view.off('pointerupoutside', end);
-        view.off('pointercancel', end);
+        view.off("pointermove", move);
+        view.off("pointerup", end);
+        view.off("pointerupoutside", end);
+        view.off("pointercancel", end);
       };
-      view.on('pointermove', move);
-      view.on('pointerup', end);
-      view.on('pointerupoutside', end);
-      view.on('pointercancel', end);
+      view.on("pointermove", move);
+      view.on("pointerup", end);
+      view.on("pointerupoutside", end);
+      view.on("pointercancel", end);
       paintAt(event.global);
     });
   }
@@ -364,14 +471,24 @@ function createCabinet(
   const cabinet = new Container3D();
 
   const body = new Mesh3D({
-    geometry: new CubeGeometry({ width: BOARD_WIDTH, height: BOARD_HEIGHT, depth: CABINET_DEPTH }),
+    geometry: new CubeGeometry({
+      width: BOARD_WIDTH,
+      height: BOARD_HEIGHT,
+      depth: CABINET_DEPTH,
+    }),
     material: new Material3D({ baseColor: 0x4d2c71, roughness: 0.7 }),
   });
   body.position.z = -CABINET_DEPTH / 2;
 
   // Every flat surface of the board - frame art, header, tabs, panels,
   // waveform, bank rows, footer and dial markings - drawn onto the front.
-  const flatBoard = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, { controls: '3d' });
+  const flatBoard = new SoundBoardFrame(
+    presetTextures,
+    mascotTexture,
+    tabIconTextures,
+    sequence,
+    { controls: "3d" },
+  );
   const faceTexture = new ContainerTexture({
     container: flatBoard,
     width: BOARD_WIDTH,
@@ -392,10 +509,22 @@ function createCabinet(
 
 function createKnob(
   renderer: Renderer,
-  knob: { label: string; cx: number; cy: number; value: number; color: number; radius: number },
+  knob: {
+    label: string;
+    cx: number;
+    cy: number;
+    value: number;
+    color: number;
+    radius: number;
+  },
 ): Knob3D {
   const rotor = new Knob3D({
-    cap: new KnobCap(knob.value, knob.color, { x: 16, y: 16 }, NEEDLE_START_ANGLE),
+    cap: new KnobCap(
+      knob.value,
+      knob.color,
+      { x: 16, y: 16 },
+      NEEDLE_START_ANGLE,
+    ),
     value: knob.value,
     radius: knob.radius,
     depth: 7,
@@ -408,13 +537,20 @@ function createKnob(
 
 /** Center a control on its face rectangle, on top of the board's front face. */
 function place<T extends Container3D>(control: T, rect: ControlRect): T {
-  const { x, y } = boardToWorld(rect.x + rect.width / 2, rect.y + rect.height / 2);
+  const { x, y } = boardToWorld(
+    rect.x + rect.width / 2,
+    rect.y + rect.height / 2,
+  );
   control.position.set(x, y, 0);
   return control;
 }
 
 function createKeyLight(): DirectionalLight {
-  const light = new DirectionalLight({ color: 0xfff4e0, intensity: 1.6, castShadow: true });
+  const light = new DirectionalLight({
+    color: 0xfff4e0,
+    intensity: 1.6,
+    castShadow: true,
+  });
   light.position.set(-140, 220, 320);
   light.lookAt({ x: 0, y: 0, z: 0 });
   return light;

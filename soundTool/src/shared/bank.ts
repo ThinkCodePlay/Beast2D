@@ -1,4 +1,8 @@
-import { copySoundSequence, createSoundSequence, type SoundSequence } from './audio/model.js';
+import {
+  copySoundSequence,
+  createSoundSequence,
+  type SoundSequence,
+} from "./audio/model.js";
 
 /**
  * Sound bank state: the board's named sound slots and the current selection.
@@ -58,9 +62,20 @@ export interface BankSlot extends BankSlotData {
  * can rename on the LCD.
  */
 export const DEFAULT_BANK_SLOTS: readonly BankSlotData[] = [
-  ...(['jump', 'coin', 'hit', 'laser', 'boom_big', 'power_up', 'enemy_die', 'select']
-    .map((name): BankSlotData => ({ name, empty: false }))),
-  ...Array.from({ length: 8 }, (): BankSlotData => ({ name: 'empty', empty: true })),
+  ...[
+    "jump",
+    "coin",
+    "hit",
+    "laser",
+    "boom_big",
+    "power_up",
+    "enemy_die",
+    "select",
+  ].map((name): BankSlotData => ({ name, empty: false })),
+  ...Array.from({ length: 8 }, (): BankSlotData => ({
+    name: "empty",
+    empty: true,
+  })),
 ];
 
 /**
@@ -81,9 +96,13 @@ export class SoundBank {
    * @param createSound Factory for a slot's starting sound; every slot gets
    * its own copy. Called once per slot at construction.
    */
-  constructor(createSound: () => SoundSequence, selectedIndex = 3, slots: readonly BankSlotData[] = DEFAULT_BANK_SLOTS) {
+  constructor(
+    createSound: () => SoundSequence,
+    selectedIndex = 3,
+    slots: readonly BankSlotData[] = DEFAULT_BANK_SLOTS,
+  ) {
     this.createSound = createSound;
-    this.slots = slots.map(slot => ({ ...slot, sound: createSound() }));
+    this.slots = slots.map((slot) => ({ ...slot, sound: createSound() }));
     this._selectedIndex = selectedIndex;
   }
 
@@ -120,7 +139,7 @@ export class SoundBank {
       copySoundSequence(slot.sound, this.active);
     }
     this._selectedIndex = index;
-    this.listeners.forEach(listener => listener(index));
+    this.listeners.forEach((listener) => listener(index));
     return true;
   }
 
@@ -149,7 +168,7 @@ export class SoundBank {
     const slot = this.slots[this._selectedIndex];
     if (!clean || clean === slot.name) return false;
     slot.name = clean;
-    this.listeners.forEach(listener => listener(this._selectedIndex));
+    this.listeners.forEach((listener) => listener(this._selectedIndex));
     return true;
   }
 
@@ -166,7 +185,7 @@ export class SoundBank {
     if (this.active) copySoundSequence(sound, this.active);
     const clean = name.trim().slice(0, MAX_NAME_LENGTH);
     if (clean) slot.name = clean;
-    this.listeners.forEach(listener => listener(this._selectedIndex));
+    this.listeners.forEach((listener) => listener(this._selectedIndex));
   }
 
   /**
@@ -176,7 +195,10 @@ export class SoundBank {
   copySlots(): BankSlot[] {
     return this.slots.map((slot, index) => {
       const sound = createSoundSequence();
-      copySoundSequence(index === this._selectedIndex && this.active ? this.active : slot.sound, sound);
+      copySoundSequence(
+        index === this._selectedIndex && this.active ? this.active : slot.sound,
+        sound,
+      );
       return { name: slot.name, empty: slot.empty, sound };
     });
   }
@@ -188,20 +210,29 @@ export class SoundBank {
    * to slot states from before the restore.
    */
   restore(slots: readonly BankSlot[], selectedIndex: number): void {
-    this.slots = slots.map(slot => {
+    this.slots = slots.map((slot) => {
       const sound = createSoundSequence();
       copySoundSequence(slot.sound, sound);
-      return { name: slot.name.trim().slice(0, MAX_NAME_LENGTH) || slot.name, empty: slot.empty, sound };
+      return {
+        name: slot.name.trim().slice(0, MAX_NAME_LENGTH) || slot.name,
+        empty: slot.empty,
+        sound,
+      };
     });
     const wanted = this.slots[selectedIndex];
-    this._selectedIndex = wanted && !wanted.empty
-      ? selectedIndex
-      : Math.max(0, this.slots.findIndex(slot => !slot.empty));
+    this._selectedIndex =
+      wanted && !wanted.empty
+        ? selectedIndex
+        : Math.max(
+            0,
+            this.slots.findIndex((slot) => !slot.empty),
+          );
     this.undoStack.length = 0;
     this._scrollOffset = 0;
-    if (this.active) copySoundSequence(this.slots[this._selectedIndex].sound, this.active);
+    if (this.active)
+      copySoundSequence(this.slots[this._selectedIndex].sound, this.active);
     this.ensureVisible(this._selectedIndex);
-    this.listeners.forEach(listener => listener(this._selectedIndex));
+    this.listeners.forEach((listener) => listener(this._selectedIndex));
   }
 
   /**
@@ -219,16 +250,20 @@ export class SoundBank {
 
   /** Scroll the row window. Offsets clamp to the meaningful range. */
   setScrollOffset(offset: number): void {
-    const next = Math.max(0, Math.min(this.maxScrollOffset, Math.round(offset)));
+    const next = Math.max(
+      0,
+      Math.min(this.maxScrollOffset, Math.round(offset)),
+    );
     if (next === this._scrollOffset) return;
     this._scrollOffset = next;
-    this.listeners.forEach(listener => listener(this._selectedIndex));
+    this.listeners.forEach((listener) => listener(this._selectedIndex));
   }
 
   /** Scroll only as far as needed to put a slot inside the window. */
   ensureVisible(index: number): void {
     if (index < this._scrollOffset) this.setScrollOffset(index);
-    else if (index >= this._scrollOffset + VISIBLE_SLOT_ROWS) this.setScrollOffset(index - VISIBLE_SLOT_ROWS + 1);
+    else if (index >= this._scrollOffset + VISIBLE_SLOT_ROWS)
+      this.setScrollOffset(index - VISIBLE_SLOT_ROWS + 1);
   }
 
   /**
@@ -239,14 +274,21 @@ export class SoundBank {
    * index.
    */
   addSlot(): number {
-    let index = this.slots.findIndex(slot => slot.empty);
+    let index = this.slots.findIndex((slot) => slot.empty);
     if (index === -1) {
       index = this.slots.length;
-      (this.slots as BankSlot[]).push({ name: '', empty: true, sound: this.createSound() });
+      (this.slots as BankSlot[]).push({
+        name: "",
+        empty: true,
+        sound: this.createSound(),
+      });
     }
     const slot = this.slots[index] as BankSlot;
     slot.empty = false;
-    slot.name = `sound_${String(index + 1).padStart(2, '0')}`.slice(0, MAX_NAME_LENGTH);
+    slot.name = `sound_${String(index + 1).padStart(2, "0")}`.slice(
+      0,
+      MAX_NAME_LENGTH,
+    );
     this.select(index);
     this.ensureVisible(index);
     return index;
@@ -267,13 +309,14 @@ export class SoundBank {
     const entry = this.undoStack.pop();
     if (!entry) return false;
     // Flush live edits back into the current slot first, as a switch does.
-    if (this.active) copySoundSequence(this.active, this.slots[this._selectedIndex].sound);
+    if (this.active)
+      copySoundSequence(this.active, this.slots[this._selectedIndex].sound);
     const slot = this.slots[entry.index];
     copySoundSequence(entry.sound, slot.sound);
     slot.name = entry.name;
     this._selectedIndex = entry.index;
     if (this.active) copySoundSequence(entry.sound, this.active);
-    this.listeners.forEach(listener => listener(entry.index));
+    this.listeners.forEach((listener) => listener(entry.index));
     return true;
   }
 
@@ -283,7 +326,9 @@ export class SoundBank {
    */
   onChange(listener: (index: number) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   /** Snapshot the selected slot before a replacement, for undoLast(). */
@@ -292,7 +337,11 @@ export class SoundBank {
     const snapshot = createSoundSequence();
     // The live sequence holds the slot's current sound while it is selected.
     copySoundSequence(this.active ?? slot.sound, snapshot);
-    this.undoStack.push({ index: this._selectedIndex, name: slot.name, sound: snapshot });
+    this.undoStack.push({
+      index: this._selectedIndex,
+      name: slot.name,
+      sound: snapshot,
+    });
     if (this.undoStack.length > UNDO_LIMIT) this.undoStack.shift();
   }
 }

@@ -1,7 +1,12 @@
-import { Container, Graphics, Rectangle, type FederatedPointerEvent } from 'pixi.js';
-import { trackDrag } from './Pressable';
-import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from './stepGrid';
-import { toStepVolume, type SoundSequence } from '../audio/model';
+import {
+  Container,
+  Graphics,
+  Rectangle,
+  type FederatedPointerEvent,
+} from "pixi.js";
+import { trackDrag } from "./Pressable";
+import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from "./stepGrid";
+import { toStepVolume, type SoundSequence } from "../audio/model";
 
 /** Highest volume a step can hold; the row shows STEP_VOLUME_MAX + 1 levels. */
 export const STEP_VOLUME_MAX = 7;
@@ -64,7 +69,9 @@ export class StepVolumeRow extends Container {
       const x = STEP_LEFT + step * STEP_STEP;
       // A dim slot line keeps silent steps visible against the frame.
       this.bars.rect(x, floor - 1, STEP_WIDTH, 1).fill(SLOT);
-      const barHeight = this.sequence.steps[step].volume * (this.rowHeight - 2) / STEP_VOLUME_MAX;
+      const barHeight =
+        (this.sequence.steps[step].volume * (this.rowHeight - 2)) /
+        STEP_VOLUME_MAX;
       if (barHeight <= 0) continue;
       const top = floor - barHeight;
       const baseHeight = Math.max(1, Math.round(barHeight * 0.18));

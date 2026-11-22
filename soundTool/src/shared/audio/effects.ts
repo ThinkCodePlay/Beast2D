@@ -1,4 +1,4 @@
-import { normalizedVolume } from './synthesis.js';
+import { normalizedVolume } from "./synthesis.js";
 
 /**
  * Dial mappings for the PAN, DECAY, PITCH and CUT controls. The sequence
@@ -28,16 +28,24 @@ export function snapPitchDial(value: number): number {
 }
 
 export function pitchFromDial(value: number): number {
-  return Math.round(snapPitchDial(value) * PITCH_RANGE_SEMITONES * 2) - PITCH_RANGE_SEMITONES;
+  return (
+    Math.round(snapPitchDial(value) * PITCH_RANGE_SEMITONES * 2) -
+    PITCH_RANGE_SEMITONES
+  );
 }
 
 export function pitchToDial(pitch: number): number {
-  return (validPitch(pitch) + PITCH_RANGE_SEMITONES) / (PITCH_RANGE_SEMITONES * 2);
+  return (
+    (validPitch(pitch) + PITCH_RANGE_SEMITONES) / (PITCH_RANGE_SEMITONES * 2)
+  );
 }
 
 export function validPitch(pitch: number): number {
   if (!Number.isFinite(pitch)) return 0;
-  return Math.max(-PITCH_RANGE_SEMITONES, Math.min(PITCH_RANGE_SEMITONES, Math.round(pitch)));
+  return Math.max(
+    -PITCH_RANGE_SEMITONES,
+    Math.min(PITCH_RANGE_SEMITONES, Math.round(pitch)),
+  );
 }
 
 /** CUT sweeps the low-pass cutoff logarithmically; the player bypasses the filter at 1. */

@@ -9,9 +9,9 @@ import {
   CREATION_WIDTH,
   HEADER_INSET,
   HEADER_TOP,
-} from '../../shared/components/SoundBoardFrame';
-import { RUN_RIGHT_INSET } from '../../shared/components/SoundBoardHeader';
-import { RUN_WIDTH, RUN_HEIGHT } from '../../shared/components/RunButton';
+} from "../../shared/components/SoundBoardFrame";
+import { RUN_RIGHT_INSET } from "../../shared/components/SoundBoardHeader";
+import { RUN_WIDTH, RUN_HEIGHT } from "../../shared/components/RunButton";
 import {
   KEPT_PRESETS,
   LCD_LEFT,
@@ -27,20 +27,24 @@ import {
   WAVEFORM_LEFT_INSET,
   WAVEFORM_RIGHT_INSET,
   WAVEFORM_TOP_GAP,
-} from '../../shared/components/SoundCreationPanel';
-import { LCD_HEIGHT } from '../../shared/components/SoundNameLcd';
-import { BANK_ROW_HEIGHT } from '../../shared/components/SoundBankRow';
-import { BANK_ROW_TOP } from '../../shared/components/BankRows';
-import { PAD_WIDTH, PAD_HEIGHT, type PresetIcon } from '../../shared/components/PresetPad';
-import { KNOB_CENTER } from '../../shared/ui/PixelKnob';
+} from "../../shared/components/SoundCreationPanel";
+import { LCD_HEIGHT } from "../../shared/components/SoundNameLcd";
+import { BANK_ROW_HEIGHT } from "../../shared/components/SoundBankRow";
+import { BANK_ROW_TOP } from "../../shared/components/BankRows";
+import {
+  PAD_WIDTH,
+  PAD_HEIGHT,
+  type PresetIcon,
+} from "../../shared/components/PresetPad";
+import { KNOB_CENTER } from "../../shared/ui/PixelKnob";
 import {
   KNOB_GRID_LEFT,
   KNOB_STEP_X,
   KNOB_TILE_INSET,
   KNOB_TOP,
-} from '../../shared/components/SoundControlStrip';
-import { KNOBS } from '../../shared/dials';
-import { WAVEFORM_TYPES, type WaveformType } from '../../shared/audio/model';
+} from "../../shared/components/SoundControlStrip";
+import { KNOBS } from "../../shared/dials";
+import { WAVEFORM_TYPES, type WaveformType } from "../../shared/audio/model";
 import {
   IO_BUTTON_TOP,
   stripButtonXs,
@@ -48,8 +52,11 @@ import {
   SCROLL_BUTTON_SIZE,
   SCROLL_INSET,
   SCROLL_TRACK_TOP,
-} from '../../shared/components/SoundBankPanel';
-import { BANK_STRIP_BUTTON_SIZE, type BankStripAction } from '../../shared/components/BankStripButton';
+} from "../../shared/components/SoundBankPanel";
+import {
+  BANK_STRIP_BUTTON_SIZE,
+  type BankStripAction,
+} from "../../shared/components/BankStripButton";
 
 /** A control's face rectangle in board-design coordinates (top-left origin). */
 export interface ControlRect {
@@ -62,13 +69,15 @@ export interface ControlRect {
 /** Play / stop / loop buttons across the creation panel's transport row,
  * each matching a preset pad exactly: same size, same column. */
 const TRANSPORT_SPECS = [
-  { icon: '▶', tone: 'pink' },
-  { icon: '■', tone: 'cream' },
-  { icon: '↻', tone: 'green' },
+  { icon: "▶", tone: "pink" },
+  { icon: "■", tone: "cream" },
+  { icon: "↻", tone: "green" },
 ] as const;
 
-export const TRANSPORT_BUTTONS: (ControlRect & { icon: '▶' | '■' | '↻'; tone: 'pink' | 'cream' | 'green' })[] =
-  TRANSPORT_SPECS.map(({ icon, tone }, index) => ({
+export const TRANSPORT_BUTTONS: (ControlRect & {
+  icon: "▶" | "■" | "↻";
+  tone: "pink" | "cream" | "green";
+})[] = TRANSPORT_SPECS.map(({ icon, tone }, index) => ({
   icon,
   tone,
   x: CONTENT_INSET + TRANSPORT_LEFT + index * PAD_STEP_X,
@@ -78,26 +87,30 @@ export const TRANSPORT_BUTTONS: (ControlRect & { icon: '▶' | '■' | '↻'; to
 }));
 
 /** The kept preset pads in their single row. */
-export const PRESET_PADS: (ControlRect & { icon: PresetIcon; selected: boolean })[] =
-  KEPT_PRESETS.map((icon, index) => ({
-    icon,
-    selected: index === 0,
-    x: CONTENT_INSET + PAD_GRID_LEFT + index * PAD_STEP_X,
-    y: CONTENT_TOP + PAD_GRID_TOP,
-    width: PAD_WIDTH,
-    height: PAD_HEIGHT,
-  }));
+export const PRESET_PADS: (ControlRect & {
+  icon: PresetIcon;
+  selected: boolean;
+})[] = KEPT_PRESETS.map((icon, index) => ({
+  icon,
+  selected: index === 0,
+  x: CONTENT_INSET + PAD_GRID_LEFT + index * PAD_STEP_X,
+  y: CONTENT_TOP + PAD_GRID_TOP,
+  width: PAD_WIDTH,
+  height: PAD_HEIGHT,
+}));
 
 /** The waveform selector row under the display, one button per preset column. */
-export const WAVEFORM_BUTTONS: (ControlRect & { type: WaveformType; selected: boolean })[] =
-  WAVEFORM_TYPES.map((type, index) => ({
-    type,
-    selected: index === 0,
-    x: CONTENT_INSET + PAD_GRID_LEFT + index * PAD_STEP_X,
-    y: CONTENT_TOP + CONTENT_HEIGHT - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT,
-    width: 45,
-    height: SELECTOR_HEIGHT,
-  }));
+export const WAVEFORM_BUTTONS: (ControlRect & {
+  type: WaveformType;
+  selected: boolean;
+})[] = WAVEFORM_TYPES.map((type, index) => ({
+  type,
+  selected: index === 0,
+  x: CONTENT_INSET + PAD_GRID_LEFT + index * PAD_STEP_X,
+  y: CONTENT_TOP + CONTENT_HEIGHT - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT,
+  width: 45,
+  height: SELECTOR_HEIGHT,
+}));
 
 /** The creation panel's waveform display, at its exact 2D position. In 3D the
  * scene draws it here as a live editable mesh instead of flat panel artwork. */
@@ -106,8 +119,13 @@ export const WAVEFORM_DISPLAY: ControlRect = {
   y: CONTENT_TOP + PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP,
   width: CREATION_WIDTH - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET,
   height:
-    CONTENT_HEIGHT - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT - SELECTOR_TOP_GAP
-    - PAD_GRID_TOP - PAD_HEIGHT - WAVEFORM_TOP_GAP,
+    CONTENT_HEIGHT -
+    WAVEFORM_BOTTOM_INSET -
+    SELECTOR_HEIGHT -
+    SELECTOR_TOP_GAP -
+    PAD_GRID_TOP -
+    PAD_HEIGHT -
+    WAVEFORM_TOP_GAP,
 };
 
 /** Centers and values of the six strip dials, aligned to the selector columns. */
@@ -155,24 +173,33 @@ export const SCROLL_THUMB_AREA: ControlRect = {
   x: BANK_LEFT + BANK_WIDTH - SCROLL_BUTTON_SIZE - SCROLL_INSET + 4,
   y: CONTENT_TOP + BANK_ROW_TOP + SCROLL_BUTTON_SIZE + 2,
   width: SCROLL_BUTTON_SIZE - 8,
-  height: BANK_HEIGHT - BANK_ROW_TOP - SCROLL_INSET - SCROLL_BUTTON_SIZE * 2 - 4,
+  height:
+    BANK_HEIGHT - BANK_ROW_TOP - SCROLL_INSET - SCROLL_BUTTON_SIZE * 2 - 4,
 };
 
 /** The sound bank's strip buttons, left to right: undo, import, export. */
-export const BANK_STRIP_BUTTONS: (ControlRect & { action: BankStripAction })[] = (() => {
-  const { undoX, importX, exportX } = stripButtonXs(BANK_WIDTH);
-  const xs: Record<BankStripAction, number> = { undo: undoX, import: importX, export: exportX };
-  return (['undo', 'import', 'export'] as const).map((action) => ({
-    action,
-    x: BANK_LEFT + xs[action],
-    y: CONTENT_TOP + IO_BUTTON_TOP,
-    width: BANK_STRIP_BUTTON_SIZE,
-    height: BANK_STRIP_BUTTON_SIZE,
-  }));
-})();
+export const BANK_STRIP_BUTTONS: (ControlRect & { action: BankStripAction })[] =
+  (() => {
+    const { undoX, importX, exportX } = stripButtonXs(BANK_WIDTH);
+    const xs: Record<BankStripAction, number> = {
+      undo: undoX,
+      import: importX,
+      export: exportX,
+    };
+    return (["undo", "import", "export"] as const).map((action) => ({
+      action,
+      x: BANK_LEFT + xs[action],
+      y: CONTENT_TOP + IO_BUTTON_TOP,
+      width: BANK_STRIP_BUTTON_SIZE,
+      height: BANK_STRIP_BUTTON_SIZE,
+    }));
+  })();
 
 /** The sound bank's two scroll-arrow buttons. */
-export const SCROLL_ARROWS: (ControlRect & { up: boolean })[] = [true, false].map((up) => ({
+export const SCROLL_ARROWS: (ControlRect & { up: boolean })[] = [
+  true,
+  false,
+].map((up) => ({
   up,
   x: BANK_LEFT + BANK_WIDTH - SCROLL_BUTTON_SIZE - SCROLL_INSET,
   y: up

@@ -1,4 +1,7 @@
-import { BOARD_WIDTH, BOARD_HEIGHT } from '../../shared/components/SoundBoardFrame';
+import {
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+} from "../../shared/components/SoundBoardFrame";
 
 export { BOARD_WIDTH, BOARD_HEIGHT };
 

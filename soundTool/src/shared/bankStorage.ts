@@ -1,6 +1,10 @@
-import type { SoundSequence } from './audio/model.js';
-import type { BankSlot, SoundBank } from './bank.js';
-import { parseSoundData, soundToJson, type SoundFileData } from './soundFile.js';
+import type { SoundSequence } from "./audio/model.js";
+import type { BankSlot, SoundBank } from "./bank.js";
+import {
+  parseSoundData,
+  soundToJson,
+  type SoundFileData,
+} from "./soundFile.js";
 
 /**
  * The bank's persistence snapshot: every slot's name, empty flag and sound,
@@ -16,11 +20,11 @@ import { parseSoundData, soundToJson, type SoundFileData } from './soundFile.js'
  */
 
 /** Format marker, so other JSON in the same key is rejected clearly. */
-export const BANK_STORAGE_FORMAT = 'beast2d-sound-bank';
+export const BANK_STORAGE_FORMAT = "beast2d-sound-bank";
 /** Snapshot version; newer versions are rejected, not guessed at. */
 export const BANK_STORAGE_VERSION = 1;
 /** The localStorage key the autosave writes and the restore reads. */
-export const BANK_STORAGE_KEY = 'beast2d-sound-bank:v1';
+export const BANK_STORAGE_KEY = "beast2d-sound-bank:v1";
 /** A corrupt snapshot's raw text is copied to a key with this prefix before the board starts fresh. */
 export const CORRUPT_BACKUP_PREFIX = `${BANK_STORAGE_KEY}:corrupt:`;
 
@@ -37,7 +41,7 @@ interface BankSnapshotData {
   version: typeof BANK_STORAGE_VERSION;
   selectedIndex: number;
   looping: boolean;
-  slots: { name: string; empty: boolean; sound: SoundFileData['sound'] }[];
+  slots: { name: string; empty: boolean; sound: SoundFileData["sound"] }[];
 }
 
 /** Serialize the bank and the loop latch. Compact JSON: machines only read it. */
@@ -47,7 +51,11 @@ export function serializeBank(bank: SoundBank, looping: boolean): string {
     version: BANK_STORAGE_VERSION,
     selectedIndex: bank.selectedIndex,
     looping,
-    slots: bank.copySlots().map(slot => ({ name: slot.name, empty: slot.empty, sound: soundToJson(slot.sound) })),
+    slots: bank.copySlots().map((slot) => ({
+      name: slot.name,
+      empty: slot.empty,
+      sound: soundToJson(slot.sound),
+    })),
   };
   return JSON.stringify(data);
 }
@@ -63,29 +71,33 @@ export function parseBankSnapshot(text: string): BankSnapshot {
   try {
     raw = JSON.parse(text);
   } catch {
-    throw new Error('The saved data is not valid JSON.');
+    throw new Error("The saved data is not valid JSON.");
   }
   const data = raw as Partial<BankSnapshotData>;
   if (data?.format !== BANK_STORAGE_FORMAT) {
-    throw new Error('The saved data is not a Beast2D sound bank snapshot.');
+    throw new Error("The saved data is not a Beast2D sound bank snapshot.");
   }
   if (data.version !== BANK_STORAGE_VERSION) {
     throw new Error(`Unsupported snapshot version ${String(data.version)}.`);
   }
   if (!Array.isArray(data.slots) || data.slots.length === 0) {
-    throw new Error('The saved data holds no slots.');
+    throw new Error("The saved data holds no slots.");
   }
   const slots: BankSlot[] = data.slots.map((slot, index) => {
-    if (!slot || typeof slot !== 'object') throw new Error(`Saved slot ${index + 1} is not an object.`);
-    if (typeof slot.name !== 'string') throw new Error(`Saved slot ${index + 1} has no name.`);
+    if (!slot || typeof slot !== "object")
+      throw new Error(`Saved slot ${index + 1} is not an object.`);
+    if (typeof slot.name !== "string")
+      throw new Error(`Saved slot ${index + 1} has no name.`);
     return {
       name: slot.name,
       empty: slot.empty === true,
       sound: parseSoundData(slot.sound) as SoundSequence,
     };
   });
-  const selectedIndex = typeof data.selectedIndex === 'number' && Number.isInteger(data.selectedIndex)
-    ? data.selectedIndex
-    : 0;
+  const selectedIndex =
+    typeof data.selectedIndex === "number" &&
+    Number.isInteger(data.selectedIndex)
+      ? data.selectedIndex
+      : 0;
   return { slots, selectedIndex, looping: data.looping === true };
 }

@@ -1,4 +1,4 @@
-import { Container, type FederatedPointerEvent } from 'pixi.js';
+import { Container, type FederatedPointerEvent } from "pixi.js";
 
 export interface PressableOptions {
   /** Design pixels the control sinks while pressed. */
@@ -24,7 +24,10 @@ const DEFAULT_PRESS_TINT = 0xd8cfdd;
  * pressed look until the latch is released. Built on federated pointer
  * events, so mouse, touch and pen all work the same way.
  */
-export function makePressable(control: Container, options: PressableOptions = {}): PressableHandle {
+export function makePressable(
+  control: Container,
+  options: PressableOptions = {},
+): PressableHandle {
   const pressDepth = options.pressDepth ?? DEFAULT_PRESS_DEPTH;
   const pressTint = options.pressTint ?? DEFAULT_PRESS_TINT;
   let held = false;
@@ -39,17 +42,30 @@ export function makePressable(control: Container, options: PressableOptions = {}
     control.tint = shown ? pressTint : 0xffffff;
   };
 
-  control.eventMode = 'static';
-  control.cursor = 'pointer';
-  control.on('pointerdown', () => { held = true; apply(); });
-  const release = (): void => { held = false; apply(); };
-  control.on('pointerup', release);
-  control.on('pointerupoutside', release);
-  control.on('pointercancel', release);
+  control.eventMode = "static";
+  control.cursor = "pointer";
+  control.on("pointerdown", () => {
+    held = true;
+    apply();
+  });
+  const release = (): void => {
+    held = false;
+    apply();
+  };
+  control.on("pointerup", release);
+  control.on("pointerupoutside", release);
+  control.on("pointercancel", release);
   // The tap runs after pointerup, so re-apply once the tap had its say.
-  if (options.onTap) control.on('pointertap', () => { options.onTap?.(); apply(); });
+  if (options.onTap)
+    control.on("pointertap", () => {
+      options.onTap?.();
+      apply();
+    });
   return {
-    setLatched(next: boolean): void { latched = next; apply(); },
+    setLatched(next: boolean): void {
+      latched = next;
+      apply();
+    },
   };
 }
 
@@ -64,22 +80,22 @@ export function trackDrag(
   onMove: (event: FederatedPointerEvent) => void,
   onEnd?: () => void,
 ): void {
-  control.eventMode = 'static';
-  control.cursor = 'pointer';
-  control.on('pointerdown', (event: FederatedPointerEvent) => {
+  control.eventMode = "static";
+  control.cursor = "pointer";
+  control.on("pointerdown", (event: FederatedPointerEvent) => {
     const stage = rootOf(control);
     const move = (e: FederatedPointerEvent): void => onMove(e);
     const end = (): void => {
-      stage.off('pointermove', move);
-      stage.off('pointerup', end);
-      stage.off('pointerupoutside', end);
-      stage.off('pointercancel', end);
+      stage.off("pointermove", move);
+      stage.off("pointerup", end);
+      stage.off("pointerupoutside", end);
+      stage.off("pointercancel", end);
       onEnd?.();
     };
-    stage.on('pointermove', move);
-    stage.on('pointerup', end);
-    stage.on('pointerupoutside', end);
-    stage.on('pointercancel', end);
+    stage.on("pointermove", move);
+    stage.on("pointerup", end);
+    stage.on("pointerupoutside", end);
+    stage.on("pointercancel", end);
     onMove(event);
   });
 }

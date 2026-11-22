@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics } from "pixi.js";
 
 const CORNER_STEP = 4;
 
@@ -17,7 +17,12 @@ export class BoardFrame extends Container {
   }
 }
 
-function drawSteppedFace(width: number, height: number, inset: number, color: number): Graphics {
+function drawSteppedFace(
+  width: number,
+  height: number,
+  inset: number,
+  color: number,
+): Graphics {
   const left = inset;
   const right = width - inset;
   const top = inset;
@@ -42,12 +47,20 @@ function drawSteppedFace(width: number, height: number, inset: number, color: nu
 
 function drawFrameHighlights(width: number, height: number): Graphics {
   return new Graphics()
-    .rect(8, 7 / 3, width - 16, 2 / 3).fill(0xa46cc4)
-    .rect(7 / 3, 8, 2 / 3, height - 16).fill(0xa46cc4)
-    .rect(8, height - 2, width - 16, 1).fill(0x2a1738)
-    .rect(width - 2, 8, 1, height - 16).fill(0x2a1738)
-    .rect(3, 3, 2, 2).fill(0xffc2f4)
-    .rect(width - 5, 3, 2, 2).fill(0xffa7e8)
-    .rect(3, height - 5, 2, 2).fill(0xcb82e5)
-    .rect(width - 5, height - 5, 2, 2).fill(0x291537);
+    .rect(8, 7 / 3, width - 16, 2 / 3)
+    .fill(0xa46cc4)
+    .rect(7 / 3, 8, 2 / 3, height - 16)
+    .fill(0xa46cc4)
+    .rect(8, height - 2, width - 16, 1)
+    .fill(0x2a1738)
+    .rect(width - 2, 8, 1, height - 16)
+    .fill(0x2a1738)
+    .rect(3, 3, 2, 2)
+    .fill(0xffc2f4)
+    .rect(width - 5, 3, 2, 2)
+    .fill(0xffa7e8)
+    .rect(3, height - 5, 2, 2)
+    .fill(0xcb82e5)
+    .rect(width - 5, height - 5, 2, 2)
+    .fill(0x291537);
 }

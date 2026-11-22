@@ -6,8 +6,8 @@ import {
   WAVEFORM_TYPES,
   type SoundSequence,
   type WaveformType,
-} from './audio/model.js';
-import { validRate } from './audio/rate.js';
+} from "./audio/model.js";
+import { validRate } from "./audio/rate.js";
 
 /**
  * The sound file format behind the bank's import/export buttons. Pixi-free,
@@ -17,7 +17,7 @@ import { validRate } from './audio/rate.js';
  */
 
 /** Format marker, so a wrong JSON file is rejected with a clear message. */
-export const SOUND_FILE_FORMAT = 'beast2d-sound';
+export const SOUND_FILE_FORMAT = "beast2d-sound";
 /** Format version; files with a newer version are rejected, not guessed at. */
 export const SOUND_FILE_VERSION = 1;
 
@@ -53,7 +53,7 @@ export function serializeSound(name: string, sound: SoundSequence): string {
 }
 
 /** Every value of a SoundSequence as JSON data. Shared with the bank snapshot. */
-export function soundToJson(sound: SoundSequence): SoundFileData['sound'] {
+export function soundToJson(sound: SoundSequence): SoundFileData["sound"] {
   return {
     rate: sound.rate,
     waveform: sound.waveform,
@@ -62,7 +62,11 @@ export function soundToJson(sound: SoundSequence): SoundFileData['sound'] {
     decay: sound.decay,
     pitch: sound.pitch,
     cut: sound.cut,
-    steps: sound.steps.map(step => ({ note: step.note, volume: step.volume, enabled: step.enabled })),
+    steps: sound.steps.map((step) => ({
+      note: step.note,
+      volume: step.volume,
+      enabled: step.enabled,
+    })),
   };
 }
 
@@ -75,22 +79,25 @@ export function soundToJson(sound: SoundSequence): SoundFileData['sound'] {
  * numbers in the MIDI range, not rounded: the board's own grid stores
  * fractional semitone positions, and export must round-trip them exactly.
  */
-export function parseSoundFile(text: string): { name: string; sound: SoundSequence } {
+export function parseSoundFile(text: string): {
+  name: string;
+  sound: SoundSequence;
+} {
   let raw: unknown;
   try {
     raw = JSON.parse(text);
   } catch {
-    throw new Error('The file is not valid JSON.');
+    throw new Error("The file is not valid JSON.");
   }
   const data = raw as Partial<SoundFileData>;
   if (data?.format !== SOUND_FILE_FORMAT) {
-    throw new Error('The file is not a Beast2D sound file.');
+    throw new Error("The file is not a Beast2D sound file.");
   }
   if (data.version !== SOUND_FILE_VERSION) {
     throw new Error(`Unsupported sound file version ${String(data.version)}.`);
   }
   const sound = parseSoundData(data.sound);
-  const name = typeof data.name === 'string' ? data.name.trim() : '';
+  const name = typeof data.name === "string" ? data.name.trim() : "";
   return { name, sound };
 }
 
@@ -98,8 +105,11 @@ export function parseSoundFile(text: string): { name: string; sound: SoundSequen
  * Validate a sound object onto a fresh sequence's defaults. Shared with the
  * bank snapshot, so stored sounds follow exactly the import rules.
  */
-export function parseSoundData(raw: SoundFileData['sound'] | undefined): SoundSequence {
-  if (!raw || typeof raw !== 'object') throw new Error('The file has no sound data.');
+export function parseSoundData(
+  raw: SoundFileData["sound"] | undefined,
+): SoundSequence {
+  if (!raw || typeof raw !== "object")
+    throw new Error("The file has no sound data.");
   if (!Array.isArray(raw.steps) || raw.steps.length !== SEQUENCE_STEP_COUNT) {
     throw new Error(`The file needs exactly ${SEQUENCE_STEP_COUNT} steps.`);
   }
@@ -112,9 +122,14 @@ export function parseSoundData(raw: SoundFileData['sound'] | undefined): SoundSe
   sound.cut = clamp01(numberOr(raw.cut, sound.cut));
   sound.pitch = clamp(numberOr(raw.pitch, 0), PITCH_RANGE.min, PITCH_RANGE.max);
   raw.steps.forEach((step, index) => {
-    if (!step || typeof step !== 'object') throw new Error(`Step ${index + 1} is not an object.`);
+    if (!step || typeof step !== "object")
+      throw new Error(`Step ${index + 1} is not an object.`);
     const note = Number(step.note);
-    if (!Number.isFinite(note) || note < NOTE_RANGE.min || note > NOTE_RANGE.max) {
+    if (
+      !Number.isFinite(note) ||
+      note < NOTE_RANGE.min ||
+      note > NOTE_RANGE.max
+    ) {
       throw new Error(`Step ${index + 1} has an invalid note.`);
     }
     sound.steps[index] = {
@@ -134,7 +149,8 @@ function numberOr(value: unknown, fallback: number): number {
 
 /** A waveform name from the file, or a clear error. */
 function parseWaveform(value: unknown): WaveformType {
-  if (WAVEFORM_TYPES.includes(value as WaveformType)) return value as WaveformType;
+  if (WAVEFORM_TYPES.includes(value as WaveformType))
+    return value as WaveformType;
   throw new Error(`Unknown waveform "${String(value)}".`);
 }
 
@@ -148,6 +164,10 @@ function clamp(value: number, min: number, max: number): number {
 
 /** A safe download filename for a slot name: lowercase ASCII plus .json. */
 export function soundFileName(name: string): string {
-  const base = name.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '_').replace(/^_+|_+$/g, '');
-  return `${base || 'sound'}.json`;
+  const base = name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return `${base || "sound"}.json`;
 }

@@ -1,6 +1,6 @@
-import { Container, Graphics, Text } from 'pixi.js';
-import { MAX_NAME_LENGTH, type SoundBank } from '../bank';
-import { canvasRectToCss, openNameEditor } from '../ui/nameEditor';
+import { Container, Graphics, Text } from "pixi.js";
+import { MAX_NAME_LENGTH, type SoundBank } from "../bank";
+import { canvasRectToCss, openNameEditor } from "../ui/nameEditor";
 
 export const LCD_HEIGHT = 32;
 
@@ -18,22 +18,35 @@ export class SoundNameLcd extends Container {
 
   constructor(width: number, bank: SoundBank) {
     super();
-    this.addChild(new Graphics()
-      .roundRect(0, 0, width, LCD_HEIGHT, 4).fill(0x24152e)
-      .roundRect(2, 2, width - 4, LCD_HEIGHT - 4, 3).fill(0x7d4f99)
-      .roundRect(3, 3, width - 6, LCD_HEIGHT - 6, 3).fill(0x371c51)
-      .roundRect(4, 4, width - 8, 9, 2).fill({ color: 0x4a2c66, alpha: 0.6 }));
+    this.addChild(
+      new Graphics()
+        .roundRect(0, 0, width, LCD_HEIGHT, 4)
+        .fill(0x24152e)
+        .roundRect(2, 2, width - 4, LCD_HEIGHT - 4, 3)
+        .fill(0x7d4f99)
+        .roundRect(3, 3, width - 6, LCD_HEIGHT - 6, 3)
+        .fill(0x371c51)
+        .roundRect(4, 4, width - 8, 9, 2)
+        .fill({ color: 0x4a2c66, alpha: 0.6 }),
+    );
     this.nameText = new Text({
       text: bank.selectedName,
-      style: { fontFamily: 'monogram', fontSize: 16, fontWeight: 'bold', fill: 0xffeaff, stroke: { color: 0x2a1440, width: 1 } }, resolution: 3,
+      style: {
+        fontFamily: "monogram",
+        fontSize: 16,
+        fontWeight: "bold",
+        fill: 0xffeaff,
+        stroke: { color: 0x2a1440, width: 1 },
+      },
+      resolution: 3,
     });
     this.nameText.position.set(8, 6);
     this.addChild(this.nameText);
     bank.onChange(() => this.setName(bank.selectedName));
 
-    this.eventMode = 'static';
-    this.cursor = 'text';
-    this.on('pointertap', () => openEditor(bank, this.getBounds()));
+    this.eventMode = "static";
+    this.cursor = "text";
+    this.on("pointertap", () => openEditor(bank, this.getBounds()));
   }
 
   /** Show a sound name. */
@@ -43,12 +56,15 @@ export class SoundNameLcd extends Container {
 }
 
 /** Open the name editor over the LCD's on-screen rectangle. */
-function openEditor(bank: SoundBank, bounds: { x: number; y: number; width: number; height: number }): void {
-  const canvas = document.querySelector('canvas');
+function openEditor(
+  bank: SoundBank,
+  bounds: { x: number; y: number; width: number; height: number },
+): void {
+  const canvas = document.querySelector("canvas");
   if (!canvas) return;
   openNameEditor(canvasRectToCss(canvas, bounds), {
     value: bank.selectedName,
     maxLength: MAX_NAME_LENGTH,
-    onCommit: name => bank.rename(name),
+    onCommit: (name) => bank.rename(name),
   });
 }

@@ -1,13 +1,23 @@
-import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
-import { chamferPoints, drawGradientFace } from '../ui/GradientFace';
-import { makePressable } from '../ui/Pressable';
+import { Container, Graphics, Sprite, type Texture } from "pixi.js";
+import { chamferPoints, drawGradientFace } from "../ui/GradientFace";
+import { makePressable } from "../ui/Pressable";
 
 export const PRESET_ICONS = [
-  'coin', 'star', 'heart', 'gem', 'potion', 'chest',
-  'boot', 'bomb', 'burst', 'sparkle', 'bell', 'skull',
+  "coin",
+  "star",
+  "heart",
+  "gem",
+  "potion",
+  "chest",
+  "boot",
+  "bomb",
+  "burst",
+  "sparkle",
+  "bell",
+  "skull",
 ] as const;
 
-export type PresetIcon = typeof PRESET_ICONS[number];
+export type PresetIcon = (typeof PRESET_ICONS)[number];
 export type PresetTextures = Record<PresetIcon, Texture>;
 
 export const PAD_WIDTH = 45;
@@ -22,7 +32,10 @@ export class PresetPad extends Container {
     const sprite = new Sprite(textures[icon]);
     sprite.width = ICON_SIZE;
     sprite.height = ICON_SIZE;
-    sprite.position.set((PAD_WIDTH - ICON_SIZE) / 2, (PAD_HEIGHT - ICON_SIZE) / 2);
+    sprite.position.set(
+      (PAD_WIDTH - ICON_SIZE) / 2,
+      (PAD_HEIGHT - ICON_SIZE) / 2,
+    );
     this.addChild(sprite);
     makePressable(this);
   }
@@ -37,16 +50,28 @@ function drawPadFace(selected: boolean): Graphics {
   if (selected) {
     // Prominent multi-line pink selection perimeter from the reference.
     pad
-      .poly(chamferPoints(-3, -3, PAD_WIDTH + 6, PAD_HEIGHT + 6, 5)).fill(0xff9ec2)
-      .poly(chamferPoints(-1.5, -1.5, PAD_WIDTH + 3, PAD_HEIGHT + 3, 4)).fill(0xe95186);
+      .poly(chamferPoints(-3, -3, PAD_WIDTH + 6, PAD_HEIGHT + 6, 5))
+      .fill(0xff9ec2)
+      .poly(chamferPoints(-1.5, -1.5, PAD_WIDTH + 3, PAD_HEIGHT + 3, 4))
+      .fill(0xe95186);
   }
   // Continuous face with a fine bevel perimeter, like the reference surface.
-  drawGradientFace(pad, 0, 0, PAD_WIDTH, PAD_HEIGHT, 4, {
-    edge: 0x24152e,
-    top: topLight,
-    mid: faceColor,
-    bottom: bottomShade,
-  }, 0.68, 4);
+  drawGradientFace(
+    pad,
+    0,
+    0,
+    PAD_WIDTH,
+    PAD_HEIGHT,
+    4,
+    {
+      edge: 0x24152e,
+      top: topLight,
+      mid: faceColor,
+      bottom: bottomShade,
+    },
+    0.68,
+    4,
+  );
   pad.rect(4, PAD_HEIGHT - 3.5, PAD_WIDTH - 8, 1).fill(bottomEdge);
   return pad;
 }

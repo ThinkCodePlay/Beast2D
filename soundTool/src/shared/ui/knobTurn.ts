@@ -30,7 +30,8 @@ export function valueTowardPoint(
 ): number {
   const raw = Math.atan2(pointY - centerY, pointX - centerX);
   // Unwrap into [startAngle, startAngle + 360°) so the sweep is contiguous.
-  const angle = ((raw - startAngle) % FULL_TURN + FULL_TURN) % FULL_TURN + startAngle;
+  const angle =
+    ((((raw - startAngle) % FULL_TURN) + FULL_TURN) % FULL_TURN) + startAngle;
   const maxAngle = startAngle + KNOB_SWEEP;
   if (angle > maxAngle) {
     // Dead zone: snap to whichever end is closer around the circle.

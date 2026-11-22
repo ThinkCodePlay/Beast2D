@@ -1,6 +1,12 @@
-import { Container, Graphics, Text, type FederatedPointerEvent, type FederatedWheelEvent } from 'pixi.js';
-import { VISIBLE_SLOT_ROWS, type SoundBank } from '../bank';
-import { BANK_ROW_HEIGHT, SoundBankRow } from './SoundBankRow';
+import {
+  Container,
+  Graphics,
+  Text,
+  type FederatedPointerEvent,
+  type FederatedWheelEvent,
+} from "pixi.js";
+import { VISIBLE_SLOT_ROWS, type SoundBank } from "../bank";
+import { BANK_ROW_HEIGHT, SoundBankRow } from "./SoundBankRow";
 
 /** Rows' vertical offset inside the bank panel. */
 export const BANK_ROW_TOP = 109 / 3;
@@ -17,16 +23,20 @@ const ADD_ROW = VISIBLE_SLOT_ROWS;
  * overlay mesh and routes the tap through the same tapAt.
  */
 export class BankRows extends Container {
-  constructor(private readonly bank: SoundBank, private readonly rowWidth: number, interactive = false) {
+  constructor(
+    private readonly bank: SoundBank,
+    private readonly rowWidth: number,
+    interactive = false,
+  ) {
     super();
     this.renderRows();
     if (interactive) {
-      this.eventMode = 'static';
-      this.cursor = 'pointer';
-      this.on('pointertap', (event: FederatedPointerEvent) => {
+      this.eventMode = "static";
+      this.cursor = "pointer";
+      this.on("pointertap", (event: FederatedPointerEvent) => {
         this.tapAt(event.getLocalPosition(this).y);
       });
-      this.on('wheel', (event: FederatedWheelEvent) => {
+      this.on("wheel", (event: FederatedWheelEvent) => {
         bank.setScrollOffset(bank.scrollOffset + Math.sign(event.deltaY));
       });
     }
@@ -57,12 +67,18 @@ export class BankRows extends Container {
   private renderRows(): void {
     const { bank } = this;
     const offset = bank.scrollOffset;
-    this.removeChildren().forEach(child => child.destroy());
+    this.removeChildren().forEach((child) => child.destroy());
     const last = Math.min(offset + ADD_ROW, bank.slots.length);
     for (let index = offset; index < last; index++) {
-      const row = new SoundBankRow(index, bank.slots[index].name, index === bank.selectedIndex, this.rowWidth);
+      const row = new SoundBankRow(
+        index,
+        bank.slots[index].name,
+        index === bank.selectedIndex,
+        this.rowWidth,
+      );
       // Row 04 sits 2/3px lower in the reference artwork.
-      row.position.y = (index - offset) * BANK_ROW_HEIGHT + (index === 3 ? 2 / 3 : 0);
+      row.position.y =
+        (index - offset) * BANK_ROW_HEIGHT + (index === 3 ? 2 / 3 : 0);
       this.addChild(row);
     }
     const add = createAddRow(this.rowWidth);
@@ -75,16 +91,25 @@ export class BankRows extends Container {
  *  enabled-name color so it reads as an actionable row, not a disabled one. */
 function createAddRow(width: number): Container {
   const row = new Container();
-  row.addChild(new Graphics()
-    .rect(5, 1, width - 1, BANK_ROW_HEIGHT - 1).fill(0x1b1027)
-    .rect(4, 0, width - 1, BANK_ROW_HEIGHT - 1).fill(0x241332)
-    .rect(4, 0, width - 1, 1).fill(0x3f2652)
-    .rect(4, 0, 1, BANK_ROW_HEIGHT - 1).fill(0x3f2652)
-    .rect(4, BANK_ROW_HEIGHT - 1, width - 1, 1).fill(0x180d24)
-    .rect(4 + width - 1, 1, 1, BANK_ROW_HEIGHT - 2).fill(0x180d24));
+  row.addChild(
+    new Graphics()
+      .rect(5, 1, width - 1, BANK_ROW_HEIGHT - 1)
+      .fill(0x1b1027)
+      .rect(4, 0, width - 1, BANK_ROW_HEIGHT - 1)
+      .fill(0x241332)
+      .rect(4, 0, width - 1, 1)
+      .fill(0x3f2652)
+      .rect(4, 0, 1, BANK_ROW_HEIGHT - 1)
+      .fill(0x3f2652)
+      .rect(4, BANK_ROW_HEIGHT - 1, width - 1, 1)
+      .fill(0x180d24)
+      .rect(4 + width - 1, 1, 1, BANK_ROW_HEIGHT - 2)
+      .fill(0x180d24),
+  );
   const label = new Text({
-    text: '+ new',
-    style: { fontFamily: 'monogram', fontSize: 15, fill: 0xffeaff }, resolution: 3,
+    text: "+ new",
+    style: { fontFamily: "monogram", fontSize: 15, fill: 0xffeaff },
+    resolution: 3,
   });
   label.anchor.set(0, 0.5);
   label.position.set(40, BANK_ROW_HEIGHT / 2 - 1); // aligned with the slot names

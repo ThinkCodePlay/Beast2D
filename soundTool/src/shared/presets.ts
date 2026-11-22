@@ -1,6 +1,11 @@
-import { createSoundSequence, type SoundSequence, type StepVolume, type WaveformType } from './audio/model.js';
-import type { PlaybackRate } from './audio/rate.js';
-import type { SoundBank } from './bank.js';
+import {
+  createSoundSequence,
+  type SoundSequence,
+  type StepVolume,
+  type WaveformType,
+} from "./audio/model.js";
+import type { PlaybackRate } from "./audio/rate.js";
+import type { SoundBank } from "./bank.js";
 
 /**
  * The six preset sounds behind the creation panel's pads, one per kept pad
@@ -15,8 +20,15 @@ import type { SoundBank } from './bank.js';
  */
 
 /** The preset pads' icons, in display order. Subset of PresetIcon. */
-export const PRESET_KEYS = ['coin', 'star', 'boot', 'bomb', 'burst', 'skull'] as const;
-export type PresetKey = typeof PRESET_KEYS[number];
+export const PRESET_KEYS = [
+  "coin",
+  "star",
+  "boot",
+  "bomb",
+  "burst",
+  "skull",
+] as const;
+export type PresetKey = (typeof PRESET_KEYS)[number];
 
 /** Type guard so a pad's PresetIcon can be looked up in PRESETS safely. */
 export function isPresetKey(icon: string): icon is PresetKey {
@@ -46,56 +58,94 @@ interface PresetSpec {
 
 export const PRESETS: Record<PresetKey, PresetSpec> = {
   // Classic two-note coin ding: quick perfect fifth up.
-  coin: { name: 'coin', waveform: 'pulse', rate: 2, decay: 0.5, notes: [
-    { at: 0, note: 79 },
-    { at: 1, note: 83 },
-  ] },
+  coin: {
+    name: "coin",
+    waveform: "pulse",
+    rate: 2,
+    decay: 0.5,
+    notes: [
+      { at: 0, note: 79 },
+      { at: 1, note: 83 },
+    ],
+  },
   // Rising major arpeggio for collecting a power-up.
-  star: { name: 'power_up', waveform: 'triangle', rate: 2, decay: 0.8, notes: [
-    { at: 0, note: 60, volume: 6 },
-    { at: 1, note: 64, volume: 6 },
-    { at: 2, note: 67, volume: 6 },
-    { at: 3, note: 72, volume: 7 },
-    { at: 4, note: 76, volume: 7 },
-    { at: 5, note: 79, volume: 7 },
-  ] },
+  star: {
+    name: "power_up",
+    waveform: "triangle",
+    rate: 2,
+    decay: 0.8,
+    notes: [
+      { at: 0, note: 60, volume: 6 },
+      { at: 1, note: 64, volume: 6 },
+      { at: 2, note: 67, volume: 6 },
+      { at: 3, note: 72, volume: 7 },
+      { at: 4, note: 76, volume: 7 },
+      { at: 5, note: 79, volume: 7 },
+    ],
+  },
   // Quick rising sweep, like a jump whoosh.
-  boot: { name: 'jump', waveform: 'square', rate: 2, decay: 0.7, notes: [
-    { at: 0, note: 60, volume: 7 },
-    { at: 1, note: 64, volume: 6 },
-    { at: 2, note: 67, volume: 6 },
-    { at: 3, note: 72, volume: 5 },
-    { at: 4, note: 76, volume: 5 },
-    { at: 5, note: 81, volume: 4 },
-  ] },
+  boot: {
+    name: "jump",
+    waveform: "square",
+    rate: 2,
+    decay: 0.7,
+    notes: [
+      { at: 0, note: 60, volume: 7 },
+      { at: 1, note: 64, volume: 6 },
+      { at: 2, note: 67, volume: 6 },
+      { at: 3, note: 72, volume: 5 },
+      { at: 4, note: 76, volume: 5 },
+      { at: 5, note: 81, volume: 4 },
+    ],
+  },
   // Explosion: noise burst on low steps, fading out through a dark filter.
-  bomb: { name: 'boom', waveform: 'noise', rate: 1, decay: 0.8, cut: 0.5, notes: [
-    { at: 0, note: 48, volume: 7 },
-    { at: 1, note: 48, volume: 7 },
-    { at: 2, note: 48, volume: 6 },
-    { at: 3, note: 48, volume: 6 },
-    { at: 4, note: 48, volume: 5 },
-    { at: 5, note: 48, volume: 4 },
-    { at: 6, note: 48, volume: 4 },
-    { at: 7, note: 48, volume: 3 },
-    { at: 8, note: 48, volume: 2 },
-    { at: 9, note: 48, volume: 1 },
-  ] },
+  bomb: {
+    name: "boom",
+    waveform: "noise",
+    rate: 1,
+    decay: 0.8,
+    cut: 0.5,
+    notes: [
+      { at: 0, note: 48, volume: 7 },
+      { at: 1, note: 48, volume: 7 },
+      { at: 2, note: 48, volume: 6 },
+      { at: 3, note: 48, volume: 6 },
+      { at: 4, note: 48, volume: 5 },
+      { at: 5, note: 48, volume: 4 },
+      { at: 6, note: 48, volume: 4 },
+      { at: 7, note: 48, volume: 3 },
+      { at: 8, note: 48, volume: 2 },
+      { at: 9, note: 48, volume: 1 },
+    ],
+  },
   // Short bright impact: three quick noise hits.
-  burst: { name: 'hit', waveform: 'noise', rate: 2, decay: 0.3, cut: 0.8, notes: [
-    { at: 0, note: 72, volume: 7 },
-    { at: 1, note: 72, volume: 4 },
-    { at: 2, note: 72, volume: 2 },
-  ] },
+  burst: {
+    name: "hit",
+    waveform: "noise",
+    rate: 2,
+    decay: 0.3,
+    cut: 0.8,
+    notes: [
+      { at: 0, note: 72, volume: 7 },
+      { at: 1, note: 72, volume: 4 },
+      { at: 2, note: 72, volume: 2 },
+    ],
+  },
   // Enemy death: a descending saw wail.
-  skull: { name: 'enemy_die', waveform: 'saw', rate: 2, decay: 0.7, notes: [
-    { at: 0, note: 72, volume: 7 },
-    { at: 1, note: 69, volume: 6 },
-    { at: 2, note: 65, volume: 6 },
-    { at: 3, note: 62, volume: 5 },
-    { at: 4, note: 58, volume: 4 },
-    { at: 5, note: 55, volume: 3 },
-  ] },
+  skull: {
+    name: "enemy_die",
+    waveform: "saw",
+    rate: 2,
+    decay: 0.7,
+    notes: [
+      { at: 0, note: 72, volume: 7 },
+      { at: 1, note: 69, volume: 6 },
+      { at: 2, note: 65, volume: 6 },
+      { at: 3, note: 62, volume: 5 },
+      { at: 4, note: 58, volume: 4 },
+      { at: 5, note: 55, volume: 3 },
+    ],
+  },
 };
 
 /**
@@ -104,7 +154,9 @@ export const PRESETS: Record<PresetKey, PresetSpec> = {
  */
 export function buildPreset(spec: PresetSpec): SoundSequence {
   const sequence = createSoundSequence();
-  sequence.steps.forEach((step) => { step.enabled = false; });
+  sequence.steps.forEach((step) => {
+    step.enabled = false;
+  });
   spec.notes.forEach(({ at, note, volume }) => {
     const step = sequence.steps[at];
     step.note = note;
