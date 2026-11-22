@@ -23,6 +23,9 @@ shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
     Pixi-free so both renderings and the tests share them.
   - `bankStorage.ts`: the localStorage snapshot format (all slots, selection,
     loop latch), Pixi-free; stored sounds share the sound file's validation.
+  - `bankFile.ts`: the whole-bank file format behind the bank strip's bank
+    import/export buttons; the snapshot envelope, pretty-printed for hand
+    editing.
   - `components/`: the board's panels and controls. Components take a
     `controls` mode: `'2d'` draws and wires the controls, `'3d'` draws flat
     artwork only so the 3D scene can place real meshes on top.
@@ -39,6 +42,8 @@ shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
   export round trip) and the apply-then-undo flow.
 - `tests/bankStorage.test.ts`: the snapshot's round trip, selection clamping
   and corruption rejection.
+- `tests/bankFile.test.ts`: the whole-bank file's round trip, its shared
+  envelope with the snapshot and its rejection wording.
 - The local `public/ui/monogram.ttf` pixel font is loaded before the board is
   drawn; its CC0 license is included alongside it.
 
@@ -67,7 +72,12 @@ mistakes: export downloads the selected slot as an editable JSON file named
 after it, import loads a JSON file into the selected slot (with a
 confirmation, since the slot's sound is replaced), and undo restores the
 sound and name the last replacement - preset or import - overwrote, also via
-Ctrl/Cmd+Z. Undo keeps the newest ten replacements.
+Ctrl/Cmd+Z. Undo keeps the newest ten replacements. The leftmost pair backs
+up and restores the whole bank at once: bank export downloads every slot,
+the selection and the loop latch as one pretty-printed JSON file, and bank
+import restores such a file after a confirmation, since every current sound
+is replaced. A cancelled picker or dialog changes nothing, and an invalid
+file is rejected with the reason, leaving the bank untouched.
 
 The board saves itself to the browser's localStorage every few seconds and
 when the page hides: every slot's name and sound, the selection and the loop

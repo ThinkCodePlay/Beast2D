@@ -81,12 +81,19 @@ view3d.eventMode = "static";
 const sequence = createSoundSequence(defaultNotes());
 const bank = new SoundBank(() => createSoundSequence(defaultNotes()));
 bank.activate(sequence);
-const transfer = createSoundTransfer(bank, sequence);
 const player = new SoundPlayer();
 // A saved snapshot loads before the board is drawn, so every view starts
 // from the restored state; the loop latch applies to the player directly.
 let looping = restoreBankSnapshot(bank);
 player.setLoopEnabled(looping);
+// The latch object lets a whole-bank import restore the file's loop state.
+const transfer = createSoundTransfer(bank, sequence, {
+  isLooping: () => looping,
+  setLooping: (value) => {
+    looping = value;
+    player.setLoopEnabled(value);
+  },
+});
 const scene = new SoundBoardScene3D(
   app.renderer,
   presetTextures,

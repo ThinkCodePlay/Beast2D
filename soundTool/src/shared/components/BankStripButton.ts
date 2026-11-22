@@ -5,15 +5,20 @@ import { makePressable } from "../ui/Pressable";
 export const BANK_STRIP_BUTTON_SIZE = 13;
 const GLYPH = 0x281638;
 
-/** The bank strip's button actions, left to right: undo, import, export. */
-export type BankStripAction = "undo" | "import" | "export";
+/**
+ * The bank strip's button actions, left to right: whole-bank import/export,
+ * undo, single-sound import/export.
+ */
+export type BankStripAction =
+  "undo" | "import" | "export" | "bankImport" | "bankExport";
 
 /**
  * The sound bank's small strip buttons: chunky pixel squares in the
- * scrollbar arrows' style. Import/export carry a tray glyph; undo a bent
- * back arrow. Self-contained: the host wires pointertap to the action and
- * can grey the button out with setEnabled while the action is unavailable
- * (undo with an empty history).
+ * scrollbar arrows' style. Single-sound import/export carry a tray glyph,
+ * the whole-bank pair a stack of slot rows, and undo a bent back arrow.
+ * Self-contained: the host wires pointertap to the action and can grey the
+ * button out with setEnabled while the action is unavailable (undo with an
+ * empty history).
  */
 export class BankStripButton extends Container {
   private enabled = true;
@@ -53,7 +58,11 @@ function drawFace(): Graphics {
     .fill(0x8a63a0);
 }
 
-/** The action glyph: a tray with an arrow for import/export, a bent back arrow for undo. */
+/**
+ * The action glyph: a tray with an arrow for single-sound import/export, a
+ * stack of slot rows with an arrow for the whole-bank pair, a bent back
+ * arrow for undo.
+ */
 function drawGlyph(action: BankStripAction): Graphics {
   const glyph = new Graphics();
   if (action === "undo") {
@@ -68,6 +77,22 @@ function drawGlyph(action: BankStripAction): Graphics {
         .rect(9, 4, 1, 5)
         .fill(GLYPH)
     );
+  }
+  if (action === "bankImport" || action === "bankExport") {
+    // The bank: a stack of slot rows, with an arrow leaving or entering it.
+    glyph
+      .rect(2, 3, 5, 1)
+      .fill(GLYPH)
+      .rect(2, 5, 5, 1)
+      .fill(GLYPH)
+      .rect(2, 7, 5, 1)
+      .fill(GLYPH);
+    if (action === "bankExport") {
+      glyph.rect(8, 4, 2, 5).fill(GLYPH).poly([9, 1, 11, 4, 7, 4]).fill(GLYPH);
+    } else {
+      glyph.rect(8, 2, 2, 5).fill(GLYPH).poly([7, 6, 11, 6, 9, 9]).fill(GLYPH);
+    }
+    return glyph;
   }
   // The tray: a flat base with two short walls.
   glyph

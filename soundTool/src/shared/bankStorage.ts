@@ -36,7 +36,7 @@ export interface BankSnapshot {
 }
 
 /** Snapshot envelope shape (the slots' sounds reuse the sound-file shape). */
-interface BankSnapshotData {
+export interface BankSnapshotData {
   format: typeof BANK_STORAGE_FORMAT;
   version: typeof BANK_STORAGE_VERSION;
   selectedIndex: number;
@@ -44,9 +44,12 @@ interface BankSnapshotData {
   slots: { name: string; empty: boolean; sound: SoundFileData["sound"] }[];
 }
 
-/** Serialize the bank and the loop latch. Compact JSON: machines only read it. */
-export function serializeBank(bank: SoundBank, looping: boolean): string {
-  const data: BankSnapshotData = {
+/** The bank and loop latch as snapshot data: the envelope both serializers share. */
+export function bankSnapshotData(
+  bank: SoundBank,
+  looping: boolean,
+): BankSnapshotData {
+  return {
     format: BANK_STORAGE_FORMAT,
     version: BANK_STORAGE_VERSION,
     selectedIndex: bank.selectedIndex,
@@ -57,7 +60,11 @@ export function serializeBank(bank: SoundBank, looping: boolean): string {
       sound: soundToJson(slot.sound),
     })),
   };
-  return JSON.stringify(data);
+}
+
+/** Serialize the bank and the loop latch. Compact JSON: machines only read it. */
+export function serializeBank(bank: SoundBank, looping: boolean): string {
+  return JSON.stringify(bankSnapshotData(bank, looping));
 }
 
 /**
@@ -67,27 +74,38 @@ export function serializeBank(bank: SoundBank, looping: boolean): string {
  * rules. Slot order and count are preserved as stored.
  */
 export function parseBankSnapshot(text: string): BankSnapshot {
+  return parseBankSnapshotLabeled(text, "The saved data");
+}
+
+/**
+ * Parse snapshot text with the source named in error messages: the autosave
+ * restore says "The saved data", the whole-bank file import says "The file".
+ */
+export function parseBankSnapshotLabeled(
+  text: string,
+  label: string,
+): BankSnapshot {
   let raw: unknown;
   try {
     raw = JSON.parse(text);
   } catch {
-    throw new Error("The saved data is not valid JSON.");
+    throw new Error(`${label} is not valid JSON.`);
   }
   const data = raw as Partial<BankSnapshotData>;
   if (data?.format !== BANK_STORAGE_FORMAT) {
-    throw new Error("The saved data is not a Beast2D sound bank snapshot.");
+    throw new Error(`${label} is not a Beast2D sound bank snapshot.`);
   }
   if (data.version !== BANK_STORAGE_VERSION) {
     throw new Error(`Unsupported snapshot version ${String(data.version)}.`);
   }
   if (!Array.isArray(data.slots) || data.slots.length === 0) {
-    throw new Error("The saved data holds no slots.");
+    throw new Error(`${label} holds no slots.`);
   }
   const slots: BankSlot[] = data.slots.map((slot, index) => {
     if (!slot || typeof slot !== "object")
-      throw new Error(`Saved slot ${index + 1} is not an object.`);
+      throw new Error(`Slot ${index + 1} is not an object.`);
     if (typeof slot.name !== "string")
-      throw new Error(`Saved slot ${index + 1} has no name.`);
+      throw new Error(`Slot ${index + 1} has no name.`);
     return {
       name: slot.name,
       empty: slot.empty === true,

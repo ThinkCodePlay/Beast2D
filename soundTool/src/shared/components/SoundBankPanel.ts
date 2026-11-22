@@ -13,24 +13,33 @@ export const SCROLL_BUTTON_SIZE = 15;
 export const SCROLL_INSET = 2;
 export const SCROLL_TRACK_TOP = BANK_ROW_TOP;
 
-/** The import/export buttons sit on the panel's subtitle strip. */
+/**
+ * The strip buttons (whole-bank import/export, undo, single-sound
+ * import/export) sit on the panel's subtitle strip.
+ */
 export const IO_BUTTON_TOP = 16;
 export const IO_BUTTON_GAP = 2;
 
 /**
- * The buttons' x positions inside the panel: export rightmost, import beside
- * it, undo leftmost. Shared with the 3D layout so the meshes land on the
- * same spots.
+ * The buttons' x positions inside the panel: single-sound export rightmost,
+ * then import and undo, with the whole-bank export/import pair leftmost.
+ * Shared with the 3D layout so the meshes land on the same spots.
  */
 export function stripButtonXs(width: number): {
+  bankImportX: number;
+  bankExportX: number;
   undoX: number;
   importX: number;
   exportX: number;
 } {
   const exportX = width - SCROLL_INSET - BANK_STRIP_BUTTON_SIZE;
   const importX = exportX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP;
+  const undoX = importX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP;
+  const bankExportX = undoX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP;
   return {
-    undoX: importX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP,
+    bankImportX: bankExportX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP,
+    bankExportX,
+    undoX,
     importX,
     exportX,
   };
@@ -64,26 +73,38 @@ export class SoundBankPanel extends Container {
 }
 
 /**
- * The strip buttons: undo leftmost, greyed out while the bank has nothing
- * to restore, then import/export when a transfer is wired.
+ * The strip buttons: the whole-bank import/export pair leftmost, undo in the
+ * middle (greyed out while the bank has nothing to restore), then the
+ * single-sound import/export. All wired only when a transfer is provided,
+ * except undo, which works on the bank alone.
  */
 function createStripButtons(
   width: number,
   bank: SoundBank,
   io?: SoundTransfer,
 ): BankStripButton[] {
-  const { undoX, importX, exportX } = stripButtonXs(width);
+  const { bankImportX, bankExportX, undoX, importX, exportX } =
+    stripButtonXs(width);
   const undoButton = new BankStripButton("undo", () => bank.undoLast());
   undoButton.position.set(undoX, IO_BUTTON_TOP);
   undoButton.setEnabled(bank.canUndo);
   bank.onChange(() => undoButton.setEnabled(bank.canUndo));
   const buttons = [undoButton];
   if (io) {
+    const bankImportButton = new BankStripButton("bankImport", io.importBank);
+    bankImportButton.position.set(bankImportX, IO_BUTTON_TOP);
+    const bankExportButton = new BankStripButton("bankExport", io.exportBank);
+    bankExportButton.position.set(bankExportX, IO_BUTTON_TOP);
     const importButton = new BankStripButton("import", io.importSelected);
     importButton.position.set(importX, IO_BUTTON_TOP);
     const exportButton = new BankStripButton("export", io.exportSelected);
     exportButton.position.set(exportX, IO_BUTTON_TOP);
-    buttons.push(importButton, exportButton);
+    buttons.push(
+      bankImportButton,
+      bankExportButton,
+      importButton,
+      exportButton,
+    );
   }
   return buttons;
 }

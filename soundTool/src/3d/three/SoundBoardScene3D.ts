@@ -91,6 +91,7 @@ export class SoundBoardScene3D extends Container3D {
   private bankRows?: BankRows3D;
   private scrollThumb?: ScrollbarThumb3D;
   private lcd?: LcdDisplay3D;
+  private loopButton?: Button3D;
 
   constructor(
     renderer: Renderer,
@@ -130,6 +131,8 @@ export class SoundBoardScene3D extends Container3D {
       button.setSelected(type === this.sequence.waveform),
     );
     this.waveform?.display.refresh();
+    // A whole-bank import may have restored the file's loop latch.
+    this.loopButton?.setLatched(this.transport.isLooping());
     this.transport.setMasterVolume(this.sequence.masterVolume);
     this.transport.setPan(this.sequence.pan);
     this.transport.setCutoff(this.sequence.cut);
@@ -282,10 +285,14 @@ export class SoundBoardScene3D extends Container3D {
       });
       if (icon === "▶") button.on("pointertap", this.transport.play);
       if (icon === "■") button.on("pointertap", this.transport.stop);
-      if (icon === "↻")
+      if (icon === "↻") {
+        this.loopButton = button;
+        // A restored snapshot may have the latch on, like the 2D row.
+        button.setLatched(this.transport.isLooping());
         button.on("pointertap", () =>
           button.setLatched(this.transport.toggleLoop()),
         );
+      }
       controls.push(place(button, rect));
     });
 
@@ -355,10 +362,15 @@ export class SoundBoardScene3D extends Container3D {
         this.bank.onChange(() => button.setEnabled(this.bank.canUndo));
         button.on("pointertap", () => this.bank.undoLast());
       } else {
-        button.on(
-          "pointertap",
-          action === "import" ? this.io.importSelected : this.io.exportSelected,
-        );
+        const handler =
+          action === "import"
+            ? this.io.importSelected
+            : action === "export"
+              ? this.io.exportSelected
+              : action === "bankImport"
+                ? this.io.importBank
+                : this.io.exportBank;
+        button.on("pointertap", handler);
       }
       controls.push(place(button, rect));
     });

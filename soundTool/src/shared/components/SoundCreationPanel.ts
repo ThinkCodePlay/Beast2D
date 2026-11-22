@@ -64,6 +64,8 @@ export interface SoundCreationPanelOptions {
 export class SoundCreationPanel extends Container {
   private waveform?: WaveformDisplay;
   private selector?: WaveformSelector;
+  private transport?: TransportActions;
+  private loopButton?: PixelButton;
 
   constructor(
     width: number,
@@ -75,9 +77,15 @@ export class SoundCreationPanel extends Container {
     super();
     const controls = options.controls ?? "2d";
     this.addChild(new RaisedPanelFrame(width, height, 0x83609a));
-    this.addChild(
-      createTransport(width, controls, options.transport, options.bank),
+    const transportRow = createTransport(
+      width,
+      controls,
+      options.transport,
+      options.bank,
     );
+    this.addChild(transportRow.row);
+    this.loopButton = transportRow.loop;
+    this.transport = options.transport;
     if (controls === "2d") {
       if (!options.transport)
         throw new Error("SoundCreationPanel 2D mode needs transport actions.");
@@ -121,6 +129,8 @@ export class SoundCreationPanel extends Container {
   refreshFromSequence(sequence: SoundSequence): void {
     this.waveform?.refresh();
     this.selector?.setSelected(sequence.waveform);
+    // A whole-bank import may have restored the file's loop latch.
+    if (this.transport) this.loopButton?.setLatched(this.transport.isLooping());
   }
 }
 
@@ -129,7 +139,7 @@ function createTransport(
   controls: ControlMode,
   transport?: TransportActions,
   bank?: SoundBank,
-): Container {
+): { row: Container; loop?: PixelButton } {
   const row = new Container();
   row.position.set(TRANSPORT_LEFT, TRANSPORT_TOP);
   // Transport buttons match the preset pads exactly: same size, same columns.
@@ -156,8 +166,9 @@ function createTransport(
     );
     lcd.position.set(LCD_LEFT, 2);
     row.addChild(lcd);
+    return { row, loop };
   }
-  return row;
+  return { row };
 }
 
 function createPresetGrid(
