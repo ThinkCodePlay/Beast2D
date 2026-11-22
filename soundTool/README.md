@@ -114,14 +114,14 @@ pnpm build      # typecheck, then both renderers: dist/2d and dist/3d
 pnpm preview
 ```
 
-`pnpm test:audio` runs the audio test suite.
+`pnpm test:audio` runs the test suite with Vitest, the same runner the
+engine uses at the repository root.
 
 ## Code checks
 
 Tooling is local to `soundTool/`; these commands do not format the engine at
 the repository root. ESLint checks source, tests and configuration. Prettier
-uses double quotes and skips generated builds, compiled tests and the pnpm
-lockfile. The existing Node test runner is unchanged.
+uses double quotes and skips generated builds and the pnpm lockfile.
 
 ```sh
 pnpm typecheck
