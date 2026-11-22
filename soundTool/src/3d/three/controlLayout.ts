@@ -150,6 +150,14 @@ export const BANK_ROWS_AREA: ControlRect = {
   height: 16 * BANK_ROW_HEIGHT + 1,
 };
 
+/** The bank scrollbar's thumb travel area, drawn live in 3D (ScrollbarThumb3D). */
+export const SCROLL_THUMB_AREA: ControlRect = {
+  x: BANK_LEFT + BANK_WIDTH - SCROLL_BUTTON_SIZE - SCROLL_INSET + 4,
+  y: CONTENT_TOP + BANK_ROW_TOP + SCROLL_BUTTON_SIZE + 2,
+  width: SCROLL_BUTTON_SIZE - 8,
+  height: BANK_HEIGHT - BANK_ROW_TOP - SCROLL_INSET - SCROLL_BUTTON_SIZE * 2 - 4,
+};
+
 /** The sound bank's strip buttons, left to right: undo, import, export. */
 export const BANK_STRIP_BUTTONS: (ControlRect & { action: BankStripAction })[] = (() => {
   const { undoX, importX, exportX } = stripButtonXs(BANK_WIDTH);

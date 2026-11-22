@@ -80,3 +80,37 @@ test('serialized sounds share the import format, so exports and snapshots agree'
   });
   assert.equal(parseBankSnapshot(text).slots[0].sound.steps[0].note, 60.5);
 });
+
+test('a bank grown past sixteen slots round-trips whole through a snapshot', () => {
+  const { bank } = makeBank();
+  for (let i = 0; i < 12; i++) bank.addSlot(); // 20 slots, no cap
+  bank.select(17);
+  const text = serializeBank(bank, false);
+  const snapshot = parseBankSnapshot(text);
+  assert.equal(snapshot.slots.length, 20);
+  assert.equal(snapshot.selectedIndex, 17);
+  assert.equal(snapshot.slots[17].name, 'sound_18');
+  assert.equal(snapshot.slots[19].empty, false);
+  const { bank: fresh } = makeBank();
+  fresh.restore(snapshot.slots, snapshot.selectedIndex);
+  assert.equal(fresh.slots.length, 20);
+  assert.equal(fresh.selectedIndex, 17);
+  assert.equal(fresh.selectedName, 'sound_18');
+});
+
+test('a snapshot saved before the add-slot feature still parses and restores', () => {
+  // Shape written by the persistence commit: 16 slots, no scroll state.
+  const legacy = {
+    format: BANK_STORAGE_FORMAT,
+    version: BANK_STORAGE_VERSION,
+    selectedIndex: 3,
+    looping: false,
+    slots: makeBank().bank.copySlots().map(slot => ({ name: slot.name, empty: slot.empty, sound: slot.sound })),
+  };
+  const snapshot = parseBankSnapshot(JSON.stringify(legacy));
+  assert.equal(snapshot.slots.length, 16);
+  const { bank } = makeBank();
+  bank.restore(snapshot.slots, snapshot.selectedIndex);
+  assert.equal(bank.slots.length, 16);
+  assert.equal(bank.scrollOffset, 0);
+});

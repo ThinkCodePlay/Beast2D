@@ -36,6 +36,7 @@ import {
   PRESET_PADS,
   RUN_BUTTON,
   SCROLL_ARROWS,
+  SCROLL_THUMB_AREA,
   STRIP_KNOBS,
   TRANSPORT_BUTTONS,
   WAVEFORM_BUTTONS,
@@ -43,6 +44,7 @@ import {
   type ControlRect,
 } from './controlLayout';
 import { BankRows3D } from './BankRows3D';
+import { ScrollbarThumb3D } from './ScrollbarThumb3D';
 import { LcdDisplay3D } from './LcdDisplay3D';
 import { WAVEFORM_FACE_Z, WaveformDisplay3D } from './WaveformDisplay3D';
 
@@ -100,10 +102,11 @@ export class SoundBoardScene3D extends Container3D {
    */
   bindPointer(view: View3D): void {
     this.bindWaveformPaint(view);
-    // Bank rows: a tap selects the tapped slot (empty slots ignore it).
+    // Bank rows: a tap selects the tapped slot (empty slots ignore it) or
+    // adds a slot on the "+ new" row.
     this.bankRows?.on('pointertap', (event) => {
       const { y } = this.boardPoint(view, event.global);
-      this.bank.select(this.bankRows!.rows.slotAt(y - BANK_ROWS_AREA.y));
+      this.bankRows!.rows.tapAt(y - BANK_ROWS_AREA.y);
     });
     // LCD: a tap opens the name editor over the LCD's on-screen rectangle.
     this.lcd?.on('pointertap', () => {
@@ -256,13 +259,15 @@ export class SoundBoardScene3D extends Container3D {
     });
 
     SCROLL_ARROWS.forEach(({ up, ...rect }) => {
-      controls.push(place(new Button3D({
+      const button = new Button3D({
         face: new ScrollArrowButton(up),
         ...rect,
         depth: 4,
         bodyColor: 0x8a63a0,
         renderer,
-      }), rect));
+      });
+      button.on('pointertap', () => this.bank.setScrollOffset(this.bank.scrollOffset + (up ? -1 : 1)));
+      controls.push(place(button, rect));
     });
 
     STRIP_KNOBS.forEach((knob) => {
@@ -282,6 +287,7 @@ export class SoundBoardScene3D extends Container3D {
     controls.push(this.lcd);
     this.bankRows = place(new BankRows3D(BANK_ROWS_AREA, renderer, this.bank), BANK_ROWS_AREA);
     controls.push(this.bankRows);
+    controls.push(place(new ScrollbarThumb3D(SCROLL_THUMB_AREA, renderer, this.bank), SCROLL_THUMB_AREA));
 
     return controls;
   }

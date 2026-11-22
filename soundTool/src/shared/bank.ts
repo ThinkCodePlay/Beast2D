@@ -23,6 +23,13 @@ export const MAX_NAME_LENGTH = 14;
 /** Deepest undo history kept: one entry per replaced slot. */
 export const UNDO_LIMIT = 10;
 
+/**
+ * Slot rows the bank panel shows at once. The window's last row is the
+ * persistent "+ new" row, so at most this many minus one slots are visible;
+ * beyond that the window scrolls.
+ */
+export const VISIBLE_SLOT_ROWS = 15;
+
 /** One undoable replacement: the slot's whole state before it was replaced. */
 interface UndoEntry {
   /** Row the replacement happened on; Undo restores and re-selects it. */
@@ -64,6 +71,8 @@ export const DEFAULT_BANK_SLOTS: readonly BankSlotData[] = [
 export class SoundBank {
   slots: readonly BankSlot[];
   private _selectedIndex: number;
+  private _scrollOffset = 0;
+  private readonly createSound: () => SoundSequence;
   private active?: SoundSequence;
   private readonly undoStack: UndoEntry[] = [];
   private readonly listeners = new Set<(index: number) => void>();
@@ -73,6 +82,7 @@ export class SoundBank {
    * its own copy. Called once per slot at construction.
    */
   constructor(createSound: () => SoundSequence, selectedIndex = 3, slots: readonly BankSlotData[] = DEFAULT_BANK_SLOTS) {
+    this.createSound = createSound;
     this.slots = slots.map(slot => ({ ...slot, sound: createSound() }));
     this._selectedIndex = selectedIndex;
   }
@@ -188,8 +198,58 @@ export class SoundBank {
       ? selectedIndex
       : Math.max(0, this.slots.findIndex(slot => !slot.empty));
     this.undoStack.length = 0;
+    this._scrollOffset = 0;
     if (this.active) copySoundSequence(this.slots[this._selectedIndex].sound, this.active);
+    this.ensureVisible(this._selectedIndex);
     this.listeners.forEach(listener => listener(this._selectedIndex));
+  }
+
+  /**
+   * First slot index shown in the panel's row window. The window holds
+   * VISIBLE_SLOT_ROWS slots plus the "+ new" row.
+   */
+  get scrollOffset(): number {
+    return this._scrollOffset;
+  }
+
+  /** Largest meaningful offset: the window's last slot row shows the last slot. */
+  get maxScrollOffset(): number {
+    return Math.max(0, this.slots.length - VISIBLE_SLOT_ROWS);
+  }
+
+  /** Scroll the row window. Offsets clamp to the meaningful range. */
+  setScrollOffset(offset: number): void {
+    const next = Math.max(0, Math.min(this.maxScrollOffset, Math.round(offset)));
+    if (next === this._scrollOffset) return;
+    this._scrollOffset = next;
+    this.listeners.forEach(listener => listener(this._selectedIndex));
+  }
+
+  /** Scroll only as far as needed to put a slot inside the window. */
+  ensureVisible(index: number): void {
+    if (index < this._scrollOffset) this.setScrollOffset(index);
+    else if (index >= this._scrollOffset + VISIBLE_SLOT_ROWS) this.setScrollOffset(index - VISIBLE_SLOT_ROWS + 1);
+  }
+
+  /**
+   * Add a sound through the bank's "+ new" row: fill the first empty
+   * placeholder slot, or grow the bank when every slot holds a sound. The
+   * new slot gets the standard demo sound, an automatic name (renameable on
+   * the LCD) and becomes the selection, scrolled into view. Returns its row
+   * index.
+   */
+  addSlot(): number {
+    let index = this.slots.findIndex(slot => slot.empty);
+    if (index === -1) {
+      index = this.slots.length;
+      (this.slots as BankSlot[]).push({ name: '', empty: true, sound: this.createSound() });
+    }
+    const slot = this.slots[index] as BankSlot;
+    slot.empty = false;
+    slot.name = `sound_${String(index + 1).padStart(2, '0')}`.slice(0, MAX_NAME_LENGTH);
+    this.select(index);
+    this.ensureVisible(index);
+    return index;
   }
 
   /** Whether undoLast() has a replacement to restore. */

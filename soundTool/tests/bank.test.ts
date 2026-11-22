@@ -252,3 +252,93 @@ test('undo history keeps only the newest UNDO_LIMIT replacements', () => {
   }
   assert.equal(bank.undoLast(), false, 'the oldest replacements fall off');
 });
+
+test('addSlot fills the first empty placeholder, names and selects it', () => {
+  const bank = makeBank();
+  const index = bank.addSlot();
+  assert.equal(index, 8); // first empty slot
+  assert.equal(bank.slots.length, 16); // bank did not grow
+  assert.equal(bank.slots[8].empty, false);
+  assert.equal(bank.slots[8].name, 'sound_09');
+  assert.equal(bank.selectedIndex, 8);
+});
+
+test('addSlot grows the bank once every placeholder is filled', () => {
+  const bank = makeBank();
+  for (let i = 0; i < 8; i++) bank.addSlot(); // fills slots 09-16
+  assert.equal(bank.slots.length, 16);
+  const index = bank.addSlot();
+  assert.equal(index, 16); // a brand-new row 17
+  assert.equal(bank.slots.length, 17);
+  assert.equal(bank.slots[16].name, 'sound_17');
+  assert.equal(bank.selectedIndex, 16);
+  // and keeps growing without any cap
+  assert.equal(bank.addSlot(), 17);
+  assert.equal(bank.slots.length, 18);
+  assert.equal(bank.slots[17].name, 'sound_18');
+});
+
+test('addSlot names stay within MAX_NAME_LENGTH', () => {
+  const bank = makeBank();
+  for (let i = 0; i < 100; i++) bank.addSlot();
+  for (const slot of bank.slots) assert.ok(slot.name.length <= MAX_NAME_LENGTH, slot.name);
+});
+
+test('added slots hold independent sounds that keep their edits', () => {
+  const bank = makeBank();
+  const index = bank.addSlot();
+  bank.slots[index].sound.decay = 0.125;
+  bank.select(0);
+  assert.notEqual(bank.slots[0].sound.decay, 0.125);
+  assert.equal(bank.slots[index].sound.decay, 0.125);
+});
+
+test('scroll window clamps offsets and only scrolls past the default bank', () => {
+  const bank = makeBank();
+  assert.equal(bank.scrollOffset, 0);
+  assert.equal(bank.maxScrollOffset, 1); // 16 slots, 15 slot rows per window
+  bank.setScrollOffset(5);
+  assert.equal(bank.scrollOffset, 1);
+  bank.setScrollOffset(-3);
+  assert.equal(bank.scrollOffset, 0);
+  const grown = makeBank();
+  for (let i = 0; i < 12; i++) grown.addSlot(); // 20 slots
+  assert.equal(grown.maxScrollOffset, 5);
+});
+
+test('scrolling notifies listeners so views re-render', () => {
+  const bank = makeBank();
+  let calls = 0;
+  bank.onChange(() => calls++);
+  bank.setScrollOffset(1);
+  bank.setScrollOffset(1); // no change, no notification
+  assert.equal(calls, 1);
+});
+
+test('ensureVisible scrolls only as far as needed', () => {
+  const bank = makeBank();
+  for (let i = 0; i < 12; i++) bank.addSlot(); // 20 slots
+  bank.setScrollOffset(0);
+  bank.ensureVisible(3); // already visible
+  assert.equal(bank.scrollOffset, 0);
+  bank.ensureVisible(19); // last slot
+  assert.equal(bank.scrollOffset, 5); // window ends at slot 19
+  bank.ensureVisible(2); // above the window
+  assert.equal(bank.scrollOffset, 2);
+});
+
+test('addSlot auto-scrolls the new slot into view', () => {
+  const bank = makeBank();
+  for (let i = 0; i < 12; i++) bank.addSlot();
+  assert.equal(bank.selectedIndex, 19);
+  assert.ok(bank.selectedIndex - bank.scrollOffset < 15);
+});
+
+test('restore resets scrolling and keeps the restored selection visible', () => {
+  const bank = makeBank();
+  for (let i = 0; i < 12; i++) bank.addSlot();
+  bank.restore(bank.copySlots().slice(0, 10), 9);
+  assert.equal(bank.scrollOffset, 0);
+  bank.restore(bank.copySlots(), bank.slots.length - 1);
+  assert.ok(bank.slots.length - 1 - bank.scrollOffset < 15);
+});
