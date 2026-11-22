@@ -1,6 +1,7 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { trackDrag } from "./Pressable";
 import { angleForValue, clampValue, valueTowardPoint } from "./knobTurn";
+import type { EditSession } from "../bank";
 
 /**
  * Board dial artwork shared by both renderers. PixelKnob is the 2D board's
@@ -69,6 +70,7 @@ export class PixelKnob extends Container {
     color: number,
     private readonly onChange?: (value: number) => void,
     private readonly snap: (value: number) => number = clampValue,
+    private readonly editSession?: EditSession,
   ) {
     super();
     this.value = clampValue(value);
@@ -84,17 +86,21 @@ export class PixelKnob extends Container {
     this.addChild(this.needle);
     this.addChild(createDialLabel(label));
     this.drawNeedle();
-    trackDrag(this, (event) => {
-      const point = this.toLocal(event.global);
-      this.setValue(
-        valueTowardPoint(
-          CENTER_X,
-          CENTER_Y,
-          point.x,
-          point.y,
-          NEEDLE_START_ANGLE,
-        ),
-      );
+    trackDrag(this, {
+      onStart: () => this.editSession?.beginEdit(),
+      onMove: (event) => {
+        const point = this.toLocal(event.global);
+        this.setValue(
+          valueTowardPoint(
+            CENTER_X,
+            CENTER_Y,
+            point.x,
+            point.y,
+            NEEDLE_START_ANGLE,
+          ),
+        );
+      },
+      onEnd: () => this.editSession?.endEdit(),
     });
   }
 

@@ -69,34 +69,42 @@ export function makePressable(
   };
 }
 
+/** Drag lifecycle: press, every move until release, and release. */
+export interface DragHandlers {
+  /** Runs first on press, before the first onMove (e.g. opens an edit). */
+  onStart?: () => void;
+  /** Runs on press and on every move until release. */
+  onMove: (event: FederatedPointerEvent) => void;
+  /** Runs on release, slide-off or cancel (e.g. closes an edit). */
+  onEnd?: () => void;
+}
+
 /**
- * Drag tracking for rotary controls: `onMove` runs on press and on every
- * move until release, wherever the pointer goes. The press lands on the
- * control; the stage follows the drag, so a fast flick never loses the knob.
- * Needs the stage to be hit-testable (eventMode 'static' with a hitArea).
+ * Drag tracking for rotary controls and paint grids: `onMove` runs on press
+ * and on every move until release, wherever the pointer goes. The press
+ * lands on the control; the stage follows the drag, so a fast flick never
+ * loses the knob. Needs the stage to be hit-testable (eventMode 'static'
+ * with a hitArea).
  */
-export function trackDrag(
-  control: Container,
-  onMove: (event: FederatedPointerEvent) => void,
-  onEnd?: () => void,
-): void {
+export function trackDrag(control: Container, handlers: DragHandlers): void {
   control.eventMode = "static";
   control.cursor = "pointer";
   control.on("pointerdown", (event: FederatedPointerEvent) => {
     const stage = rootOf(control);
-    const move = (e: FederatedPointerEvent): void => onMove(e);
+    const move = (e: FederatedPointerEvent): void => handlers.onMove(e);
     const end = (): void => {
       stage.off("pointermove", move);
       stage.off("pointerup", end);
       stage.off("pointerupoutside", end);
       stage.off("pointercancel", end);
-      onEnd?.();
+      handlers.onEnd?.();
     };
     stage.on("pointermove", move);
     stage.on("pointerup", end);
     stage.on("pointerupoutside", end);
     stage.on("pointercancel", end);
-    onMove(event);
+    handlers.onStart?.();
+    handlers.onMove(event);
   });
 }
 

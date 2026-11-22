@@ -7,10 +7,10 @@ const GLYPH = 0x281638;
 
 /**
  * The bank strip's button actions, left to right: whole-bank import/export,
- * undo, single-sound import/export.
+ * undo/redo, single-sound import/export.
  */
 export type BankStripAction =
-  "undo" | "import" | "export" | "bankImport" | "bankExport";
+  "undo" | "redo" | "import" | "export" | "bankImport" | "bankExport";
 
 /**
  * The sound bank's small strip buttons: chunky pixel squares in the
@@ -65,16 +65,22 @@ function drawFace(): Graphics {
  */
 function drawGlyph(action: BankStripAction): Graphics {
   const glyph = new Graphics();
-  if (action === "undo") {
+  if (action === "undo" || action === "redo") {
+    // Bent arrow: undo points left, redo mirrors it pointing right.
+    const left = action === "undo";
+    const mirror = (x: number): number => (left ? x : 12 - x);
     return (
       glyph
-        // Arrowhead pointing left.
-        .poly([2, 5, 6, 2, 6, 8])
+        .poly(
+          left
+            ? [2, 5, 6, 2, 6, 8] // Arrowhead pointing left.
+            : [10, 5, 6, 2, 6, 8], // Arrowhead pointing right.
+        )
         .fill(GLYPH)
-        // Shaft running right, then bending down.
-        .rect(6, 4, 4, 2)
+        // Shaft running away from the head, then bending down.
+        .rect(mirror(6), 4, 4, 2)
         .fill(GLYPH)
-        .rect(9, 4, 1, 5)
+        .rect(mirror(9), 4, 1, 5)
         .fill(GLYPH)
     );
   }

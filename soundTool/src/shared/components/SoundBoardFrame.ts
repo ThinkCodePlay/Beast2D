@@ -105,7 +105,7 @@ export class SoundBoardFrame extends Container {
       CREATION_WIDTH,
       CONTROLS_HEIGHT,
       sequence,
-      { dials: options.transport, controls },
+      { dials: options.transport, editSession: options.bank, controls },
     );
     this.controls.position.set(CONTROLS_INSET, CONTROLS_TOP);
     this.footer = new SoundBoardFooter(BOARD_WIDTH - FOOTER_INSET * 2);

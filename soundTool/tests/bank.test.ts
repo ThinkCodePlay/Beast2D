@@ -2,9 +2,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   DEFAULT_BANK_SLOTS,
+  HISTORY_LIMIT,
   MAX_NAME_LENGTH,
   SoundBank,
-  UNDO_LIMIT,
 } from "../src/shared/bank.js";
 import { createSoundSequence } from "../src/shared/audio/model.js";
 
@@ -192,7 +192,7 @@ test("replaceSelected with a blank name keeps the old name", () => {
   assert.equal(bank.selectedName, "laser");
 });
 
-test("undoLast restores the sound and name a replacement overwrote", () => {
+test("undo restores the sound and name a replacement overwrote", () => {
   const bank = makeBank();
   const live = createSoundSequence();
   bank.activate(live);
@@ -208,22 +208,26 @@ test("undoLast restores the sound and name a replacement overwrote", () => {
   assert.equal(bank.selectedName, "zap");
   assert.equal(bank.canUndo, true);
 
-  assert.equal(bank.undoLast(), true);
+  assert.equal(bank.undo(), true);
   assert.equal(bank.selectedName, "my_sound");
   assert.equal(live.waveform, "saw");
   assert.equal(live.decay, 0.2);
   assert.equal(live.steps[0].note, 66);
+  // The rename is its own undo step: undoing it brings back the old name.
+  assert.equal(bank.canUndo, true);
+  assert.equal(bank.undo(), true);
+  assert.equal(bank.selectedName, "laser");
   assert.equal(bank.canUndo, false);
 });
 
-test("undoLast restores the replaced slot even after the selection moved on", () => {
+test("undo restores the replaced slot even after the selection moved on", () => {
   const bank = makeBank();
   const live = createSoundSequence();
   bank.activate(live);
   bank.replaceSelected(createSoundSequence(), "zap");
   bank.select(0);
 
-  assert.equal(bank.undoLast(), true);
+  assert.equal(bank.undo(), true);
   assert.equal(
     bank.selectedIndex,
     3,
@@ -232,34 +236,92 @@ test("undoLast restores the replaced slot even after the selection moved on", ()
   assert.equal(bank.selectedName, "laser");
 });
 
-test("undoLast restores the stored slot sound, not just the live sequence", () => {
+test("undo restores the stored slot sound, not just the live sequence", () => {
   const bank = makeBank();
   const live = createSoundSequence();
   bank.activate(live);
   live.waveform = "saw";
   bank.replaceSelected(createSoundSequence(), "zap");
-  assert.equal(bank.undoLast(), true);
+  assert.equal(bank.undo(), true);
   bank.select(0); // live now holds slot 01's sound
   bank.select(3); // and back
   assert.equal(live.waveform, "saw");
 });
 
-test("undoLast with an empty history is a no-op", () => {
+test("undo with an empty history is a no-op", () => {
   const bank = makeBank();
   assert.equal(bank.canUndo, false);
-  assert.equal(bank.undoLast(), false);
+  assert.equal(bank.undo(), false);
   assert.equal(bank.selectedIndex, 3);
 });
 
-test("undo history keeps only the newest UNDO_LIMIT replacements", () => {
+test("undo history keeps only the newest HISTORY_LIMIT edits", () => {
   const bank = makeBank();
-  for (let round = 0; round < UNDO_LIMIT + 2; round += 1) {
+  for (let round = 0; round < HISTORY_LIMIT + 2; round += 1) {
     bank.replaceSelected(createSoundSequence(), `sound_${round}`);
   }
-  for (let round = 0; round < UNDO_LIMIT; round += 1) {
-    assert.equal(bank.undoLast(), true, `undo ${round}`);
+  for (let round = 0; round < HISTORY_LIMIT; round += 1) {
+    assert.equal(bank.undo(), true, `undo ${round}`);
   }
-  assert.equal(bank.undoLast(), false, "the oldest replacements fall off");
+  assert.equal(bank.undo(), false, "the oldest edits fall off");
+});
+
+test("redo re-applies an undone edit, and a new edit clears it", () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  bank.replaceSelected(createSoundSequence(), "zap");
+  assert.equal(bank.undo(), true);
+  assert.equal(bank.selectedName, "laser");
+  assert.equal(bank.canRedo, true);
+
+  assert.equal(bank.redo(), true);
+  assert.equal(bank.selectedName, "zap");
+  assert.equal(bank.canRedo, false);
+  assert.equal(bank.canUndo, true, "the redone edit is undoable again");
+
+  bank.undo();
+  bank.rename("other"); // a fresh edit clears the redo stack
+  assert.equal(bank.canRedo, false);
+});
+
+test("an editing gesture is one undo step", () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  const before = live.steps[0].note;
+
+  // A paint stroke: several changes between beginEdit and endEdit.
+  bank.beginEdit();
+  live.steps[0].note = 70;
+  live.steps[1].note = 74;
+  live.waveform = "square";
+  bank.endEdit();
+  assert.equal(bank.canUndo, true);
+
+  assert.equal(bank.undo(), true);
+  assert.equal(live.steps[0].note, before);
+  assert.equal(live.waveform, "sine");
+  assert.equal(bank.redo(), true);
+  assert.equal(live.steps[0].note, 70);
+  assert.equal(live.steps[1].note, 74);
+  assert.equal(live.waveform, "square");
+});
+
+test("a gesture that changes nothing records no undo step", () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  bank.beginEdit();
+  bank.endEdit();
+  assert.equal(bank.canUndo, false);
+
+  // A knob turned away and back to its exact start is no edit either.
+  bank.beginEdit();
+  live.decay = 0.5;
+  live.decay = 1;
+  bank.endEdit();
+  assert.equal(bank.canUndo, false);
 });
 
 test("addSlot fills the first empty placeholder, names and selects it", () => {

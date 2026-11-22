@@ -137,10 +137,16 @@ const scene = new SoundBoardScene3D(
 // LCD's name editor is open - its input needs the arrows itself).
 window.addEventListener("keydown", (event) => {
   if (event.target instanceof HTMLInputElement) return;
-  // Ctrl/Cmd+Z restores the sound a preset or import replaced.
+  // Ctrl/Cmd+Z undoes the last edit; Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes it.
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
     event.preventDefault();
-    bank.undoLast();
+    if (event.shiftKey) bank.redo();
+    else bank.undo();
+    return;
+  }
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y") {
+    event.preventDefault();
+    bank.redo();
     return;
   }
   if (event.key === "ArrowUp" || event.key === "ArrowDown") {

@@ -12,20 +12,23 @@ import {
  *
  * Each slot holds its own sound (notes, waveform and dial settings). The
  * editor works on one live SoundSequence; switching slots copies the outgoing
- * slot's sound out and the incoming slot's sound in, in place. Everything is
- * in memory: nothing persists across a reload yet.
+ * slot's sound out and the incoming slot's sound in, in place.
  *
- * Replacing a slot's sound (import, preset) snapshots the slot first, so
- * undoLast() restores exactly what was there: name, notes, waveform and
- * dials. The history is single-purpose and shallow: replacements only,
- * capped at UNDO_LIMIT entries.
+ * Editing history: every sound or bank mutation is undoable, not just
+ * replacements. One-shot bank edits (rename, preset or import replacement,
+ * add/duplicate/delete slot) record themselves. Continuous editor gestures
+ * (painting notes or volumes, turning a dial) bracket themselves with
+ * beginEdit()/endEdit(): the whole stroke is one undo step, and a stroke
+ * that changed nothing records nothing. Undo/redo restore whole-bank
+ * snapshots - slots and selection - so every kind of edit reverts coherently,
+ * and a new edit clears the redo stack. History is capped at HISTORY_LIMIT.
  */
 
 /** Longest sound name the LCD and bank row take. */
 export const MAX_NAME_LENGTH = 14;
 
-/** Deepest undo history kept: one entry per replaced slot. */
-export const UNDO_LIMIT = 10;
+/** Deepest editing history kept: one whole-bank snapshot per edit. */
+export const HISTORY_LIMIT = 50;
 
 /**
  * Slot rows the bank panel shows at once. The window's last row is the
@@ -34,12 +37,21 @@ export const UNDO_LIMIT = 10;
  */
 export const VISIBLE_SLOT_ROWS = 15;
 
-/** One undoable replacement: the slot's whole state before it was replaced. */
-interface UndoEntry {
-  /** Row the replacement happened on; Undo restores and re-selects it. */
-  index: number;
-  name: string;
-  sound: SoundSequence;
+/** One undoable edit: the whole bank as it was before the edit. */
+interface HistoryEntry {
+  slots: BankSlot[];
+  selectedIndex: number;
+}
+
+/**
+ * The editing-history session the editor's gesture controls use: beginEdit()
+ * before the gesture's first change, endEdit() after its last. SoundBank
+ * implements it; components take the narrow interface so they never touch
+ * the bank's selection API.
+ */
+export interface EditSession {
+  beginEdit(): void;
+  endEdit(): void;
 }
 
 /** Slot data without its sound: what the static defaults describe. */
@@ -81,15 +93,18 @@ export const DEFAULT_BANK_SLOTS: readonly BankSlotData[] = [
 /**
  * The bank's selection and per-slot sounds. Filled slots are selectable by
  * tap or arrow keys; empty slots are skipped. Listeners are notified on an
- * actual selection change or a rename of the selected slot.
+ * actual selection change, a rename of the selected slot, or a committed
+ * edit (so undo/redo availability and the rows stay current).
  */
-export class SoundBank {
+export class SoundBank implements EditSession {
   slots: readonly BankSlot[];
   private _selectedIndex: number;
   private _scrollOffset = 0;
   private readonly createSound: () => SoundSequence;
   private active?: SoundSequence;
-  private readonly undoStack: UndoEntry[] = [];
+  private readonly undoStack: HistoryEntry[] = [];
+  private readonly redoStack: HistoryEntry[] = [];
+  private pendingEdit?: HistoryEntry;
   private readonly listeners = new Set<(index: number) => void>();
 
   /**
@@ -128,8 +143,8 @@ export class SoundBank {
   /**
    * Select a filled slot by row index. Empty or out-of-range slots are
    * ignored. The outgoing slot keeps the editor's current sound; the incoming
-   * slot's sound loads into the editor. Returns whether the selection
-   * changed.
+   * slot's sound loads into the editor. Selection itself is not an undoable
+   * edit. Returns whether the selection changed.
    */
   select(index: number): boolean {
     const slot = this.slots[index];
@@ -160,32 +175,34 @@ export class SoundBank {
 
   /**
    * Rename the selected slot. The name is trimmed and capped at
-   * MAX_NAME_LENGTH; an empty result keeps the old name. Returns whether the
-   * name changed.
+   * MAX_NAME_LENGTH; an empty result keeps the old name. Undoable. Returns
+   * whether the name changed.
    */
   rename(name: string): boolean {
     const clean = name.trim().slice(0, MAX_NAME_LENGTH);
     const slot = this.slots[this._selectedIndex];
     if (!clean || clean === slot.name) return false;
+    this.beginEdit();
     slot.name = clean;
-    this.listeners.forEach((listener) => listener(this._selectedIndex));
+    this.endEdit();
     return true;
   }
 
   /**
-   * Replace the selected slot's sound and name, as an import does. Copies
-   * the incoming sound into the slot and into the live editor sequence, so
-   * the board plays and shows the new sound at once. A blank name keeps the
-   * old one. Notifies listeners once, so views refresh like a slot switch.
+   * Replace the selected slot's sound and name, as an import or preset does.
+   * Copies the incoming sound into the slot and into the live editor
+   * sequence, so the board plays and shows the new sound at once. A blank
+   * name keeps the old one. Undoable. Notifies listeners once, so views
+   * refresh like a slot switch.
    */
   replaceSelected(sound: SoundSequence, name: string): void {
+    this.beginEdit();
     const slot = this.slots[this._selectedIndex];
-    this.pushUndo();
     copySoundSequence(sound, slot.sound);
     if (this.active) copySoundSequence(sound, this.active);
     const clean = name.trim().slice(0, MAX_NAME_LENGTH);
     if (clean) slot.name = clean;
-    this.listeners.forEach((listener) => listener(this._selectedIndex));
+    this.endEdit();
   }
 
   /**
@@ -205,9 +222,11 @@ export class SoundBank {
 
   /**
    * Replace the whole bank with restored slots and selection, as loading a
-   * persistence snapshot does. The live editor sequence loads the restored
-   * selection's sound and the undo history starts fresh: undo entries refer
-   * to slot states from before the restore.
+   * persistence snapshot or a whole-bank file does. The live editor sequence
+   * loads the restored selection's sound. The editing history survives the
+   * restore (snapshots are whole-bank, so earlier entries stay valid);
+   * bracket the call with beginEdit()/endEdit() to make the restore itself
+   * undoable, as the whole-bank import does.
    */
   restore(slots: readonly BankSlot[], selectedIndex: number): void {
     this.slots = slots.map((slot) => {
@@ -227,7 +246,6 @@ export class SoundBank {
             0,
             this.slots.findIndex((slot) => !slot.empty),
           );
-    this.undoStack.length = 0;
     this._scrollOffset = 0;
     if (this.active)
       copySoundSequence(this.slots[this._selectedIndex].sound, this.active);
@@ -269,11 +287,11 @@ export class SoundBank {
   /**
    * Add a sound through the bank's "+ new" row: fill the first empty
    * placeholder slot, or grow the bank when every slot holds a sound. The
-   * new slot gets the standard demo sound, an automatic name (renameable on
-   * the LCD) and becomes the selection, scrolled into view. Returns its row
-   * index.
+   * new slot gets an automatic name (renameable on the LCD) and becomes the
+   * selection, scrolled into view. Undoable. Returns its row index.
    */
   addSlot(): number {
+    this.beginEdit();
     let index = this.slots.findIndex((slot) => slot.empty);
     if (index === -1) {
       index = this.slots.length;
@@ -291,38 +309,78 @@ export class SoundBank {
     );
     this.select(index);
     this.ensureVisible(index);
+    this.endEdit();
     return index;
   }
 
-  /** Whether undoLast() has a replacement to restore. */
+  /** Whether undo() has an edit to restore. */
   get canUndo(): boolean {
     return this.undoStack.length > 0;
   }
 
+  /** Whether redo() has an undone edit to re-apply. */
+  get canRedo(): boolean {
+    return this.redoStack.length > 0;
+  }
+
   /**
-   * Restore the slot state from before the most recent replacement: name,
-   * notes, waveform and dials. The restored slot becomes the selection, even
-   * if the user moved on after the replacement. Returns whether anything was
+   * Start an editing gesture: snapshot the bank so endEdit() can record the
+   * whole gesture as one undo step. One-shot edits call beginEdit() and
+   * endEdit() around their mutation; gesture controls (the pitch grid, the
+   * volume row, the dials) call beginEdit() on press and endEdit() on
+   * release. A nested beginEdit() keeps the original snapshot.
+   */
+  beginEdit(): void {
+    this.pendingEdit ??= this.capture();
+  }
+
+  /**
+   * Finish an editing gesture: when the bank actually changed since
+   * beginEdit(), record the pre-edit snapshot as one undo step and clear the
+   * redo stack. A gesture that changed nothing records nothing.
+   */
+  endEdit(): void {
+    const pending = this.pendingEdit;
+    this.pendingEdit = undefined;
+    if (!pending) return;
+    if (historyEntriesEqual(pending, this.capture())) return;
+    this.undoStack.push(pending);
+    if (this.undoStack.length > HISTORY_LIMIT) this.undoStack.shift();
+    this.redoStack.length = 0;
+    this.listeners.forEach((listener) => listener(this._selectedIndex));
+  }
+
+  /**
+   * Restore the bank from before the most recent edit: names, notes,
+   * waveform and dials on every slot, with the edit's slot selected again.
+   * The current state moves to the redo stack. Returns whether anything was
    * restored.
    */
-  undoLast(): boolean {
+  undo(): boolean {
     const entry = this.undoStack.pop();
     if (!entry) return false;
-    // Flush live edits back into the current slot first, as a switch does.
-    if (this.active)
-      copySoundSequence(this.active, this.slots[this._selectedIndex].sound);
-    const slot = this.slots[entry.index];
-    copySoundSequence(entry.sound, slot.sound);
-    slot.name = entry.name;
-    this._selectedIndex = entry.index;
-    if (this.active) copySoundSequence(entry.sound, this.active);
-    this.listeners.forEach((listener) => listener(entry.index));
+    this.redoStack.push(this.capture());
+    this.pendingEdit = undefined; // An open gesture's snapshot is stale now.
+    this.restore(entry.slots, entry.selectedIndex);
     return true;
   }
 
   /**
-   * Subscribe to selection and rename changes; the listener gets the selected
-   * slot index. Returns an unsubscribe function.
+   * Re-apply the most recently undone edit. Returns whether anything was
+   * re-applied.
+   */
+  redo(): boolean {
+    const entry = this.redoStack.pop();
+    if (!entry) return false;
+    this.undoStack.push(this.capture());
+    this.pendingEdit = undefined; // An open gesture's snapshot is stale now.
+    this.restore(entry.slots, entry.selectedIndex);
+    return true;
+  }
+
+  /**
+   * Subscribe to selection, rename and committed-edit changes; the listener
+   * gets the selected slot index. Returns an unsubscribe function.
    */
   onChange(listener: (index: number) => void): () => void {
     this.listeners.add(listener);
@@ -331,17 +389,39 @@ export class SoundBank {
     };
   }
 
-  /** Snapshot the selected slot before a replacement, for undoLast(). */
-  private pushUndo(): void {
-    const slot = this.slots[this._selectedIndex];
-    const snapshot = createSoundSequence();
-    // The live sequence holds the slot's current sound while it is selected.
-    copySoundSequence(this.active ?? slot.sound, snapshot);
-    this.undoStack.push({
-      index: this._selectedIndex,
-      name: slot.name,
-      sound: snapshot,
-    });
-    if (this.undoStack.length > UNDO_LIMIT) this.undoStack.shift();
+  /** The bank as one history snapshot: every slot plus the selection. */
+  private capture(): HistoryEntry {
+    return { slots: this.copySlots(), selectedIndex: this._selectedIndex };
   }
+}
+
+/** Two history snapshots match when slots and selection are all equal. */
+function historyEntriesEqual(a: HistoryEntry, b: HistoryEntry): boolean {
+  if (a.selectedIndex !== b.selectedIndex) return false;
+  if (a.slots.length !== b.slots.length) return false;
+  return a.slots.every(
+    (slot, index) =>
+      slot.name === b.slots[index].name &&
+      slot.empty === b.slots[index].empty &&
+      soundsEqual(slot.sound, b.slots[index].sound),
+  );
+}
+
+/** Field-by-field sound equality, steps included. */
+function soundsEqual(a: SoundSequence, b: SoundSequence): boolean {
+  return (
+    a.rate === b.rate &&
+    a.waveform === b.waveform &&
+    a.masterVolume === b.masterVolume &&
+    a.pan === b.pan &&
+    a.decay === b.decay &&
+    a.pitch === b.pitch &&
+    a.cut === b.cut &&
+    a.steps.every(
+      (step, index) =>
+        step.note === b.steps[index].note &&
+        step.volume === b.steps[index].volume &&
+        step.enabled === b.steps[index].enabled,
+    )
+  );
 }

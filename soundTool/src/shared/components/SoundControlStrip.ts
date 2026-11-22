@@ -10,6 +10,7 @@ import {
   KNOBS,
   type DialActions,
 } from "../dials";
+import type { EditSession } from "../bank";
 
 /**
  * Bottom strip with the six 32px dials, as wide as the creation panel above
@@ -32,6 +33,8 @@ const KNOB_SIZE = 32;
 export interface SoundControlStripOptions {
   /** Live dial callbacks; in '2d' mode the composition root passes the transport. */
   dials?: DialActions;
+  /** Editing history session: one undo step per dial drag. '2d' mode only. */
+  editSession?: EditSession;
   /** '2d' draws interactive dials, '3d' draws markings only. Default '2d'. */
   controls?: ControlMode;
 }
@@ -66,6 +69,7 @@ export class SoundControlStrip extends Container {
             ? (next) => applyDial(knob.label, next, sequence, dials)
             : undefined,
           dialSnap(knob.label),
+          options.editSession,
         );
         control.position.set(
           tileLeft + (KNOB_TILE_WIDTH - KNOB_SIZE) / 2,

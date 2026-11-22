@@ -179,21 +179,22 @@ export const SCROLL_THUMB_AREA: ControlRect = {
 
 /**
  * The sound bank's strip buttons, left to right: whole-bank import/export,
- * undo, single-sound import/export.
+ * undo/redo, single-sound import/export.
  */
 export const BANK_STRIP_BUTTONS: (ControlRect & { action: BankStripAction })[] =
   (() => {
-    const { bankImportX, bankExportX, undoX, importX, exportX } =
+    const { bankImportX, bankExportX, undoX, redoX, importX, exportX } =
       stripButtonXs(BANK_WIDTH);
     const xs: Record<BankStripAction, number> = {
       bankImport: bankImportX,
       bankExport: bankExportX,
       undo: undoX,
+      redo: redoX,
       import: importX,
       export: exportX,
     };
     return (
-      ["bankImport", "bankExport", "undo", "import", "export"] as const
+      ["bankImport", "bankExport", "undo", "redo", "import", "export"] as const
     ).map((action) => ({
       action,
       x: BANK_LEFT + xs[action],

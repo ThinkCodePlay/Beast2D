@@ -3,6 +3,7 @@ import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from "./stepGrid";
 import { StepPitchGrid, defaultNotes } from "./StepPitchGrid";
 import { StepVolumeRow } from "./StepVolumeRow";
 import { createSoundSequence, type SoundSequence } from "../audio/model";
+import type { EditSession } from "../bank";
 
 const SECTION_COUNT = 8;
 const STEPS_PER_SECTION = STEP_COUNT / SECTION_COUNT;
@@ -28,6 +29,7 @@ export class WaveformDisplay extends Container {
     sequence = createSoundSequence(defaultNotes()),
     onNoteChange?: (index: number) => void,
     onVolumeChange?: (index: number) => void,
+    editSession?: EditSession,
   ) {
     super();
     this.sequence = sequence;
@@ -39,6 +41,7 @@ export class WaveformDisplay extends Container {
       width,
       barsBottom,
       onNoteChange,
+      editSession,
     );
     this.addChild(this.pitchGrid);
     this.volumeRow = new StepVolumeRow(
@@ -46,6 +49,7 @@ export class WaveformDisplay extends Container {
       width,
       VOLUME_ROW_HEIGHT,
       onVolumeChange,
+      editSession,
     );
     this.volumeRow.position.set(0, this.volumeRowTop);
     this.addChild(this.volumeRow);

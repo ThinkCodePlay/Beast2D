@@ -103,13 +103,15 @@ export class SoundCreationPanel extends Container {
       );
       const waveformTop = PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
       const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;
-      // Pitch and volume edits both audition the edited step.
+      // Pitch and volume edits both audition the edited step. The bank is
+      // the edit session: a paint stroke is one undo step.
       this.waveform = new WaveformDisplay(
         width - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET,
         selectorTop - SELECTOR_TOP_GAP - waveformTop,
         sequence,
         transport.audition,
         transport.audition,
+        bank,
       );
       this.waveform.position.set(WAVEFORM_LEFT_INSET, waveformTop);
       this.addChild(this.waveform);
@@ -117,7 +119,10 @@ export class SoundCreationPanel extends Container {
         sequence.waveform,
         PAD_STEP_X,
         (type) => {
+          if (sequence.waveform === type) return;
+          bank.beginEdit();
           sequence.waveform = type;
+          bank.endEdit();
         },
       );
       this.selector.position.set(PAD_GRID_LEFT, selectorTop);

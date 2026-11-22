@@ -43,17 +43,24 @@ test("a snapshot round-trips every slot, the selection and the loop latch", () =
   assert.equal(snapshot.slots[0].sound.steps.length, SEQUENCE_STEP_COUNT);
 });
 
-test("a snapshot restores into a fresh bank, clearing undo history", () => {
+test("a snapshot restores into a fresh bank as one undo step", () => {
   const { bank } = makeBank();
   bank.replaceSelected(createSoundSequence(), "zap"); // undo history exists
   const text = serializeBank(bank, false);
   const { bank: fresh, live: freshLive } = makeBank();
   const snapshot = parseBankSnapshot(text);
+  // Bracketed like the whole-bank file import does: undo crosses the restore.
+  fresh.beginEdit();
   fresh.restore(snapshot.slots, snapshot.selectedIndex);
+  fresh.endEdit();
   assert.equal(fresh.selectedName, "zap");
   assert.equal(fresh.selectedIndex, 3);
   assert.equal(freshLive.waveform, fresh.slots[3].sound.waveform);
-  assert.equal(fresh.canUndo, false, "undo cannot cross a restore");
+  assert.equal(fresh.canUndo, true, "undo crosses a whole-bank restore");
+  assert.equal(fresh.undo(), true);
+  assert.equal(fresh.selectedName, "laser", "the pre-restore bank is back");
+  assert.equal(fresh.redo(), true);
+  assert.equal(fresh.selectedName, "zap");
 });
 
 test("restore clamps a selection pointing at an empty or missing slot", () => {

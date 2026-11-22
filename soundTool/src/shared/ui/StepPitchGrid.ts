@@ -11,6 +11,7 @@ import {
   NOTE_WINDOW_BASE,
   type SoundSequence,
 } from "../audio/model";
+import type { EditSession } from "../bank";
 
 const GOLD = 0xffd251;
 const ORANGE = 0xf3864d;
@@ -58,12 +59,17 @@ export class StepPitchGrid extends Container {
     width: number,
     private readonly areaBottom: number,
     private readonly onNoteChange?: (index: number) => void,
+    private readonly editSession?: EditSession,
   ) {
     super();
     this.hitArea = new Rectangle(0, TOP_INSET, width, areaBottom - TOP_INSET);
     this.addChild(this.bars);
     this.redraw();
-    trackDrag(this, (event) => this.paint(event));
+    trackDrag(this, {
+      onStart: () => this.editSession?.beginEdit(),
+      onMove: (event) => this.paint(event),
+      onEnd: () => this.editSession?.endEdit(),
+    });
   }
 
   private paint(event: FederatedPointerEvent): void {

@@ -101,8 +101,12 @@ test("applyPreset replaces the selected slot and Undo restores it exactly", () =
     sequenceValues(buildPreset(PRESETS.coin)),
   );
 
-  assert.equal(bank.undoLast(), true);
+  assert.equal(bank.undo(), true);
   assert.equal(bank.selectedName, "my_sound");
   assert.deepEqual(sequenceValues(sequence), before);
+  // The earlier rename is its own remaining undo step.
+  assert.equal(bank.canUndo, true);
+  assert.equal(bank.undo(), true);
+  assert.equal(bank.selectedName, "laser");
   assert.equal(bank.canUndo, false);
 });

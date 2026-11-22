@@ -91,8 +91,8 @@ async function importIntoSelected(bank: SoundBank): Promise<void> {
   const incoming = parsed.name || bank.selectedName;
   const message =
     incoming === bank.selectedName
-      ? `Replace the sound in "${bank.selectedName}"? This cannot be undone.`
-      : `Replace "${bank.selectedName}" with "${incoming}"? This cannot be undone.`;
+      ? `Replace the sound in "${bank.selectedName}"?`
+      : `Replace "${bank.selectedName}" with "${incoming}"?`;
   if (!window.confirm(message)) return;
   bank.replaceSelected(parsed.sound, parsed.name);
 }
@@ -114,13 +114,16 @@ async function importWholeBank(
     return;
   }
   const confirmed = window.confirm(
-    `Replace the whole sound bank with "${file.name}"? Every current sound will be replaced. This cannot be undone.`,
+    `Replace the whole sound bank with "${file.name}"? Every current sound will be replaced.`,
   );
   if (!confirmed) return;
   // Apply the latch first: restore's change notification refreshes the
   // views, and the loop button re-reads the latch during that refresh.
   loop.setLooping(snapshot.looping);
+  // One undo step: Undo brings back the whole pre-import bank.
+  bank.beginEdit();
   bank.restore(snapshot.slots, snapshot.selectedIndex);
+  bank.endEdit();
 }
 
 /** Download text as a file through a temporary anchor. */

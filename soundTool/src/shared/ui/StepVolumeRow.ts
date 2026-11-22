@@ -7,6 +7,7 @@ import {
 import { trackDrag } from "./Pressable";
 import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from "./stepGrid";
 import { toStepVolume, type SoundSequence } from "../audio/model";
+import type { EditSession } from "../bank";
 
 /** Highest volume a step can hold; the row shows STEP_VOLUME_MAX + 1 levels. */
 export const STEP_VOLUME_MAX = 7;
@@ -31,12 +32,17 @@ export class StepVolumeRow extends Container {
     width: number,
     private readonly rowHeight: number,
     private readonly onVolumeChange?: (index: number) => void,
+    private readonly editSession?: EditSession,
   ) {
     super();
     this.hitArea = new Rectangle(0, 0, width, rowHeight);
     this.addChild(this.bars);
     this.redraw();
-    trackDrag(this, (event) => this.paint(event));
+    trackDrag(this, {
+      onStart: () => this.editSession?.beginEdit(),
+      onMove: (event) => this.paint(event),
+      onEnd: () => this.editSession?.endEdit(),
+    });
   }
 
   private paint(event: FederatedPointerEvent): void {

@@ -70,14 +70,19 @@ replacing its sound and name, and play the new sound once.
 Small buttons on the bank's top strip move sounds in and out and recover
 mistakes: export downloads the selected slot as an editable JSON file named
 after it, import loads a JSON file into the selected slot (with a
-confirmation, since the slot's sound is replaced), and undo restores the
-sound and name the last replacement - preset or import - overwrote, also via
-Ctrl/Cmd+Z. Undo keeps the newest ten replacements. The leftmost pair backs
-up and restores the whole bank at once: bank export downloads every slot,
-the selection and the loop latch as one pretty-printed JSON file, and bank
-import restores such a file after a confirmation, since every current sound
-is replaced. A cancelled picker or dialog changes nothing, and an invalid
-file is rejected with the reason, leaving the bank untouched.
+confirmation, since the slot's sound is replaced), and undo/redo step
+through the board's editing history, also via Ctrl/Cmd+Z and
+Ctrl/Cmd+Shift+Z (or Ctrl/Cmd+Y). The history covers every kind of edit -
+painting notes or volumes, turning a dial, picking a waveform, renaming,
+presets, imports, adding, duplicating and deleting slots - with one undo
+step per gesture, and restores the whole bank (slots and selection) per
+step, keeping the newest fifty. A new edit clears the redo stack. The
+leftmost pair backs up and restores the whole bank at once: bank export
+downloads every slot, the selection and the loop latch as one pretty-printed
+JSON file, and bank import restores such a file after a confirmation, since
+every current sound is replaced (itself one undo step). A cancelled picker
+or dialog changes nothing, and an invalid file is rejected with the reason,
+leaving the bank untouched.
 
 The board saves itself to the browser's localStorage every few seconds and
 when the page hides: every slot's name and sound, the selection and the loop

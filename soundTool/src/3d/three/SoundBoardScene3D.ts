@@ -212,12 +212,15 @@ export class SoundBoardScene3D extends Container3D {
         this.applyDial(label, rotor.getValue());
       };
       rotor.on("pointerdown", (event) => {
+        // One undo step per dial drag, like the 2D knobs' edit session.
+        this.bank.beginEdit();
         const move = (e: FederatedPointerEvent): void => turnToward(e.global);
         const end = (): void => {
           view.off("pointermove", move);
           view.off("pointerup", end);
           view.off("pointerupoutside", end);
           view.off("pointercancel", end);
+          this.bank.endEdit();
         };
         view.on("pointermove", move);
         view.on("pointerup", end);
@@ -325,7 +328,10 @@ export class SoundBoardScene3D extends Container3D {
       });
       button.setSelected(type === this.sequence.waveform);
       button.on("pointertap", () => {
+        if (this.sequence.waveform === type) return;
+        this.bank.beginEdit();
         this.sequence.waveform = type;
+        this.bank.endEdit();
         waveformButtons.forEach((other) =>
           other.button.setSelected(other.type === type),
         );
@@ -356,11 +362,16 @@ export class SoundBoardScene3D extends Container3D {
         bodyColor: 0x8a63a0,
         renderer,
       });
-      if (action === "undo") {
-        // Dimmed while the bank has nothing to restore, like the 2D strip.
-        button.setEnabled(this.bank.canUndo);
-        this.bank.onChange(() => button.setEnabled(this.bank.canUndo));
-        button.on("pointertap", () => this.bank.undoLast());
+      if (action === "undo" || action === "redo") {
+        // Dimmed while they have nothing to restore, like the 2D strip.
+        const act = action === "undo" ? "undo" : "redo";
+        const can = (): boolean =>
+          act === "undo" ? this.bank.canUndo : this.bank.canRedo;
+        button.setEnabled(can());
+        this.bank.onChange(() => button.setEnabled(can()));
+        button.on("pointertap", () =>
+          act === "undo" ? this.bank.undo() : this.bank.redo(),
+        );
       } else {
         const handler =
           action === "import"
@@ -454,12 +465,15 @@ export class SoundBoardScene3D extends Container3D {
       waveform.display.paintAt(x, y);
     };
     waveform.on("pointerdown", (event) => {
+      // One undo step per paint stroke, like the 2D display's edit session.
+      this.bank.beginEdit();
       const move = (e: FederatedPointerEvent): void => paintAt(e.global);
       const end = (): void => {
         view.off("pointermove", move);
         view.off("pointerup", end);
         view.off("pointerupoutside", end);
         view.off("pointercancel", end);
+        this.bank.endEdit();
       };
       view.on("pointermove", move);
       view.on("pointerup", end);
