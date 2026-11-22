@@ -22,6 +22,7 @@
     "tests/soundFile.test.ts",
     "tests/bankFile.test.ts",
     "tests/presets.test.ts",
-    "tests/bankStorage.test.ts"
+    "tests/bankStorage.test.ts",
+    "tests/stepDraw.test.ts"
   ]
 }

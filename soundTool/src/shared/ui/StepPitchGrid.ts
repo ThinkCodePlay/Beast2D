@@ -9,6 +9,7 @@ import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from "./stepGrid";
 import {
   NOTE_WINDOW,
   NOTE_WINDOW_BASE,
+  paintStepNote,
   type SoundSequence,
 } from "../audio/model";
 import type { EditSession } from "../bank";
@@ -88,8 +89,9 @@ export class StepPitchGrid extends Container {
       Math.min(NOTE_WINDOW - 1, Math.round(t * (NOTE_WINDOW - 1))),
     );
     const note = NOTE_WINDOW_BASE + offset;
-    if (this.sequence.steps[step].note === note) return false;
-    this.sequence.steps[step].note = note;
+    // Painting a note also re-enables a rest, so notes drawn past a preset's
+    // last step sound on the next Play.
+    if (!paintStepNote(this.sequence.steps[step], note)) return false;
     this.redraw();
     this.onNoteChange?.(step);
     return true;

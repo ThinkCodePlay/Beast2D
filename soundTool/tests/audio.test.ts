@@ -20,8 +20,11 @@ import assert from "node:assert/strict";
 import { SoundPlayer } from "../src/shared/audio/SoundPlayer.js";
 import {
   createSoundSequence,
+  paintStepNote,
+  paintStepVolume,
   WAVEFORM_TYPES,
 } from "../src/shared/audio/model.js";
+import { buildPreset, PRESETS } from "../src/shared/presets.js";
 import {
   normalizedVolume,
   noteFrequency,
@@ -165,6 +168,19 @@ test("32-step snapshot uses audio-clock slots, keeping silent slot timing", asyn
   sequence.steps[0].note = 100;
   assert.equal(context.voices[0].frequency.points[0][0], noteFrequency(60));
   assert.equal(context.outputs[0].gain.value, 0.25);
+});
+test("notes painted past a preset's last step sound on Play", async () => {
+  const { context, player } = setup();
+  const sequence = buildPreset(PRESETS.coin); // Steps 0 and 1, double rate.
+  paintStepNote(sequence.steps[10], 76);
+  paintStepVolume(sequence.steps[20], 5);
+  await player.play(sequence);
+  assert.equal(context.voices.length, 4);
+  const slot = STEP_SECONDS / 2;
+  assert.equal(context.voices[0].startTime, 10.01);
+  assert.equal(context.voices[1].startTime, 10.01 + slot);
+  assert.equal(context.voices[2].startTime, 10.01 + 10 * slot);
+  assert.equal(context.voices[3].startTime, 10.01 + 20 * slot);
 });
 test("Stop cancels active and future voices, then releases every node", async () => {
   const { context, player } = setup();

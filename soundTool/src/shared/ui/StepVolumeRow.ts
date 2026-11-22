@@ -6,7 +6,11 @@ import {
 } from "pixi.js";
 import { trackDrag } from "./Pressable";
 import { STEP_COUNT, STEP_LEFT, STEP_STEP, STEP_WIDTH } from "./stepGrid";
-import { toStepVolume, type SoundSequence } from "../audio/model";
+import {
+  paintStepVolume,
+  toStepVolume,
+  type SoundSequence,
+} from "../audio/model";
 import type { EditSession } from "../bank";
 
 /** Highest volume a step can hold; the row shows STEP_VOLUME_MAX + 1 levels. */
@@ -56,8 +60,8 @@ export class StepVolumeRow extends Container {
     if (step < 0 || step >= STEP_COUNT) return false;
     const band = this.rowHeight / (STEP_VOLUME_MAX + 1);
     const level = toStepVolume(Math.floor((this.rowHeight - y) / band));
-    if (this.sequence.steps[step].volume === level) return false;
-    this.sequence.steps[step].volume = level;
+    // Painting a level also re-enables a rest, matching the pitch grid.
+    if (!paintStepVolume(this.sequence.steps[step], level)) return false;
     this.redraw();
     this.onVolumeChange?.(step);
     return true;

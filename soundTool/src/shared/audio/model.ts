@@ -88,6 +88,35 @@ export function toStepVolume(value: number): StepVolume {
   return Math.max(0, Math.min(7, Math.round(value))) as StepVolume;
 }
 
+/**
+ * Paint a drawn note into a step. Painting is how rests come back: a painted
+ * step is meant to sound, so the edit enables the step as well as moving its
+ * note. Returns true when the step changed.
+ */
+export function paintStepNote(step: SoundStep, note: NoteNumber): boolean {
+  const next = Math.max(
+    NOTE_RANGE.min,
+    Math.min(NOTE_RANGE.max, Math.round(note)),
+  );
+  if (next === step.note && step.enabled) return false;
+  step.note = next;
+  step.enabled = true;
+  return true;
+}
+
+/**
+ * Paint a level into a step's volume. Like a painted note, a painted level
+ * is meant to sound, so the edit enables the step too.
+ * Returns true when the step changed.
+ */
+export function paintStepVolume(step: SoundStep, volume: number): boolean {
+  const next = toStepVolume(volume);
+  if (next === step.volume && step.enabled) return false;
+  step.volume = next;
+  step.enabled = true;
+  return true;
+}
+
 /** A fresh sequence: every step enabled at full volume, master at a quiet audition level. */
 export function createSoundSequence(notes?: NoteNumber[]): SoundSequence {
   const steps: SoundStep[] = Array.from(
