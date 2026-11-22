@@ -1,6 +1,7 @@
 import { Assets, Application, type Texture } from 'pixi.js';
 import { Camera3D, View3D } from '@pixi/3d';
 import { PRESET_ICONS, type PresetTextures } from '../shared/components/PresetPad';
+import { SoundBank } from '../shared/bank';
 import { createSoundSequence } from '../shared/audio/model';
 import { SoundPlayer } from '../shared/audio/SoundPlayer';
 import { SoundBoardScene3D } from './three/SoundBoardScene3D';
@@ -59,9 +60,10 @@ const view3d = new View3D({
 view3d.eventMode = 'static';
 // The composition root owns the data and player, not either rendering component.
 const sequence = createSoundSequence(defaultNotes());
+const bank = new SoundBank();
 const player = new SoundPlayer();
 let looping = false;
-const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures, sequence, {
+const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures, sequence, bank, {
   play: () => {
     void player.play(sequence).catch(error => {
       console.error('Sound playback failed:', error);
@@ -83,6 +85,13 @@ const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture,
       console.warn('Note preview could not start:', error);
     });
   },
+});
+// Arrow keys move the bank selection, as the footer help says.
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    event.preventDefault();
+    bank.selectNext(event.key === 'ArrowDown' ? 1 : -1);
+  }
 });
 scene.once('destroyed', () => { void player.dispose(); });
 window.addEventListener('pagehide', () => player.stop());

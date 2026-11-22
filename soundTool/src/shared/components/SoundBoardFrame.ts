@@ -1,6 +1,7 @@
 import { Container, type Texture } from 'pixi.js';
 import { BoardFrame as BoardFrameArtwork } from './BoardFrame';
 import type { ControlMode } from '../controls';
+import type { SoundBank } from '../bank';
 import type { TransportActions } from '../transport';
 import type { PresetTextures } from './PresetPad';
 import type { SoundSequence } from '../audio/model';
@@ -40,6 +41,8 @@ const BANK_WIDTH = 159;
 export interface SoundBoardFrameOptions {
   /** Transport and live-dial callbacks; required in '2d' mode, unused in '3d'. */
   transport?: TransportActions;
+  /** Sound bank driving the name LCD and the selectable bank rows; required in '2d' mode. */
+  bank?: SoundBank;
   /** '2d' draws and wires the controls, '3d' leaves them out for the 3D scene. Default '2d'. */
   controls?: ControlMode;
 }
@@ -66,10 +69,10 @@ export class SoundBoardFrame extends Container {
 
     this.content = new Container();
     this.content.position.set(CONTENT_INSET, CONTENT_TOP);
-    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures, sequence, { transport: options.transport, controls });
+    this.creationPanel = new SoundCreationPanel(CREATION_WIDTH, CONTENT_HEIGHT, presetTextures, sequence, { transport: options.transport, bank: options.bank, controls });
     // The bank runs full height beside the creation panel and the control strip.
     const bankHeight = CONTROLS_TOP + CONTROLS_HEIGHT - CONTENT_TOP;
-    this.bankPanel = new SoundBankPanel(BANK_WIDTH, bankHeight, controls);
+    this.bankPanel = new SoundBankPanel(BANK_WIDTH, bankHeight, options.bank, controls);
     this.bankPanel.position.x = BANK_LEFT - CONTENT_INSET;
     this.content.addChild(this.creationPanel, this.bankPanel);
 

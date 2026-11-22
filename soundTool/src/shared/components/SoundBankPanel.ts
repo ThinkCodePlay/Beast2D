@@ -1,26 +1,30 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { makePressable } from '../ui/Pressable';
 import type { ControlMode } from '../controls';
-import { SoundBankRow, BANK_ROW_HEIGHT } from './SoundBankRow';
+import type { SoundBank } from '../bank';
+import { BANK_ROW_TOP, BankRows } from './BankRows';
 
-const BANK_ITEMS = [
-  'jump', 'coin', 'hit', 'laser', 'boom_big', 'power_up',
-  'enemy_die', 'select', 'empty', 'empty', 'empty', 'empty',
-  'empty', 'empty', 'empty', 'empty',
-] as const;
-const BANK_ROW_TOP = 109 / 3;
+/** Panel width kept clear of the rows (the scrollbar's side). */
+export const ROWS_WIDTH_INSET = 24;
 export const SCROLL_BUTTON_SIZE = 15;
 export const SCROLL_INSET = 2;
 export const SCROLL_TRACK_TOP = BANK_ROW_TOP;
 
 /** Shallow inset sound-bank area with a fine board-colored boundary. */
 export class SoundBankPanel extends Container {
-  constructor(width: number, height: number, controls: ControlMode = '2d') {
+  constructor(width: number, height: number, bank: SoundBank | undefined, controls: ControlMode = '2d') {
     super();
     this.addChild(drawFlatBoundary(width, height));
     this.addChild(createTitle());
     this.addChild(createSubtitle());
-    this.addChild(createRows(width));
+    // In '3d' mode the rows are left out so the 3D scene's live overlay can
+    // draw and hit-test them instead (see three/BankRows3D.ts).
+    if (controls === '2d') {
+      if (!bank) throw new Error('SoundBankPanel 2D mode needs the sound bank.');
+      const rows = new BankRows(bank, width - ROWS_WIDTH_INSET, true);
+      rows.position.set(0, BANK_ROW_TOP);
+      this.addChild(rows);
+    }
     this.addChild(createScrollbar(width, height, controls));
   }
 }
@@ -55,17 +59,6 @@ function createSubtitle(): Text {
   });
   subtitle.position.set(6, 17);
   return subtitle;
-}
-
-function createRows(width: number): Container {
-  const rows = new Container();
-  rows.position.set(0, BANK_ROW_TOP);
-  BANK_ITEMS.forEach((name, index) => {
-    const row = new SoundBankRow(index, name, name === 'laser', width - 24);
-    row.position.y = index * BANK_ROW_HEIGHT + (index === 3 ? 2 / 3 : 0);
-    rows.addChild(row);
-  });
-  return rows;
 }
 
 function createScrollbar(width: number, height: number, controls: ControlMode): Container {

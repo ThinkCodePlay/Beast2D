@@ -10,6 +10,7 @@ import {
 } from '@pixi/3d';
 import type { FederatedPointerEvent, PointData, Renderer, Texture } from 'pixi.js';
 import type { SoundSequence } from '../../shared/audio/model';
+import type { SoundBank } from '../../shared/bank';
 import type { TransportActions } from '../../shared/transport';
 import { applyDial, dialSnap, dialValue, type KnobLabel } from '../../shared/dials';
 import { valueTowardPoint } from '../../shared/ui/knobTurn';
@@ -25,6 +26,8 @@ import { Button3D } from './Button3D';
 import { Knob3D } from './Knob3D';
 import { BOARD_WIDTH, BOARD_HEIGHT, CABINET_DEPTH, boardToWorld } from './boardSpace';
 import {
+  BANK_ROWS_AREA,
+  LCD_DISPLAY,
   PRESET_PADS,
   RUN_BUTTON,
   SCROLL_ARROWS,
@@ -34,6 +37,8 @@ import {
   WAVEFORM_DISPLAY,
   type ControlRect,
 } from './controlLayout';
+import { BankRows3D } from './BankRows3D';
+import { LcdDisplay3D } from './LcdDisplay3D';
 import { WAVEFORM_FACE_Z, WaveformDisplay3D } from './WaveformDisplay3D';
 
 const FACE_RESOLUTION = 3; // Captures the 512-wide design at the canvas's 1536 pixels.
@@ -46,6 +51,7 @@ const FACE_RESOLUTION = 3; // Captures the 512-wide design at the canvas's 1536 
 export class SoundBoardScene3D extends Container3D {
   private readonly knobs: { rotor: Knob3D; cx: number; cy: number; label: KnobLabel }[] = [];
   private waveform?: WaveformDisplay3D;
+  private bankRows?: BankRows3D;
 
   constructor(
     renderer: Renderer,
@@ -53,6 +59,7 @@ export class SoundBoardScene3D extends Container3D {
     mascotTexture: Texture,
     tabIconTextures: TabIconTextures,
     private readonly sequence: SoundSequence,
+    private readonly bank: SoundBank,
     private readonly transport: TransportActions,
   ) {
     super();
@@ -68,6 +75,11 @@ export class SoundBoardScene3D extends Container3D {
    */
   bindPointer(view: View3D): void {
     this.bindWaveformPaint(view);
+    // Bank rows: a tap selects the tapped slot (empty slots ignore it).
+    this.bankRows?.on('pointertap', (event) => {
+      const { y } = this.boardPoint(view, event.global);
+      this.bank.select(this.bankRows!.rows.slotAt(y - BANK_ROWS_AREA.y));
+    });
     this.knobs.forEach(({ rotor, cx, cy, label }) => {
       const turnToward = (global: PointData): void => {
         const ray = view.screenToRay(global);
@@ -99,6 +111,16 @@ export class SoundBoardScene3D extends Container3D {
   /** Write a rotor's turn into the sequence; live dials also reach the player. */
   private applyDial(label: KnobLabel, value: number): void {
     applyDial(label, value, this.sequence, this.transport);
+  }
+
+  /** Meet the pointer ray with the board plane (z = 0), in board-design pixels. */
+  private boardPoint(view: View3D, global: PointData): { x: number; y: number } {
+    const ray = view.screenToRay(global);
+    const t = -ray.origin.z / ray.direction.z;
+    return {
+      x: ray.origin.x + t * ray.direction.x + BOARD_WIDTH / 2,
+      y: BOARD_HEIGHT / 2 - (ray.origin.y + t * ray.direction.y),
+    };
   }
 
   private createControls(renderer: Renderer, presetTextures: PresetTextures): Container3D[] {
@@ -173,6 +195,12 @@ export class SoundBoardScene3D extends Container3D {
     // Pitch and volume edits both audition the edited step.
     this.waveform = place(new WaveformDisplay3D(WAVEFORM_DISPLAY, renderer, this.sequence, this.transport.audition, this.transport.audition), WAVEFORM_DISPLAY);
     controls.push(this.waveform);
+
+    // Live flat overlays: the name LCD and the selectable bank rows, left out
+    // of the cabinet's baked face artwork so they can change with the bank.
+    controls.push(place(new LcdDisplay3D(LCD_DISPLAY, renderer, this.bank), LCD_DISPLAY));
+    this.bankRows = place(new BankRows3D(BANK_ROWS_AREA, renderer, this.bank), BANK_ROWS_AREA);
+    controls.push(this.bankRows);
 
     return controls;
   }

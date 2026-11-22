@@ -5,14 +5,37 @@ const ROW_LEFT = 4;
 const NAME_LEFT = 36;
 const INDEX_COLUMN_WIDTH = 32;
 
-/** One numbered sound-bank slot with an individual thin outline and cell rules. */
+/**
+ * One numbered sound-bank slot with an individual thin outline and cell
+ * rules. Redraws itself when its selection state changes.
+ */
 export class SoundBankRow extends Container {
-  constructor(index: number, name: string, selected: boolean, width: number) {
+  private selected: boolean;
+
+  constructor(
+    private readonly index: number,
+    private readonly slotName: string,
+    selected: boolean,
+    private readonly rowWidth: number,
+  ) {
     super();
-    this.addChild(drawRow(selected, width));
-    this.addChild(createIndex(index, selected));
-    this.addChild(createName(name, selected));
-    if (name !== 'empty') this.addChild(createPreviewGlyph(width, selected));
+    this.selected = selected;
+    this.draw();
+  }
+
+  /** Redraw with a new selection state. */
+  setSelected(selected: boolean): void {
+    if (selected === this.selected) return;
+    this.selected = selected;
+    this.draw();
+  }
+
+  private draw(): void {
+    this.removeChildren().forEach(child => child.destroy());
+    this.addChild(drawRow(this.selected, this.rowWidth));
+    this.addChild(createIndex(this.index, this.selected));
+    this.addChild(createName(this.slotName, this.selected));
+    if (this.slotName !== 'empty') this.addChild(createPreviewGlyph(this.rowWidth, this.selected));
   }
 }
 

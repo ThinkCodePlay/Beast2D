@@ -14,6 +14,8 @@ import { RUN_RIGHT_INSET } from '../../shared/components/SoundBoardHeader';
 import { RUN_WIDTH, RUN_HEIGHT } from '../../shared/components/RunButton';
 import {
   KEPT_PRESETS,
+  LCD_LEFT,
+  LCD_RIGHT_INSET,
   PAD_GRID_LEFT,
   PAD_GRID_TOP,
   PAD_STEP_X,
@@ -26,6 +28,9 @@ import {
   WAVEFORM_RIGHT_INSET,
   WAVEFORM_TOP_GAP,
 } from '../../shared/components/SoundCreationPanel';
+import { LCD_HEIGHT } from '../../shared/components/SoundNameLcd';
+import { BANK_ROW_HEIGHT } from '../../shared/components/SoundBankRow';
+import { BANK_ROW_TOP } from '../../shared/components/BankRows';
 import { PAD_WIDTH, PAD_HEIGHT, type PresetIcon } from '../../shared/components/PresetPad';
 import { KNOB_CENTER } from '../../shared/ui/PixelKnob';
 import {
@@ -36,7 +41,7 @@ import {
 } from '../../shared/components/SoundControlStrip';
 import { KNOBS } from '../../shared/dials';
 import { WAVEFORM_TYPES, type WaveformType } from '../../shared/audio/model';
-import { SCROLL_BUTTON_SIZE, SCROLL_INSET, SCROLL_TRACK_TOP } from '../../shared/components/SoundBankPanel';
+import { ROWS_WIDTH_INSET, SCROLL_BUTTON_SIZE, SCROLL_INSET, SCROLL_TRACK_TOP } from '../../shared/components/SoundBankPanel';
 
 /** A control's face rectangle in board-design coordinates (top-left origin). */
 export interface ControlRect {
@@ -120,6 +125,22 @@ export const RUN_BUTTON: ControlRect = {
 const BANK_WIDTH = 159;
 // The bank runs full height: from the content top to the control strip's bottom.
 const BANK_HEIGHT = CONTROLS_TOP + 157 / 3 - CONTENT_TOP;
+
+/** The sound-name LCD on the transport row, drawn live in 3D (LcdDisplay3D). */
+export const LCD_DISPLAY: ControlRect = {
+  x: CONTENT_INSET + TRANSPORT_LEFT + LCD_LEFT,
+  y: CONTENT_TOP + TRANSPORT_TOP + 2,
+  width: CREATION_WIDTH - TRANSPORT_LEFT - LCD_RIGHT_INSET - LCD_LEFT,
+  height: LCD_HEIGHT,
+};
+
+/** The sound bank's slot rows, drawn and hit-tested live in 3D (BankRows3D). */
+export const BANK_ROWS_AREA: ControlRect = {
+  x: BANK_LEFT,
+  y: CONTENT_TOP + BANK_ROW_TOP,
+  width: BANK_WIDTH - ROWS_WIDTH_INSET + 4, // The rows' drawn extent, including their 4px left offset.
+  height: 16 * BANK_ROW_HEIGHT + 1,
+};
 
 /** The sound bank's two scroll-arrow buttons. */
 export const SCROLL_ARROWS: (ControlRect & { up: boolean })[] = [true, false].map((up) => ({

@@ -1,6 +1,7 @@
 import { Assets, Application, Rectangle, type Texture } from 'pixi.js';
 import { PRESET_ICONS, type PresetTextures } from '../shared/components/PresetPad';
 import { SoundBoardFrame } from '../shared/components/SoundBoardFrame';
+import { SoundBank } from '../shared/bank';
 import { createSoundSequence } from '../shared/audio/model';
 import { SoundPlayer } from '../shared/audio/SoundPlayer';
 import { defaultNotes } from '../shared/ui/StepPitchGrid';
@@ -47,9 +48,10 @@ app.stage.hitArea = new Rectangle(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 // The composition root owns the data and player, not either rendering component.
 const sequence = createSoundSequence(defaultNotes());
+const bank = new SoundBank();
 const player = new SoundPlayer();
 let looping = false;
-const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, { transport: {
+const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, { bank, transport: {
   play: () => {
     void player.play(sequence).catch(error => {
       console.error('Sound playback failed:', error);
@@ -71,6 +73,13 @@ const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures
       console.warn('Note preview could not start:', error);
     });
   } },
+});
+// Arrow keys move the bank selection, as the footer help says.
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    event.preventDefault();
+    bank.selectNext(event.key === 'ArrowDown' ? 1 : -1);
+  }
 });
 board.once('destroyed', () => { void player.dispose(); });
 window.addEventListener('pagehide', () => player.stop());

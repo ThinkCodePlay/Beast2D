@@ -10,5 +10,5 @@
     "outDir": ".audio-tests",
     "rootDir": "."
   },
-  "include": ["src/shared/audio/*.ts", "tests/audio.test.ts"]
+  "include": ["src/shared/audio/*.ts", "src/shared/bank.ts", "tests/audio.test.ts", "tests/bank.test.ts"]
 }
