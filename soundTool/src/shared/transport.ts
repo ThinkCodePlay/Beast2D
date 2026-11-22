@@ -20,4 +20,6 @@ export interface TransportActions {
   setCutoff(value: number): void;
   /** Flips the loop latch; returns the new state so the button can show it. */
   toggleLoop(): boolean;
+  /** Current loop latch, so the loop button can show a restored state. */
+  isLooping(): boolean;
 }

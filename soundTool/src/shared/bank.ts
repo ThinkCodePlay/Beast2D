@@ -62,7 +62,7 @@ export const DEFAULT_BANK_SLOTS: readonly BankSlotData[] = [
  * actual selection change or a rename of the selected slot.
  */
 export class SoundBank {
-  readonly slots: readonly BankSlot[];
+  slots: readonly BankSlot[];
   private _selectedIndex: number;
   private active?: SoundSequence;
   private readonly undoStack: UndoEntry[] = [];
@@ -156,6 +156,39 @@ export class SoundBank {
     if (this.active) copySoundSequence(sound, this.active);
     const clean = name.trim().slice(0, MAX_NAME_LENGTH);
     if (clean) slot.name = clean;
+    this.listeners.forEach(listener => listener(this._selectedIndex));
+  }
+
+  /**
+   * Deep copy of every slot, with the live editor's edits folded into the
+   * selected one first: what a persistence snapshot should store.
+   */
+  copySlots(): BankSlot[] {
+    return this.slots.map((slot, index) => {
+      const sound = createSoundSequence();
+      copySoundSequence(index === this._selectedIndex && this.active ? this.active : slot.sound, sound);
+      return { name: slot.name, empty: slot.empty, sound };
+    });
+  }
+
+  /**
+   * Replace the whole bank with restored slots and selection, as loading a
+   * persistence snapshot does. The live editor sequence loads the restored
+   * selection's sound and the undo history starts fresh: undo entries refer
+   * to slot states from before the restore.
+   */
+  restore(slots: readonly BankSlot[], selectedIndex: number): void {
+    this.slots = slots.map(slot => {
+      const sound = createSoundSequence();
+      copySoundSequence(slot.sound, sound);
+      return { name: slot.name.trim().slice(0, MAX_NAME_LENGTH) || slot.name, empty: slot.empty, sound };
+    });
+    const wanted = this.slots[selectedIndex];
+    this._selectedIndex = wanted && !wanted.empty
+      ? selectedIndex
+      : Math.max(0, this.slots.findIndex(slot => !slot.empty));
+    this.undoStack.length = 0;
+    if (this.active) copySoundSequence(this.slots[this._selectedIndex].sound, this.active);
     this.listeners.forEach(listener => listener(this._selectedIndex));
   }
 

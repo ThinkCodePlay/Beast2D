@@ -21,6 +21,8 @@ shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
     per file, validated on the way in.
   - `presets.ts`: the six preset sounds behind the creation panel's pads,
     Pixi-free so both renderings and the tests share them.
+  - `bankStorage.ts`: the localStorage snapshot format (all slots, selection,
+    loop latch), Pixi-free; stored sounds share the sound file's validation.
   - `components/`: the board's panels and controls. Components take a
     `controls` mode: `'2d'` draws and wires the controls, `'3d'` draws flat
     artwork only so the 3D scene can place real meshes on top.
@@ -35,6 +37,8 @@ shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
   validation and clamping rules.
 - `tests/presets.test.ts`: the preset definitions (valid playable sequences,
   export round trip) and the apply-then-undo flow.
+- `tests/bankStorage.test.ts`: the snapshot's round trip, selection clamping
+  and corruption rejection.
 - The local `public/ui/monogram.ttf` pixel font is loaded before the board is
   drawn; its CC0 license is included alongside it.
 
@@ -54,9 +58,16 @@ mistakes: export downloads the selected slot as an editable JSON file named
 after it, import loads a JSON file into the selected slot (with a
 confirmation, since the slot's sound is replaced), and undo restores the
 sound and name the last replacement - preset or import - overwrote, also via
-Ctrl/Cmd+Z. Undo keeps the newest ten replacements. Everything else is in
-memory: nothing persists across a reload yet, and during playback a switch
-takes effect on the next Play, matching the existing snapshot semantics.
+Ctrl/Cmd+Z. Undo keeps the newest ten replacements.
+
+The board saves itself to the browser's localStorage every few seconds and
+when the page hides: every slot's name and sound, the selection and the loop
+latch, under one namespaced versioned key. A snapshot that fails validation
+is never silently overwritten - its raw text is copied to a timestamped
+backup key and the board starts fresh with a notice. localStorage is scoped
+to the origin, not the path, so a snapshot written at one commit-pinned
+GitHack URL loads at the next one. During playback a switch takes effect on
+the next Play, matching the existing snapshot semantics.
 
 ## Run
 

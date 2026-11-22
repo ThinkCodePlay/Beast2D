@@ -20,9 +20,11 @@
     "src/shared/bank.ts",
     "src/shared/soundFile.ts",
     "src/shared/presets.ts",
+    "src/shared/bankStorage.ts",
     "tests/audio.test.ts",
     "tests/bank.test.ts",
     "tests/soundFile.test.ts",
-    "tests/presets.test.ts"
+    "tests/presets.test.ts",
+    "tests/bankStorage.test.ts"
   ]
 }

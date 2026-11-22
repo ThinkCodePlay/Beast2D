@@ -100,6 +100,7 @@ function createTransport(panelWidth: number, controls: ControlMode, transport?: 
     play.on('pointertap', transport.play);
     stop.on('pointertap', transport.stop);
     loop.on('pointertap', () => loop.setLatched(transport.toggleLoop()));
+    loop.setLatched(transport.isLooping()); // A restored snapshot may have the latch on.
     [play, stop, loop].forEach((button, index) => {
       button.position.x = index * PAD_STEP_X;
     });

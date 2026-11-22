@@ -5,6 +5,7 @@ import { SoundBank } from '../shared/bank';
 import { createSoundSequence } from '../shared/audio/model';
 import { SoundPlayer } from '../shared/audio/SoundPlayer';
 import { createSoundTransfer } from '../shared/ui/soundFileTransfer';
+import { restoreBankSnapshot, startBankAutosave } from '../shared/ui/bankPersistence';
 import { SoundBoardScene3D } from './three/SoundBoardScene3D';
 import { defaultNotes } from '../shared/ui/StepPitchGrid';
 
@@ -65,7 +66,10 @@ const bank = new SoundBank(() => createSoundSequence(defaultNotes()));
 bank.activate(sequence);
 const transfer = createSoundTransfer(bank, sequence);
 const player = new SoundPlayer();
-let looping = false;
+// A saved snapshot loads before the board is drawn, so every view starts
+// from the restored state; the loop latch applies to the player directly.
+let looping = restoreBankSnapshot(bank);
+player.setLoopEnabled(looping);
 const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures, sequence, bank, {
   play: () => {
     void player.play(sequence).catch(error => {
@@ -85,6 +89,7 @@ const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture,
     player.setLoopEnabled(looping);
     return looping;
   },
+  isLooping: () => looping,
   setMasterVolume: (value) => player.setMasterVolume(value),
   setPan: (value) => player.setPan(value),
   setCutoff: (value) => player.setCutoff(value),
@@ -110,6 +115,7 @@ window.addEventListener('keydown', (event) => {
     bank.selectNext(event.key === 'ArrowDown' ? 1 : -1);
   }
 });
+startBankAutosave(bank, () => looping);
 scene.once('destroyed', () => { void player.dispose(); });
 window.addEventListener('pagehide', () => player.stop());
 scene.bindPointer(view3d);

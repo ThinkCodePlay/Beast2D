@@ -5,6 +5,7 @@ import { SoundBank } from '../shared/bank';
 import { createSoundSequence } from '../shared/audio/model';
 import { SoundPlayer } from '../shared/audio/SoundPlayer';
 import { createSoundTransfer } from '../shared/ui/soundFileTransfer';
+import { restoreBankSnapshot, startBankAutosave } from '../shared/ui/bankPersistence';
 import { defaultNotes } from '../shared/ui/StepPitchGrid';
 
 const DISPLAY_WIDTH = 1536;
@@ -53,7 +54,10 @@ const bank = new SoundBank(() => createSoundSequence(defaultNotes()));
 bank.activate(sequence);
 const transfer = createSoundTransfer(bank, sequence);
 const player = new SoundPlayer();
-let looping = false;
+// A saved snapshot loads before the board is drawn, so every view starts
+// from the restored state; the loop latch applies to the player directly.
+let looping = restoreBankSnapshot(bank);
+player.setLoopEnabled(looping);
 const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, { bank, io: transfer, transport: {
   play: () => {
     void player.play(sequence).catch(error => {
@@ -73,6 +77,7 @@ const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures
     player.setLoopEnabled(looping);
     return looping;
   },
+  isLooping: () => looping,
   setMasterVolume: (value) => player.setMasterVolume(value),
   setPan: (value) => player.setPan(value),
   setCutoff: (value) => player.setCutoff(value),
@@ -85,6 +90,7 @@ const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures
 });
 // A slot switch swaps the sequence's contents; caching views re-read it.
 bank.onChange(() => board.refreshFromSequence());
+startBankAutosave(bank, () => looping);
 // Arrow keys move the bank selection, as the footer help says (not while the
 // LCD's name editor is open - its input needs the arrows itself).
 window.addEventListener('keydown', (event) => {

@@ -47,18 +47,23 @@ export function serializeSound(name: string, sound: SoundSequence): string {
     format: SOUND_FILE_FORMAT,
     version: SOUND_FILE_VERSION,
     name,
-    sound: {
-      rate: sound.rate,
-      waveform: sound.waveform,
-      masterVolume: sound.masterVolume,
-      pan: sound.pan,
-      decay: sound.decay,
-      pitch: sound.pitch,
-      cut: sound.cut,
-      steps: sound.steps.map(step => ({ note: step.note, volume: step.volume, enabled: step.enabled })),
-    },
+    sound: soundToJson(sound),
   };
   return `${JSON.stringify(data, null, 2)}\n`;
+}
+
+/** Every value of a SoundSequence as JSON data. Shared with the bank snapshot. */
+export function soundToJson(sound: SoundSequence): SoundFileData['sound'] {
+  return {
+    rate: sound.rate,
+    waveform: sound.waveform,
+    masterVolume: sound.masterVolume,
+    pan: sound.pan,
+    decay: sound.decay,
+    pitch: sound.pitch,
+    cut: sound.cut,
+    steps: sound.steps.map(step => ({ note: step.note, volume: step.volume, enabled: step.enabled })),
+  };
 }
 
 /**
@@ -84,13 +89,16 @@ export function parseSoundFile(text: string): { name: string; sound: SoundSequen
   if (data.version !== SOUND_FILE_VERSION) {
     throw new Error(`Unsupported sound file version ${String(data.version)}.`);
   }
-  const sound = parseSound(data.sound);
+  const sound = parseSoundData(data.sound);
   const name = typeof data.name === 'string' ? data.name.trim() : '';
   return { name, sound };
 }
 
-/** Validate the file's sound object onto a fresh sequence's defaults. */
-function parseSound(raw: SoundFileData['sound'] | undefined): SoundSequence {
+/**
+ * Validate a sound object onto a fresh sequence's defaults. Shared with the
+ * bank snapshot, so stored sounds follow exactly the import rules.
+ */
+export function parseSoundData(raw: SoundFileData['sound'] | undefined): SoundSequence {
   if (!raw || typeof raw !== 'object') throw new Error('The file has no sound data.');
   if (!Array.isArray(raw.steps) || raw.steps.length !== SEQUENCE_STEP_COUNT) {
     throw new Error(`The file needs exactly ${SEQUENCE_STEP_COUNT} steps.`);
