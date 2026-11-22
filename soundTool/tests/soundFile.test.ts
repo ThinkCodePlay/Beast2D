@@ -37,6 +37,13 @@ test('parse rejects an unsupported format version', () => {
   assert.throws(() => parseSoundFile(text), /Unsupported sound file version/);
 });
 
+test('fractional notes round-trip exactly, as the grid paints them', () => {
+  const sound = createSoundSequence();
+  sound.steps[0].note = 81.55163727959697;
+  const { sound: parsed } = parseSoundFile(serializeSound('curve', sound));
+  assert.equal(parsed.steps[0].note, 81.55163727959697);
+});
+
 test('parse rejects a wrong step count and bad notes', () => {
   const data = JSON.parse(serializeSound('laser', createSoundSequence()));
   data.sound.steps = data.sound.steps.slice(0, SEQUENCE_STEP_COUNT - 1);

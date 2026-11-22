@@ -66,7 +66,9 @@ export function serializeSound(name: string, sound: SoundSequence): string {
  * Throws an Error with a user-readable message when the file is not valid
  * JSON, not this format, or holds out-of-shape values. Forgiving where a
  * clamp is harmless (dial ranges, step volumes), strict where a guess would
- * change the music (notes, waveform, step count).
+ * change the music (notes, waveform, step count). Notes are validated as
+ * numbers in the MIDI range, not rounded: the board's own grid stores
+ * fractional semitone positions, and export must round-trip them exactly.
  */
 export function parseSoundFile(text: string): { name: string; sound: SoundSequence } {
   let raw: unknown;
@@ -104,7 +106,7 @@ function parseSound(raw: SoundFileData['sound'] | undefined): SoundSequence {
   raw.steps.forEach((step, index) => {
     if (!step || typeof step !== 'object') throw new Error(`Step ${index + 1} is not an object.`);
     const note = Number(step.note);
-    if (!Number.isInteger(note) || note < NOTE_RANGE.min || note > NOTE_RANGE.max) {
+    if (!Number.isFinite(note) || note < NOTE_RANGE.min || note > NOTE_RANGE.max) {
       throw new Error(`Step ${index + 1} has an invalid note.`);
     }
     sound.steps[index] = {
