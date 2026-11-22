@@ -44,7 +44,6 @@ export class SoundBankRow extends Container {
     this.addChild(drawRow(this.selected, this.rowWidth));
     this.addChild(createIndex(this.index, this.selected));
     this.addChild(createName(this.slotName, this.selected));
-    if (this.slotName !== 'empty') this.addChild(createPreviewGlyph(this.rowWidth, this.selected));
   }
 }
 
@@ -97,16 +96,6 @@ function createName(name: string, selected: boolean): Text {
   });
   label.anchor.set(0, 0.5);
   label.position.set(NAME_LEFT + 4, BANK_ROW_HEIGHT / 2 - 1);
-  return label;
-}
-
-function createPreviewGlyph(width: number, selected: boolean): Text {
-  const label = new Text({
-    text: '▶',
-    style: { fontFamily: 'monogram', fontSize: 11, fill: selected ? 0x392044 : 0xd26ff7 }, resolution: 3,
-  });
-  label.anchor.set(0, 0.5);
-  label.position.set(width - 16, BANK_ROW_HEIGHT / 2);
   return label;
 }
 
