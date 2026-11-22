@@ -22,11 +22,12 @@ const PEAK = Math.max(...BAR_HEIGHTS);
 
 /**
  * Starting notes matching the decorative envelope, so the board looks exactly
- * as before the first edit. Values are window-relative floats; drawing snaps
- * a step to a whole semitone.
+ * as before the first edit. Whole semitones, like drawn notes: each value is
+ * the envelope's float rounded to the nearest semitone, which shifts a bar by
+ * less than half a step and matches the sound the player always made.
  */
 export function defaultNotes(): number[] {
-  return BAR_HEIGHTS.map((height) => NOTE_WINDOW_BASE + height / PEAK * (NOTE_WINDOW - 1));
+  return BAR_HEIGHTS.map((height) => NOTE_WINDOW_BASE + Math.round(height / PEAK * (NOTE_WINDOW - 1)));
 }
 
 /**
