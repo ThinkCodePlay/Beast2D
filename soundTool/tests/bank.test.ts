@@ -324,6 +324,112 @@ test("a gesture that changes nothing records no undo step", () => {
   assert.equal(bank.canUndo, false);
 });
 
+test("duplicateSlot copies the selected slot's live sound into a free slot", () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  live.waveform = "saw";
+  live.steps[0].note = 66;
+
+  const index = bank.duplicateSlot(3);
+  assert.equal(index, 8, "the first empty slot takes the copy");
+  assert.equal(bank.selectedIndex, 8, "the copy becomes the selection");
+  assert.equal(bank.selectedName, "laser_2");
+  assert.equal(live.waveform, "saw", "live edits are part of the copy");
+  assert.equal(live.steps[0].note, 66);
+  assert.equal(bank.slots[3].name, "laser", "the original is untouched");
+
+  const again = bank.duplicateSlot(3);
+  assert.equal(bank.slots[again!].name, "laser_3", "names stay unique");
+});
+
+test("duplicateSlot keeps names within MAX_NAME_LENGTH", () => {
+  const bank = makeBank();
+  bank.rename("x".repeat(MAX_NAME_LENGTH));
+  const index = bank.duplicateSlot(3);
+  const name = bank.slots[index!].name;
+  assert.equal(name.length, MAX_NAME_LENGTH);
+  assert.ok(name.endsWith("_2"), name);
+});
+
+test("duplicateSlot ignores empty slots and grows a full bank", () => {
+  const bank = makeBank();
+  assert.equal(bank.duplicateSlot(8), null, "empty slot");
+  assert.equal(bank.duplicateSlot(99), null, "missing slot");
+  for (let i = 0; i < 8; i++) bank.addSlot(); // fill slots 09-16
+  const index = bank.duplicateSlot(0);
+  assert.equal(index, 16, "a full bank grows for the copy");
+  assert.equal(bank.slots.length, 17);
+});
+
+test("undo removes a duplicated slot", () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  bank.duplicateSlot(3);
+  assert.equal(bank.slots[8].empty, false);
+  assert.equal(bank.undo(), true);
+  assert.equal(bank.slots[8].empty, true);
+  assert.equal(bank.selectedIndex, 3);
+  assert.equal(bank.selectedName, "laser");
+});
+
+test("deleteSlot clears a slot to an empty placeholder", () => {
+  const bank = makeBank();
+  assert.equal(bank.deleteSlot(0), true);
+  assert.equal(bank.slots[0].empty, true);
+  assert.equal(bank.slots[0].name, "empty");
+  assert.equal(bank.selectedIndex, 3, "the selection stays put");
+  assert.equal(bank.select(0), false, "the cleared slot cannot be selected");
+});
+
+test("deleting the selected slot moves the selection to the nearest filled slot", () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  bank.slots[4].sound.waveform = "noise";
+  assert.equal(bank.deleteSlot(3), true);
+  assert.equal(bank.selectedIndex, 4);
+  assert.equal(bank.selectedName, "boom_big");
+  assert.equal(live.waveform, "noise", "the live sequence follows");
+});
+
+test("undo restores a deleted slot with its sound", () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  live.waveform = "saw"; // a live edit on the deleted slot
+  assert.equal(bank.deleteSlot(3), true);
+  assert.equal(bank.selectedName, "boom_big");
+  assert.equal(bank.undo(), true);
+  assert.equal(bank.selectedIndex, 3);
+  assert.equal(bank.selectedName, "laser");
+  assert.equal(bank.slots[3].empty, false);
+  assert.equal(live.waveform, "saw", "live edits before the delete survive");
+});
+
+test("deleteSlot refuses the last filled slot and empty slots", () => {
+  const bank = new SoundBank(() => createSoundSequence(), 0, [
+    { name: "only", empty: false },
+    { name: "empty", empty: true },
+  ]);
+  assert.equal(bank.deleteSlot(1), false, "already empty");
+  assert.equal(bank.deleteSlot(0), false, "the board keeps one sound");
+  assert.equal(bank.slots[0].empty, false);
+});
+
+test("a recycled placeholder gets the demo sound, not the deleted one", () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  bank.slots[0].sound.waveform = "noise";
+  bank.deleteSlot(0);
+  const index = bank.addSlot();
+  assert.equal(index, 0, "the first empty slot is refilled");
+  assert.equal(bank.slots[0].sound.waveform, "sine", "the sound was reset");
+  assert.equal(bank.slots[0].name, "sound_01");
+});
+
 test("addSlot fills the first empty placeholder, names and selects it", () => {
   const bank = makeBank();
   const index = bank.addSlot();

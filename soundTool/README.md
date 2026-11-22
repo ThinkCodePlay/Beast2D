@@ -56,12 +56,18 @@ opens a name editor (Enter commits, Escape cancels).
 
 The bank's last row is a persistent "+ new" row that adds a sound: it fills
 the first empty placeholder, or grows the bank once every slot is filled -
-there is no cap. The new slot gets the standard demo sound and an automatic
-name (renameable on the LCD), becomes the selection and scrolls into view.
-The bank panel shows fifteen slots at a time beside "+ new"; the scrollbar
-steps or drags the window (the mouse wheel works too), its thumb sizing to
-the visible share. In 3D the arrow buttons scroll and the thumb follows on
-its overlay.
+there is no cap. The new slot gets the standard demo sound (a recycled
+placeholder is reset, never resurrected with its deleted sound) and an
+automatic name (renameable on the LCD), becomes the selection and scrolls
+into view. Filled rows carry two small buttons on their right edge:
+duplicate copies the slot's sound into the first free slot as "<name>_2"
+and selects the copy; delete clears the slot back to an empty placeholder
+(the selected slot's deletion moves the selection to the nearest filled
+slot, and the board always keeps at least one sound). Delete also works
+from the keyboard (Del), as the footer help says. The bank panel shows
+fifteen slots at a time beside "+ new"; the scrollbar steps or drags the
+window (the mouse wheel works too), its thumb sizing to the visible share.
+In 3D the arrow buttons scroll and the thumb follows on its overlay.
 
 The six preset pads on the creation panel load ready-made game sounds - coin,
 power-up, jump, explosion, hit and enemy death - into the selected slot,

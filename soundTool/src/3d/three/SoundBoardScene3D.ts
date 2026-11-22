@@ -149,8 +149,8 @@ export class SoundBoardScene3D extends Container3D {
     // adds a slot on the "+ new" row. The mouse wheel steps the row window,
     // like the 2D rows.
     this.bankRows?.on("pointertap", (event) => {
-      const { y } = this.boardPoint(view, event.global);
-      this.bankRows!.rows.tapAt(y - BANK_ROWS_AREA.y);
+      const { x, y } = this.boardPoint(view, event.global);
+      this.bankRows!.rows.tapAt(x - BANK_ROWS_AREA.x, y - BANK_ROWS_AREA.y);
     });
     this.bankRows?.on("wheel", (event: FederatedWheelEvent) => {
       this.bank.setScrollOffset(

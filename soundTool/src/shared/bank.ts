@@ -287,8 +287,10 @@ export class SoundBank implements EditSession {
   /**
    * Add a sound through the bank's "+ new" row: fill the first empty
    * placeholder slot, or grow the bank when every slot holds a sound. The
-   * new slot gets an automatic name (renameable on the LCD) and becomes the
-   * selection, scrolled into view. Undoable. Returns its row index.
+   * new slot gets the standard demo sound (a recycled placeholder is reset,
+   * not resurrected with its deleted sound), an automatic name (renameable
+   * on the LCD) and becomes the selection, scrolled into view. Undoable.
+   * Returns its row index.
    */
   addSlot(): number {
     this.beginEdit();
@@ -303,6 +305,7 @@ export class SoundBank implements EditSession {
     }
     const slot = this.slots[index] as BankSlot;
     slot.empty = false;
+    copySoundSequence(this.createSound(), slot.sound);
     slot.name = `sound_${String(index + 1).padStart(2, "0")}`.slice(
       0,
       MAX_NAME_LENGTH,
@@ -311,6 +314,70 @@ export class SoundBank implements EditSession {
     this.ensureVisible(index);
     this.endEdit();
     return index;
+  }
+
+  /**
+   * Duplicate a filled slot's sound into the first empty placeholder, or
+   * grow the bank when every slot holds a sound. The copy takes the slot's
+   * current sound (live edits included when the slot is selected) and a
+   * free "<name>_2"-style name, and becomes the selection. Undoable.
+   * Returns the copy's row index, or null for an empty or missing slot.
+   */
+  duplicateSlot(index: number): number | null {
+    const source = this.slots[index];
+    if (!source || source.empty) return null;
+    this.beginEdit();
+    const sound = createSoundSequence();
+    copySoundSequence(
+      index === this._selectedIndex && this.active ? this.active : source.sound,
+      sound,
+    );
+    let target = this.slots.findIndex((slot) => slot.empty);
+    if (target === -1) {
+      target = this.slots.length;
+      (this.slots as BankSlot[]).push({
+        name: "",
+        empty: true,
+        sound: this.createSound(),
+      });
+    }
+    const slot = this.slots[target] as BankSlot;
+    slot.empty = false;
+    copySoundSequence(sound, slot.sound);
+    slot.name = this.uniqueCopyName(source.name);
+    this.select(target);
+    this.ensureVisible(target);
+    this.endEdit();
+    return target;
+  }
+
+  /**
+   * Delete a filled slot: it goes back to an empty placeholder and the row
+   * numbering stays put. Deleting the selected slot moves the selection to
+   * the nearest filled slot. The last filled slot cannot be deleted, so the
+   * board always has a selectable sound. Undoable. Returns whether the slot
+   * was deleted.
+   */
+  deleteSlot(index: number): boolean {
+    const slot = this.slots[index];
+    if (!slot || slot.empty) return false;
+    if (
+      this.slots.every(
+        (other, otherIndex) => other.empty || otherIndex === index,
+      )
+    )
+      return false;
+    this.beginEdit();
+    slot.empty = true;
+    slot.name = "empty";
+    if (index === this._selectedIndex) {
+      this._selectedIndex = this.nearestFilled(index);
+      if (this.active)
+        copySoundSequence(this.slots[this._selectedIndex].sound, this.active);
+    }
+    this.ensureVisible(this._selectedIndex);
+    this.endEdit();
+    return true;
   }
 
   /** Whether undo() has an edit to restore. */
@@ -392,6 +459,27 @@ export class SoundBank implements EditSession {
   /** The bank as one history snapshot: every slot plus the selection. */
   private capture(): HistoryEntry {
     return { slots: this.copySlots(), selectedIndex: this._selectedIndex };
+  }
+
+  /** First free "<base>_2"-style name, kept within MAX_NAME_LENGTH. */
+  private uniqueCopyName(base: string): string {
+    const taken = new Set(this.slots.map((slot) => slot.name));
+    for (let copy = 2; ; copy += 1) {
+      const suffix = `_${copy}`;
+      const name = base.slice(0, MAX_NAME_LENGTH - suffix.length) + suffix;
+      if (!taken.has(name)) return name;
+    }
+  }
+
+  /** Closest filled slot to a deleted one: the next row, else the previous. */
+  private nearestFilled(index: number): number {
+    for (let distance = 1; distance < this.slots.length; distance += 1) {
+      const next = this.slots[index + distance];
+      if (next && !next.empty) return index + distance;
+      const previous = this.slots[index - distance];
+      if (previous && !previous.empty) return index - distance;
+    }
+    return index; // Unreachable: deleteSlot refuses the last filled slot.
   }
 }
 

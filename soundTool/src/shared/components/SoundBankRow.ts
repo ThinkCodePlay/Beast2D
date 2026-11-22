@@ -5,9 +5,50 @@ const ROW_LEFT = 4;
 const NAME_LEFT = 36;
 const INDEX_COLUMN_WIDTH = 32;
 
+/** Edge of a filled row's small action buttons (duplicate, delete). */
+export const ROW_ACTION_SIZE = 11;
+const ROW_ACTION_GAP = 2;
+const ROW_ACTION_RIGHT_INSET = 2;
+
+/**
+ * A filled row's duplicate and delete buttons, right-aligned inside the row
+ * face, in row-local coordinates. Shared with BankRows' tap routing and the
+ * 3D scene, so the drawn buttons and their hit zones can never drift apart.
+ */
+export function rowActionZones(rowWidth: number): {
+  duplicate: { x: number; y: number; size: number };
+  delete: { x: number; y: number; size: number };
+} {
+  const y = Math.round((BANK_ROW_HEIGHT - ROW_ACTION_SIZE) / 2);
+  const deleteX =
+    ROW_LEFT + rowWidth - ROW_ACTION_RIGHT_INSET - ROW_ACTION_SIZE;
+  return {
+    duplicate: {
+      x: deleteX - ROW_ACTION_GAP - ROW_ACTION_SIZE,
+      y,
+      size: ROW_ACTION_SIZE,
+    },
+    delete: { x: deleteX, y, size: ROW_ACTION_SIZE },
+  };
+}
+
+/** Whether a row-local x lands on one of the row's action buttons. */
+export function rowActionAt(
+  rowWidth: number,
+  x: number,
+): "duplicate" | "delete" | null {
+  const zones = rowActionZones(rowWidth);
+  for (const action of ["duplicate", "delete"] as const) {
+    const zone = zones[action];
+    if (x >= zone.x - 1 && x <= zone.x + zone.size + 1) return action;
+  }
+  return null;
+}
+
 /**
  * One numbered sound-bank slot with an individual thin outline and cell
- * rules. Redraws itself when its selection state changes.
+ * rules. Filled rows carry small duplicate and delete buttons on their right
+ * edge. Redraws itself when its selection state changes.
  */
 export class SoundBankRow extends Container {
   private selected: boolean;
@@ -18,6 +59,7 @@ export class SoundBankRow extends Container {
     slotName: string,
     selected: boolean,
     private readonly rowWidth: number,
+    private readonly actions = false,
   ) {
     super();
     this.slotName = slotName;
@@ -44,7 +86,58 @@ export class SoundBankRow extends Container {
     this.addChild(drawRow(this.selected, this.rowWidth));
     this.addChild(createIndex(this.index, this.selected));
     this.addChild(createName(this.slotName, this.selected));
+    if (this.actions) {
+      const zones = rowActionZones(this.rowWidth);
+      this.addChild(drawActionButton(zones.duplicate, this.selected, "copy"));
+      this.addChild(drawActionButton(zones.delete, this.selected, "delete"));
+    }
   }
+}
+
+/** One small square row-action button with a chunky glyph. */
+function drawActionButton(
+  zone: { x: number; y: number; size: number },
+  selected: boolean,
+  kind: "copy" | "delete",
+): Graphics {
+  const face = selected ? 0xf2b954 : 0x1b1027;
+  const edge = selected ? 0x9a5b3c : 0x3f2652;
+  const ink = selected ? 0x392044 : 0xb88acb;
+  const button = new Graphics()
+    .rect(zone.x, zone.y, zone.size, zone.size)
+    .fill(face)
+    .rect(zone.x, zone.y, zone.size, 1)
+    .fill(edge)
+    .rect(zone.x, zone.y + zone.size - 1, zone.size, 1)
+    .fill(edge)
+    .rect(zone.x, zone.y, 1, zone.size)
+    .fill(edge)
+    .rect(zone.x + zone.size - 1, zone.y, 1, zone.size)
+    .fill(edge);
+  const gx = zone.x + 2;
+  const gy = zone.y + 2;
+  if (kind === "copy") {
+    // Two overlapping slot faces: the copy in front, down-left.
+    button
+      .rect(gx + 2, gy, 5, 5)
+      .fill(ink)
+      .rect(gx + 3, gy + 1, 3, 3)
+      .fill(face)
+      .rect(gx, gy + 2, 5, 5)
+      .fill(ink)
+      .rect(gx + 1, gy + 3, 3, 3)
+      .fill(face);
+  } else {
+    // A diagonal-pixel cross.
+    for (let i = 0; i < 7; i += 1) {
+      button
+        .rect(gx + i, gy + i, 1, 1)
+        .fill(ink)
+        .rect(gx + 6 - i, gy + i, 1, 1)
+        .fill(ink);
+    }
+  }
+  return button;
 }
 
 function drawRow(selected: boolean, width: number): Graphics {

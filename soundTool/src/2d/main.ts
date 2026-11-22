@@ -138,6 +138,11 @@ window.addEventListener("keydown", (event) => {
     bank.redo();
     return;
   }
+  // Delete clears the selected slot, as the footer's DEL help says.
+  if (event.key === "Delete") {
+    bank.deleteSlot(bank.selectedIndex);
+    return;
+  }
   if (event.key === "ArrowUp" || event.key === "ArrowDown") {
     event.preventDefault();
     bank.selectNext(event.key === "ArrowDown" ? 1 : -1);

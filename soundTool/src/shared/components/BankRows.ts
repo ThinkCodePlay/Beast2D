@@ -6,7 +6,7 @@ import {
   type FederatedWheelEvent,
 } from "pixi.js";
 import { VISIBLE_SLOT_ROWS, type SoundBank } from "../bank";
-import { BANK_ROW_HEIGHT, SoundBankRow } from "./SoundBankRow";
+import { BANK_ROW_HEIGHT, rowActionAt, SoundBankRow } from "./SoundBankRow";
 
 /** Rows' vertical offset inside the bank panel. */
 export const BANK_ROW_TOP = 109 / 3;
@@ -34,7 +34,8 @@ export class BankRows extends Container {
       this.eventMode = "static";
       this.cursor = "pointer";
       this.on("pointertap", (event: FederatedPointerEvent) => {
-        this.tapAt(event.getLocalPosition(this).y);
+        const point = event.getLocalPosition(this);
+        this.tapAt(point.x, point.y);
       });
       this.on("wheel", (event: FederatedWheelEvent) => {
         bank.setScrollOffset(bank.scrollOffset + Math.sign(event.deltaY));
@@ -44,18 +45,31 @@ export class BankRows extends Container {
   }
 
   /**
-   * The tap target at a local y, for pointer input in either renderer: the
-   * "+ new" row adds a slot, any other row selects its slot (empty slots
-   * ignore taps, per SoundBank).
+   * The tap target at a local point, for pointer input in either renderer:
+   * the "+ new" row adds a slot; on a filled row, its small right-edge
+   * buttons duplicate or delete that slot, and anywhere else selects it
+   * (empty slots ignore taps, per SoundBank).
    */
-  tapAt(y: number): void {
+  tapAt(x: number, y: number): void {
     const windowRow = Math.floor(y / BANK_ROW_HEIGHT);
     if (windowRow === this.addRowIndex()) {
       this.bank.addSlot();
       return;
     }
     if (windowRow < 0 || windowRow > ADD_ROW) return;
-    this.bank.select(this.bank.scrollOffset + windowRow);
+    const index = this.bank.scrollOffset + windowRow;
+    const slot = this.bank.slots[index];
+    if (!slot || slot.empty) return;
+    const action = rowActionAt(this.rowWidth, x);
+    if (action === "duplicate") {
+      this.bank.duplicateSlot(index);
+      return;
+    }
+    if (action === "delete") {
+      this.bank.deleteSlot(index);
+      return;
+    }
+    this.bank.select(index);
   }
 
   /** Window row holding "+ new": after the last visible slot, capped at the window's last row. */
@@ -75,6 +89,7 @@ export class BankRows extends Container {
         bank.slots[index].name,
         index === bank.selectedIndex,
         this.rowWidth,
+        !bank.slots[index].empty,
       );
       // Row 04 sits 2/3px lower in the reference artwork.
       row.position.y =
