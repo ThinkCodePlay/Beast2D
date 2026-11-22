@@ -8,7 +8,7 @@ import {
   PlaneGeometry,
   View3D,
 } from '@pixi/3d';
-import type { FederatedPointerEvent, PointData, Renderer, Texture } from 'pixi.js';
+import type { FederatedPointerEvent, FederatedWheelEvent, PointData, Renderer, Texture } from 'pixi.js';
 import type { SoundSequence, WaveformType } from '../../shared/audio/model';
 import { MAX_NAME_LENGTH, type SoundBank } from '../../shared/bank';
 import type { SoundTransfer } from '../../shared/ui/soundFileTransfer';
@@ -62,6 +62,7 @@ export class SoundBoardScene3D extends Container3D {
   private waveformButtons: { type: WaveformType; button: Button3D }[] = [];
   private waveform?: WaveformDisplay3D;
   private bankRows?: BankRows3D;
+  private scrollThumb?: ScrollbarThumb3D;
   private lcd?: LcdDisplay3D;
 
   constructor(
@@ -103,10 +104,34 @@ export class SoundBoardScene3D extends Container3D {
   bindPointer(view: View3D): void {
     this.bindWaveformPaint(view);
     // Bank rows: a tap selects the tapped slot (empty slots ignore it) or
-    // adds a slot on the "+ new" row.
+    // adds a slot on the "+ new" row. The mouse wheel steps the row window,
+    // like the 2D rows.
     this.bankRows?.on('pointertap', (event) => {
       const { y } = this.boardPoint(view, event.global);
       this.bankRows!.rows.tapAt(y - BANK_ROWS_AREA.y);
+    });
+    this.bankRows?.on('wheel', (event: FederatedWheelEvent) => {
+      this.bank.setScrollOffset(this.bank.scrollOffset + Math.sign(event.deltaY));
+    });
+    // Scrollbar thumb: a press on the thumb drags it to scroll, tracked on
+    // the view so the drag survives leaving the track. The bare track and
+    // the arrow buttons keep their 2D behavior (nothing / step).
+    this.scrollThumb?.on('pointerdown', (event) => {
+      const grabOffset = this.scrollThumb!.grabOffsetAt(this.boardPoint(view, event.global).y - SCROLL_THUMB_AREA.y);
+      if (grabOffset === null) return;
+      const move = (e: FederatedPointerEvent): void => {
+        this.scrollThumb!.dragTo(this.boardPoint(view, e.global).y - SCROLL_THUMB_AREA.y, grabOffset);
+      };
+      const end = (): void => {
+        view.off('pointermove', move);
+        view.off('pointerup', end);
+        view.off('pointerupoutside', end);
+        view.off('pointercancel', end);
+      };
+      view.on('pointermove', move);
+      view.on('pointerup', end);
+      view.on('pointerupoutside', end);
+      view.on('pointercancel', end);
     });
     // LCD: a tap opens the name editor over the LCD's on-screen rectangle.
     this.lcd?.on('pointertap', () => {
@@ -287,7 +312,8 @@ export class SoundBoardScene3D extends Container3D {
     controls.push(this.lcd);
     this.bankRows = place(new BankRows3D(BANK_ROWS_AREA, renderer, this.bank), BANK_ROWS_AREA);
     controls.push(this.bankRows);
-    controls.push(place(new ScrollbarThumb3D(SCROLL_THUMB_AREA, renderer, this.bank), SCROLL_THUMB_AREA));
+    this.scrollThumb = place(new ScrollbarThumb3D(SCROLL_THUMB_AREA, renderer, this.bank), SCROLL_THUMB_AREA);
+    controls.push(this.scrollThumb);
 
     return controls;
   }
