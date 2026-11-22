@@ -4,6 +4,7 @@ import { PRESET_ICONS, type PresetTextures } from '../shared/components/PresetPa
 import { SoundBank } from '../shared/bank';
 import { createSoundSequence } from '../shared/audio/model';
 import { SoundPlayer } from '../shared/audio/SoundPlayer';
+import { createSoundTransfer } from '../shared/ui/soundFileTransfer';
 import { SoundBoardScene3D } from './three/SoundBoardScene3D';
 import { defaultNotes } from '../shared/ui/StepPitchGrid';
 
@@ -62,6 +63,7 @@ view3d.eventMode = 'static';
 const sequence = createSoundSequence(defaultNotes());
 const bank = new SoundBank(() => createSoundSequence(defaultNotes()));
 bank.activate(sequence);
+const transfer = createSoundTransfer(bank, sequence);
 const player = new SoundPlayer();
 let looping = false;
 const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures, sequence, bank, {
@@ -86,7 +88,7 @@ const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture,
       console.warn('Note preview could not start:', error);
     });
   },
-});
+}, transfer);
 // Arrow keys move the bank selection, as the footer help says (not while the
 // LCD's name editor is open - its input needs the arrows itself).
 window.addEventListener('keydown', (event) => {

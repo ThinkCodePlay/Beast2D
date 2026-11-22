@@ -41,7 +41,15 @@ import {
 } from '../../shared/components/SoundControlStrip';
 import { KNOBS } from '../../shared/dials';
 import { WAVEFORM_TYPES, type WaveformType } from '../../shared/audio/model';
-import { ROWS_WIDTH_INSET, SCROLL_BUTTON_SIZE, SCROLL_INSET, SCROLL_TRACK_TOP } from '../../shared/components/SoundBankPanel';
+import {
+  IO_BUTTON_TOP,
+  ioButtonXs,
+  ROWS_WIDTH_INSET,
+  SCROLL_BUTTON_SIZE,
+  SCROLL_INSET,
+  SCROLL_TRACK_TOP,
+} from '../../shared/components/SoundBankPanel';
+import { BANK_IO_BUTTON_SIZE } from '../../shared/components/BankIoButton';
 
 /** A control's face rectangle in board-design coordinates (top-left origin). */
 export interface ControlRect {
@@ -141,6 +149,18 @@ export const BANK_ROWS_AREA: ControlRect = {
   width: BANK_WIDTH - ROWS_WIDTH_INSET + 4, // The rows' drawn extent, including their 4px left offset.
   height: 16 * BANK_ROW_HEIGHT + 1,
 };
+
+/** The sound bank's import/export buttons on its strip (import left, export right). */
+export const BANK_IO_BUTTONS: (ControlRect & { direction: 'import' | 'export' })[] = (() => {
+  const { importX, exportX } = ioButtonXs(BANK_WIDTH);
+  return (['import', 'export'] as const).map((direction) => ({
+    direction,
+    x: BANK_LEFT + (direction === 'import' ? importX : exportX),
+    y: CONTENT_TOP + IO_BUTTON_TOP,
+    width: BANK_IO_BUTTON_SIZE,
+    height: BANK_IO_BUTTON_SIZE,
+  }));
+})();
 
 /** The sound bank's two scroll-arrow buttons. */
 export const SCROLL_ARROWS: (ControlRect & { up: boolean })[] = [true, false].map((up) => ({

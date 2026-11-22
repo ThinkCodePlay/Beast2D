@@ -127,6 +127,21 @@ export class SoundBank {
   }
 
   /**
+   * Replace the selected slot's sound and name, as an import does. Copies
+   * the incoming sound into the slot and into the live editor sequence, so
+   * the board plays and shows the new sound at once. A blank name keeps the
+   * old one. Notifies listeners once, so views refresh like a slot switch.
+   */
+  replaceSelected(sound: SoundSequence, name: string): void {
+    const slot = this.slots[this._selectedIndex];
+    copySoundSequence(sound, slot.sound);
+    if (this.active) copySoundSequence(sound, this.active);
+    const clean = name.trim().slice(0, MAX_NAME_LENGTH);
+    if (clean) slot.name = clean;
+    this.listeners.forEach(listener => listener(this._selectedIndex));
+  }
+
+  /**
    * Subscribe to selection and rename changes; the listener gets the selected
    * slot index. Returns an unsubscribe function.
    */

@@ -2,7 +2,9 @@ import { Container, Graphics, Text } from 'pixi.js';
 import { makePressable } from '../ui/Pressable';
 import type { ControlMode } from '../controls';
 import type { SoundBank } from '../bank';
+import type { SoundTransfer } from '../ui/soundFileTransfer';
 import { BANK_ROW_TOP, BankRows } from './BankRows';
+import { BANK_IO_BUTTON_SIZE, BankIoButton } from './BankIoButton';
 
 /** Panel width kept clear of the rows (the scrollbar's side). */
 export const ROWS_WIDTH_INSET = 24;
@@ -10,23 +12,47 @@ export const SCROLL_BUTTON_SIZE = 15;
 export const SCROLL_INSET = 2;
 export const SCROLL_TRACK_TOP = BANK_ROW_TOP;
 
+/** The import/export buttons sit on the panel's subtitle strip. */
+export const IO_BUTTON_TOP = 16;
+export const IO_BUTTON_GAP = 2;
+
+/**
+ * The buttons' x positions inside the panel: export rightmost, import beside
+ * it. Shared with the 3D layout so the meshes land on the same spots.
+ */
+export function ioButtonXs(width: number): { importX: number; exportX: number } {
+  const exportX = width - SCROLL_INSET - BANK_IO_BUTTON_SIZE;
+  return { importX: exportX - BANK_IO_BUTTON_SIZE - IO_BUTTON_GAP, exportX };
+}
+
 /** Shallow inset sound-bank area with a fine board-colored boundary. */
 export class SoundBankPanel extends Container {
-  constructor(width: number, height: number, bank: SoundBank | undefined, controls: ControlMode = '2d') {
+  constructor(width: number, height: number, bank: SoundBank | undefined, controls: ControlMode = '2d', io?: SoundTransfer) {
     super();
     this.addChild(drawFlatBoundary(width, height));
     this.addChild(createTitle());
-    this.addChild(createSubtitle());
-    // In '3d' mode the rows are left out so the 3D scene's live overlay can
-    // draw and hit-test them instead (see three/BankRows3D.ts).
+    // In '3d' mode the rows and import/export buttons are left out so the 3D
+    // scene can draw and hit-test its own (see three/BankRows3D.ts and
+    // BANK_IO_BUTTONS in three/controlLayout.ts).
     if (controls === '2d') {
       if (!bank) throw new Error('SoundBankPanel 2D mode needs the sound bank.');
       const rows = new BankRows(bank, width - ROWS_WIDTH_INSET, true);
       rows.position.set(0, BANK_ROW_TOP);
       this.addChild(rows);
+      if (io) this.addChild(...createIoButtons(width, io));
     }
     this.addChild(createScrollbar(width, height, controls));
   }
+}
+
+/** The import and export buttons on the strip, wired to the transfer. */
+function createIoButtons(width: number, io: SoundTransfer): BankIoButton[] {
+  const { importX, exportX } = ioButtonXs(width);
+  const importButton = new BankIoButton('import', io.importSelected);
+  importButton.position.set(importX, IO_BUTTON_TOP);
+  const exportButton = new BankIoButton('export', io.exportSelected);
+  exportButton.position.set(exportX, IO_BUTTON_TOP);
+  return [importButton, exportButton];
 }
 
 function drawFlatBoundary(width: number, height: number): Graphics {
@@ -50,15 +76,6 @@ function createTitle(): Text {
   });
   title.position.set(6, -2);
   return title;
-}
-
-function createSubtitle(): Text {
-  const subtitle = new Text({
-    text: 'RUN → GAME',
-    style: { fontFamily: 'monogram', fontSize: 13, fill: 0xb88acb }, resolution: 3,
-  });
-  subtitle.position.set(6, 17);
-  return subtitle;
 }
 
 function createScrollbar(width: number, height: number, controls: ControlMode): Container {

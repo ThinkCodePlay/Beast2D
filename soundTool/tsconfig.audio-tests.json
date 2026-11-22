@@ -3,12 +3,24 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022", "DOM"],
-    "types": ["node"],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "types": [
+      "node"
+    ],
     "strict": true,
     "skipLibCheck": true,
     "outDir": ".audio-tests",
     "rootDir": "."
   },
-  "include": ["src/shared/audio/*.ts", "src/shared/bank.ts", "tests/audio.test.ts", "tests/bank.test.ts"]
+  "include": [
+    "src/shared/audio/*.ts",
+    "src/shared/bank.ts",
+    "src/shared/soundFile.ts",
+    "tests/audio.test.ts",
+    "tests/bank.test.ts",
+    "tests/soundFile.test.ts"
+  ]
 }

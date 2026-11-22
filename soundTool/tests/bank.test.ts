@@ -138,3 +138,51 @@ test('renaming one slot leaves the others alone', () => {
   bank.select(3);
   assert.equal(bank.selectedName, 'zap');
 });
+
+test('replaceSelected swaps the selected slot\'s sound into the live sequence', () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  const incoming = createSoundSequence();
+  incoming.waveform = 'noise';
+  incoming.pitch = -5;
+  incoming.steps[0] = { note: 40, volume: 1, enabled: false };
+  const seen: number[] = [];
+  bank.onChange(index => seen.push(index));
+
+  bank.replaceSelected(incoming, 'imported');
+  assert.equal(bank.selectedName, 'imported');
+  assert.equal(live.waveform, 'noise');
+  assert.equal(live.pitch, -5);
+  assert.deepEqual(live.steps[0], { note: 40, volume: 1, enabled: false });
+  assert.deepEqual(seen, [3]);
+});
+
+test('replaceSelected keeps the imported sound in the slot across switches', () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  const incoming = createSoundSequence();
+  incoming.waveform = 'pulse';
+  bank.replaceSelected(incoming, 'zap');
+  bank.select(0); // live now holds slot 01's sound
+  bank.select(3); // and back
+  assert.equal(live.waveform, 'pulse');
+  assert.equal(bank.selectedName, 'zap');
+});
+
+test('replaceSelected edits the stored copy, not the imported object', () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  const incoming = createSoundSequence();
+  bank.replaceSelected(incoming, 'zap');
+  incoming.waveform = 'saw'; // later edits to the source must not leak in
+  assert.equal(live.waveform, 'sine');
+});
+
+test('replaceSelected with a blank name keeps the old name', () => {
+  const bank = makeBank();
+  bank.replaceSelected(createSoundSequence(), '   ');
+  assert.equal(bank.selectedName, 'laser');
+});

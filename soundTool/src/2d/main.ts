@@ -4,6 +4,7 @@ import { SoundBoardFrame } from '../shared/components/SoundBoardFrame';
 import { SoundBank } from '../shared/bank';
 import { createSoundSequence } from '../shared/audio/model';
 import { SoundPlayer } from '../shared/audio/SoundPlayer';
+import { createSoundTransfer } from '../shared/ui/soundFileTransfer';
 import { defaultNotes } from '../shared/ui/StepPitchGrid';
 
 const DISPLAY_WIDTH = 1536;
@@ -50,9 +51,10 @@ app.stage.hitArea = new Rectangle(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 const sequence = createSoundSequence(defaultNotes());
 const bank = new SoundBank(() => createSoundSequence(defaultNotes()));
 bank.activate(sequence);
+const transfer = createSoundTransfer(bank, sequence);
 const player = new SoundPlayer();
 let looping = false;
-const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, { bank, transport: {
+const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures, sequence, { bank, io: transfer, transport: {
   play: () => {
     void player.play(sequence).catch(error => {
       console.error('Sound playback failed:', error);

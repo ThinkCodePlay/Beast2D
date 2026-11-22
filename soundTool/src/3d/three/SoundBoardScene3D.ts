@@ -11,6 +11,7 @@ import {
 import type { FederatedPointerEvent, PointData, Renderer, Texture } from 'pixi.js';
 import type { SoundSequence, WaveformType } from '../../shared/audio/model';
 import { MAX_NAME_LENGTH, type SoundBank } from '../../shared/bank';
+import type { SoundTransfer } from '../../shared/ui/soundFileTransfer';
 import { canvasRectToCss, openNameEditor } from '../../shared/ui/nameEditor';
 import type { TransportActions } from '../../shared/transport';
 import { applyDial, dialSnap, dialValue, type KnobLabel } from '../../shared/dials';
@@ -21,12 +22,14 @@ import { KnobCap } from '../../shared/ui/PixelKnob';
 import { PresetPad, type PresetTextures } from '../../shared/components/PresetPad';
 import { RunButton } from '../../shared/components/RunButton';
 import { ScrollArrowButton } from '../../shared/components/SoundBankPanel';
+import { BankIoButton } from '../../shared/components/BankIoButton';
 import { SoundBoardFrame } from '../../shared/components/SoundBoardFrame';
 import type { TabIconTextures } from '../../shared/components/SoundBoardTabs';
 import { Button3D } from './Button3D';
 import { Knob3D } from './Knob3D';
 import { BOARD_WIDTH, BOARD_HEIGHT, CABINET_DEPTH, boardToWorld } from './boardSpace';
 import {
+  BANK_IO_BUTTONS,
   BANK_ROWS_AREA,
   LCD_DISPLAY,
   PRESET_PADS,
@@ -66,6 +69,7 @@ export class SoundBoardScene3D extends Container3D {
     private readonly sequence: SoundSequence,
     private readonly bank: SoundBank,
     private readonly transport: TransportActions,
+    private readonly io: SoundTransfer,
   ) {
     super();
     this.addChild(createCabinet(renderer, presetTextures, mascotTexture, tabIconTextures, sequence));
@@ -223,6 +227,18 @@ export class SoundBoardScene3D extends Container3D {
       bodyColor: 0x8e2b4a,
       renderer,
     }), RUN_BUTTON));
+
+    BANK_IO_BUTTONS.forEach(({ direction, ...rect }) => {
+      const button = new Button3D({
+        face: new BankIoButton(direction),
+        ...rect,
+        depth: 4,
+        bodyColor: 0x8a63a0,
+        renderer,
+      });
+      button.on('pointertap', direction === 'import' ? this.io.importSelected : this.io.exportSelected);
+      controls.push(place(button, rect));
+    });
 
     SCROLL_ARROWS.forEach(({ up, ...rect }) => {
       controls.push(place(new Button3D({
