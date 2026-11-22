@@ -18,7 +18,12 @@ export class WaveformSelector extends Container {
   }
 
   private select(type: WaveformType): void {
-    this.buttons.forEach(button => button.setSelected(button.type === type));
+    this.setSelected(type);
     this.onSelect(type);
+  }
+
+  /** Move the ring without firing onSelect (e.g. after a bank slot switch). */
+  setSelected(type: WaveformType): void {
+    this.buttons.forEach(button => button.setSelected(button.type === type));
   }
 }

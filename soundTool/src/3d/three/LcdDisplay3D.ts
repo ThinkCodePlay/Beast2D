@@ -30,6 +30,8 @@ export class LcdDisplay3D extends Container3D {
     });
     face.position.z = OVERLAY_FACE_Z;
     this.addChild(face);
+    this.eventMode = 'static';
+    this.cursor = 'text';
     bank.onChange(() => faceTexture.render());
   }
 }

@@ -9,8 +9,9 @@ import {
   View3D,
 } from '@pixi/3d';
 import type { FederatedPointerEvent, PointData, Renderer, Texture } from 'pixi.js';
-import type { SoundSequence } from '../../shared/audio/model';
-import type { SoundBank } from '../../shared/bank';
+import type { SoundSequence, WaveformType } from '../../shared/audio/model';
+import { MAX_NAME_LENGTH, type SoundBank } from '../../shared/bank';
+import { canvasRectToCss, openNameEditor } from '../../shared/ui/nameEditor';
 import type { TransportActions } from '../../shared/transport';
 import { applyDial, dialSnap, dialValue, type KnobLabel } from '../../shared/dials';
 import { valueTowardPoint } from '../../shared/ui/knobTurn';
@@ -42,6 +43,8 @@ import { LcdDisplay3D } from './LcdDisplay3D';
 import { WAVEFORM_FACE_Z, WaveformDisplay3D } from './WaveformDisplay3D';
 
 const FACE_RESOLUTION = 3; // Captures the 512-wide design at the canvas's 1536 pixels.
+/** World z of the flat live overlays (LCD, bank rows), just above the cabinet face. */
+const OVERLAY_WORLD_Z = 0.7;
 
 /**
  * The sound board as a 3D scene: a cabinet body with the flat board artwork
@@ -50,8 +53,10 @@ const FACE_RESOLUTION = 3; // Captures the 512-wide design at the canvas's 1536 
  */
 export class SoundBoardScene3D extends Container3D {
   private readonly knobs: { rotor: Knob3D; cx: number; cy: number; label: KnobLabel }[] = [];
+  private waveformButtons: { type: WaveformType; button: Button3D }[] = [];
   private waveform?: WaveformDisplay3D;
   private bankRows?: BankRows3D;
+  private lcd?: LcdDisplay3D;
 
   constructor(
     renderer: Renderer,
@@ -66,6 +71,21 @@ export class SoundBoardScene3D extends Container3D {
     this.addChild(createCabinet(renderer, presetTextures, mascotTexture, tabIconTextures, sequence));
     this.addChild(...this.createControls(renderer, presetTextures));
     this.addChild(createKeyLight());
+    bank.onChange(() => this.refreshFromSequence());
+  }
+
+  /**
+   * Re-read the sequence after a bank slot switch: rotors point at the new
+   * slot's dial values, the waveform ring and display follow, and the live
+   * dials re-apply to the player so what you hear matches the slot.
+   */
+  private refreshFromSequence(): void {
+    this.knobs.forEach(({ rotor, label }) => rotor.setValue(dialValue(label, this.sequence)));
+    this.waveformButtons.forEach(({ type, button }) => button.setSelected(type === this.sequence.waveform));
+    this.waveform?.display.refresh();
+    this.transport.setMasterVolume(this.sequence.masterVolume);
+    this.transport.setPan(this.sequence.pan);
+    this.transport.setCutoff(this.sequence.cut);
   }
 
   /**
@@ -79,6 +99,18 @@ export class SoundBoardScene3D extends Container3D {
     this.bankRows?.on('pointertap', (event) => {
       const { y } = this.boardPoint(view, event.global);
       this.bank.select(this.bankRows!.rows.slotAt(y - BANK_ROWS_AREA.y));
+    });
+    // LCD: a tap opens the name editor over the LCD's on-screen rectangle.
+    this.lcd?.on('pointertap', () => {
+      const canvas = document.querySelector('canvas');
+      if (!canvas) return;
+      const rect = this.screenRect(view, LCD_DISPLAY);
+      if (!rect) return;
+      openNameEditor(canvasRectToCss(canvas, rect), {
+        value: this.bank.selectedName,
+        maxLength: MAX_NAME_LENGTH,
+        onCommit: name => this.bank.rename(name),
+      });
     });
     this.knobs.forEach(({ rotor, cx, cy, label }) => {
       const turnToward = (global: PointData): void => {
@@ -123,6 +155,22 @@ export class SoundBoardScene3D extends Container3D {
     };
   }
 
+  /** A board-design rectangle's bounds in pixi screen space, or null behind the camera. */
+  private screenRect(view: View3D, rect: ControlRect): { x: number; y: number; width: number; height: number } | null {
+    const corners = [
+      boardToWorld(rect.x, rect.y),
+      boardToWorld(rect.x + rect.width, rect.y),
+      boardToWorld(rect.x, rect.y + rect.height),
+      boardToWorld(rect.x + rect.width, rect.y + rect.height),
+    ].map(({ x, y }) => view.worldToScreen({ x, y, z: OVERLAY_WORLD_Z }));
+    if (corners.some(corner => corner === null)) return null;
+    const xs = corners.map(corner => corner!.x);
+    const ys = corners.map(corner => corner!.y);
+    const left = Math.min(...xs);
+    const top = Math.min(...ys);
+    return { x: left, y: top, width: Math.max(...xs) - left, height: Math.max(...ys) - top };
+  }
+
   private createControls(renderer: Renderer, presetTextures: PresetTextures): Container3D[] {
     const controls: Container3D[] = [];
 
@@ -149,7 +197,7 @@ export class SoundBoardScene3D extends Container3D {
       }), rect));
     });
 
-    const waveformButtons = WAVEFORM_BUTTONS.map(({ type, ...rect }) => {
+    this.waveformButtons = WAVEFORM_BUTTONS.map(({ type, ...rect }) => {
       const button = new Button3D({
         face: new WaveformButton(type),
         ring: drawSelectionRing(rect.width, rect.height),
@@ -166,6 +214,7 @@ export class SoundBoardScene3D extends Container3D {
       controls.push(place(button, rect));
       return { type, button };
     });
+    const waveformButtons = this.waveformButtons;
 
     controls.push(place(new Button3D({
       face: new RunButton(),
@@ -198,7 +247,8 @@ export class SoundBoardScene3D extends Container3D {
 
     // Live flat overlays: the name LCD and the selectable bank rows, left out
     // of the cabinet's baked face artwork so they can change with the bank.
-    controls.push(place(new LcdDisplay3D(LCD_DISPLAY, renderer, this.bank), LCD_DISPLAY));
+    this.lcd = place(new LcdDisplay3D(LCD_DISPLAY, renderer, this.bank), LCD_DISPLAY);
+    controls.push(this.lcd);
     this.bankRows = place(new BankRows3D(BANK_ROWS_AREA, renderer, this.bank), BANK_ROWS_AREA);
     controls.push(this.bankRows);
 

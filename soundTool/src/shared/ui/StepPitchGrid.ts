@@ -70,6 +70,11 @@ export class StepPitchGrid extends Container {
     return true;
   }
 
+  /** Redraw from the sequence (e.g. after a bank slot switch). */
+  refresh(): void {
+    this.redraw();
+  }
+
   private redraw(): void {
     this.bars.clear();
     const usable = this.areaBottom - TOP_INSET;

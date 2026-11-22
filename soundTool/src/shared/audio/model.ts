@@ -52,6 +52,27 @@ export const NOTE_WINDOW = 24;
 /** Lowest note shown in the window: C4, middle C. */
 export const NOTE_WINDOW_BASE = 60;
 
+/**
+ * Copy every value of one sequence into another, in place, so components
+ * holding the target keep working. Used to swap per-slot sounds in and out
+ * of the editor's one live sequence. Both sequences have SEQUENCE_STEP_COUNT
+ * steps.
+ */
+export function copySoundSequence(from: SoundSequence, to: SoundSequence): void {
+  to.rate = from.rate;
+  to.waveform = from.waveform;
+  to.masterVolume = from.masterVolume;
+  to.pan = from.pan;
+  to.decay = from.decay;
+  to.pitch = from.pitch;
+  to.cut = from.cut;
+  for (let index = 0; index < SEQUENCE_STEP_COUNT; index += 1) {
+    to.steps[index].note = from.steps[index].note;
+    to.steps[index].volume = from.steps[index].volume;
+    to.steps[index].enabled = from.steps[index].enabled;
+  }
+}
+
 /** Clamp and round an incoming value to a valid step volume. */
 export function toStepVolume(value: number): StepVolume {
   return Math.max(0, Math.min(7, Math.round(value))) as StepVolume;

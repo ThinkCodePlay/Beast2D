@@ -56,7 +56,7 @@ export class SoundBoardFrame extends Container {
   readonly controls: SoundControlStrip;
   readonly footer: SoundBoardFooter;
 
-  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures, sequence: SoundSequence, options: SoundBoardFrameOptions = {}) {
+  constructor(presetTextures: PresetTextures, mascotTexture: Texture, tabIconTextures: TabIconTextures, private readonly sequence: SoundSequence, options: SoundBoardFrameOptions = {}) {
     super();
     const controls = options.controls ?? '2d';
     if (controls === '2d') this.scale.set(3);
@@ -82,5 +82,11 @@ export class SoundBoardFrame extends Container {
     this.footer.position.set(FOOTER_INSET, FOOTER_TOP);
 
     this.addChild(board, this.header, this.content, this.tabs, this.controls, this.footer);
+  }
+
+  /** Re-read the sequence in every caching view after a bank slot switch. */
+  refreshFromSequence(): void {
+    this.creationPanel.refreshFromSequence(this.sequence);
+    this.controls.refreshFromSequence(this.sequence);
   }
 }

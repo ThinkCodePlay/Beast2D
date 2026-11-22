@@ -1,5 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
-import type { SoundBank } from '../bank';
+import { MAX_NAME_LENGTH, type SoundBank } from '../bank';
+import { canvasRectToCss, openNameEditor } from '../ui/nameEditor';
 
 export const LCD_HEIGHT = 32;
 
@@ -7,6 +8,10 @@ export const LCD_HEIGHT = 32;
  * The sound-name LCD on the transport row: an inset plate whose text follows
  * the sound bank's selected slot. Subscribes to the bank, so it stays current
  * in whichever renderer hosts it (2D panel or 3D overlay texture).
+ *
+ * In 2D the LCD is also the name editor: tap it and an HTML input opens over
+ * the plate (see ui/nameEditor.ts); the typed name renames the selected slot.
+ * In 3D the scene hit-tests the LCD overlay mesh and opens the same editor.
  */
 export class SoundNameLcd extends Container {
   private readonly nameText: Text;
@@ -25,10 +30,25 @@ export class SoundNameLcd extends Container {
     this.nameText.position.set(8, 6);
     this.addChild(this.nameText);
     bank.onChange(() => this.setName(bank.selectedName));
+
+    this.eventMode = 'static';
+    this.cursor = 'text';
+    this.on('pointertap', () => openEditor(bank, this.getBounds()));
   }
 
   /** Show a sound name. */
   setName(name: string): void {
     this.nameText.text = name;
   }
+}
+
+/** Open the name editor over the LCD's on-screen rectangle. */
+function openEditor(bank: SoundBank, bounds: { x: number; y: number; width: number; height: number }): void {
+  const canvas = document.querySelector('canvas');
+  if (!canvas) return;
+  openNameEditor(canvasRectToCss(canvas, bounds), {
+    value: bank.selectedName,
+    maxLength: MAX_NAME_LENGTH,
+    onCommit: name => bank.rename(name),
+  });
 }

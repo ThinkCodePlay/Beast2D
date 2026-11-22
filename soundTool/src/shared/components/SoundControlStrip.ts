@@ -31,6 +31,8 @@ export interface SoundControlStripOptions {
 }
 
 export class SoundControlStrip extends Container {
+  private readonly knobControls: PixelKnob[] = [];
+
   constructor(width: number, height: number, sequence: SoundSequence, options: SoundControlStripOptions = {}) {
     super();
     const controls = options.controls ?? '2d';
@@ -48,9 +50,19 @@ export class SoundControlStrip extends Container {
         const control = new PixelKnob(knob.label, dialValue(knob.label, sequence), knob.color,
           dials ? (next) => applyDial(knob.label, next, sequence, dials) : undefined, dialSnap(knob.label));
         control.position.set(tileLeft + (KNOB_TILE_WIDTH - KNOB_SIZE) / 2, KNOB_TOP);
+        this.knobControls.push(control);
         this.addChild(control);
       }
     });
+  }
+
+  /**
+   * Re-read every dial from the sequence after a bank slot switch. The
+   * knobs' own change path re-applies the live dials (VOL/PAN/CUT) to the
+   * player, so what you hear matches the selected slot.
+   */
+  refreshFromSequence(sequence: SoundSequence): void {
+    this.knobControls.forEach((control, index) => control.setValue(dialValue(KNOBS[index].label, sequence)));
   }
 }
 

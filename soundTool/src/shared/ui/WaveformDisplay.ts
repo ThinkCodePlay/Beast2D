@@ -41,6 +41,12 @@ export class WaveformDisplay extends Container {
     this.addChild(this.volumeRow);
   }
 
+  /** Redraw both rows from the sequence (e.g. after a bank slot switch). */
+  refresh(): void {
+    this.pitchGrid.refresh();
+    this.volumeRow.refresh();
+  }
+
   /**
    * Edit the step under a display-local point, routing to the pitch grid or
    * the volume row by zone. Returns true when a value changed. Used by the 3D

@@ -60,7 +60,8 @@ const view3d = new View3D({
 view3d.eventMode = 'static';
 // The composition root owns the data and player, not either rendering component.
 const sequence = createSoundSequence(defaultNotes());
-const bank = new SoundBank();
+const bank = new SoundBank(() => createSoundSequence(defaultNotes()));
+bank.activate(sequence);
 const player = new SoundPlayer();
 let looping = false;
 const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture, tabIconTextures, sequence, bank, {
@@ -86,8 +87,10 @@ const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture,
     });
   },
 });
-// Arrow keys move the bank selection, as the footer help says.
+// Arrow keys move the bank selection, as the footer help says (not while the
+// LCD's name editor is open - its input needs the arrows itself).
 window.addEventListener('keydown', (event) => {
+  if (event.target instanceof HTMLInputElement) return;
   if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
     event.preventDefault();
     bank.selectNext(event.key === 'ArrowDown' ? 1 : -1);

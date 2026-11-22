@@ -52,6 +52,11 @@ export class StepVolumeRow extends Container {
     return true;
   }
 
+  /** Redraw from the sequence (e.g. after a bank slot switch). */
+  refresh(): void {
+    this.redraw();
+  }
+
   private redraw(): void {
     this.bars.clear();
     const floor = this.rowHeight - BASE_INSET;

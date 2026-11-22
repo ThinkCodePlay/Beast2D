@@ -1,40 +1,62 @@
+import { copySoundSequence, type SoundSequence } from './audio/model.js';
+
 /**
  * Sound bank state: the board's named sound slots and the current selection.
  * Kept free of Pixi, like the audio model, so the same state drives the 2D
  * panel, the 3D overlays and later the export format. Selection changes are
  * pushed to subscribers; rendering components only read and select.
+ *
+ * Each slot holds its own sound (notes, waveform and dial settings). The
+ * editor works on one live SoundSequence; switching slots copies the outgoing
+ * slot's sound out and the incoming slot's sound in, in place. Everything is
+ * in memory: nothing persists across a reload yet.
  */
 
-/** One bank slot: a named sound, or an empty slot that cannot be selected yet. */
-export interface BankSlot {
+/** Longest sound name the LCD and bank row take. */
+export const MAX_NAME_LENGTH = 14;
+
+/** Slot data without its sound: what the static defaults describe. */
+export interface BankSlotData {
   /** Row label; empty slots display as 'empty'. */
   name: string;
   /** Empty slots show dimmed and ignore selection. */
   empty: boolean;
 }
 
+/** One bank slot: a named sound, or an empty slot that cannot be selected yet. */
+export interface BankSlot extends BankSlotData {
+  /** The slot's own sound, kept whole across selection switches. */
+  sound: SoundSequence;
+}
+
 /**
  * The board's sixteen slots in display order: eight named game sounds, then
- * empty slots. Slot 01 is the first row. The names are placeholders until
- * slots hold real sounds.
+ * empty slots. Slot 01 is the first row. The names are placeholders the user
+ * can rename on the LCD.
  */
-export const DEFAULT_BANK_SLOTS: readonly BankSlot[] = [
+export const DEFAULT_BANK_SLOTS: readonly BankSlotData[] = [
   ...(['jump', 'coin', 'hit', 'laser', 'boom_big', 'power_up', 'enemy_die', 'select']
-    .map((name): BankSlot => ({ name, empty: false }))),
-  ...Array.from({ length: 8 }, (): BankSlot => ({ name: 'empty', empty: true })),
+    .map((name): BankSlotData => ({ name, empty: false }))),
+  ...Array.from({ length: 8 }, (): BankSlotData => ({ name: 'empty', empty: true })),
 ];
 
 /**
- * The bank's selection. Filled slots are selectable by tap or arrow keys;
- * empty slots are skipped. Listeners are notified only on an actual change.
+ * The bank's selection and per-slot sounds. Filled slots are selectable by
+ * tap or arrow keys; empty slots are skipped. Listeners are notified on an
+ * actual selection change or a rename of the selected slot.
  */
 export class SoundBank {
   readonly slots: readonly BankSlot[];
   private _selectedIndex: number;
+  private active?: SoundSequence;
   private readonly listeners = new Set<(index: number) => void>();
 
-  constructor(slots: readonly BankSlot[] = DEFAULT_BANK_SLOTS, selectedIndex = 3) {
-    this.slots = slots;
+  /**
+   * @param createSound Factory for a slot's starting sound; every slot gets
+   * its own copy. Called once per slot at construction.
+   */
+  constructor(createSound: () => SoundSequence, selectedIndex = 3, slots: readonly BankSlotData[] = DEFAULT_BANK_SLOTS) {
+    this.slots = slots.map(slot => ({ ...slot, sound: createSound() }));
     this._selectedIndex = selectedIndex;
   }
 
@@ -49,12 +71,27 @@ export class SoundBank {
   }
 
   /**
+   * Bind the editor's live sequence and load the selected slot's sound into
+   * it. Call once at startup, after the sequence exists.
+   */
+  activate(sequence: SoundSequence): void {
+    this.active = sequence;
+    copySoundSequence(this.slots[this._selectedIndex].sound, sequence);
+  }
+
+  /**
    * Select a filled slot by row index. Empty or out-of-range slots are
-   * ignored. Returns whether the selection changed.
+   * ignored. The outgoing slot keeps the editor's current sound; the incoming
+   * slot's sound loads into the editor. Returns whether the selection
+   * changed.
    */
   select(index: number): boolean {
     const slot = this.slots[index];
     if (!slot || slot.empty || index === this._selectedIndex) return false;
+    if (this.active) {
+      copySoundSequence(this.active, this.slots[this._selectedIndex].sound);
+      copySoundSequence(slot.sound, this.active);
+    }
     this._selectedIndex = index;
     this.listeners.forEach(listener => listener(index));
     return true;
@@ -76,8 +113,22 @@ export class SoundBank {
   }
 
   /**
-   * Subscribe to selection changes; the listener gets the new slot index.
-   * Returns an unsubscribe function.
+   * Rename the selected slot. The name is trimmed and capped at
+   * MAX_NAME_LENGTH; an empty result keeps the old name. Returns whether the
+   * name changed.
+   */
+  rename(name: string): boolean {
+    const clean = name.trim().slice(0, MAX_NAME_LENGTH);
+    const slot = this.slots[this._selectedIndex];
+    if (!clean || clean === slot.name) return false;
+    slot.name = clean;
+    this.listeners.forEach(listener => listener(this._selectedIndex));
+    return true;
+  }
+
+  /**
+   * Subscribe to selection and rename changes; the listener gets the selected
+   * slot index. Returns an unsubscribe function.
    */
   onChange(listener: (index: number) => void): () => void {
     this.listeners.add(listener);

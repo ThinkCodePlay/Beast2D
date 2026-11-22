@@ -48,6 +48,9 @@ export interface SoundCreationPanelOptions {
 }
 
 export class SoundCreationPanel extends Container {
+  private waveform?: WaveformDisplay;
+  private selector?: WaveformSelector;
+
   constructor(width: number, height: number, presetTextures: PresetTextures, sequence: SoundSequence, options: SoundCreationPanelOptions = {}) {
     super();
     const controls = options.controls ?? '2d';
@@ -60,13 +63,19 @@ export class SoundCreationPanel extends Container {
       const waveformTop = PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
       const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;
       // Pitch and volume edits both audition the edited step.
-      const waveform = new WaveformDisplay(width - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence, transport.audition, transport.audition);
-      waveform.position.set(WAVEFORM_LEFT_INSET, waveformTop);
-      this.addChild(waveform);
-      const selector = new WaveformSelector(sequence.waveform, PAD_STEP_X, (type) => { sequence.waveform = type; });
-      selector.position.set(PAD_GRID_LEFT, selectorTop);
-      this.addChild(selector);
+      this.waveform = new WaveformDisplay(width - WAVEFORM_LEFT_INSET - WAVEFORM_RIGHT_INSET, selectorTop - SELECTOR_TOP_GAP - waveformTop, sequence, transport.audition, transport.audition);
+      this.waveform.position.set(WAVEFORM_LEFT_INSET, waveformTop);
+      this.addChild(this.waveform);
+      this.selector = new WaveformSelector(sequence.waveform, PAD_STEP_X, (type) => { sequence.waveform = type; });
+      this.selector.position.set(PAD_GRID_LEFT, selectorTop);
+      this.addChild(this.selector);
     }
+  }
+
+  /** Re-read the sequence after a bank slot switch (2D mode only). */
+  refreshFromSequence(sequence: SoundSequence): void {
+    this.waveform?.refresh();
+    this.selector?.setSelected(sequence.waveform);
   }
 }
 

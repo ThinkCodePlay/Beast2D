@@ -31,10 +31,13 @@ shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
   drawn; its CC0 license is included alongside it.
 
 The sound bank has sixteen slots beside the creation panel and control
-strip. Tapping a filled slot (or pressing the up/down arrow keys) selects it
-- the row highlights and the LCD beside Play/Stop/Loop shows its name. Empty
-slots are skipped. The slot names are placeholders until slots hold real
-sounds.
+strip, each holding its own sound: notes, waveform and dial settings. Tapping
+a filled slot (or pressing the up/down arrow keys) loads its sound into the
+editor; the outgoing slot keeps its edits. Empty slots are skipped. The LCD
+beside Play/Stop/Loop shows the selected slot's name, and tapping the LCD
+opens a name editor (Enter commits, Escape cancels). Everything is in memory:
+nothing persists across a reload yet, and during playback a switch takes
+effect on the next Play, matching the existing snapshot semantics.
 
 ## Run
 

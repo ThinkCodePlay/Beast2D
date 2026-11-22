@@ -11,14 +11,16 @@ const INDEX_COLUMN_WIDTH = 32;
  */
 export class SoundBankRow extends Container {
   private selected: boolean;
+  private slotName: string;
 
   constructor(
     private readonly index: number,
-    private readonly slotName: string,
+    slotName: string,
     selected: boolean,
     private readonly rowWidth: number,
   ) {
     super();
+    this.slotName = slotName;
     this.selected = selected;
     this.draw();
   }
@@ -27,6 +29,13 @@ export class SoundBankRow extends Container {
   setSelected(selected: boolean): void {
     if (selected === this.selected) return;
     this.selected = selected;
+    this.draw();
+  }
+
+  /** Redraw with a new slot name (renamed on the LCD). */
+  setName(name: string): void {
+    if (name === this.slotName) return;
+    this.slotName = name;
     this.draw();
   }
 

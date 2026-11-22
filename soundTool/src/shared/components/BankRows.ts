@@ -31,7 +31,10 @@ export class BankRows extends Container {
       });
     }
     bank.onChange(selected => {
-      this.rows.forEach((row, index) => row.setSelected(index === selected));
+      this.rows.forEach((row, index) => {
+        row.setName(bank.slots[index].name);
+        row.setSelected(index === selected);
+      });
     });
   }
 
