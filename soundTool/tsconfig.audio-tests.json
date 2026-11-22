@@ -19,8 +19,10 @@
     "src/shared/audio/*.ts",
     "src/shared/bank.ts",
     "src/shared/soundFile.ts",
+    "src/shared/presets.ts",
     "tests/audio.test.ts",
     "tests/bank.test.ts",
-    "tests/soundFile.test.ts"
+    "tests/soundFile.test.ts",
+    "tests/presets.test.ts"
   ]
 }

@@ -3,6 +3,7 @@ import type { ControlMode } from '../controls';
 import type { TransportActions } from '../transport';
 import type { SoundBank } from '../bank';
 import { PAD_HEIGHT, PAD_WIDTH, PresetPad, type PresetIcon, type PresetTextures } from './PresetPad';
+import { applyPreset, isPresetKey, type PresetKey } from '../presets';
 import { PixelButton } from '../ui/PixelButton';
 import { RaisedPanelFrame } from '../ui/RaisedPanelFrame';
 import { SoundNameLcd } from './SoundNameLcd';
@@ -59,7 +60,14 @@ export class SoundCreationPanel extends Container {
     if (controls === '2d') {
       if (!options.transport) throw new Error('SoundCreationPanel 2D mode needs transport actions.');
       const transport = options.transport;
-      this.addChild(createPresetGrid(presetTextures));
+      const bank = options.bank;
+      if (!bank) throw new Error('SoundCreationPanel 2D mode needs the sound bank.');
+      this.addChild(createPresetGrid(presetTextures, (key) => {
+        // A pad tap loads its preset into the selected bank slot (Undo
+        // restores what was there) and plays it once, like a Play press.
+        applyPreset(bank, key);
+        transport.play();
+      }));
       const waveformTop = PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
       const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;
       // Pitch and volume edits both audition the edited step.
@@ -104,12 +112,13 @@ function createTransport(panelWidth: number, controls: ControlMode, transport?: 
   return row;
 }
 
-function createPresetGrid(presetTextures: PresetTextures): Container {
+function createPresetGrid(presetTextures: PresetTextures, onPreset?: (key: PresetKey) => void): Container {
   const grid = new Container();
   grid.position.set(PAD_GRID_LEFT, PAD_GRID_TOP);
   KEPT_PRESETS.forEach((icon, index) => {
     const pad = new PresetPad(icon, presetTextures, index === 0);
     pad.position.x = index * PAD_STEP_X;
+    if (onPreset && isPresetKey(icon)) pad.on('pointertap', () => onPreset(icon));
     grid.addChild(pad);
   });
   return grid;

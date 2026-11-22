@@ -19,6 +19,8 @@ shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
     the selection in both renderings.
   - `soundFile.ts`: the import/export JSON format, Pixi-free: one named sound
     per file, validated on the way in.
+  - `presets.ts`: the six preset sounds behind the creation panel's pads,
+    Pixi-free so both renderings and the tests share them.
   - `components/`: the board's panels and controls. Components take a
     `controls` mode: `'2d'` draws and wires the controls, `'3d'` draws flat
     artwork only so the 3D scene can place real meshes on top.
@@ -31,6 +33,8 @@ shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
   arrow-key movement, change notification).
 - `tests/soundFile.test.ts`: the sound-file format's round trip and its
   validation and clamping rules.
+- `tests/presets.test.ts`: the preset definitions (valid playable sequences,
+  export round trip) and the apply-then-undo flow.
 - The local `public/ui/monogram.ttf` pixel font is loaded before the board is
   drawn; its CC0 license is included alongside it.
 
@@ -41,12 +45,18 @@ editor; the outgoing slot keeps its edits. Empty slots are skipped. The LCD
 beside Play/Stop/Loop shows the selected slot's name, and tapping the LCD
 opens a name editor (Enter commits, Escape cancels).
 
-Two small buttons on the bank's top strip move one sound at a time: export
-downloads the selected slot as an editable JSON file named after it, and
-import loads a JSON file into the selected slot (with a confirmation, since
-the slot's sound is replaced). Everything else is in memory: nothing persists
-across a reload yet, and during playback a switch takes effect on the next
-Play, matching the existing snapshot semantics.
+The six preset pads on the creation panel load ready-made game sounds - coin,
+power-up, jump, explosion, hit and enemy death - into the selected slot,
+replacing its sound and name, and play the new sound once.
+
+Small buttons on the bank's top strip move sounds in and out and recover
+mistakes: export downloads the selected slot as an editable JSON file named
+after it, import loads a JSON file into the selected slot (with a
+confirmation, since the slot's sound is replaced), and undo restores the
+sound and name the last replacement - preset or import - overwrote, also via
+Ctrl/Cmd+Z. Undo keeps the newest ten replacements. Everything else is in
+memory: nothing persists across a reload yet, and during playback a switch
+takes effect on the next Play, matching the existing snapshot semantics.
 
 ## Run
 

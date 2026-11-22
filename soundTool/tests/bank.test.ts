@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_BANK_SLOTS, MAX_NAME_LENGTH, SoundBank } from '../src/shared/bank.js';
+import { DEFAULT_BANK_SLOTS, MAX_NAME_LENGTH, SoundBank, UNDO_LIMIT } from '../src/shared/bank.js';
 import { createSoundSequence } from '../src/shared/audio/model.js';
 
 function makeBank(selectedIndex = 3): SoundBank {
@@ -185,4 +185,70 @@ test('replaceSelected with a blank name keeps the old name', () => {
   const bank = makeBank();
   bank.replaceSelected(createSoundSequence(), '   ');
   assert.equal(bank.selectedName, 'laser');
+});
+
+test('undoLast restores the sound and name a replacement overwrote', () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  // Edit the live sequence so the slot's current sound is distinctive.
+  live.waveform = 'saw';
+  live.decay = 0.2;
+  live.steps[0].note = 66;
+  bank.rename('my_sound');
+
+  const incoming = createSoundSequence();
+  incoming.waveform = 'pulse';
+  bank.replaceSelected(incoming, 'zap');
+  assert.equal(bank.selectedName, 'zap');
+  assert.equal(bank.canUndo, true);
+
+  assert.equal(bank.undoLast(), true);
+  assert.equal(bank.selectedName, 'my_sound');
+  assert.equal(live.waveform, 'saw');
+  assert.equal(live.decay, 0.2);
+  assert.equal(live.steps[0].note, 66);
+  assert.equal(bank.canUndo, false);
+});
+
+test('undoLast restores the replaced slot even after the selection moved on', () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  bank.replaceSelected(createSoundSequence(), 'zap');
+  bank.select(0);
+
+  assert.equal(bank.undoLast(), true);
+  assert.equal(bank.selectedIndex, 3, 'the restored slot becomes the selection');
+  assert.equal(bank.selectedName, 'laser');
+});
+
+test('undoLast restores the stored slot sound, not just the live sequence', () => {
+  const bank = makeBank();
+  const live = createSoundSequence();
+  bank.activate(live);
+  live.waveform = 'saw';
+  bank.replaceSelected(createSoundSequence(), 'zap');
+  assert.equal(bank.undoLast(), true);
+  bank.select(0); // live now holds slot 01's sound
+  bank.select(3); // and back
+  assert.equal(live.waveform, 'saw');
+});
+
+test('undoLast with an empty history is a no-op', () => {
+  const bank = makeBank();
+  assert.equal(bank.canUndo, false);
+  assert.equal(bank.undoLast(), false);
+  assert.equal(bank.selectedIndex, 3);
+});
+
+test('undo history keeps only the newest UNDO_LIMIT replacements', () => {
+  const bank = makeBank();
+  for (let round = 0; round < UNDO_LIMIT + 2; round += 1) {
+    bank.replaceSelected(createSoundSequence(), `sound_${round}`);
+  }
+  for (let round = 0; round < UNDO_LIMIT; round += 1) {
+    assert.equal(bank.undoLast(), true, `undo ${round}`);
+  }
+  assert.equal(bank.undoLast(), false, 'the oldest replacements fall off');
 });

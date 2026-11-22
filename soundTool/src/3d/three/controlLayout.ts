@@ -43,13 +43,13 @@ import { KNOBS } from '../../shared/dials';
 import { WAVEFORM_TYPES, type WaveformType } from '../../shared/audio/model';
 import {
   IO_BUTTON_TOP,
-  ioButtonXs,
+  stripButtonXs,
   ROWS_WIDTH_INSET,
   SCROLL_BUTTON_SIZE,
   SCROLL_INSET,
   SCROLL_TRACK_TOP,
 } from '../../shared/components/SoundBankPanel';
-import { BANK_IO_BUTTON_SIZE } from '../../shared/components/BankIoButton';
+import { BANK_STRIP_BUTTON_SIZE, type BankStripAction } from '../../shared/components/BankStripButton';
 
 /** A control's face rectangle in board-design coordinates (top-left origin). */
 export interface ControlRect {
@@ -150,15 +150,16 @@ export const BANK_ROWS_AREA: ControlRect = {
   height: 16 * BANK_ROW_HEIGHT + 1,
 };
 
-/** The sound bank's import/export buttons on its strip (import left, export right). */
-export const BANK_IO_BUTTONS: (ControlRect & { direction: 'import' | 'export' })[] = (() => {
-  const { importX, exportX } = ioButtonXs(BANK_WIDTH);
-  return (['import', 'export'] as const).map((direction) => ({
-    direction,
-    x: BANK_LEFT + (direction === 'import' ? importX : exportX),
+/** The sound bank's strip buttons, left to right: undo, import, export. */
+export const BANK_STRIP_BUTTONS: (ControlRect & { action: BankStripAction })[] = (() => {
+  const { undoX, importX, exportX } = stripButtonXs(BANK_WIDTH);
+  const xs: Record<BankStripAction, number> = { undo: undoX, import: importX, export: exportX };
+  return (['undo', 'import', 'export'] as const).map((action) => ({
+    action,
+    x: BANK_LEFT + xs[action],
     y: CONTENT_TOP + IO_BUTTON_TOP,
-    width: BANK_IO_BUTTON_SIZE,
-    height: BANK_IO_BUTTON_SIZE,
+    width: BANK_STRIP_BUTTON_SIZE,
+    height: BANK_STRIP_BUTTON_SIZE,
   }));
 })();
 

@@ -93,6 +93,12 @@ const scene = new SoundBoardScene3D(app.renderer, presetTextures, mascotTexture,
 // LCD's name editor is open - its input needs the arrows itself).
 window.addEventListener('keydown', (event) => {
   if (event.target instanceof HTMLInputElement) return;
+  // Ctrl/Cmd+Z restores the sound a preset or import replaced.
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+    event.preventDefault();
+    bank.undoLast();
+    return;
+  }
   if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
     event.preventDefault();
     bank.selectNext(event.key === 'ArrowDown' ? 1 : -1);

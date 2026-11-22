@@ -1,4 +1,4 @@
-import { copySoundSequence, type SoundSequence } from './audio/model.js';
+import { copySoundSequence, createSoundSequence, type SoundSequence } from './audio/model.js';
 
 /**
  * Sound bank state: the board's named sound slots and the current selection.
@@ -10,10 +10,26 @@ import { copySoundSequence, type SoundSequence } from './audio/model.js';
  * editor works on one live SoundSequence; switching slots copies the outgoing
  * slot's sound out and the incoming slot's sound in, in place. Everything is
  * in memory: nothing persists across a reload yet.
+ *
+ * Replacing a slot's sound (import, preset) snapshots the slot first, so
+ * undoLast() restores exactly what was there: name, notes, waveform and
+ * dials. The history is single-purpose and shallow: replacements only,
+ * capped at UNDO_LIMIT entries.
  */
 
 /** Longest sound name the LCD and bank row take. */
 export const MAX_NAME_LENGTH = 14;
+
+/** Deepest undo history kept: one entry per replaced slot. */
+export const UNDO_LIMIT = 10;
+
+/** One undoable replacement: the slot's whole state before it was replaced. */
+interface UndoEntry {
+  /** Row the replacement happened on; Undo restores and re-selects it. */
+  index: number;
+  name: string;
+  sound: SoundSequence;
+}
 
 /** Slot data without its sound: what the static defaults describe. */
 export interface BankSlotData {
@@ -49,6 +65,7 @@ export class SoundBank {
   readonly slots: readonly BankSlot[];
   private _selectedIndex: number;
   private active?: SoundSequence;
+  private readonly undoStack: UndoEntry[] = [];
   private readonly listeners = new Set<(index: number) => void>();
 
   /**
@@ -134,11 +151,37 @@ export class SoundBank {
    */
   replaceSelected(sound: SoundSequence, name: string): void {
     const slot = this.slots[this._selectedIndex];
+    this.pushUndo();
     copySoundSequence(sound, slot.sound);
     if (this.active) copySoundSequence(sound, this.active);
     const clean = name.trim().slice(0, MAX_NAME_LENGTH);
     if (clean) slot.name = clean;
     this.listeners.forEach(listener => listener(this._selectedIndex));
+  }
+
+  /** Whether undoLast() has a replacement to restore. */
+  get canUndo(): boolean {
+    return this.undoStack.length > 0;
+  }
+
+  /**
+   * Restore the slot state from before the most recent replacement: name,
+   * notes, waveform and dials. The restored slot becomes the selection, even
+   * if the user moved on after the replacement. Returns whether anything was
+   * restored.
+   */
+  undoLast(): boolean {
+    const entry = this.undoStack.pop();
+    if (!entry) return false;
+    // Flush live edits back into the current slot first, as a switch does.
+    if (this.active) copySoundSequence(this.active, this.slots[this._selectedIndex].sound);
+    const slot = this.slots[entry.index];
+    copySoundSequence(entry.sound, slot.sound);
+    slot.name = entry.name;
+    this._selectedIndex = entry.index;
+    if (this.active) copySoundSequence(entry.sound, this.active);
+    this.listeners.forEach(listener => listener(entry.index));
+    return true;
   }
 
   /**
@@ -148,5 +191,15 @@ export class SoundBank {
   onChange(listener: (index: number) => void): () => void {
     this.listeners.add(listener);
     return () => { this.listeners.delete(listener); };
+  }
+
+  /** Snapshot the selected slot before a replacement, for undoLast(). */
+  private pushUndo(): void {
+    const slot = this.slots[this._selectedIndex];
+    const snapshot = createSoundSequence();
+    // The live sequence holds the slot's current sound while it is selected.
+    copySoundSequence(this.active ?? slot.sound, snapshot);
+    this.undoStack.push({ index: this._selectedIndex, name: slot.name, sound: snapshot });
+    if (this.undoStack.length > UNDO_LIMIT) this.undoStack.shift();
   }
 }

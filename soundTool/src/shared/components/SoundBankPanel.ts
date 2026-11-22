@@ -4,7 +4,7 @@ import type { ControlMode } from '../controls';
 import type { SoundBank } from '../bank';
 import type { SoundTransfer } from '../ui/soundFileTransfer';
 import { BANK_ROW_TOP, BankRows } from './BankRows';
-import { BANK_IO_BUTTON_SIZE, BankIoButton } from './BankIoButton';
+import { BANK_STRIP_BUTTON_SIZE, BankStripButton } from './BankStripButton';
 
 /** Panel width kept clear of the rows (the scrollbar's side). */
 export const ROWS_WIDTH_INSET = 24;
@@ -18,11 +18,13 @@ export const IO_BUTTON_GAP = 2;
 
 /**
  * The buttons' x positions inside the panel: export rightmost, import beside
- * it. Shared with the 3D layout so the meshes land on the same spots.
+ * it, undo leftmost. Shared with the 3D layout so the meshes land on the
+ * same spots.
  */
-export function ioButtonXs(width: number): { importX: number; exportX: number } {
-  const exportX = width - SCROLL_INSET - BANK_IO_BUTTON_SIZE;
-  return { importX: exportX - BANK_IO_BUTTON_SIZE - IO_BUTTON_GAP, exportX };
+export function stripButtonXs(width: number): { undoX: number; importX: number; exportX: number } {
+  const exportX = width - SCROLL_INSET - BANK_STRIP_BUTTON_SIZE;
+  const importX = exportX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP;
+  return { undoX: importX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP, importX, exportX };
 }
 
 /** Shallow inset sound-bank area with a fine board-colored boundary. */
@@ -31,28 +33,39 @@ export class SoundBankPanel extends Container {
     super();
     this.addChild(drawFlatBoundary(width, height));
     this.addChild(createTitle());
-    // In '3d' mode the rows and import/export buttons are left out so the 3D
+    // In '3d' mode the rows and strip buttons are left out so the 3D
     // scene can draw and hit-test its own (see three/BankRows3D.ts and
-    // BANK_IO_BUTTONS in three/controlLayout.ts).
+    // BANK_STRIP_BUTTONS in three/controlLayout.ts).
     if (controls === '2d') {
       if (!bank) throw new Error('SoundBankPanel 2D mode needs the sound bank.');
       const rows = new BankRows(bank, width - ROWS_WIDTH_INSET, true);
       rows.position.set(0, BANK_ROW_TOP);
       this.addChild(rows);
-      if (io) this.addChild(...createIoButtons(width, io));
+      this.addChild(...createStripButtons(width, bank, io));
     }
     this.addChild(createScrollbar(width, height, controls));
   }
 }
 
-/** The import and export buttons on the strip, wired to the transfer. */
-function createIoButtons(width: number, io: SoundTransfer): BankIoButton[] {
-  const { importX, exportX } = ioButtonXs(width);
-  const importButton = new BankIoButton('import', io.importSelected);
-  importButton.position.set(importX, IO_BUTTON_TOP);
-  const exportButton = new BankIoButton('export', io.exportSelected);
-  exportButton.position.set(exportX, IO_BUTTON_TOP);
-  return [importButton, exportButton];
+/**
+ * The strip buttons: undo leftmost, greyed out while the bank has nothing
+ * to restore, then import/export when a transfer is wired.
+ */
+function createStripButtons(width: number, bank: SoundBank, io?: SoundTransfer): BankStripButton[] {
+  const { undoX, importX, exportX } = stripButtonXs(width);
+  const undoButton = new BankStripButton('undo', () => bank.undoLast());
+  undoButton.position.set(undoX, IO_BUTTON_TOP);
+  undoButton.setEnabled(bank.canUndo);
+  bank.onChange(() => undoButton.setEnabled(bank.canUndo));
+  const buttons = [undoButton];
+  if (io) {
+    const importButton = new BankStripButton('import', io.importSelected);
+    importButton.position.set(importX, IO_BUTTON_TOP);
+    const exportButton = new BankStripButton('export', io.exportSelected);
+    exportButton.position.set(exportX, IO_BUTTON_TOP);
+    buttons.push(importButton, exportButton);
+  }
+  return buttons;
 }
 
 function drawFlatBoundary(width: number, height: number): Graphics {

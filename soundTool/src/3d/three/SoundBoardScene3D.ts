@@ -22,14 +22,15 @@ import { KnobCap } from '../../shared/ui/PixelKnob';
 import { PresetPad, type PresetTextures } from '../../shared/components/PresetPad';
 import { RunButton } from '../../shared/components/RunButton';
 import { ScrollArrowButton } from '../../shared/components/SoundBankPanel';
-import { BankIoButton } from '../../shared/components/BankIoButton';
+import { BankStripButton } from '../../shared/components/BankStripButton';
+import { applyPreset, isPresetKey } from '../../shared/presets';
 import { SoundBoardFrame } from '../../shared/components/SoundBoardFrame';
 import type { TabIconTextures } from '../../shared/components/SoundBoardTabs';
 import { Button3D } from './Button3D';
 import { Knob3D } from './Knob3D';
 import { BOARD_WIDTH, BOARD_HEIGHT, CABINET_DEPTH, boardToWorld } from './boardSpace';
 import {
-  BANK_IO_BUTTONS,
+  BANK_STRIP_BUTTONS,
   BANK_ROWS_AREA,
   LCD_DISPLAY,
   PRESET_PADS,
@@ -192,13 +193,20 @@ export class SoundBoardScene3D extends Container3D {
     });
 
     PRESET_PADS.forEach(({ icon, selected, ...rect }) => {
-      controls.push(place(new Button3D({
+      const button = new Button3D({
         face: new PresetPad(icon, presetTextures, selected),
         ...rect,
         facePadding: 3, // The selected pad's selection ring spills 3px past its face.
         bodyColor: selected ? 0xe0607f : 0xe87d50,
         renderer,
-      }), rect));
+      });
+      // A pad tap loads its preset into the selected bank slot (Undo restores
+      // what was there) and plays it once, like the 2D panel.
+      if (isPresetKey(icon)) button.on('pointertap', () => {
+        applyPreset(this.bank, icon);
+        this.transport.play();
+      });
+      controls.push(place(button, rect));
     });
 
     this.waveformButtons = WAVEFORM_BUTTONS.map(({ type, ...rect }) => {
@@ -228,15 +236,16 @@ export class SoundBoardScene3D extends Container3D {
       renderer,
     }), RUN_BUTTON));
 
-    BANK_IO_BUTTONS.forEach(({ direction, ...rect }) => {
+    BANK_STRIP_BUTTONS.forEach(({ action, ...rect }) => {
       const button = new Button3D({
-        face: new BankIoButton(direction),
+        face: new BankStripButton(action),
         ...rect,
         depth: 4,
         bodyColor: 0x8a63a0,
         renderer,
       });
-      button.on('pointertap', direction === 'import' ? this.io.importSelected : this.io.exportSelected);
+      if (action === 'undo') button.on('pointertap', () => this.bank.undoLast());
+      else button.on('pointertap', action === 'import' ? this.io.importSelected : this.io.exportSelected);
       controls.push(place(button, rect));
     });
 
