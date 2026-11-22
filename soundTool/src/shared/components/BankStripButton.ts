@@ -7,10 +7,16 @@ const GLYPH = 0x281638;
 
 /**
  * The bank strip's button actions, left to right: whole-bank import/export,
- * undo/redo, single-sound import/export.
+ * undo/redo, single-sound import/export, WAV export.
  */
 export type BankStripAction =
-  "undo" | "redo" | "import" | "export" | "bankImport" | "bankExport";
+  | "undo"
+  | "redo"
+  | "import"
+  | "export"
+  | "exportWav"
+  | "bankImport"
+  | "bankExport";
 
 /**
  * The sound bank's small strip buttons: chunky pixel squares in the
@@ -83,6 +89,20 @@ function drawGlyph(action: BankStripAction): Graphics {
         .rect(mirror(9), 4, 1, 5)
         .fill(GLYPH)
     );
+  }
+  if (action === "exportWav") {
+    // A mini waveform with an arrow pointing down: the sound as an audio file.
+    return glyph
+      .rect(2, 4, 1, 5)
+      .fill(GLYPH)
+      .rect(4, 2, 1, 9)
+      .fill(GLYPH)
+      .rect(6, 5, 1, 3)
+      .fill(GLYPH)
+      .rect(8, 2, 2, 4)
+      .fill(GLYPH)
+      .poly([7, 6, 11, 6, 9, 9])
+      .fill(GLYPH);
   }
   if (action === "bankImport" || action === "bankExport") {
     // The bank: a stack of slot rows, with an arrow leaving or entering it.

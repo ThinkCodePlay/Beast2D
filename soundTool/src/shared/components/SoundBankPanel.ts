@@ -15,15 +15,16 @@ export const SCROLL_TRACK_TOP = BANK_ROW_TOP;
 
 /**
  * The strip buttons (whole-bank import/export, undo/redo, single-sound
- * import/export) sit on the panel's subtitle strip.
+ * import/export, WAV export) sit on the panel's subtitle strip.
  */
 export const IO_BUTTON_TOP = 16;
 export const IO_BUTTON_GAP = 2;
 
 /**
- * The buttons' x positions inside the panel: single-sound export rightmost,
- * then import, redo and undo, with the whole-bank export/import pair
- * leftmost. Shared with the 3D layout so the meshes land on the same spots.
+ * The buttons' x positions inside the panel: WAV export rightmost, then
+ * single-sound export and import, redo and undo, with the whole-bank
+ * export/import pair leftmost. Shared with the 3D layout so the meshes
+ * land on the same spots.
  */
 export function stripButtonXs(width: number): {
   bankImportX: number;
@@ -32,8 +33,10 @@ export function stripButtonXs(width: number): {
   redoX: number;
   importX: number;
   exportX: number;
+  wavX: number;
 } {
-  const exportX = width - SCROLL_INSET - BANK_STRIP_BUTTON_SIZE;
+  const wavX = width - SCROLL_INSET - BANK_STRIP_BUTTON_SIZE;
+  const exportX = wavX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP;
   const importX = exportX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP;
   const redoX = importX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP;
   const undoX = redoX - BANK_STRIP_BUTTON_SIZE - IO_BUTTON_GAP;
@@ -45,6 +48,7 @@ export function stripButtonXs(width: number): {
     redoX,
     importX,
     exportX,
+    wavX,
   };
 }
 
@@ -78,15 +82,15 @@ export class SoundBankPanel extends Container {
 /**
  * The strip buttons: the whole-bank import/export pair leftmost, undo and
  * redo in the middle (greyed out while they have nothing to restore), then
- * the single-sound import/export. All wired only when a transfer is
- * provided, except undo/redo, which work on the bank alone.
+ * the single-sound import/export and the WAV export. All wired only when a
+ * transfer is provided, except undo/redo, which work on the bank alone.
  */
 function createStripButtons(
   width: number,
   bank: SoundBank,
   io?: SoundTransfer,
 ): BankStripButton[] {
-  const { bankImportX, bankExportX, undoX, redoX, importX, exportX } =
+  const { bankImportX, bankExportX, undoX, redoX, importX, exportX, wavX } =
     stripButtonXs(width);
   const undoButton = new BankStripButton("undo", () => bank.undo());
   undoButton.position.set(undoX, IO_BUTTON_TOP);
@@ -108,11 +112,14 @@ function createStripButtons(
     importButton.position.set(importX, IO_BUTTON_TOP);
     const exportButton = new BankStripButton("export", io.exportSelected);
     exportButton.position.set(exportX, IO_BUTTON_TOP);
+    const wavButton = new BankStripButton("exportWav", io.exportWav);
+    wavButton.position.set(wavX, IO_BUTTON_TOP);
     buttons.push(
       bankImportButton,
       bankExportButton,
       importButton,
       exportButton,
+      wavButton,
     );
   }
   return buttons;

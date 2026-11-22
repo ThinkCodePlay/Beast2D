@@ -1,6 +1,12 @@
 import type { SoundBank } from "../bank";
 import type { SoundSequence } from "../audio/model";
-import { parseSoundFile, serializeSound, soundFileName } from "../soundFile";
+import { encodeWav, renderSound } from "../audio/wav";
+import {
+  downloadFileName,
+  parseSoundFile,
+  serializeSound,
+  soundFileName,
+} from "../soundFile";
 import type { BankSnapshot } from "../bankStorage";
 import { BANK_FILE_NAME, parseBankFile, serializeBankFile } from "../bankFile";
 
@@ -16,6 +22,11 @@ import { BANK_FILE_NAME, parseBankFile, serializeBankFile } from "../bankFile";
 export interface SoundTransfer {
   /** Download the selected slot's sound as a JSON file named after it. */
   exportSelected(): void;
+  /**
+   * Download the selected slot's sound as a WAV audio file named after it:
+   * one pass rendered offline, exactly as Play sounds it.
+   */
+  exportWav(): void;
   /**
    * Pick a JSON sound file and load it into the selected slot, after a
    * confirmation, since the slot's current sound is replaced. Alerts and
@@ -62,6 +73,9 @@ export function createSoundTransfer(
     },
     importSelected(): void {
       void importIntoSelected(bank);
+    },
+    exportWav(): void {
+      void exportWavFile(bank.selectedName, liveSequence);
     },
     exportBank(): void {
       downloadTextFile(
@@ -126,11 +140,39 @@ async function importWholeBank(
   bank.endEdit();
 }
 
+/** The WAV export flow: render one pass offline, then download the file. */
+async function exportWavFile(
+  name: string,
+  sequence: SoundSequence,
+): Promise<void> {
+  try {
+    const rendered = await renderSound(sequence);
+    downloadBinaryFile(
+      downloadFileName(name, "wav"),
+      encodeWav(
+        [rendered.getChannelData(0), rendered.getChannelData(1)],
+        rendered.sampleRate,
+      ),
+    );
+  } catch (error) {
+    console.error("WAV export failed:", error);
+    window.alert("The sound could not be exported as WAV.");
+  }
+}
+
 /** Download text as a file through a temporary anchor. */
 function downloadTextFile(filename: string, text: string): void {
-  const url = URL.createObjectURL(
-    new Blob([text], { type: "application/json" }),
-  );
+  downloadBlob(filename, new Blob([text], { type: "application/json" }));
+}
+
+/** Download binary data as a file through a temporary anchor. */
+function downloadBinaryFile(filename: string, data: ArrayBuffer): void {
+  downloadBlob(filename, new Blob([data], { type: "audio/wav" }));
+}
+
+/** Download a blob as a file through a temporary anchor. */
+function downloadBlob(filename: string, blob: Blob): void {
+  const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;

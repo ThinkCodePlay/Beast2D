@@ -18,6 +18,7 @@ import {
   ringShareFromDial,
   validPitch,
 } from "./effects.js";
+import { createChannel, type SoundChannel } from "./channel.js";
 
 import { validRate } from "./rate.js";
 
@@ -406,22 +407,14 @@ export class SoundPlayer {
     for (const voice of playback.voices) voice.stop(now + STOP_FADE_SECONDS);
   }
 
-  /** Channel shared by playback and previews: gain into low-pass into panner. */
-  private createChannel(
-    context: AudioContext,
-  ): Pick<Playback, "output" | "filter" | "panner"> {
-    const output = context.createGain();
-    output.gain.value = this.masterVolume;
-    const filter = context.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = cutoffFromDial(this.cutDial);
-    const panner = context.createStereoPanner();
-    panner.pan.value = panFromDial(this.panDial);
-    // Fully open CUT is a true bypass, so the default sounds exactly as before.
-    if (this.cutDial >= 1) output.connect(panner);
-    else output.connect(filter).connect(panner);
-    panner.connect(context.destination);
-    return { output, filter, panner };
+  /** The board's channel: gain into low-pass into panner (see channel.ts). */
+  private createChannel(context: AudioContext): SoundChannel {
+    return createChannel(
+      context,
+      this.masterVolume,
+      this.cutDial,
+      this.panDial,
+    );
   }
 
   private release(playback: Playback): void {

@@ -17,8 +17,10 @@ shared core: a flat 2D board and a 3D cabinet. PixiJS + TypeScript + Vite.
   - `bank.ts`: the sound bank's slots and selection, Pixi-free like the audio
     model. Components subscribe to it; the name LCD and the bank rows follow
     the selection in both renderings.
-  - `soundFile.ts`: the import/export JSON format, Pixi-free: one named sound
-    per file, validated on the way in.
+  - `wav.ts`: the WAV export's offline render and 16-bit PCM encoding,
+    Pixi-free like the player, through the same channel (see `channel.ts`).
+- `soundFile.ts`: the import/export JSON format, Pixi-free: one named sound
+  per file, validated on the way in.
   - `presets.ts`: the six preset sounds behind the creation panel's pads,
     Pixi-free so both renderings and the tests share them.
   - `bankStorage.ts`: the localStorage snapshot format (all slots, selection,
@@ -75,7 +77,9 @@ replacing its sound and name, and play the new sound once.
 
 Small buttons on the bank's top strip move sounds in and out and recover
 mistakes: export downloads the selected slot as an editable JSON file named
-after it, import loads a JSON file into the selected slot (with a
+after it, WAV export downloads it as a playable audio file (one pass
+rendered offline, exactly as Play sounds it), import loads a JSON file
+into the selected slot (with a
 confirmation, since the slot's sound is replaced), and undo/redo step
 through the board's editing history, also via Ctrl/Cmd+Z and
 Ctrl/Cmd+Shift+Z (or Ctrl/Cmd+Y). The history covers every kind of edit -

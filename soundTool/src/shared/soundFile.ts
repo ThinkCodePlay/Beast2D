@@ -162,12 +162,17 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-/** A safe download filename for a slot name: lowercase ASCII plus .json. */
-export function soundFileName(name: string): string {
+/** A safe download filename for a slot name: lowercase ASCII plus the extension. */
+export function downloadFileName(name: string, extension: string): string {
   const base = name
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9_-]+/g, "_")
     .replace(/^_+|_+$/g, "");
-  return `${base || "sound"}.json`;
+  return `${base || "sound"}.${extension}`;
+}
+
+/** A safe download filename for a slot's sound file: lowercase ASCII plus .json. */
+export function soundFileName(name: string): string {
+  return downloadFileName(name, "json");
 }

@@ -373,15 +373,14 @@ export class SoundBoardScene3D extends Container3D {
           act === "undo" ? this.bank.undo() : this.bank.redo(),
         );
       } else {
-        const handler =
-          action === "import"
-            ? this.io.importSelected
-            : action === "export"
-              ? this.io.exportSelected
-              : action === "bankImport"
-                ? this.io.importBank
-                : this.io.exportBank;
-        button.on("pointertap", handler);
+        const handlers = {
+          import: this.io.importSelected,
+          export: this.io.exportSelected,
+          exportWav: this.io.exportWav,
+          bankImport: this.io.importBank,
+          bankExport: this.io.exportBank,
+        } as const;
+        button.on("pointertap", handlers[action]);
       }
       controls.push(place(button, rect));
     });
