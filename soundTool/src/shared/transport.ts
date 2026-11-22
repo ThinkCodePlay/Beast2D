@@ -6,6 +6,8 @@
 export interface TransportActions {
   /** Start a pass of the current sequence (snapshot semantics: later edits wait for the next Play). */
   play(): void;
+  /** Play the current sequence exactly once, whatever the loop latch says; the latch is unchanged. */
+  playOnce(): void;
   /** Fade out playback and previews. */
   stop(): void;
   /** Play a short preview of one edited step. */

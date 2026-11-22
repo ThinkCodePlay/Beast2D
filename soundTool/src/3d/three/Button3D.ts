@@ -27,6 +27,7 @@ const RING_PARKED_DEPTH = 20;
  */
 export class Button3D extends Container3D {
   private ringPlane?: Mesh3D;
+  private facePlane?: Mesh3D;
   private ringDepth = 0;
   private pressSink = 0;
   private held = false;
@@ -58,6 +59,7 @@ export class Button3D extends Container3D {
       receiveShadow: false,
     });
     facePlane.position.z = depth + 0.2;
+    this.facePlane = facePlane;
 
     this.addChild(body, facePlane);
     if (ring) this.addChild(this.createRingPlane(ring, faceSize, facePadding, depth, renderer));
@@ -71,6 +73,12 @@ export class Button3D extends Container3D {
     this.on('pointerup', release);
     this.on('pointerupoutside', release);
     this.on('pointercancel', release);
+  }
+
+  /** Dim the face and drop the pointer cursor while the action is unavailable. */
+  setEnabled(enabled: boolean): void {
+    if (this.facePlane) this.facePlane.material.alpha = enabled ? 1 : 0.45;
+    this.cursor = enabled ? 'pointer' : 'default';
   }
 
   /** Hold or release the sunken look for latched toggles like the loop button. */

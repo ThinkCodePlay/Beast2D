@@ -61,6 +61,12 @@ const board = new SoundBoardFrame(presetTextures, mascotTexture, tabIconTextures
       window.alert('Sound could not start. Tap Play to try again.');
     });
   },
+  playOnce: () => {
+    void player.play(sequence, { once: true }).catch(error => {
+      console.error('Sound playback failed:', error);
+      window.alert('Sound could not start. Tap Play to try again.');
+    });
+  },
   stop: () => player.stop(),
   toggleLoop: () => {
     looping = !looping;

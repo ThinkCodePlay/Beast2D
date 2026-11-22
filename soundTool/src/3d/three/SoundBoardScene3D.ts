@@ -201,10 +201,10 @@ export class SoundBoardScene3D extends Container3D {
         renderer,
       });
       // A pad tap loads its preset into the selected bank slot (Undo restores
-      // what was there) and plays it once, like the 2D panel.
+      // what was there) and plays it once, even while Loop is on.
       if (isPresetKey(icon)) button.on('pointertap', () => {
         applyPreset(this.bank, icon);
-        this.transport.play();
+        this.transport.playOnce();
       });
       controls.push(place(button, rect));
     });
@@ -244,8 +244,14 @@ export class SoundBoardScene3D extends Container3D {
         bodyColor: 0x8a63a0,
         renderer,
       });
-      if (action === 'undo') button.on('pointertap', () => this.bank.undoLast());
-      else button.on('pointertap', action === 'import' ? this.io.importSelected : this.io.exportSelected);
+      if (action === 'undo') {
+        // Dimmed while the bank has nothing to restore, like the 2D strip.
+        button.setEnabled(this.bank.canUndo);
+        this.bank.onChange(() => button.setEnabled(this.bank.canUndo));
+        button.on('pointertap', () => this.bank.undoLast());
+      } else {
+        button.on('pointertap', action === 'import' ? this.io.importSelected : this.io.exportSelected);
+      }
       controls.push(place(button, rect));
     });
 

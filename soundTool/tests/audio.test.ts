@@ -403,6 +403,27 @@ test('turning loop on during a one-shot play repeats from the next boundary, arm
   assert.equal(context.voices.length, 96);
   player.stop();
 });
+test('a one-shot play ignores the loop latch and leaves it untouched', async () => {
+  const { context, player } = setup();
+  const pass = 32 * STEP_SECONDS;
+  player.setLoopEnabled(true);
+  await player.play(createSoundSequence(), { once: true });
+  assert.equal(context.voices.length, 32);
+  // Toggling the latch mid-flight must not arm the one-shot either.
+  player.setLoopEnabled(false);
+  player.setLoopEnabled(true);
+  context.currentTime = 10.01 + pass - 0.2;
+  await wait(150);
+  assert.equal(context.voices.length, 32, 'no repeat is scheduled');
+  // The latch itself is untouched: the next regular Play loops again.
+  await player.play(createSoundSequence());
+  assert.equal(context.voices.length, 64);
+  context.currentTime = 10.02 + 2 * pass - 0.4;
+  await wait(150);
+  assert.equal(context.voices.length, 96, 'a regular Play still loops');
+  player.stop();
+});
+
 test('Stop during a loop cancels the pending pass; a restart keeps a single chain', async () => {
   const { context, player } = setup();
   player.setLoopEnabled(true);

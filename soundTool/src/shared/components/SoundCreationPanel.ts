@@ -64,9 +64,9 @@ export class SoundCreationPanel extends Container {
       if (!bank) throw new Error('SoundCreationPanel 2D mode needs the sound bank.');
       this.addChild(createPresetGrid(presetTextures, (key) => {
         // A pad tap loads its preset into the selected bank slot (Undo
-        // restores what was there) and plays it once, like a Play press.
+        // restores what was there) and plays it once, even while Loop is on.
         applyPreset(bank, key);
-        transport.play();
+        transport.playOnce();
       }));
       const waveformTop = PAD_GRID_TOP + PAD_HEIGHT + WAVEFORM_TOP_GAP;
       const selectorTop = height - WAVEFORM_BOTTOM_INSET - SELECTOR_HEIGHT;

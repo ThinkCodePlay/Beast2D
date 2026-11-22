@@ -35,6 +35,8 @@ interface Playback {
   nextPassStart?: number;
   /** The single pending pass-boundary check. */
   loopTimer?: ReturnType<typeof setTimeout>;
+  /** One-shot playback (preset audition): never loops, even when the latch is on. */
+  once?: boolean;
 }
 
 /** UI-free one-shot player. Each Play reads a snapshot, never the live editor. */
@@ -55,8 +57,13 @@ export class SoundPlayer {
 
   constructor(private readonly createContext = () => new AudioContext()) {}
 
-  /** Call directly from a click/tap so browser audio permission can unlock. */
-  async play(sequence: SoundSequence): Promise<void> {
+  /**
+   * Call directly from a click/tap so browser audio permission can unlock.
+   * With `once: true` the sound plays a single pass and stops, whatever the
+   * loop latch says; the latch itself is untouched and still applies to the
+   * next regular Play.
+   */
+  async play(sequence: SoundSequence, options?: { once?: boolean }): Promise<void> {
     if (this.disposed) return;
     this.stop();
     this.masterVolume = normalizedVolume(sequence.masterVolume);
@@ -90,13 +97,13 @@ export class SoundPlayer {
       throw new Error('Audio could not start. Tap Play to retry.');
     }
 
-    const playback: Playback = { ...this.createChannel(context), voices: new Set(), snapshot };
+    const playback: Playback = { ...this.createChannel(context), voices: new Set(), snapshot, once: options?.once === true };
     this.playback = playback;
     const start = context.currentTime + START_LEAD_SECONDS;
     try {
       this.schedulePass(context, playback, start);
       playback.nextPassStart = start + snapshot.passSeconds;
-      if (this.loopEnabled) this.armLoopTimer(playback, playback.nextPassStart);
+      if (this.loopEnabled && !playback.once) this.armLoopTimer(playback, playback.nextPassStart);
       if (playback.voices.size === 0 && !playback.loopTimer) this.release(playback);
     } catch (error) {
       this.stop();
@@ -111,7 +118,8 @@ export class SoundPlayer {
   setLoopEnabled(enabled: boolean): void {
     this.loopEnabled = enabled;
     const playback = this.playback;
-    if (!playback || playback.nextPassStart === undefined) return;
+    // A one-shot playback never picks up the latch mid-flight.
+    if (!playback || playback.nextPassStart === undefined || playback.once) return;
     if (enabled) {
       this.armLoopTimer(playback, playback.nextPassStart);
     } else if (playback.loopTimer) {
