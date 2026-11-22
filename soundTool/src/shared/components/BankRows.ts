@@ -71,7 +71,8 @@ export class BankRows extends Container {
   }
 }
 
-/** The persistent "+ new" row, styled like a slot row but inviting. */
+/** The persistent "+ new" row: a darker row face, with the label in the
+ *  enabled-name color so it reads as an actionable row, not a disabled one. */
 function createAddRow(width: number): Container {
   const row = new Container();
   row.addChild(new Graphics()
@@ -83,9 +84,10 @@ function createAddRow(width: number): Container {
     .rect(4 + width - 1, 1, 1, BANK_ROW_HEIGHT - 2).fill(0x180d24));
   const label = new Text({
     text: '+ new',
-    style: { fontFamily: '"Press Start 2P", monospace', fontSize: 7, fill: 0x8f6dab },
+    style: { fontFamily: 'monogram', fontSize: 15, fill: 0xffeaff }, resolution: 3,
   });
-  label.position.set(8, (BANK_ROW_HEIGHT - label.height) / 2);
+  label.anchor.set(0, 0.5);
+  label.position.set(40, BANK_ROW_HEIGHT / 2 - 1); // aligned with the slot names
   row.addChild(label);
   return row;
 }
